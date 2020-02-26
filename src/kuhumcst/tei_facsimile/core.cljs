@@ -9,7 +9,7 @@
   "tei")
 
 (def css
-  (style/patch-css (resource/inline "css/tei.css") prefix))
+  (style/prefix-css prefix (resource/inline "css/tei.css")))
 
 (def da-type
   {"conference" "Konference"
@@ -20,15 +20,18 @@
    "receiver"   "Modtager"
    "sender"     "Afsender"})
 
-(defn- rewrite*
+;; Needed for postprocessing content inside meander-rewrite.
+(declare postprocess)
+
+(defn- meander-rewrite
   [element]
   (m/rewrite element
     ;; Substitute TEI lists with HTML lists.
     [:list (m/or {:as ?attr}
-                 (m/let [?attr {}])) .
-     [:item !x] ...]
-    [:ul ?attr .
-     [:li !x] ...]
+                 (m/let [?attr {}]))
+     . [:item & _ :as !x] ...]
+    [:ul ?attr
+     . [:li (m/app postprocess [:<> !x])] ...]
 
     ;; Surround all ref attributes with hyperlinks.
     [_ {:ref  (m/some ?ref)
@@ -39,20 +42,22 @@
 
 (defn rewrite
   [hiccup]
-  (when-let [hiccup* (rewrite* hiccup)]
+  (when-let [hiccup* (meander-rewrite hiccup)]
     (fn [this] hiccup*)))
 
-(def transform
-  (xml/patch-fn prefix {} rewrite))
+(def postprocess
+  (let [xml-postprocessor (xml/postprocessor prefix {} rewrite)]
+    (memoize (partial rescope/postprocess xml-postprocessor))))
+
+(def parse
+  (memoize xml/parse))
 
 (defn tei-hiccup
-  "Transform and display TEI that has already been parsed as hiccup."
+  "Postprocess and display TEI that has already been parsed as hiccup."
   [hiccup]
-  (let [hiccup* (xml/transform transform hiccup)
-        tags    (rescope/hiccup->tags hiccup*)]
-    [rescope/scope hiccup* css tags]))
+  [rescope/scope (postprocess hiccup) css])
 
 (defn tei-xml
-  "Parse, transform and display TEI."
+  "Parse, postprocess, and display TEI."
   [xml]
-  [tei-hiccup (xml/parse xml)])
+  [tei-hiccup (parse xml)])
