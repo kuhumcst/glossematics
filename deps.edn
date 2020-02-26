@@ -1,9 +1,9 @@
 {:paths   ["src" "resources"]
  :deps    {org.clojure/clojurescript {:mvn/version "1.10.597"}
+           thheller/shadow-cljs      {:mvn/version "2.8.83"}
            kuhumcst/rescope          {:git/url "https://github.com/kuhumcst/rescope.git"
-                                      :sha     "7d1a1912b9efa21adec49a835d43d34593a05459"}}
+                                      :sha     "773dbc5c9759379e7e6f10ca6a40f7eb28705a37"}
+           meander/epsilon           {:mvn/version "0.0.387"}}
  :aliases {:dev  {:extra-paths ["dev"]
-                  :extra-deps  {thheller/shadow-cljs {:mvn/version "2.8.83"}
-                                reagent              {:mvn/version "0.9.1"}
-                                meander/epsilon      {:mvn/version "0.0.387"}}}
+                  :extra-deps  {reagent {:mvn/version "0.9.1"}}}
            :test {:extra-paths ["test"]}}}
