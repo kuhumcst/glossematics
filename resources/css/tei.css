@@ -79,7 +79,7 @@ add[place=above] {
 
 /* Assuming letters are written on a typewriter. */
 [type=letter] {
-    font-family: monospace;
+    font-family: Georgia, serif;
 }
 
 [rend=handwritten] {
