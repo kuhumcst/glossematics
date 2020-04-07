@@ -30,9 +30,8 @@
                                   (let [i (js/parseInt (.. e -target -value))]
                                     (swap! state assoc :i i)))}
      (for [n (range (count kvs))]
-       [:<> {:key n}
-        [nth-label n state]
-        [:span.tab-head__spacer]])]))
+       ^{:key n} [nth-label n state])
+     [:span.tab-head__spacer]]))
 
 (defn body
   "The currently selected body in the tab `state`."

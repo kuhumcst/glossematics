@@ -23,8 +23,9 @@
 (defn mk-kvs
   [filename]
   (let [tei (get tei-examples filename)]
-    [["Content" ^{:key tei} [facsimile/tei-xml tei]]
-     ["XML" [:pre [:code tei]]]]))
+    [["Tekst" ^{:key tei} [facsimile/tei-xml tei]]
+     ["TEI" [:pre [:code tei]]]
+     ["Test" [:pre [:code tei]]]]))
 
 (defonce tab-state
   (r/atom {:i   0
