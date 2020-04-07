@@ -3,7 +3,7 @@
             [shadow.resource :as resource]
             [reagent.core :as r]
             [reagent.dom :as rdom]
-            [kuhumcst.tei-facsimile.tab :as tab]
+            [kuhumcst.recap.tab :as tab]
             [kuhumcst.tei-facsimile.core :as facsimile]))
 
 (def tei-examples
@@ -23,13 +23,14 @@
 (defn mk-kvs
   [filename]
   (let [tei (get tei-examples filename)]
-    [["Tekst" ^{:key tei} [facsimile/tei-xml tei]]
-     ["TEI" [:pre [:code tei]]]
-     ["Test" [:pre [:code tei]]]]))
+    [["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
+     ["XML" [:pre [:code tei]]]
+     ["Noget andet" [:<>
+                     [:h1 "A title"]
+                     [:p "Something entirely different"]]]]))
 
 (defonce tab-state
-  (r/atom {:i   0
-           :kvs (mk-kvs "tei_example.xml")}))
+  (r/atom {:kvs (mk-kvs "tei_example.xml")}))
 
 (defn set-content!
   [filename]

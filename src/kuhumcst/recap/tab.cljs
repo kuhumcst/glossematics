@@ -1,20 +1,25 @@
-(ns kuhumcst.tei-facsimile.tab
+(ns kuhumcst.recap.tab
   "Tab components that rely entirely on external, derefable state, e.g. a ratom.
-  The `state` should always deref as a map of the keys:
+  The `state` should always deref as a map with the following required keys:
 
-    :i - the index of the currently selected tab.
     :kvs - key-value pairs of tab headers and bodies.
 
-  The tab `head` and `body` are, in principle, visually decoupled. However, a
-  merged view is available in the form of the `window` component.")
+  And optionally:
 
-(defn- nth-label
+    :i - the index of the currently selected tab.
+
+  The tab `head` and `body` are - in principle - decoupled. However, a merged
+  representation is available through the `window` component.")
+
+;;;; recap = (Reusable|Reactive|Reagent) Components for Academic Projects
+
+(defn- label
   "The header in the tab `state` at index `n`."
   [n state]
-  (let [{:keys [i kvs]} @state
+  (let [{:keys [i kvs] :or {i 0}} @state
         [k v] (nth kvs n)
         id (random-uuid)]
-    [:<> {:key id}                                          ; so checked works
+    [:<> {:key id}                                          ; make checked work
      [:input {:id        id
               :type      "radio"
               :checked   (= n i)
@@ -25,18 +30,19 @@
 (defn head
   "The headers available in the tab `state`."
   [state]
-  (let [{:keys [kvs]} @state]
-    [:form.tab-head {:on-change (fn [e]
-                                  (let [i (js/parseInt (.. e -target -value))]
-                                    (swap! state assoc :i i)))}
+  (let [{:keys [kvs]} @state
+        change-label (fn [e]
+                       (let [i (js/parseInt (.. e -target -value))]
+                         (swap! state assoc :i i)))]
+    [:form.tab-head {:on-change change-label}
      (for [n (range (count kvs))]
-       ^{:key n} [nth-label n state])
+       ^{:key n} [label n state])
      [:span.tab-head__spacer]]))
 
 (defn body
   "The currently selected body in the tab `state`."
   [state]
-  (let [{:keys [i kvs]} @state
+  (let [{:keys [i kvs] :or {i 0}} @state
         [_ v] (nth kvs i)]
     [:article.tab-body v]))
 
