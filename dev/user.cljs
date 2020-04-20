@@ -3,7 +3,7 @@
             [shadow.resource :as resource]
             [reagent.core :as r]
             [reagent.dom :as rdom]
-            [kuhumcst.recap.tab :as tab]
+            [kuhumcst.recap.tabs :as tabs]
             [kuhumcst.tei-facsimile.core :as facsimile]))
 
 (def tei-examples
@@ -26,24 +26,28 @@
     [["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
      ["XML" [:pre [:code tei]]]
      ["Noget andet" [:<>
-                     [:h1 "A title"]
-                     [:p "Something entirely different"]]]]))
+                     [:h1 "Noget andet indhold"]
+                     [:p "Her er ikke noget lige nu."]]]]))
 
-(defonce tab-state
-  (r/atom {:kvs (mk-kvs "tei_example.xml")}))
+(defonce tabs-state
+  (r/atom {:tabs (mk-kvs "tei_example.xml")}))
 
 (defn set-content!
   [filename]
-  (swap! tab-state assoc :kvs (mk-kvs filename)))
+  (swap! tabs-state assoc :tabs (mk-kvs filename)))
 
 (defn app
   []
   [:<>
-   [:select {:on-change (fn [e] (set-content! (.. e -target -value)))}
-    (for [[k _] (sort tei-examples)]
-      ^{:key k} [:option k])]
-   [:hr]
-   [tab/window tab-state]])
+   [:p {:style {:display         "flex"
+                :justify-content "flex-end"}}
+    [:select {:style     {:font-size "1rem"
+                          :padding   "0.4rem"}
+              :on-change (fn [e] (set-content! (.. e -target -value)))}
+     (for [[k _] (sort tei-examples)]
+       ^{:key k} [:option k])]]
+   ;; TODO: fix - it's error prone to copy-paste the CSS file from recap!
+   [tabs/tabs tabs-state {:tab-list-id "tei-tabs"}]])
 
 (def root
   (js/document.getElementById "app"))
