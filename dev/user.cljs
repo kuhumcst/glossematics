@@ -3,7 +3,7 @@
             [shadow.resource :as sr]
             [reagent.core :as r]
             [reagent.dom :as rdom]
-            [kuhumcst.recap.tabs :as tabs]
+            [kuhumcst.recap.widgets.tabs :as tabs]
             [kuhumcst.tei-facsimile.core :as facsimile]))
 
 (def initial-examples
@@ -34,12 +34,13 @@
 
 (defonce state
   (r/atom {:current-file "tei_example.xml"
-           :tabs-state   {:tabs (mk-tabs "tei_example.xml")}}))
+           :tabs         {:kvs (mk-tabs "tei_example.xml")
+                          :i   0}}))
 
 (defn set-content!
   [filename]
   (swap! state assoc :current-file filename)
-  (swap! state assoc-in [:tabs-state :tabs] (mk-tabs filename)))
+  (swap! state assoc-in [:tabs :kvs] (mk-tabs filename)))
 
 (defn app
   []
@@ -65,7 +66,7 @@
                                          (set-content! (.-name file))))))}]])]
 
    ;; TODO: fix - it's error prone to copy-paste the CSS file from recap!
-   [tabs/tabs (r/cursor state [:tabs-state]) {:tab-list-id "tei-tabs"}]])
+   [tabs/tabs (r/cursor state [:tabs]) {:tab-list-id "tei-tabs"}]])
 
 (def root
   (js/document.getElementById "app"))

@@ -1,78 +1,136 @@
 .tab-list {
     display: flex;
+    height: 36px; /* TODO: calculate dynamically? */
+
+    transition: var(--transition);
+
+    border: var(--transparent-border);
+    border-bottom: var(--border);
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
 }
 
-.tab-list .tab {
-    transition: background-color 0.3s;
-    cursor: pointer;
-    color: #222;
-    font-size: 14px;
-    font-family: Futura, sans-serif;
-    padding: 8px 40px;
-    margin: 0; /* Remove default button margin (for Safari). */
+.tab-list--drag-over {
+     background: var(--background);
+     border: var(--inactive-border);
+     border-bottom: var(--border);
+     box-shadow:
+         inset 8px 0px 16px -8px rgba(0,0,0,0.1),
+         inset -8px 0px 16px -8px rgba(0,0,0,0.1),
+         inset 0px -8px 16px -8px rgba(0,0,0,0.1);
+}
+
+.tab-list:empty {
+    background: var(--background);
+    border-radius: var(--border-radius);
+    border: var(--inactive-border);
+}
+
+.tab {
+    white-space: nowrap;
+    overflow: hidden; /* Also fixes internal drop area when dragging. */
+    text-overflow: ellipsis;
+    transition: var(--transition);
+    cursor: grab;
+    color: var(--color);
+    font-size: var(--font-size);
+    font-family: var(--heading-font-family);
+    padding: var(--padding) var(--padding-xl);
     display: inline-block;
-    background: #CCC;
+    background: var(--background);
+    filter: var(--inactive-filter);
     box-shadow:
         inset -8px 0px 8px -8px rgba(0,0,0,0.4),
         inset 0px -8px 8px -8px rgba(0,0,0,0.2);
-    border: 1px solid #888;
+    border: var(--border);
     border-right: none;
     text-transform: uppercase;
     letter-spacing: 2px;
+
+    /* Cover tab-list borders. */
+    margin-bottom: calc(0px - var(--border-width));
+    margin-top: calc(0px - var(--border-width));
 }
 
-.tab-list .tab[aria-selected="true"] ~ .tab {
+/* Cover tab-list borders. */
+.tab:first-child {
+    margin-left: calc(0px - var(--border-width));
+}
+.tab:last-child {
+    margin-right: calc(0px - var(--border-width));
+}
+
+.tab--drag {
+    pointer-events: none; /* Ignore certain strange hover events. */
+    transition:
+        var(--transition),
+        color 0s; /* Just looks better. */
+    border-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+    color: transparent;
+}
+
+/* Shouldn't transition at the end of tab-list. */
+.tab:last-child.tab--drag {
+    transition: all 0s;
+}
+
+/* Fixes issue with border... somehow! */
+.tab:first-child:last-child.tab--drag {
+    border: none;
+}
+
+.tab[aria-selected="true"] ~ .tab {
     box-shadow:
         inset 8px 0px 8px -8px rgba(0,0,0,0.4),
         inset 0px -8px 8px -8px rgba(0,0,0,0.2);
 }
 
-.tab-list .tab:first-child {
-    border-radius: 4px 0 0 0;
+.tab:first-child {
+    border-top-left-radius: var(--border-radius);
 }
 
-.tab-list .tab:nth-last-child(2) {
-    border-right: 1px solid #888;
-    border-radius: 0 4px 0 0;
+.tab:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-right: var(--border);
 }
 
 /* Keeping the outline (the default behaviour) sucks. */
-.tab-list .tab:active {
+.tab:active {
     outline: none;
 }
 
-.tab-list .tab:hover,
-.tab-list .tab:focus {
-    background-color: #EEE;
+/* :not(.tab-list--drag-parent) fixes Chrome :hover on adjacent element. */
+.tab-list:not(.tab-list--drag-parent) > .tab:hover,
+.tab:focus {
+    filter: var(--inactive-filter-focus);
 
     /* Fix missing outline border on infixed labels. */
     z-index: 1;
 }
 
-.tab-list .tab[aria-selected="true"] {
-    cursor: default;
-    background: white;
-    border-bottom: none;
-    padding-bottom: 9px; /* Re-adding 1px from missing border. */
+.tab[aria-selected="true"],
+.tab-list:not(.tab-list--drag-parent) > .tab[aria-selected="true"]:hover {
+    background: var(--background);
+    filter: var(--filter);
     box-shadow: none;
-}
 
-/* The spacer element is needed to draw the remaining bottom border. */
-.tab-list__spacer {
-    flex-grow: 1;
-    border-bottom: 1px solid #888;
-
-    /* Hide the internal text (... which provides a box with no css). */
-    color: transparent;
-    user-select: none;
+    /* Extra padding making up for missing border. */
+    border-bottom: none;
+    padding-bottom: calc(var(--padding) + var(--border-width));
 }
 
 .tab-panel {
-    border: 1px solid #888;
-    padding: 10px;
+    background: var(--background);
+    padding: var(--padding);
+    border: var(--border);
+    border-radius:  var(--border-radius);
 }
 
 /* The visual merging of tab-list and tab-panel is only based on placement. */
 .tab-list + .tab-panel {
     border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
