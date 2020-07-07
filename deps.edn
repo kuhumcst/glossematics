@@ -1,12 +1,15 @@
 {:paths   ["src" "resources"]
  :deps    {org.clojure/clojurescript {:mvn/version "1.10.773"}
-           thheller/shadow-cljs      {:mvn/version "2.10.14"}
+           thheller/shadow-cljs      {:mvn/version "2.10.21"}
+           ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
+           ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
+           ;kuhumcst/recap            {:local/root "/Users/rqf595/Code/recap"}}
            kuhumcst/cuphic           {:git/url "https://github.com/kuhumcst/cuphic.git"
-                                      :sha     "662b1733a786e19de8c34310ddd59b086c2f5ff0"}
+                                      :sha     "5122b24da9e1e723f4d1496b1acc98bc699d9d38"}
            kuhumcst/rescope          {:git/url "https://github.com/kuhumcst/rescope.git"
-                                      :sha     "195cc69d7b14fefb6532e74e47337d7b566207ff"}
-           kuhumcast/recap           {:git/url "https://github.com/kuhumcst/recap.git"
-                                      :sha     "1579e4b1f3df35cc883a687e9da44c70b8736f46"}}
+                                      :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
+           kuhumcst/recap            {:git/url "https://github.com/kuhumcst/recap.git"
+                                      :sha     "d721cdf31de0657d29fcec8883d0e667edc6376c"}}
  :aliases {:app  {:extra-paths ["dev"]
                   :extra-deps  {reagent {:mvn/version "0.10.0"}}}
            :test {:extra-paths ["test"]}}}

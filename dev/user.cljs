@@ -3,8 +3,9 @@
             [shadow.resource :as sr]
             [reagent.core :as r]
             [reagent.dom :as rdom]
-            [kuhumcst.recap.widgets.tabs :as tabs]
-            [kuhumcst.tei-facsimile.core :as facsimile]))
+            [recap.widgets.tabs :as tabs]
+            [tei-facsimile.core :as facsimile]
+            [clojure.string :as str]))
 
 (def initial-examples
   {"1151anno-anno-tei.xml"  (sr/inline "examples/tei/1151anno-anno-tei.xml")
@@ -27,14 +28,13 @@
   [filename]
   (let [tei (get @examples filename)]
     [["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
-     ["XML" [:pre [:code tei]]]
-     ["Noget andet" [:<>
-                     [:h1 "Noget andet indhold for " filename]
-                     [:p "Her er ikke noget lige nu."]]]]))
+     ["XML" [:pre {:style {:white-space "pre-wrap"}}
+             [:code
+              tei]]]]))
 
 (defonce state
-  (r/atom {:current-file "tei_example.xml"
-           :tabs         {:kvs (mk-tabs "tei_example.xml")
+  (r/atom {:current-file "test-1307-anno-tei.xml"
+           :tabs         {:kvs (mk-tabs "test-1307-anno-tei.xml")
                           :i   0}}))
 
 (defn set-content!
@@ -64,15 +64,22 @@
                                        (fn [s]
                                          (swap! examples assoc (.-name file) s)
                                          (set-content! (.-name file))))))}]])]
-
-   ;; TODO: fix - it's error prone to copy-paste the CSS file from recap!
-   [tabs/tabs (r/cursor state [:tabs]) {:tab-list-id "tei-tabs"}]])
-
+   [:div {:style {:max-width "100ch"
+                  :min-width "40ch"
+                  :margin    "0 auto"}}
+    [tabs/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
 (def root
   (js/document.getElementById "app"))
 
 (defn ^:dev/after-load render
   []
+  ;; TODO: dumb hack - do this another way
+  (defonce add-recap-styles
+    (let [style      (js/document.createElement "style")
+          root-style (str/replace-first recap.css/shadow-style ":host" ":root")]
+      (set! (.-innerHTML style) root-style)
+      (js/document.head.appendChild style)))
+
   (rdom/render [app] root))
 
 (defn start-dev
