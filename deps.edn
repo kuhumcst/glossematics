@@ -9,7 +9,7 @@
            kuhumcst/rescope          {:git/url "https://github.com/kuhumcst/rescope.git"
                                       :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/recap            {:git/url "https://github.com/kuhumcst/recap.git"
-                                      :sha     "d721cdf31de0657d29fcec8883d0e667edc6376c"}}
+                                      :sha     "2668835572a5523bc5a9f0f5543dd85ab1c31681"}}
  :aliases {:app  {:extra-paths ["dev"]
                   :extra-deps  {reagent {:mvn/version "0.10.0"}}}
            :test {:extra-paths ["test"]}}}

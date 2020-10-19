@@ -3,7 +3,7 @@
             [shadow.resource :as sr]
             [reagent.core :as r]
             [reagent.dom :as rdom]
-            [recap.widgets.tabs :as tabs]
+            [recap.component.widget.tabs :as tabs]
             [tei-facsimile.core :as facsimile]
             [clojure.string :as str]))
 
@@ -84,5 +84,5 @@
 
 (defn start-dev
   []
-  (println "Started development environment for kuhumcst/tei-facsimile.")
+  (println "Started development environment for kuhumcst/louis-hjelmslev.")
   (render))

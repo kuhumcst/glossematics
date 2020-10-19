@@ -2,7 +2,7 @@
   (:require [shadow.resource :as resource]
             [cuphic.core :as cup]
             [recap.css :as rc]
-            [recap.widgets.carousel :as carousel]
+            [recap.component.widget.carousel :as carousel]
             [rescope.core :as rescope]
             [rescope.helpers :as helpers]
             [rescope.style :as style]

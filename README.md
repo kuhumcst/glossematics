@@ -1,6 +1,8 @@
-tei-facsimile
-=============
-A facsimile viewer implemented as a [reagent](https://github.com/reagent-project/reagent) component using [rescope](https://github.com/kuhumcst/rescope). Displays facsimiles and transcriptions in parallel. Supports transcriptions written in a subset of the [TEI standard](https://tei-c.org/).
+Louis Hjelmslev
+===============
+Infrastrukturalisme is a joint project between the University of Copenhagen and Aarhus University. The project has the goal of publishing a web app to allow researchers from around the world to explore the life of the Danish linguist [Louis Hjelmslev](https://en.wikipedia.org/wiki/Louis_Hjelmslev) by making material available from previously unpublished primary sources, e.g. letters sent and received by the linguist.
+
+The web app includes a facsimile viewer implemented as a [reagent](https://github.com/reagent-project/reagent) component using [rescope](https://github.com/kuhumcst/rescope). Displays facsimiles and transcriptions in parallel. Supports transcriptions written in a subset of the [TEI standard](https://tei-c.org/).
 
 Development prerequisites
 -------------------------
