@@ -4,6 +4,19 @@ Infrastrukturalisme is a joint project between the University of Copenhagen and 
 
 The web app includes a facsimile viewer implemented as a [reagent](https://github.com/reagent-project/reagent) component using [rescope](https://github.com/kuhumcst/rescope). Displays facsimiles and transcriptions in parallel. Supports transcriptions written in a subset of the [TEI standard](https://tei-c.org/).
 
+Roadmap
+-------
+
+* Basic data transmission endpoint
+  - Try out [hanasu](https://github.com/jsa-aerial/hanasu)...?
+* Single sign-on
+  - WAYF is integrated with edugain
+    * Need to register (sign contract + 100 kr fee)
+  - Using Shibboleth-sp presumably
+    * Needs to run in either Tomcat or Jetty
+* Database
+  - Document, graph, or relational db...?
+
 Development prerequisites
 -------------------------
 The development workflow of the project itself is built around the [Clojure CLI](https://clojure.org/reference/deps_and_cli) for managing dependencies and [shadow-cljs](https://github.com/thheller/shadow-cljs) for compiling ClojureScript code and providing a live-reloading development environment.
