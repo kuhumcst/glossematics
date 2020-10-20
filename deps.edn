@@ -1,15 +1,23 @@
 {:paths   ["src" "resources"]
- :deps    {org.clojure/clojurescript {:mvn/version "1.10.773"}
-           thheller/shadow-cljs      {:mvn/version "2.10.21"}
+ :deps    {org.clojure/clojurescript    {:mvn/version "1.10.773"}
+           org.clojure/data.json        {:mvn/version "1.0.0"}
+           thheller/shadow-cljs         {:mvn/version "2.11.5"}
+           metabase/saml20-clj          {:mvn/version "2.0.0"}
+           io.pedestal/pedestal.service {:mvn/version "0.5.8"}
+           io.pedestal/pedestal.route   {:mvn/version "0.5.8"}
+           io.pedestal/pedestal.jetty   {:mvn/version "0.5.8"}
+           luminus/ring-ttl-session     {:mvn/version "0.3.3"}
+           org.slf4j/slf4j-simple       {:mvn/version "1.7.30"}
+           hiccup                       {:mvn/version "1.0.5"}
            ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
            ;kuhumcst/recap            {:local/root "/Users/rqf595/Code/recap"}}
-           kuhumcst/cuphic           {:git/url "https://github.com/kuhumcst/cuphic.git"
-                                      :sha     "5122b24da9e1e723f4d1496b1acc98bc699d9d38"}
-           kuhumcst/rescope          {:git/url "https://github.com/kuhumcst/rescope.git"
-                                      :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
-           kuhumcst/recap            {:git/url "https://github.com/kuhumcst/recap.git"
-                                      :sha     "2668835572a5523bc5a9f0f5543dd85ab1c31681"}}
+           kuhumcst/cuphic              {:git/url "https://github.com/kuhumcst/cuphic.git"
+                                         :sha     "5122b24da9e1e723f4d1496b1acc98bc699d9d38"}
+           kuhumcst/rescope             {:git/url "https://github.com/kuhumcst/rescope.git"
+                                         :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
+           kuhumcst/recap               {:git/url "https://github.com/kuhumcst/recap.git"
+                                         :sha     "2668835572a5523bc5a9f0f5543dd85ab1c31681"}}
  :aliases {:app  {:extra-paths ["dev"]
                   :extra-deps  {reagent {:mvn/version "0.10.0"}}}
            :test {:extra-paths ["test"]}}}
