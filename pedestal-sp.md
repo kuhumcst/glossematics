@@ -1,6 +1,20 @@
 Pedestal-sp
 ===========
-Enhance your [Pedestal](https://github.com/pedestal/pedestal) web service with [SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) 2.0 routes to turn to it a valid [Service Provider](https://en.wikipedia.org/wiki/Service_provider_(SAML)). Restrict your resources using the provided interceptor chains.
+Enhance your [Pedestal](https://github.com/pedestal/pedestal) web service with [SAML](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language) 2.0 routes to turn to it a valid [Service Provider](https://en.wikipedia.org/wiki/Service_provider_(SAML)).
+
+* [Why use this?](#why-use-this)
+* [Setup](#setup)
+* [SAML flow](#saml-flow)
+
+> _This project was made using [quephird/saml-test](https://github.com/quephird/saml-test) as a reference while applying the much more recent, actively developed fork of the [saml20-clj](https://github.com/metabase/saml20-clj) library by Metabase._
+
+Why use this?
+-------------
+In academia - as well as in the corporate  world - SAML is a very popular way to implement [Single Sign-On](https://en.wikipedia.org/wiki/Single_sign-on) (SSO) for web services.
+
+To log in to a web service, the so-called Service Provider (SP) must delegate login to one or more Identity Providers (IdP). A common way to do this is by setting up [Shibboleth-sp](https://wiki.shibboleth.net/confluence/display/SP3/Home) as a separate web service and then integrating that with your own web service through a fairly involved setup using a Java web server as the middle-man.
+
+Personally, I prefer to run my own code and just have that start a web server while being in control of the overall login flow. You should consider `Pedestal-sp` if you need users to log in through a SAML IdP and think integrating with Shibboleth-sp sounds too complex.
 
 Setup
 -----
@@ -10,9 +24,8 @@ Setup
 * `dk.cst.pedestal-sp.interceptors`: helpful Pedestal interceptors for SAML-authentication.
 * `dk.cst.pedestal-sp.example`: an example web service using the SAML routes and interceptors.
 
----
 
-Like Pedestal itself, `Pedestal-sp` is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config expanded using `dk.cst.pedestal-sp/expand-conf` and passed on to the `dk.cst.pedestal-sp/saml-routes` function - as well as any of the interceptors in `dk.cst.pedestal-sp.interceptors` that you choose to use.
+Like Pedestal itself, `Pedestal-sp` is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config expanded using `dk.cst.pedestal-sp/expand-conf` and passed on to the `dk.cst.pedestal-sp/saml-routes` function - as well as any of the interceptors in `dk.cst.pedestal-sp.interceptors` that you may choose to use.
 
 ### Mock IdP
 While developing your SAML SP, your probably want a mock IdP to develop up against. I followed the instructions at [quephird/saml-test](
@@ -53,21 +66,6 @@ Altogether, these 5 keys (`:idp-url`, `:idp-cert`, `:credential`, `:app-name`, `
 
 > _<a name="idp-caveat"><sup>†</sup></a> Depending on what IdP you're integrating with, additional steps might need to be taken. That is beyond the scope of this little setup guide._
 
-Why use this?
--------------
-In academia - as well as in the corporate  world - SAML is a very popular way to implement [Single Sign-On](https://en.wikipedia.org/wiki/Single_sign-on) (SSO) for web services.
-
-To log in to a web service, the so-called Service Provider (SP) must delegate login to one or more Identity Providers (IdP). A common way to do this is by setting up [Shibboleth-sp](https://wiki.shibboleth.net/confluence/display/SP3/Home) as a separate web service and then integrating that with your own web service through a fairly involved setup using a Java web server as the middle-man.
-
-Personally, I prefer to run my own code and just have that start a web server while being in control of its login flow.
-
-You should consider `Pedestal-sp` if you
-
-* need users to log in through a SAML IdP
-* like making web services in Clojure
-* dislike making web services in Java
-* think setting up Shibboleth-sp sounds a bit too complicated
-
 SAML flow
 ---------
 It is helpful to understand the flow of SAML and how it is represented in `Pedestal-sp`.
@@ -88,7 +86,3 @@ Our SP now receives signed data from the IdP which we decrypt and verify. This d
 From here on, we use a session cookie in the browser (named `pedestal-sp` by default) to verify the user's identity. The chain of authentication interceptors can be used to gate restricted resources at different endpoints.
 
 > _Note: there is also a separate endpoint available at `/saml/meta` whose sole job is to expose the metadata of our SP to the world._
-
-Acknowledgements
-----------------
-This was made using [quephird/saml-test](https://github.com/quephird/saml-test) as a reference, while applying the much more recent, actively developed fork of the [saml20-clj](https://github.com/metabase/saml20-clj) library by Metabase.

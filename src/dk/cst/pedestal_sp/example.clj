@@ -13,7 +13,7 @@
 
 (def conf
   (sp/expand-conf {:app-name   "Test SAML app"              ; EntityId in meta, ProviderName in request
-                   :sp-url     "http://localhost:8080"
+                   :sp-url     "https://localhost:4433"
                    :idp-url    "http://localhost:7000"
                    :idp-cert   (slurp "/Users/rqf595/Code/temp/saml-test/node_modules/saml-idp/idp-public-cert.pem")
                    :credential {:alias    "mylocalsp"
@@ -41,9 +41,9 @@
                               :value relay-state}])
                    [:button {:type "submit"}
                     "Log in"]]
-                  [:a {:href "/guarded"} "Visit something off-limits"]]])}))
+                  [:a {:href "/restricted"} "Visit something off-limits"]]])}))
 
-(defn guarded-page
+(defn restricted-page
   "Example page requiring SAML login."
   [req]
   (let [attrs        (get-in req [:session :assertions :attrs])
@@ -61,27 +61,39 @@
 (defn example-routes
   [conf]
   #{["/" :get (login-page conf) :route-name ::login-page]
-    ["/guarded" :get (conj (sp-ic/authorized conf) guarded-page) :route-name ::guarded-page]})
+    ["/restricted" :get (conj (sp-ic/authorized conf) restricted-page) :route-name ::restricted-page]})
 
 (def routes
   (route/expand-routes
     (set/union (example-routes conf)
                (sp/saml-routes conf))))
 
+(def hjelmslev-csp
+  {:default-src "'none'"
+   :script-src  "'self' 'unsafe-inline'"
+   :connect-src "'self'"
+   :img-src     "'self'"
+   :style-src   "'self' 'unsafe-inline'"
+   :base-uri    "'self'"})
+
 (def service-map
   (let [home (System/getProperty "user.home")
         jks  (str home "/_certifiable_certs/localhost-1d070e4/dev-server.jks")]
-    {::http/routes routes
-     ::http/type   :jetty
-     ::http/port   8080
+    {::http/routes            routes
+     ::http/type              :jetty
+     ::http/port              8080
 
-     ;; TODO: disabled for now, re-enable later
+     ;; TODO: move CSP stuff over to the hjelmslev service instead
+     ::http/resource-path     "/public"
+     ;; Using the starter policy from https://content-security-policy.com/ as a basis
+     ::http/secure-headers    {:content-security-policy-settings hjelmslev-csp}
+
      ;; Development-only keystore created using Bruce Hauman's Certifiable.
      ;; https://github.com/bhauman/certifiable#quick-start-command-line-usage
-     #_#_::http/container-options {:ssl?         true
-                                   :ssl-port     4433       ; ports below 1024 require root permissions
-                                   :keystore     jks
-                                   :key-password "password"}}))
+     ::http/container-options {:ssl?         true
+                               :ssl-port     4433           ; ports below 1024 require root permissions
+                               :keystore     jks
+                               :key-password "password"}}))
 
 (defn start []
   (http/start (http/create-server service-map)))
