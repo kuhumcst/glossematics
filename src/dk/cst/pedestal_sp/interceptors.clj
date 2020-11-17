@@ -1,5 +1,6 @@
 (ns dk.cst.pedestal-sp.interceptors
-  (:require [saml20-clj.core :as saml]
+  (:require [clojure.pprint :refer [pprint]]
+            [saml20-clj.core :as saml]
             [saml20-clj.encode-decode :as saml-decode]
             [hiccup.core :as hiccup]
             [io.pedestal.log :as log]
@@ -41,17 +42,50 @@
     (ic/interceptor
       {:name  ::session-guard
        :enter (fn [{:keys [request] :as ctx}]
-                (if-let [assertions (get-in request [:session :assertions])]
+                (if-let [saml (get-in request [:session :saml])]
                   ctx
                   (do
                     (log/warn :msg (str "Unauthorised: " request))
                     (assoc ctx :response (no-auth request)))))})))
 
-(defn authorized
-  "Tiny interceptor chain to make sure user is authorized to access a resource.
+(defn saml-logout
+  "Delete current SAML-related session info related to the user, i.e. log out.
+
+  This is an API endpoint by default, so it returns 204. That will not by itself
+  refresh the browser page, but a 303 redirect can be triggered by providing
+  a RelayState query parameter similar to how the SAML login response endpoint
+  works."
+  [{:keys [form-params] :as req}]
+  (let [{:keys [RelayState]} form-params
+        session (not-empty (update req :session dissoc :saml))]
+    (if RelayState
+      {:status  303
+       :headers {"Location" RelayState}
+       :session session}
+      {:status  204
+       :headers {}
+       :session session})))
+
+(defn restrictions
+  "Tiny interceptor chain to make sure user is authorised to access a resource.
   Should be used at the beginning of an interceptor chain."
   [conf]
   [(session conf) (session-guard conf)])
+
+(defn echo-saml-resp
+  "Handler echoing full SAML response (including assertions) in session store."
+  [req]
+  {:status  200
+   :headers {"Content-Type" "text/xml"}
+   :body    (get-in req [:session :saml :response])})
+
+(defn echo-saml-assertions
+  "Handler echoing SAML response assertions in session store."
+  [req]
+  {:status  200
+   :headers {"Content-Type"        "application/edn"
+             "Content-Disposition" "filename=\"assertions.edn\""}
+   :body    (with-out-str (pprint (get-in req [:session :saml :assertions])))})
 
 (defn saml-meta
   "SAML Metadata handler from an expanded `conf`. Returns the metadata as XML."
@@ -92,12 +126,13 @@
     :as   conf}]
   (fn [{:keys [form-params session] :as req}]
     (let [{:keys [SAMLResponse RelayState]} form-params
-          assertions (-> SAMLResponse
+          response   (-> SAMLResponse
                          saml-decode/base64->str
-                         saml/->Response
-                         (saml/validate idp-cert sp-private-key validation)
-                         saml/assertions)]
+                         (saml/validate idp-cert sp-private-key validation))
+          xml        (saml/->xml-string response)
+          assertions (saml/assertions response)]
       {:status  303
        ;; TODO: could there ever be more than one assertion map?
-       :session (assoc session :assertions (first assertions))
+       :session (assoc session :saml {:assertions (first assertions)
+                                      :response   xml})
        :headers {"Location" RelayState}})))

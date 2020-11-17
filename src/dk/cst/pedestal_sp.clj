@@ -6,8 +6,11 @@
             [ring-ttl-session.core :as ttl]))
 
 (def default-paths
-  {:saml      "/saml"
-   :saml-meta "/saml/meta"})
+  {:saml            "/saml"
+   :saml-meta       "/saml/meta"
+   :saml-logout     "/saml/logout"
+   :saml-response   "/saml/response"
+   :saml-assertions "/saml/assertions"})
 
 ;; TODO: also validate
 (defn expand-conf
@@ -56,15 +59,24 @@
       :paths paths*
       :session session*)))
 
-;; TODO: fetch conf from key in service map too
-;; User can specify :dk.cst.pedestal-sp instead of conf map to let interceptors
-;; know that they can fetch the conf map at that key in the service-map
 (defn saml-routes
   "Create SAML routes in table syntax based on a `conf` map."
   [{:keys [paths] :as conf}]
-  (let [{:keys [saml saml-meta]} paths]
+  (let [{:keys [saml
+                saml-meta
+                saml-logout
+                saml-response
+                saml-assertions]} paths
+        body-params  (body-params)
+        session      (ic/session conf)
+        restrictions (ic/restrictions conf)]
     #{[saml-meta :get (ic/saml-meta conf) :route-name ::saml-meta]
       [saml :get (ic/saml-req conf) :route-name ::saml-req]
-      [saml :post [(body-params)
-                   (ic/session conf)
-                   (ic/saml-resp conf)] :route-name ::saml-res]}))
+      [saml :post [body-params session (ic/saml-resp conf)] :route-name ::saml-resp]
+
+      ;; Logout endpoint, not connected to the standardised SAML flow
+      [saml-logout :post [body-params session `ic/saml-logout]]
+
+      ;; User-centric metadata for transparency, not related to SAML login flow
+      [saml-response :get (conj restrictions session `ic/echo-saml-resp)]
+      [saml-assertions :get (conj restrictions session `ic/echo-saml-assertions)]}))

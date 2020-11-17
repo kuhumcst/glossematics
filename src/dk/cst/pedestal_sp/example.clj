@@ -21,47 +21,63 @@
                                 :password (System/getenv "KEYSTORE_PASS")}}))
 
 (defn login-page
-  "Example login page handler from an expanded `conf`. Setting the query-param
-  RelayState will redirect there after successful SAML authentication."
-  [{:keys [app-name
-           acs-url]
-    :as   conf}]
-  (fn [{:keys [query-params] :as req}]
-    {:status  200
-     :headers {"Content-Type" "text/html"}
-     :body    (hiccup/html
-                [:html
-                 [:body
-                  [:h1 app-name]
-                  [:p "Example login form for logging in through an IdP."]
-                  [:form {:action acs-url}
-                   (when-let [relay-state (:RelayState query-params)]
-                     [:input {:type  "hidden"
-                              :name  "RelayState"
-                              :value relay-state}])
-                   [:button {:type "submit"}
-                    "Log in"]]
-                  [:a {:href "/restricted"} "Visit something off-limits"]]])}))
-
-(defn restricted-page
-  "Example page requiring SAML login."
-  [req]
-  (let [attrs        (get-in req [:session :assertions :attrs])
-        display-name (str (or (first (get attrs "firstName"))
-                              (first (get attrs "displayName"))
-                              "stranger"))]
-    {:status  200
-     :headers {"Content-Type" "text/html"}
-     :body    (hiccup/html
-                [:html
-                 [:body
-                  [:h1 "Congratulations!"]
-                  [:p "Seems like you made it through, " display-name "."]]])}))
+  "Example login page handler. Specifying the query-param RelayState will
+  redirect there after successful SAML authentication."
+  [conf]
+  (fn [{:keys [query-params session] :as req}]
+    (let [{:keys [app-name
+                  acs-url
+                  paths]} conf
+          {:keys [saml-meta
+                  saml-response
+                  saml-assertions
+                  saml-logout]} paths
+          logged-in? (:saml session)]
+      {:status  200
+       :headers {"Content-Type" "text/html"}
+       :body    (hiccup/html
+                  [:html
+                   [:body
+                    [:h1 app-name]
+                    [:p "Example login form for logging in through an IdP."]
+                    (if logged-in?
+                      [:form {:action saml-logout
+                              :method "post"}
+                       [:input {:type  "hidden"
+                                :name  "RelayState"
+                                :value "/"}]
+                       [:button {:type "submit"}
+                        "Log out"]]
+                      [:form {:action acs-url}
+                       (when-let [relay-state (:RelayState query-params)]
+                         [:input {:type  "hidden"
+                                  :name  "RelayState"
+                                  :value relay-state}])
+                       [:button {:type "submit"}
+                        "Log in"]])
+                    [:h2 "Available resources:"]
+                    [:ul
+                     [:li
+                      [:a {:href saml-meta}
+                       "SAML metadata"]]
+                     (if logged-in?
+                       [:li
+                        [:a {:href saml-response}
+                         "IdP response"]]
+                       [:li "⚠️ "
+                        [:a {:href saml-response}
+                         [:del "IdP response"]]])
+                     (if logged-in?
+                       [:li
+                        [:a {:href saml-assertions}
+                         "User assertions"]]
+                       [:li "⚠️ "
+                        [:a {:href saml-assertions}
+                         [:del "User assertions"]]])]]])})))
 
 (defn example-routes
   [conf]
-  #{["/" :get (login-page conf) :route-name ::login-page]
-    ["/restricted" :get (conj (sp-ic/authorized conf) restricted-page) :route-name ::restricted-page]})
+  #{["/" :get [(sp-ic/session conf) (login-page conf)] :route-name ::login]})
 
 (def routes
   (route/expand-routes
