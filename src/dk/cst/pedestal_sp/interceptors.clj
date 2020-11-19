@@ -1,10 +1,13 @@
 (ns dk.cst.pedestal-sp.interceptors
   (:require [clojure.pprint :refer [pprint]]
             [saml20-clj.core :as saml]
+            [saml20-clj.coerce :as coerce]
             [saml20-clj.encode-decode :as saml-decode]
             [hiccup.core :as hiccup]
             [io.pedestal.log :as log]
             [io.pedestal.interceptor :as ic]
+            [io.pedestal.interceptor.chain :as chain]
+            [io.pedestal.http.route :as route]
             [io.pedestal.http.ring-middlewares :as middlewares]))
 
 ;; https://github.com/ring-clojure/ring/wiki/Sessions
@@ -26,7 +29,8 @@
                  [:body
                   [:h1 "Login required"]
                   [:p "You must "
-                   [:a {:href (str (:saml paths) "?RelayState=" uri)} "log in"]
+                   [:a {:href (str (:saml-login paths) "?RelayState=" uri)}
+                    "log in"]
                    " before you can access this resource."]]])}))
 
 ;; TODO: optionally redirect to login page with RelayState set to current URL
@@ -39,14 +43,75 @@
 (defn session-guard
   [{:keys [no-auth] :as conf}]
   (let [no-auth (or no-auth (no-auth-resp conf))]
-    (ic/interceptor
-      {:name  ::session-guard
-       :enter (fn [{:keys [request] :as ctx}]
-                (if-let [saml (get-in request [:session :saml])]
-                  ctx
-                  (do
-                    (log/warn :msg (str "Unauthorised: " request))
-                    (assoc ctx :response (no-auth request)))))})))
+    (with-meta
+      (ic/interceptor
+        {:name  ::session-guard
+         :enter (fn [{:keys [request] :as ctx}]
+                  ;; TODO: needs more fine-grained approach than this
+                  (if-let [saml (get-in request [:session :saml :response])]
+                    ctx
+                    (do
+                      (log/warn :msg (str "Unauthorised: " request))
+                      (assoc ctx :response (no-auth request)))))})
+      ;; TODO: attach actual authz stuff
+      {:permit :authenticated})))
+
+(defn- get-ic*
+  [interceptors ic-name]
+  (loop [[ic & remaining] interceptors]
+    (cond
+      (= (:name ic) ic-name) ic
+      remaining (recur remaining))))
+
+(def ^:private get-ic
+  (memoize get-ic*))
+
+(defn ctx->router-ic
+  [ctx]
+  (get-ic (::chain/stack ctx) ::route/router))
+
+(defn routing-for
+  "Resolve routing for `query-string` and `verb` using the router in the `ctx`.
+  This is a modified version of `io.pedestal.http.route/try-routing-for`."
+  [ctx query-string verb]
+  (let [router-ic (ctx->router-ic ctx)
+        context   ((:enter router-ic) {:request {:path-info      query-string
+                                                 :request-method verb}})]
+    (:route context)))
+
+;; TODO: further investigate possibility of bidirectional route resolution
+(defn url-for
+  "Call *url-for* in `ctx` with `args`."
+  [{:keys [bindings] :as ctx} & args]
+  (let [*url-for* @(get bindings #'io.pedestal.http.route/*url-for*)]
+    (apply *url-for* args)))
+
+(defn restrictions
+  "Given a `routing` map for a single route, return the restrictions attached
+  as metadata to the ::session-guard interceptor.
+
+  Note: routing maps are returned by `routing-for`."
+  [{:keys [interceptors] :as routing}]
+  (:permit (meta (get-ic interceptors ::session-guard))))
+
+(defn authenticated?
+  "The presence of an IdP response is evidence of authentication."
+  [ctx]
+  (get-in ctx [:request :session :saml :response]))
+
+(defn permit?
+  "Is a `route` or `query-string` allowed within the current interceptor `ctx`?
+  Checks restrictions set by interceptor chain constructed with the permit fn."
+  ([ctx query-string verb]
+   (let [r (restrictions (routing-for ctx query-string verb))]
+     (or (not r)
+         (and (= r :authenticated)
+              (authenticated? ctx)))))
+  ([ctx route]
+   (let [query-string (if (keyword? route)
+                        (url-for ctx route)
+                        route)]
+     (permit? ctx query-string :get))))
 
 (defn saml-logout
   "Delete current SAML-related session info related to the user, i.e. log out.
@@ -66,11 +131,23 @@
        :headers {}
        :session session})))
 
-(defn restrictions
-  "Tiny interceptor chain to make sure user is authorised to access a resource.
-  Should be used at the beginning of an interceptor chain."
-  [conf]
-  [(session conf) (session-guard conf)])
+;; TODO: eventually delete, but keep for now as future API examples
+(comment
+  (permit :authenticated)
+  (permit {:role "blabala"
+           :ids  #{}})
+  (permit #(fn [session] ...)))
+
+(defn permit
+  "Create an interceptor chain to make sure that a user is authorised to access
+  a resource. The :authenticated restriction will simply ensure that the user
+  is authenticated by an IdP, but more detailed parameters can be specified too.
+
+  Note: return value should constitute the beginning of an interceptor chain."
+  [conf restriction]
+  (if (= restriction :authenticated)
+    [(session conf) (session-guard conf)]
+    (throw (ex-info "Unknown restriction" restriction))))
 
 (defn echo-saml-resp
   "Handler echoing full SAML response (including assertions) in session store."
@@ -79,13 +156,36 @@
    :headers {"Content-Type" "text/xml"}
    :body    (get-in req [:session :saml :response])})
 
+(defn echo-saml-req
+  "Handler echoing full SAML request in session store."
+  [req]
+  (if-let [saml-request (get-in req [:session :saml :request])]
+    {:status  200
+     :headers {"Content-Type" "text/xml"}
+     :body    saml-request}
+    {:status  404
+     :headers {}}))
+
 (defn echo-saml-assertions
   "Handler echoing SAML response assertions in session store."
   [req]
   {:status  200
    :headers {"Content-Type"        "application/edn"
              "Content-Disposition" "filename=\"assertions.edn\""}
-   :body    (with-out-str (pprint (get-in req [:session :saml :assertions])))})
+   :body    (-> (get-in req [:session :saml :assertions])
+                (pprint)
+                (with-out-str))})
+
+(defn echo-saml-session
+  "Handler echoing all current SAML-related information in session store."
+  [req]
+  (if-let [saml-session (get-in req [:session :saml])]
+    {:status  200
+     :headers {"Content-Type"        "application/edn"
+               "Content-Disposition" "filename=\"session.edn\""}
+     :body    (with-out-str (pprint saml-session))}
+    {:status  404
+     :headers {}}))
 
 (defn saml-meta
   "SAML Metadata handler from an expanded `conf`. Returns the metadata as XML."
@@ -110,10 +210,13 @@
            relay-state]
     :as   conf}]
   (fn [{:keys [query-params] :as req}]
-    (-> (saml/request (dissoc conf :relay-state))
-        (saml/idp-redirect-response idp-url (or (:RelayState query-params)
-                                                relay-state
-                                                "/")))))
+    (let [saml-request (saml/request (dissoc conf :relay-state))
+          relay-state* (or (:RelayState query-params)
+                           relay-state
+                           "/")]
+      (assoc (saml/idp-redirect-response saml-request idp-url relay-state*)
+        :session {:saml {:request     (coerce/->xml-string saml-request)
+                         :relay-state relay-state*}}))))
 
 ;; TODO: add error handler
 ;; TODO: validate response some more?
@@ -132,7 +235,20 @@
           xml        (saml/->xml-string response)
           assertions (saml/assertions response)]
       {:status  303
-       ;; TODO: could there ever be more than one assertion map?
-       :session (assoc session :saml {:assertions (first assertions)
-                                      :response   xml})
+       :session (update session :saml merge {:assertions assertions
+                                             :response   xml})
        :headers {"Location" RelayState}})))
+
+;; TODO: probably remove - left here for now
+(comment
+  (def echo-context
+    (ic/interceptor
+      {:name  ::echo-context
+       :enter (fn [ctx]
+                (assoc ctx
+                  :response {:status  200
+                             :body    (with-out-str (pprint ctx))
+                             :headers {"Content-Type" "text/plain"}}))}))
+
+  (def debug-routes
+    #{["/ctx" :get [`echo-context]]}))
