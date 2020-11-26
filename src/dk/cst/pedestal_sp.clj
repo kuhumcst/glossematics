@@ -4,8 +4,9 @@
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as saml-coerce]
             [ring-ttl-session.core :as ttl]
-            [dk.cst.pedestal-sp.spec :as sp-spec]
-            [dk.cst.pedestal-sp.interceptors :as sp-ic]))
+            [dk.cst.pedestal-sp.spec :as sp.spec]
+            [dk.cst.pedestal-sp.saml :as sp.saml]
+            [dk.cst.pedestal-sp.auth :as sp.auth]))
 
 (def ^:private default-paths
   {:saml-meta       "/saml/meta"
@@ -31,8 +32,8 @@
            session
            no-auth]
     :as   base-conf}]
-  {:pre  [(s/valid? ::sp-spec/config base-conf)]
-   :post [(s/valid? ::sp-spec/config %)]}
+  {:pre  [(s/valid? ::sp.spec/config base-conf)]
+   :post [(s/valid? ::sp.spec/config %)]}
   (let [{:keys [saml-login saml-meta] :as paths*} (merge default-paths paths)
         {:keys [cookie-attrs]} session
         max-age*       (or (:max-age cookie-attrs) (* 60 60 8))
@@ -64,12 +65,6 @@
       :paths paths*
       :session session*)))
 
-(defn authenticated?
-  [session]
-  (get-in session [:saml :assertions]))
-
-;; TODO: allow more detailed authorisation through `restrictions`
-;; TODO: make corresponding `authed?` function to gauge auth level from session
 (defn saml-routes
   "Create SAML routes in table syntax based on a `conf` map."
   [{:keys [paths] :as conf}]
@@ -80,19 +75,20 @@
                 saml-request
                 saml-response
                 saml-assertions]} paths
-        body-params   (body-params)
-        session       (sp-ic/session conf)
-        authenticated (sp-ic/permit conf :authenticated)]
+        body-params    (body-params)
+        all            (sp.auth/permit conf)
+        auth-requested (sp.auth/permit conf #(get-in % [:session :saml :request]))
+        authenticated  (sp.auth/permit conf sp.auth/authenticated?)]
     ;; Standard endpoints required for an sp-initiated SAML login flow
-    #{[saml-meta :get (sp-ic/saml-meta conf) :route-name ::saml-meta]
-      [saml-login :get [session (sp-ic/saml-req conf)] :route-name ::saml-req]
-      [saml-login :post [body-params session (sp-ic/saml-resp conf)] :route-name ::saml-resp]
+    #{[saml-meta :get (sp.saml/metadata conf) :route-name ::saml-meta]
+      [saml-login :get (conj all (sp.saml/request conf)) :route-name ::saml-req]
+      [saml-login :post (conj all body-params (sp.saml/response conf)) :route-name ::saml-resp]
 
       ;; Logout endpoint, similar to - but not part of - the standard endpoints
-      [saml-logout :post [body-params session `sp-ic/saml-logout]]
+      [saml-logout :post (conj all body-params `sp.saml/logout)]
 
       ;; User-centric metadata endpoints, not related to the SAML login flow
-      [saml-session :get [session `sp-ic/echo-saml-session]]
-      [saml-request :get [session `sp-ic/echo-saml-req]]
-      [saml-response :get (conj authenticated `sp-ic/echo-saml-resp)]
-      [saml-assertions :get (conj authenticated `sp-ic/echo-saml-assertions)]}))
+      [saml-session :get (conj all `sp.saml/echo-session)]
+      [saml-request :get (conj auth-requested `sp.saml/echo-request)]
+      [saml-response :get (conj authenticated `sp.saml/echo-response)]
+      [saml-assertions :get (conj authenticated `sp.saml/echo-assertions)]}))

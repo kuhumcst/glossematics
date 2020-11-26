@@ -5,7 +5,7 @@
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [dk.cst.pedestal-sp :as sp]
-            [dk.cst.pedestal-sp.interceptors :as sp-ic]))
+            [dk.cst.pedestal-sp.auth :as sp.auth]))
 
 (def conf
   (sp/expand-conf {:app-name   "Example app"                ; EntityId in meta, ProviderName in request
@@ -16,6 +16,13 @@
                                 :filename "/Users/rqf595/Code/temp/saml-test/keystore.jks"
                                 :password (System/getenv "KEYSTORE_PASS")}}))
 
+(defn- link
+  [ctx path description]
+  [:a {:href path}
+   (if (sp.auth/permit? ctx path)
+     [:strong description]
+     [:del description])])
+
 (defn login-page
   "Example login page handler. Specifying the query-param RelayState will
   redirect there after successful SAML authentication."
@@ -23,15 +30,16 @@
   (ic/interceptor
     {:name  ::login-page
      :enter (fn [{:keys [request] :as ctx}]
-              (let [{:keys [query-params session]} request
+              (let [{:keys [query-params]} request
+                    {:keys [RelayState]} query-params
                     {:keys [app-name
                             acs-url
                             paths]} conf
                     {:keys [saml-meta
+                            saml-request
                             saml-response
                             saml-assertions
-                            saml-logout]} paths
-                    logged-in? (sp/authenticated? session)]
+                            saml-logout]} paths]
                 (assoc ctx
                   :response {:status  200
                              :headers {"Content-Type" "text/html"}
@@ -40,7 +48,7 @@
                                          [:body
                                           [:h1 app-name]
                                           [:p "Example login form for logging in through an IdP."]
-                                          (if logged-in?
+                                          (if (sp.auth/authenticated? request)
                                             [:form {:action saml-logout
                                                     :method "post"}
                                              [:input {:type  "hidden"
@@ -49,35 +57,22 @@
                                              [:button {:type "submit"}
                                               "Log out"]]
                                             [:form {:action acs-url}
-                                             (when-let [relay-state (:RelayState query-params)]
+                                             (when RelayState
                                                [:input {:type  "hidden"
                                                         :name  "RelayState"
-                                                        :value relay-state}])
+                                                        :value RelayState}])
                                              [:button {:type "submit"}
                                               "Log in"]])
                                           [:h2 "Available resources:"]
                                           [:ul
-                                           [:li
-                                            [:a {:href saml-meta}
-                                             "SAML metadata"]]
-                                           (if (sp-ic/permit? ctx saml-response)
-                                             [:li
-                                              [:a {:href saml-response}
-                                               "IdP response"]]
-                                             [:li "⚠️ "
-                                              [:a {:href saml-response}
-                                               [:del "IdP response"]]])
-                                           (if (sp-ic/permit? ctx saml-assertions)
-                                             [:li
-                                              [:a {:href saml-assertions}
-                                               "User assertions"]]
-                                             [:li "⚠️ "
-                                              [:a {:href saml-assertions}
-                                               [:del "User assertions"]]])]]])})))}))
+                                           [:li (link ctx saml-meta "SAML metadata")]
+                                           [:li (link ctx saml-request "SP request")]
+                                           [:li (link ctx saml-response "IdP response")]
+                                           [:li (link ctx saml-assertions "User assertions")]]]])})))}))
 
 (defn example-routes
   [conf]
-  #{["/" :get [(sp-ic/session conf) (login-page conf)] :route-name ::login]})
+  #{["/" :get [(sp.auth/session conf) (login-page conf)] :route-name ::login]})
 
 (def routes
   (route/expand-routes

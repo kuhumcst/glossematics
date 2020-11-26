@@ -4,7 +4,7 @@
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [dk.cst.pedestal-sp :as sp]
-            [dk.cst.pedestal-sp.interceptors :as sp-ic]
+            [dk.cst.pedestal-sp.auth :as sp.auth]
             [dk.cst.pedestal-sp.example :as example])
   (:import [javax.servlet DispatcherType]
            [java.util EnumSet]
@@ -23,7 +23,7 @@
 
 (defn hjelmslev-routes
   [conf]
-  #{["/" :get [(sp-ic/session conf) (example/login-page conf)] :route-name ::login]})
+  #{["/" :get [(sp.auth/session conf) (example/login-page conf)] :route-name ::login]})
 
 (def routes
   (route/expand-routes

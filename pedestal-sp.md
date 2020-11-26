@@ -25,10 +25,12 @@ Setup
 **Pedestal-sp** is divided into the following namespaces:
 
 * `dk.cst.pedestal-sp`: SAML routes to add to your Pedestal web service + config map creation.
-* `dk.cst.pedestal-sp.interceptors`: helpful Pedestal interceptors for SAML-authentication.
+* `dk.cst.pedestal-sp.saml`: Pedestal interceptors for SAML authentication and debugging.
+* `dk.cst.pedestal-sp.auth`: authentication and authorisation functions.
+* `dk.cst.pedestal-sp.spec`: various Clojure spec definitions.
 * `dk.cst.pedestal-sp.example`: an example web service using the SAML routes and interceptors.
 
-Like Pedestal itself, **Pedestal-sp** is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config is expanded using `dk.cst.pedestal-sp/expand-conf` and passed on to the `dk.cst.pedestal-sp/saml-routes` function - as well as any of the interceptors in `dk.cst.pedestal-sp.interceptors` that you may choose to use.
+Like Pedestal itself, **Pedestal-sp** is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config is expanded using `dk.cst.pedestal-sp/expand-conf` and passed on to the `dk.cst.pedestal-sp/saml-routes` function - as well as any of the interceptors in `dk.cst.pedestal-sp.auth` that you may choose to use.
 
 Here's an example using a minimal config:
 
@@ -97,12 +99,12 @@ By default, the act of logging in via a SAML IdP is treated as successful authen
 Once authenticated, the IdP response and its assertions are stored in an in-memory Ring session store with a limited TTL. The session store and other Ring session-related parameters can be customised via the `:session` key of the config map. Refer to `ring.middleware.session/wrap-session` for the available configuration options.
 
 ### Bidirectional authorisation
-Authorisation in **Pedestal-sp** derives from the user assertions that have been provided by the IdP. Two authorisation helper functions - `permit` and `permit?` - can be found in the `dk.cst.pedestal-sp.interceptors` namespace.
+Authorisation in **Pedestal-sp** derives from the user assertions that have been provided by the IdP. Two authorisation helper functions - `permit` and `permit?` - can be found in the `dk.cst.pedestal-sp.auth` namespace.
 
-The `permit` function is used to build an interceptor chain requiring certain assertions, e.g.
+The `permit` function can be used to build an interceptor chain to restrict a route, e.g.
 
 ```clojure
-["/some/route" (conj (permit :authenticated) `protected-page)]
+["/some/route" (conj (permit authenticated?) `protected-page)]
 ```
 
 The above snippet defines a route that can only be accessed by an authenticated user. More stringent authorisation requirements can be specified too; these dig more deeply into the IdP assertions about the user.
