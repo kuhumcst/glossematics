@@ -16,12 +16,11 @@
                                 :filename "/Users/rqf595/Code/temp/saml-test/keystore.jks"
                                 :password (System/getenv "KEYSTORE_PASS")}}))
 
-(defn- link
+(defn- resource
   [ctx path description]
-  [:a {:href path}
-   (if (sp.auth/permit? ctx path)
-     [:strong description]
-     [:del description])])
+  (if (sp.auth/permit? ctx path)
+    [:li [:a {:href path} description]]
+    [:li "⚠️ " [:a {:href path} [:del description]]]))
 
 (defn login-page
   "Example login page handler. Specifying the query-param RelayState will
@@ -45,6 +44,8 @@
                              :headers {"Content-Type" "text/html"}
                              :body    (hiccup/html
                                         [:html
+                                         [:head
+                                          [:meta {:charset "utf-8"}]]
                                          [:body
                                           [:h1 app-name]
                                           [:p "Example login form for logging in through an IdP."]
@@ -65,14 +66,16 @@
                                               "Log in"]])
                                           [:h2 "Available resources:"]
                                           [:ul
-                                           [:li (link ctx saml-meta "SAML metadata")]
-                                           [:li (link ctx saml-request "SP request")]
-                                           [:li (link ctx saml-response "IdP response")]
-                                           [:li (link ctx saml-assertions "User assertions")]]]])})))}))
+                                           (resource ctx saml-meta "SAML metadata")
+                                           (resource ctx saml-request "SP request")
+                                           (resource ctx saml-response "IdP response")
+                                           (resource ctx saml-assertions "User assertions")
+                                           (resource ctx "/forbidden" "Always forbidden")]]])})))}))
 
 (defn example-routes
   [conf]
-  #{["/" :get [(sp.auth/session conf) (login-page conf)] :route-name ::login]})
+  #{["/" :get [(sp.auth/session conf) (login-page conf)] :route-name ::login]
+    ["/forbidden" :any (sp.auth/permit conf :none) :route-name ::forbidden]})
 
 (def routes
   (route/expand-routes

@@ -104,7 +104,7 @@ Authorisation in **Pedestal-sp** derives from the user assertions that have been
 The `permit` function can be used to build an interceptor chain to restrict a route, e.g.
 
 ```clojure
-["/some/route" (conj (permit authenticated?) `protected-page)]
+["/some/route" (conj (permit :authenticated) `protected-page)]
 ```
 
 The above snippet defines a route that can only be accessed by an authenticated user. More stringent authorisation requirements can be specified too; these dig more deeply into the IdP assertions about the user.
