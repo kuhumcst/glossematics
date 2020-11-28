@@ -76,9 +76,9 @@
                 saml-response
                 saml-assertions]} paths
         body-params    (body-params)
-        all            (sp.auth/permit conf)
-        auth-requested (sp.auth/permit conf #(get-in % [:session :saml :request]))
-        authenticated  (sp.auth/permit conf sp.auth/authenticated?)]
+        all            (sp.auth/permit conf :all)
+        authenticated  (sp.auth/permit conf :authenticated)
+        auth-requested (sp.auth/permit conf #(get-in % [:session :saml :request]))]
     ;; Standard endpoints required for an sp-initiated SAML login flow
     #{[saml-meta :get (sp.saml/metadata conf) :route-name ::saml-meta]
       [saml-login :get (conj all (sp.saml/request conf)) :route-name ::saml-req]

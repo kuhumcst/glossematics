@@ -119,12 +119,10 @@
 
   When no `restriction` is provided, simply returns an interceptor chain with
   the session interceptor."
-  ([conf]
-   [(session conf)])
-  ([conf restriction]
-   (if (or (keyword? restriction) (fn? restriction))
-     [(failure conf) (session conf) (guard conf restriction)]
-     (throw (ex-info "Unknown restriction type" restriction)))))
+  [conf restriction]
+  (if (or (keyword? restriction) (fn? restriction))
+    [(failure conf) (session conf) (guard conf restriction)]
+    (throw (ex-info "Unknown restriction type" restriction))))
 
 (defn permit?
   "Is a `route` or `query-string` allowed within the current interceptor `ctx`?
