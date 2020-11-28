@@ -1,4 +1,4 @@
-(ns dk.cst.pedestal-sp.spec
+(ns dk.cst.pedestal.sp.spec
   (:require [clojure.spec.alpha :as s]))
 
 ;; TODO: add fdef for expand-conf?

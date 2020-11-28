@@ -1,4 +1,4 @@
-(ns dk.cst.pedestal-sp.saml
+(ns dk.cst.pedestal.sp.interceptors
   (:require [clojure.pprint :refer [pprint]]
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as coerce]

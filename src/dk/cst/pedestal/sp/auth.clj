@@ -1,4 +1,4 @@
-(ns dk.cst.pedestal-sp.auth
+(ns dk.cst.pedestal.sp.auth
   (:require [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.interceptor.chain :as chain]

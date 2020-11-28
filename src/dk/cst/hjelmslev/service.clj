@@ -3,9 +3,9 @@
             [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
-            [dk.cst.pedestal-sp :as sp]
-            [dk.cst.pedestal-sp.auth :as sp.auth]
-            [dk.cst.pedestal-sp.example :as example])
+            [dk.cst.pedestal.sp.routes :as sp.routes]
+            [dk.cst.pedestal.sp.auth :as sp.auth]
+            [dk.cst.pedestal.sp.example :as example])
   (:import [javax.servlet DispatcherType]
            [java.util EnumSet]
            [org.eclipse.jetty.servlets DoSFilter]
@@ -13,13 +13,13 @@
            [org.eclipse.jetty.server.handler.gzip GzipHandler]))
 
 (def conf
-  (sp/expand-conf {:app-name   "Hjelmslev"                  ; EntityId in meta, ProviderName in request
-                   :sp-url     "https://localhost:4433"
-                   :idp-url    "https://localhost:7000"
-                   :idp-cert   (slurp "/Users/rqf595/Code/temp/saml-test/node_modules/saml-idp/idp-public-cert.pem")
-                   :credential {:alias    "mylocalsp"
-                                :filename "/Users/rqf595/Code/temp/saml-test/keystore.jks"
-                                :password (System/getenv "KEYSTORE_PASS")}}))
+  (sp.routes/->conf {:app-name   "Hjelmslev"                ; EntityId in meta, ProviderName in request
+                     :sp-url     "https://localhost:4433"
+                     :idp-url    "https://localhost:7000"
+                     :idp-cert   (slurp "/Users/rqf595/Code/temp/saml-test/node_modules/saml-idp/idp-public-cert.pem")
+                     :credential {:alias    "mylocalsp"
+                                  :filename "/Users/rqf595/Code/temp/saml-test/keystore.jks"
+                                  :password (System/getenv "KEYSTORE_PASS")}}))
 
 (defn hjelmslev-routes
   [conf]
@@ -28,7 +28,7 @@
 (def routes
   (route/expand-routes
     (set/union (hjelmslev-routes conf)
-               (sp/saml-routes conf))))
+               (sp.routes/all conf))))
 
 ;; TODO: make dev exception for shadow-cljs
 (def hjelmslev-csp
