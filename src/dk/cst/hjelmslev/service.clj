@@ -1,9 +1,11 @@
 (ns dk.cst.hjelmslev.service
   (:require [clojure.set :as set]
+            [clojure.java.io :as io]
             [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [dk.cst.pedestal.sp.routes :as sp.routes]
+            [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.auth :as sp.auth]
             [dk.cst.pedestal.sp.example :as example])
   (:import [javax.servlet DispatcherType]
@@ -13,13 +15,9 @@
            [org.eclipse.jetty.server.handler.gzip GzipHandler]))
 
 (def conf
-  (sp.routes/->conf {:app-name   "Hjelmslev"                ; EntityId in meta, ProviderName in request
-                     :sp-url     "https://localhost:4433"
-                     :idp-url    "https://localhost:7000"
-                     :idp-cert   (slurp "/Users/rqf595/Code/temp/saml-test/node_modules/saml-idp/idp-public-cert.pem")
-                     :credential {:alias    "mylocalsp"
-                                  :filename "/Users/rqf595/Code/temp/saml-test/keystore.jks"
-                                  :password (System/getenv "KEYSTORE_PASS")}}))
+  (-> (io/resource "config.edn")
+      (sp.conf/read-file! (keyword (System/getenv "GLOSSEMATICS_ENV")))
+      (sp.conf/init)))
 
 (defn hjelmslev-routes
   [conf]

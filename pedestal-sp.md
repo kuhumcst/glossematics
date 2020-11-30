@@ -24,18 +24,19 @@ Setup
 -----
 **Pedestal SP** is divided into the following namespaces:
 
-* `dk.cst.pedestal.sp.routes`: SAML routes to add to your Pedestal web service, plus config map creation.
-* `dk.cst.pedestal.sp.interceptors`: interceptors for SAML authentication and observability.
+* `dk.cst.pedestal.sp.routes`: prepackaged SAML routes to add to your Pedestal web service.
+* `dk.cst.pedestal.sp.conf`: config map creation + relevant Clojure Spec definitions.
 * `dk.cst.pedestal.sp.auth`: functions for setting/checking authentication and authorisation.
-* `dk.cst.pedestal.sp.spec`: various Clojure spec definitions for **Pedestal SP**.
-* `dk.cst.pedestal.sp.example`: an example web service using the SAML routes and interceptors.
+* `dk.cst.pedestal.sp.interceptors`: interceptors for SAML authentication and observability.
+* `dk.cst.pedestal.sp.example`: an example web service using **Pedestal SP**.
 
-Like Pedestal itself, **Pedestal SP** is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config is expanded using `dk.cst.pedestal.sp.routes/->conf` and passed to the `dk.cst.pedestal.sp.routes/all` function. The same config map should be reused when defining auth interceptor chains using `dk.cst.pedestal.sp.auth/permit`.
+Like Pedestal itself, **Pedestal SP** is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config is expanded using `sp.conf/init` and passed to the `sp.routes/all` function. The same config map should be reused when defining auth interceptor chains using `sp.auth/permit`.
 
 Here's an example using a minimal config:
 
 ````clojure
-(require '[dk.cst.pedestal.sp.routes :as sp.routes])
+(require '[dk.cst.pedestal.sp.routes :as sp.routes]
+         '[dk.cst.pedestal.sp.conf :as sp.conf])
 
 (def base-conf
   {:app-name   "ExampleServiceProvider"
@@ -47,7 +48,7 @@ Here's an example using a minimal config:
                 :password (System/getenv "KEYSTORE_PASS")}})
 
 (def conf
-  (sp.routes/->conf base-conf))
+  (sp.conf/init base-conf))
 
 ;; This constructor function will provide a ready-made set of SAML routes.
 ;; You may also define the routes yourself too using the provided interceptors.
@@ -95,15 +96,15 @@ Authentication and authorisation
 --------------------------------
 SAML is meant to be a complete package for handling authentication and authorisation. **Pedestal SP** builds on this design with helpful functions in a simple to understand system based on Pedestal interceptors and the familiar Ring session middleware.
 
-### Authenticated sessions
+### SAML-authenticated sessions
 By default, the act of logging in via a SAML IdP is treated as successful authentication, though you can specify additional parameters that must be met through the `:validation` map in the config. The available options are explained in the `saml20-clj.sp.response/validate` function of [metabase/saml20-clj](https://github.com/metabase/saml20-clj). The authentication itself has been delegated entirely to this library.
 
 Once authenticated, the IdP response and its assertions are stored in an in-memory Ring session store with a limited TTL. The session store and other Ring session-related parameters can be customised via the `:session` key of the config map. Refer to `ring.middleware.session/wrap-session` for the available configuration options.
 
-### Bidirectional authorisation
+### Route authorisation
 Authorisation in **Pedestal SP** derives from the user assertions that have been provided by the IdP. Two authorisation helper functions - `permit` and `permit?` - can be found in the `dk.cst.pedestal.sp.auth` namespace.
 
-The `permit` function can be used to build an interceptor chain to restrict a route, e.g.
+The `sp.auth/permit` function can be used to build an interceptor chain to restrict a route, e.g.
 
 ```clojure
 ["/some/route" (conj (sp.auth/permit :authenticated) `protected-page)]
@@ -111,12 +112,14 @@ The `permit` function can be used to build an interceptor chain to restrict a ro
 
 The above snippet defines a route that can only be accessed by an authenticated user. More stringent authorisation requirements can be specified too; these dig more deeply into the IdP assertions about the user.
 
-When generating dynamic content for the user, it quite often becomes necessary to know ahead of time if the user is authorised to visit a specific URL. To facilitate this common situation, **Pedestal SP** also comes with the `permit?` function which can be used to check authorisation status for a `permit`-decorated route bidirectionally from the interceptor context:
+When generating dynamic content for the user, it quite often becomes necessary to know ahead of time if the user is authorised to access a specific resource. To solve this common issue, **Pedestal SP** also comes with the `sp.auth/permit?` function which can be used to check authorisation status within a `sp.auth/permit`-decorated interceptor chain:
 
 ```clojure
 (when (sp.auth/permit? ctx "/some/route")
   [:p "You may visit " [:a {:href "/some/route"} "this route"]])
 ```
+
+By dynamically looking up the route in the router (provided via the Interceptor context) in order to trial requests ahead of time, the code defining the authorisation restrictions is completely decoupled from the code depending on these restrictions.
 
 SAML authentication endpoints
 -----------------------------

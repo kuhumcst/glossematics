@@ -1,0 +1,7 @@
+{:app-name   "Glossematics"
+ :sp-url     #profile {:default "https://glossematics.org"
+                       :dev     "https://localhost:4433"}
+ :idp-url    #profile {:default "https://wayf.wayf.dk/saml2/idp/SSOService2.php"
+                       :dev     "https://localhost:7000"}
+ :idp-cert  #env GLOSSEMATICS_IDP_CERT
+ :credential #include #env GLOSSEMATICS_CREDENTIAL}
