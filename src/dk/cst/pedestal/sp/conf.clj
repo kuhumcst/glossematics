@@ -34,7 +34,7 @@
 ;; TODO: add opt-un keys
 ;; TODO: split into minimal and complete versions
 (s/def ::config
-  (s/keys :req-un [::app-name ::sp-url ::idp-url ::credential]))
+  (s/keys :req-un [::app-name ::sp-url ::idp-url ::idp-cert ::credential]))
 
 (def ^:private default-paths
   {:saml-meta       "/saml/meta"
@@ -48,9 +48,11 @@
 (defn read-file!
   "Load an Aero `edn-file` with the given `profile`. The contents of this
   file may then be passed to sp.conf/init."
-  [edn-file profile]
-  (let [conf (aero/read-config edn-file {:profile profile})]
-    (assoc conf :idp-cert (slurp (:idp-cert conf)))))
+  [edn-file & [opts]]
+  (let [conf (aero/read-config edn-file opts)]
+    (if (s/valid? ::config conf)
+      (assoc conf :idp-cert (slurp (:idp-cert conf)))
+      (throw (ex-info "invalid config" (s/explain-data ::config conf))))))
 
 (defn init
   "Derive full configuration from `base-conf`; ensures internal consistency."

@@ -1,0 +1,12 @@
+version: '3'
+services:
+  glossematics:
+    build: .
+    volumes:
+      - ${GLOSSEMATICS_CONF}:/etc/glossematics/conf.edn
+      - ${GLOSSEMATICS_IDP_CERTIFICATE}:/etc/glossematics/idp-certificate.pem
+      - ${GLOSSEMATICS_SAML_KEYSTORE}:/etc/glossematics/saml-keystore.jks
+      - ${GLOSSEMATICS_HTTPS_KEYSTORE}:/etc/glossematics/https-keystore.jks
+    ports:
+      - "80:80"
+      - "443:443"

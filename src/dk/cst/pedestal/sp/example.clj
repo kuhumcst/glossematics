@@ -5,15 +5,13 @@
             [io.pedestal.interceptor :as ic]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
+            [io.pedestal.log :as log]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
 
-(def conf
-  (-> (io/resource "config.edn")
-      (sp.conf/read-file! :dev)
-      (assoc :app-name "Example")
-      (sp.conf/init)))
+(defonce server (atom nil))
+(defonce sp-conf (atom nil))
 
 (defn- resource
   [ctx path description]
@@ -76,29 +74,37 @@
   #{["/" :get [(sp.auth/session conf) (login-page conf)] :route-name ::login]
     ["/forbidden" :any (sp.auth/permit conf :none) :route-name ::forbidden]})
 
-(def routes
+(defn routes
+  [conf]
   (route/expand-routes
     (set/union (example-routes conf)
                (sp.routes/all conf))))
 
-(def service-map
-  (let [home (System/getProperty "user.home")
-        jks  (str home "/_certifiable_certs/localhost-1d070e4/dev-server.jks")]
-    {::http/routes            routes
-     ::http/type              :jetty
-     ::http/port              8080
+(defn service-map
+  [conf]
+  (let [{:keys [filename password]} (:https-credential conf)]
+    (merge
+      {::http/routes (routes conf)
+       ::http/type   :jetty
+       ::http/port   8080}
 
-     ;; Development-only keystore created using Bruce Hauman's Certifiable.
-     ;; https://github.com/bhauman/certifiable#quick-start-command-line-usage
-     ::http/container-options {:ssl?         true
-                               :ssl-port     4433           ; ports below 1024 require root permissions
-                               :keystore     jks
-                               :key-password "password"}}))
+      (if (and filename password)
+        ;; Development-only keystore created using Bruce Hauman's Certifiable.
+        ;; https://github.com/bhauman/certifiable#quick-start-command-line-usage
+        {::http/container-options {:ssl?         true
+                                   :ssl-port     4433       ; ports below 1024 require root permissions
+                                   :keystore     filename
+                                   :key-password password}}
+        (log/warn :example/ssl "HTTPS unavailable: no filename or password")))))
 
-(defonce server (atom nil))
+(defn load-sp-conf!
+  ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
+  ([] (load-sp-conf! (io/resource "conf.edn"))))
 
 (defn start []
-  (reset! server (-> service-map
+  (when (not @sp-conf)
+    (load-sp-conf!))
+  (reset! server (-> (service-map @sp-conf)
                      (assoc ::http/join? false)
                      (http/create-server)
                      (http/start))))
@@ -117,5 +123,6 @@
   (stop)
 
   ;; Currently, there's a print-related bug with the SAML StateManager...
-  (dissoc conf :state-manager)
-  @(:state-manager conf))
+  (dissoc @sp-conf :state-manager)
+  (dissoc (load-sp-conf!) :state-manager)
+  @(:state-manager @sp-conf))
