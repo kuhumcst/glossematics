@@ -1,5 +1,4 @@
-{:app-name         #or [#env PEDESTALSP_APP_NAME "PedestalServiceProvider"]
- :sp-url           #env PEDESTALSP_SP_URL
+{:sp-url           #env PEDESTALSP_SP_URL
  :idp-url          #env PEDESTALSP_IDP_URL
  :idp-cert         #env PEDESTALSP_IDP_CERT
  :credential       #include #env PEDESTALSP_CREDENTIAL

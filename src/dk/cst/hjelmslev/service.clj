@@ -57,7 +57,8 @@
 (defn ->service-map
   [{:keys [ports https-credential] :as sp-conf}]
   (when-let [conf-error (s/explain-data ::config sp-conf)]
-    (throw (ex-info "invalid configuration" conf-error)))
+    ;; TODO: print conf-error instead, once the state-manager print issue is fixed: https://github.com/metabase/saml20-clj/issues/27
+    (throw (ex-info "invalid configuration" {:ks (keys (dissoc sp-conf :state-manager))} #_conf-error)))
   (let [{:keys [filename password]} https-credential
         {:keys [http https]
          :or   {http  80
@@ -88,8 +89,7 @@
                                :context-configurator context-configurator}}))
 
 (defn load-sp-conf!
-  ([path] (reset! sp-conf (sp.conf/init (assoc (sp.conf/read-file! path)
-                                          :app-name "Glossematics"))))
+  ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
   ([] (load-sp-conf! (io/resource "conf.edn"))))
 
 (defn start []

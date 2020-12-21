@@ -34,7 +34,7 @@
 ;; TODO: add opt-un keys
 ;; TODO: split into minimal and complete versions
 (s/def ::config
-  (s/keys :req-un [::app-name ::sp-url ::idp-url ::idp-cert ::credential]))
+  (s/keys :req-un [::sp-url ::idp-url ::idp-cert ::credential]))
 
 (def ^:private default-paths
   {:saml-meta       "/saml/meta"
@@ -52,7 +52,8 @@
   (let [conf (aero/read-config edn-file opts)]
     (if (s/valid? ::config conf)
       (assoc conf :idp-cert (slurp (:idp-cert conf)))
-      (throw (ex-info "invalid config" (s/explain-data ::config conf))))))
+      ;; TODO: print explain-data instead, once the state-manager print issue is fixed: https://github.com/metabase/saml20-clj/issues/27
+      (throw (ex-info "invalid config" (dissoc conf :state-manager) #_(s/explain-data ::config conf))))))
 
 (defn init
   "Derive full configuration from `base-conf`; ensures internal consistency."
@@ -70,10 +71,11 @@
     :as   base-conf}]
   {:pre  [(s/valid? ::config base-conf)]
    :post [(s/valid? ::config %)]}
-  (let [{:keys [saml-login saml-meta] :as paths*} (merge default-paths paths)
+  (let [{:keys [saml-login] :as paths*} (merge default-paths paths)
         {:keys [cookie-attrs]} session
         max-age*       (or (:max-age cookie-attrs) (* 60 60 8))
         acs-url        (str sp-url saml-login)
+        app-name*      (or app-name sp-url)
         state-manager* (or state-manager (saml/in-memory-state-manager 60))
         validation*    (merge {:acs-url       acs-url
                                :state-manager state-manager}
@@ -89,11 +91,12 @@
     (assoc base-conf
 
       ;; Derived
-      :sp-name app-name                                     ; TODO: same or not?
+      :app-name app-name*
+      :sp-name app-name*                                    ; TODO: same or not?
       :sp-cert (saml/->X509Certificate credential)
       :sp-private-key (saml-coerce/->PrivateKey credential)
       :acs-url acs-url
-      :issuer (str sp-url saml-meta)
+      :issuer app-name*
 
       ;; Defaults
       :state-manager state-manager*
