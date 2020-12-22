@@ -3,7 +3,12 @@
             [aero.core :as aero]
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as saml-coerce]
+            [saml20-clj.state :as saml-state]
             [ring-ttl-session.core :as ttl]))
+
+;; Fix StateManager print bug: https://github.com/metabase/saml20-clj/issues/27
+(prefer-method print-method pretty.core.PrettyPrintable saml-state/StateManager)
+(prefer-method print-method pretty.core.PrettyPrintable clojure.lang.IDeref)
 
 ;; TODO: add fdef for expand-conf?
 
@@ -52,8 +57,7 @@
   (let [conf (aero/read-config edn-file opts)]
     (if (s/valid? ::config conf)
       (assoc conf :idp-cert (slurp (:idp-cert conf)))
-      ;; TODO: print explain-data instead, once the state-manager print issue is fixed: https://github.com/metabase/saml20-clj/issues/27
-      (throw (ex-info "invalid config" (dissoc conf :state-manager) #_(s/explain-data ::config conf))))))
+      (throw (ex-info "invalid config" (s/explain-data ::config conf))))))
 
 (defn init
   "Derive full configuration from `base-conf`; ensures internal consistency."

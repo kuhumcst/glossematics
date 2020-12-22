@@ -57,8 +57,7 @@
 (defn ->service-map
   [{:keys [ports https-credential] :as sp-conf}]
   (when-let [conf-error (s/explain-data ::config sp-conf)]
-    ;; TODO: print conf-error instead, once the state-manager print issue is fixed: https://github.com/metabase/saml20-clj/issues/27
-    (throw (ex-info "invalid configuration" {:ks (keys (dissoc sp-conf :state-manager))} #_conf-error)))
+    (throw (ex-info "invalid configuration" conf-error)))
   (let [{:keys [filename password]} https-credential
         {:keys [http https]
          :or   {http  80
@@ -129,10 +128,10 @@
       (log/error :conf/missing {:source conf-source*}))))
 
 (comment
-  ;; Currently, there's a print-related bug with the SAML StateManager...
-  (dissoc @sp-conf :state-manager)
-  @(:state-manager @sp-conf)
-  (dissoc (load-sp-conf!) :state-manager)
+  @sp-conf
+  (:state-manager @sp-conf)
+
+  (load-sp-conf!)
   (clojure.pprint/pprint (->service-map @sp-conf))
 
   (test/response-for (:io.pedestal.http/service-fn @server) :get "/no-such-route")

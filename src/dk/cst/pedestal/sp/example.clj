@@ -122,7 +122,6 @@
   (start)
   (stop)
 
-  ;; Currently, there's a print-related bug with the SAML StateManager...
-  (dissoc @sp-conf :state-manager)
-  (dissoc (load-sp-conf!) :state-manager)
+  @sp-conf
+  (load-sp-conf!)
   @(:state-manager @sp-conf))
