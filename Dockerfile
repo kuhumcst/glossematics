@@ -1,11 +1,20 @@
 FROM ubuntu:focal
 
-RUN apt-get update && \
+RUN apt-get clean && \
+    apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get install --no-install-recommends -y \
     openjdk-11-jdk \
     curl \
-    rlwrap
+    rlwrap \
+    locales
+
+# Fix emojis not showing up on HTML pages
+# https://medium.com/quiq-blog/handling-emoticons-or-other-unicode-characters-beware-of-docker-images-f0f11673dac4
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
 
 # The recommended way of installing Clojure CLI tools
 RUN curl -O https://download.clojure.org/install/linux-install-1.10.1.754.sh
