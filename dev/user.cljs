@@ -1,11 +1,15 @@
 (ns user
   (:require [clojure.pprint :refer [pprint]]
             [shadow.resource :as sr]
+            [load :as load]
             [reagent.core :as r]
             [reagent.dom :as rdom]
             [recap.component.widget.tabs :as tabs]
             [tei-facsimile.core :as facsimile]
             [clojure.string :as str]))
+
+(def timeline-data
+  (load/timeline))
 
 (def initial-examples
   {"1151anno-anno-tei.xml"  (sr/inline "examples/tei/1151anno-anno-tei.xml")
