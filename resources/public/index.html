@@ -14,7 +14,6 @@
     Timeline = new Object();
 
     SimileAjax = {
-        loaded:    true,
         Platform:  new Object(),
         urlPrefix: "api/"
     };
@@ -153,21 +152,6 @@
             tl = Timeline.create(document.getElementById("tl"), bandInfos, Timeline.HORIZONTAL);
             tl.loadXML("examples/jfk/jfk.xml", function(xml, url) { eventSource.loadXML(xml, url); });
         }
-
-        var resizeTimerID = null;
-        function onResize() {
-            if (resizeTimerID == null) {
-                resizeTimerID = window.setTimeout(function() {
-                    resizeTimerID = null;
-                    tl.layout();
-                }, 500);
-            }
-        }
-
-        function themeSwitch(){
-          var timeline = document.getElementById('tl');
-          timeline.className = (timeline.className.indexOf('dark-theme') != -1) ? timeline.className.replace('dark-theme', '') : timeline.className += ' dark-theme';
-        }
     </script>
     <style type="text/css">
         .t-highlight1 { background-color: #ccf; }
@@ -178,34 +162,9 @@
 
         .timeline-band-events .important { color: #f00; }
         .timeline-band-events .small-important { background: #c00; }
-
-        /*---------------------------------*/
-
-        .dark-theme { color: #eee; }
-        .dark-theme .timeline-band-0 .timeline-ether-bg { background-color: #333 }
-        .dark-theme .timeline-band-1 .timeline-ether-bg { background-color: #111 }
-        .dark-theme .timeline-band-2 .timeline-ether-bg { background-color: #222 }
-        .dark-theme .timeline-band-3 .timeline-ether-bg { background-color: #444 }
-
-        .dark-theme .t-highlight1 { background-color: #003; }
-        .dark-theme .p-highlight1 { background-color: #300; }
-
-        .dark-theme .timeline-highlight-label-start .label_t-highlight1 { color: #f00; }
-        .dark-theme .timeline-highlight-label-end .label_t-highlight1 { color: #115; }
-
-        .dark-theme .timeline-band-events .important { color: #c00; }
-        .dark-theme .timeline-band-events .small-important { background: #c00; }
-
-        .dark-theme .timeline-date-label-em { color: #fff; }
-        .dark-theme .timeline-ether-lines { border-color: #555; border-style: solid; }
-        .dark-theme .timeline-ether-highlight { background: #555; }
-
-        .dark-theme .timeline-event-tape,
-        .dark-theme .timeline-small-event-tape { background: #f60; }
-        .dark-theme .timeline-ether-weekends { background: #111; }
     </style>
 </head>
-    <body onresize="onResize();">
+    <body>
         <div id="app"></div>
         <script src="js/compiled/main.js"></script>
     </body>
