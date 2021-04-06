@@ -46,9 +46,28 @@
   (swap! state assoc :current-file filename)
   (swap! state assoc-in [:tabs :kvs] (mk-tabs filename)))
 
+(defn timeline-view
+  []
+  [:div#tl {:style {:height 350}}])
+
+(defn setup-timeline!
+  []
+  (set! js/window.Timeline.DateTime js/window.SimileAjax.DateTime)
+  (set! js/window.Timeline.serverLocale "en")
+  (set! js/window.Timeline.clientLocale "en")
+  (set! js/window.Timeline.urlPrefix "api/")
+  (js/onLoad))
+
+(defn timeline
+  []
+  (r/create-class
+    {:component-did-mount setup-timeline!
+     :reagent-render      timeline-view}))
+
 (defn app
   []
   [:<>
+   [timeline]
    [:p {:style {:display         "flex"
                 :justify-content "flex-end"}}
     (let [current-file (r/cursor state [:current-file])]
