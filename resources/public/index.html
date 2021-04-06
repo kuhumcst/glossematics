@@ -8,10 +8,17 @@
     <link rel='stylesheet' href='/api/styles/events.css' type='text/css'/>
     <link rel='stylesheet' href='/api/styles/timeline.css' type='text/css'/>
 
-    <!--  This singleton object is required by the Timeline API. -->
-    <script>window.Timeline = new Object();</script>
+    <!--  These singleton objects are required by the Timeline API. -->
+    <script>
+    Timeline = new Object();
 
-    <script src="/api/simile-ajax-api.js" type="text/javascript"></script>
+    SimileAjax = {
+        loaded:    true,
+        Platform:  new Object(),
+        urlPrefix: "api/"
+    };
+    </script>
+
     <script src="/api/simile-ajax-bundle.js" type="text/javascript"></script>
 
     <script src="/api/scripts/timeline.js" type="text/javascript"></script>
