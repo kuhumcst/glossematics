@@ -1,19 +1,44 @@
 (ns user
-  (:require [clojure.pprint :refer [pprint]]
+  (:require [clojure.string :as str]
+            [clojure.pprint :refer [pprint]]
             [shadow.resource :as sr]
             [load :as load]
             [reagent.core :as r]
             [reagent.dom :as rdom]
             [recap.component.widget.tabs :as tabs]
             [tei-facsimile.core :as facsimile]
-            [clojure.string :as str]))
+            [dk.cst.hjelmslev.timeline :refer [timeline]]))
 
+;; TODO
 (def timeline-data
   (load/timeline))
 
-(def jfk-xml
+;; Only left here in case I need to call (.loadXML ...) again.
+(defonce jfk-xml
   (let [source (sr/inline "public/examples/jfk/jfk.xml")]
     (.parseFromString (js/DOMParser.) source "text/xml")))
+
+(defonce jfk-events
+  (as-> (sr/inline "public/examples/jfk/jfk.xml") $
+        (.parseFromString (js/DOMParser.) $ "text/xml")
+        (.getElementsByTagName $ "event")
+        (map (fn [node]
+               (into {:description (str/trim (.-innerHTML node))}
+                     (for [obj (.-attributes node)]
+                       [(keyword (.-name obj)) (.-value obj)])))
+             $)))
+
+
+(def band-infos
+  {:primary  {:width        "80%"
+              :intervalUnit :week
+              :zones        []}
+   :overview {:width        "20%"
+              :intervalUnit :month
+              :zones        []}
+   :common   {:intervalPixels 200
+              :timeZone       -6
+              :date           "Fri Nov 22 1963 13:00:00 GMT-0600"}})
 
 (def initial-examples
   {"1151anno-anno-tei.xml"  (sr/inline "examples/tei/1151anno-anno-tei.xml")
@@ -35,7 +60,10 @@
 (defn mk-tabs
   [filename]
   (let [tei (get @examples filename)]
-    [["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
+    [["Tidslinje" [timeline {:style {:height 350}}
+                   {:events     jfk-events
+                    :band-infos band-infos}]]
+     ["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
      ["XML" [:pre {:style {:white-space "pre-wrap"}}
              [:code
               tei]]]]))
@@ -50,49 +78,9 @@
   (swap! state assoc :current-file filename)
   (swap! state assoc-in [:tabs :kvs] (mk-tabs filename)))
 
-(defn paint-timeline!
-  [elem state]
-  (let [date            "Fri Nov 22 1963 13:00:00 GMT-0600"
-        date-time       js/SimileAjax.DateTime
-        event-source    (js/Timeline.DefaultEventSource.)
-        layout          js/Timeline.HORIZONTAL
-        interval-pixels 200
-        time-zone       -6
-        band-infos      #js [(js/Timeline.createHotZoneBandInfo
-                               #js {:width          "80%"
-                                    :intervalUnit   (.-WEEK date-time)
-                                    :intervalPixels interval-pixels
-                                    :zones          #js []
-                                    :eventSource    event-source
-                                    :date           date
-                                    :timeZone       time-zone})
-                             (doto (js/Timeline.createHotZoneBandInfo
-                                     #js {:width          "20%"
-                                          :intervalUnit   (.-MONTH date-time)
-                                          :intervalPixels interval-pixels
-                                          :zones          #js []
-                                          :eventSource    event-source
-                                          :date           date
-                                          :timeZone       time-zone
-                                          :overview       true})
-                               (set! -syncWith 0)
-                               (set! -highlight true))]]
-    (when-not (:timeline @state)
-      (let [timeline (js/Timeline.create elem band-infos layout)]
-        (swap! state assoc :timeline timeline)))
-    (.loadXML event-source jfk-xml "localhost")))
-
-(defn timeline
-  []
-  (let [state (r/atom {:timeline nil})]
-    (fn []
-      [:div#tl {:style {:height 350}
-                :ref   #(paint-timeline! % state)}])))
-
 (defn app
   []
   [:<>
-   [timeline]
    [:p {:style {:display         "flex"
                 :justify-content "flex-end"}}
     (let [current-file (r/cursor state [:current-file])]
@@ -116,6 +104,7 @@
                   :min-width "40ch"
                   :margin    "0 auto"}}
     [tabs/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
+
 (def root
   (js/document.getElementById "app"))
 
