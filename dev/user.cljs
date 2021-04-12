@@ -11,6 +11,10 @@
 (def timeline-data
   (load/timeline))
 
+(def jfk-xml
+  (let [source (sr/inline "public/examples/jfk/jfk.xml")]
+    (.parseFromString (js/DOMParser.) source "text/xml")))
+
 (def initial-examples
   {"1151anno-anno-tei.xml"  (sr/inline "examples/tei/1151anno-anno-tei.xml")
    "1152anno-anno-tei.xml"  (sr/inline "examples/tei/1152anno-anno-tei.xml")
@@ -46,23 +50,44 @@
   (swap! state assoc :current-file filename)
   (swap! state assoc-in [:tabs :kvs] (mk-tabs filename)))
 
-(defn timeline-view
-  []
-  [:div#tl {:style {:height 350}}])
-
-(defn setup-timeline!
-  []
-  (set! js/window.Timeline.DateTime js/window.SimileAjax.DateTime)
-  (set! js/window.Timeline.serverLocale "en")
-  (set! js/window.Timeline.clientLocale "en")
-  (set! js/window.Timeline.urlPrefix "api/")
-  (js/onLoad))
+(defn paint-timeline!
+  [elem state]
+  (let [date            "Fri Nov 22 1963 13:00:00 GMT-0600"
+        date-time       js/SimileAjax.DateTime
+        event-source    (js/Timeline.DefaultEventSource.)
+        layout          js/Timeline.HORIZONTAL
+        interval-pixels 200
+        time-zone       -6
+        band-infos      #js [(js/Timeline.createHotZoneBandInfo
+                               #js {:width          "80%"
+                                    :intervalUnit   (.-WEEK date-time)
+                                    :intervalPixels interval-pixels
+                                    :zones          #js []
+                                    :eventSource    event-source
+                                    :date           date
+                                    :timeZone       time-zone})
+                             (doto (js/Timeline.createHotZoneBandInfo
+                                     #js {:width          "20%"
+                                          :intervalUnit   (.-MONTH date-time)
+                                          :intervalPixels interval-pixels
+                                          :zones          #js []
+                                          :eventSource    event-source
+                                          :date           date
+                                          :timeZone       time-zone
+                                          :overview       true})
+                               (set! -syncWith 0)
+                               (set! -highlight true))]]
+    (when-not (:timeline @state)
+      (let [timeline (js/Timeline.create elem band-infos layout)]
+        (swap! state assoc :timeline timeline)))
+    (.loadXML event-source jfk-xml "localhost")))
 
 (defn timeline
   []
-  (r/create-class
-    {:component-did-mount setup-timeline!
-     :reagent-render      timeline-view}))
+  (let [state (r/atom {:timeline nil})]
+    (fn []
+      [:div#tl {:style {:height 350}
+                :ref   #(paint-timeline! % state)}])))
 
 (defn app
   []
