@@ -28,11 +28,48 @@
                        [(keyword (.-name obj)) (.-value obj)])))
              $)))
 
-
-(def bands
+(def jfk-bands
   {:primary  {:width        "80%"
+              :zones        [{:start   "Fri Nov 22 1963 00:00:00 GMT-0600"
+                              :end     "Mon Nov 25 1963 00:00:00 GMT-0600"
+                              :magnify 10
+                              :unit    js/SimileAjax.DateTime.DAY}
+                             {:start   "Fri Nov 22 1963 09:00:00 GMT-0600"
+                              :end     "Sun Nov 24 1963 00:00:00 GMT-0600"
+                              :magnify 5
+                              :unit    js/SimileAjax.DateTime.HOUR}
+                             {:start    "Fri Nov 22 1963 11:00:00 GMT-0600"
+                              :end      "Sat Nov 23 1963 00:00:00 GMT-0600"
+                              :magnify  5
+                              :unit     js/SimileAjax.DateTime.MINUTE,
+                              :multiple 10}
+                             {:start    "Fri Nov 22 1963 12:00:00 GMT-0600"
+                              :end      "Fri Nov 22 1963 14:00:00 GMT-0600"
+                              :magnify  3
+                              :unit     js/SimileAjax.DateTime.MINUTE
+                              :multiple 5}]
               :intervalUnit :week}
    :overview {:width        "20%"
+              :zones        [{:start   "Fri Nov 22 1963 00:00:00 GMT-0600"
+                              :end     "Mon Nov 25 1963 00:00:00 GMT-0600"
+                              :magnify 10
+                              :unit    js/SimileAjax.DateTime.WEEK}
+                             {:start   "Fri Nov 22 1963 09:00:00 GMT-0600"
+                              :end     "Sun Nov 24 1963 00:00:00 GMT-0600"
+                              :magnify 5
+                              :unit    js/SimileAjax.DateTime.DAY}
+                             {:start    "Fri Nov 22 1963 11:00:00 GMT-0600"
+                              :end      "Sat Nov 23 1963 00:00:00 GMT-0600"
+                              :magnify  5
+                              :unit     js/SimileAjax.DateTime.MINUTE
+                              :multiple 60}
+                             {:start    "Fri Nov 22 1963 12:00:00 GMT-0600"
+                              :end      "Fri Nov 22 1963 14:00:00 GMT-0600"
+                              :magnify  3
+                              :unit     js/SimileAjax.DateTime.MINUTE
+                              :multiple 15}]
+
+
               :intervalUnit :month}
    :common   {:intervalPixels 200
               :timeZone       -6
@@ -60,7 +97,7 @@
   (let [tei (get @examples filename)]
     [["Tidslinje" [timeline {:style {:height 350}}
                    {:events jfk-events
-                    :bands  bands}]]
+                    :bands  jfk-bands}]]
      ["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
      ["XML" [:pre {:style {:white-space "pre-wrap"}}
              [:code
@@ -78,30 +115,37 @@
 
 (defn app
   []
-  [:<>
-   [:p {:style {:display         "flex"
-                :justify-content "flex-end"}}
-    (let [current-file (r/cursor state [:current-file])]
-      [:label "TEI-fil: "
-       [:select {:key           @current-file
-                 :default-value @current-file
-                 :on-change     (fn [e] (set-content! (.. e -target -value)))}
-        (for [[k _] (sort @examples)]
-          ^{:key k} [:option {:value k}
-                     k])]
-       " "
-       [:input {:aria-label "Lokal TEI-fil"
-                :type       "file"
-                :on-change  (fn [e]
-                              (when-let [file (.item e.target.files 0)]
-                                (.then (.text file)
-                                       (fn [s]
-                                         (swap! examples assoc (.-name file) s)
-                                         (set-content! (.-name file))))))}]])]
-   [:div {:style {:max-width "100ch"
-                  :min-width "40ch"
-                  :margin    "0 auto"}}
-    [tabs/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
+  [:div {:style {:padding "20px"}}
+   [:p "ZONES: " (if (some? (get-in jfk-bands [:primary :zones]))
+                   "present -- time band is stretched, events get distributed"
+                   "not present -- time band is linear, events concentrate at hot spots")]
+   [timeline {:style {:height 350}}
+    {:events jfk-events
+     :bands  jfk-bands}]]
+  #_[:<>
+     [:p {:style {:display         "flex"
+                  :justify-content "flex-end"}}
+      (let [current-file (r/cursor state [:current-file])]
+        [:label "TEI-fil: "
+         [:select {:key           @current-file
+                   :default-value @current-file
+                   :on-change     (fn [e] (set-content! (.. e -target -value)))}
+          (for [[k _] (sort @examples)]
+            ^{:key k} [:option {:value k}
+                       k])]
+         " "
+         [:input {:aria-label "Lokal TEI-fil"
+                  :type       "file"
+                  :on-change  (fn [e]
+                                (when-let [file (.item e.target.files 0)]
+                                  (.then (.text file)
+                                         (fn [s]
+                                           (swap! examples assoc (.-name file) s)
+                                           (set-content! (.-name file))))))}]])]
+     [:div {:style {:max-width "100ch"
+                    :min-width "40ch"
+                    :margin    "0 auto"}}
+      [tabs/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
 
 (def root
   (js/document.getElementById "app"))
