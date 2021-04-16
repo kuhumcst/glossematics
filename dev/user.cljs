@@ -9,9 +9,17 @@
             [tei-facsimile.core :as facsimile]
             [dk.cst.hjelmslev.timeline :refer [timeline]]))
 
-;; TODO
-(def timeline-data
+(def hjemslev-events
   (load/timeline))
+
+(def hjemslev-bands
+  {:primary  {:width        "80%"
+              :intervalUnit :month}
+   :overview {:width        "20%"
+              :intervalUnit :decade}
+   :common   {:intervalPixels 400
+              :timeZone       1
+              :date           "1952-06-01"}})
 
 ;; Only left here in case I need to call (.loadXML ...) again.
 (defonce jfk-xml
@@ -116,12 +124,9 @@
 (defn app
   []
   [:div {:style {:padding "20px"}}
-   [:p "ZONES: " (if (some? (get-in jfk-bands [:primary :zones]))
-                   "present -- time band is stretched, events get distributed"
-                   "not present -- time band is linear, events concentrate at hot spots")]
    [timeline {:style {:height 350}}
-    {:events jfk-events
-     :bands  jfk-bands}]]
+    {:events hjemslev-events
+     :bands  hjemslev-bands}]]
   #_[:<>
      [:p {:style {:display         "flex"
                   :justify-content "flex-end"}}
