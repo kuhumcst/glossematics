@@ -69,8 +69,15 @@
   {:horizontal js/Timeline.HORIZONTAL
    :vertical   js/Timeline.VERTICAL})
 
-(defn ->HotZoneBandInfos
-  "Create two connected `bands` for a Simile Timeline `event-source`."
+(defn ->BandInfo
+  "Create a BandInfo or HotZoneBandInfo from a `band` map."
+  [band]
+  (if (:zones band)
+    (js/Timeline.createHotZoneBandInfo (clj->js band))
+    (js/Timeline.createBandInfo (clj->js band))))
+
+(defn connect-bands
+  "Connect two BandInfos given a `bands` config and an `event-source`."
   [event-source {:keys [primary overview common] :as bands}]
   (let [get-unit #(get ->DateTime % %)
         primary  (-> (merge common primary)
@@ -81,18 +88,19 @@
                        :eventSource event-source
                        :layout "overview")
                      (update :intervalUnit get-unit))]
-    (array (js/Timeline.createHotZoneBandInfo (clj->js primary))
-           (doto (js/Timeline.createHotZoneBandInfo (clj->js overview))
+    (array (->BandInfo primary)
+           (doto (->BandInfo overview)
              (set! -syncWith 0)
              (set! -highlight true)))))
 
+;; TODO: optimise redrawing (store JS objects as state and reuse)
 (defn draw-timeline!
   "Draw a Simile Timeline in the HTML `element` based on `opts`."
-  [element {:keys [layout events band-infos timeline]
+  [element {:keys [layout events bands timeline]
             :or   {layout :horizontal}
             :as   opts}]
   (let [event-source (js/Timeline.DefaultEventSource.)
-        band-infos   (->HotZoneBandInfos event-source band-infos)]
+        band-infos   (connect-bands event-source bands)]
     (when-not timeline
       (js/Timeline.create element band-infos (->Layout layout)))
     (add-events! event-source events)))

@@ -29,13 +29,11 @@
              $)))
 
 
-(def band-infos
+(def bands
   {:primary  {:width        "80%"
-              :intervalUnit :week
-              :zones        []}
+              :intervalUnit :week}
    :overview {:width        "20%"
-              :intervalUnit :month
-              :zones        []}
+              :intervalUnit :month}
    :common   {:intervalPixels 200
               :timeZone       -6
               :date           "Fri Nov 22 1963 13:00:00 GMT-0600"}})
@@ -61,8 +59,8 @@
   [filename]
   (let [tei (get @examples filename)]
     [["Tidslinje" [timeline {:style {:height 350}}
-                   {:events     jfk-events
-                    :band-infos band-infos}]]
+                   {:events jfk-events
+                    :bands  bands}]]
      ["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
      ["XML" [:pre {:style {:white-space "pre-wrap"}}
              [:code
