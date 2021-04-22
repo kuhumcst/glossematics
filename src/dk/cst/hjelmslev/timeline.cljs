@@ -50,19 +50,23 @@
          (into-array)
          (.addMany event-source))))
 
+(def interval-kvs
+  "Sorted order, for dropdowns."
+  [[:millisecond js/SimileAjax.DateTime.MILLISECOND]
+   [:second js/SimileAjax.DateTime.SECOND]
+   [:minute js/SimileAjax.DateTime.MINUTE]
+   [:hour js/SimileAjax.DateTime.HOUR]
+   [:day js/SimileAjax.DateTime.DAY]
+   [:week js/SimileAjax.DateTime.WEEK]
+   [:month js/SimileAjax.DateTime.MONTH]
+   [:year js/SimileAjax.DateTime.YEAR]
+   [:decade js/SimileAjax.DateTime.DECADE]
+   [:century js/SimileAjax.DateTime.CENTURY]
+   [:millennium js/SimileAjax.DateTime.MILLENNIUM]])
+
 (def ->DateTime
   "Mapping the interval time units described in labeller.js."
-  {:millisecond js/SimileAjax.DateTime.MILLISECOND
-   :second      js/SimileAjax.DateTime.SECOND
-   :minute      js/SimileAjax.DateTime.MINUTE
-   :hour        js/SimileAjax.DateTime.HOUR
-   :day         js/SimileAjax.DateTime.DAY
-   :week        js/SimileAjax.DateTime.WEEK
-   :month       js/SimileAjax.DateTime.MONTH
-   :year        js/SimileAjax.DateTime.YEAR
-   :decade      js/SimileAjax.DateTime.DECADE
-   :century     js/SimileAjax.DateTime.CENTURY
-   :millennium  js/SimileAjax.DateTime.MILLENNIUM})
+  (into {} interval-kvs))
 
 (def ->Layout
   "Mapping the layouts described in timeline.js."
@@ -96,13 +100,12 @@
 ;; TODO: optimise redrawing (store JS objects as state and reuse)
 (defn draw-timeline!
   "Draw a Simile Timeline in the HTML `element` based on `opts`."
-  [element {:keys [layout events bands timeline]
+  [element {:keys [layout events bands]
             :or   {layout :horizontal}
             :as   opts}]
   (let [event-source (js/Timeline.DefaultEventSource.)
         band-infos   (connect-bands event-source bands)]
-    (when-not timeline
-      (js/Timeline.create element band-infos (->Layout layout)))
+    (js/Timeline.create element band-infos (->Layout layout))
     (add-events! event-source events)))
 
 (defn timeline
@@ -111,15 +114,20 @@
 
   The available options are:
 
-    :events     - events as Clojure maps (see the prepare-event fn).
-    :band-infos - information about the bands (see the ->BandInfos fn).
-    :layout     - (OPTIONAL) can be :horizontal or :vertical."
+    :events - events as Clojure maps (see the prepare-event fn).
+    :bands  - information about the bands (see the connect-bands fn)."
   [attr opts]
-  (r/create-class
-    {:component-did-mount
-     (fn [this]
-       (draw-timeline! (rdom/dom-node this) opts))
+  (let [opts* (r/atom nil)]
+    (r/create-class
+      {:component-did-mount
+       (fn [this]
+         (draw-timeline! (rdom/dom-node this) @opts*))
 
-     :reagent-render
-     (fn [attr opts]
-       [:div attr])}))
+       :component-did-update
+       (fn [this]
+         (draw-timeline! (rdom/dom-node this) @opts*))
+
+       :reagent-render
+       (fn [attr opts]
+         (reset! opts* opts)
+         [:div attr])})))
