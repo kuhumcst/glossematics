@@ -18,8 +18,8 @@
         all            (sp.auth/permit conf :all)
         authenticated  (sp.auth/permit conf :authenticated)
         auth-requested (sp.auth/permit conf #(get-in % [:session :saml :request]))]
-    ;; Standard endpoints required for an sp-initiated SAML login flow
-    #{[saml-meta :get (sp.ic/metadata conf) :route-name ::saml-meta]
+    #{;; Standard endpoints required for an sp-initiated SAML login flow
+      [saml-meta :get (sp.ic/metadata conf) :route-name ::saml-meta]
       [saml-login :get (conj all (sp.ic/request conf)) :route-name ::saml-req]
       [saml-login :post (conj all body-params (sp.ic/response conf)) :route-name ::saml-resp]
 

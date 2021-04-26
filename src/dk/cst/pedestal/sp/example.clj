@@ -5,7 +5,6 @@
             [io.pedestal.interceptor :as ic]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
-            [io.pedestal.log :as log]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
@@ -82,20 +81,9 @@
 
 (defn service-map
   [conf]
-  (let [{:keys [filename password]} (:https-credential conf)]
-    (merge
-      {::http/routes (routes conf)
-       ::http/type   :jetty
-       ::http/port   8080}
-
-      (if (and filename password)
-        ;; Development-only keystore created using Bruce Hauman's Certifiable.
-        ;; https://github.com/bhauman/certifiable#quick-start-command-line-usage
-        {::http/container-options {:ssl?         true
-                                   :ssl-port     4433       ; ports below 1024 require root permissions
-                                   :keystore     filename
-                                   :key-password password}}
-        (log/warn :example/ssl "HTTPS unavailable: no filename or password")))))
+  {::http/routes (routes conf)
+   ::http/type   :jetty
+   ::http/port   8080})
 
 (defn load-sp-conf!
   ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
