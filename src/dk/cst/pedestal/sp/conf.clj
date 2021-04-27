@@ -1,6 +1,6 @@
 (ns dk.cst.pedestal.sp.conf
   (:require [clojure.spec.alpha :as s]
-            [aero.core :as aero]
+            [clojure.edn :as edn]
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as saml-coerce]
             [saml20-clj.state :as saml-state]
@@ -53,8 +53,8 @@
 (defn read-file!
   "Load an Aero `edn-file` with the given `profile`. The contents of this
   file may then be passed to sp.conf/init."
-  [edn-file & [opts]]
-  (let [conf (aero/read-config edn-file opts)]
+  [edn-file]
+  (let [conf (edn/read-string (slurp edn-file))]
     (if (s/valid? ::config conf)
       (assoc conf :idp-cert (slurp (:idp-cert conf)))
       (throw (ex-info "invalid config" (s/explain-data ::config conf))))))

@@ -28,9 +28,9 @@ COPY ./deps.edn /etc/glossematics/deps.edn
 COPY ./shadow-cljs.edn /etc/glossematics/shadow-cljs.edn
 
 # Create a Java classpath, i.e. fetch required Clojure library dependencies
+WORKDIR /etc/glossematics
 RUN clojure -Spath
 
 COPY ./start.sh /etc/glossematics/start.sh
 RUN chmod +x /etc/glossematics/start.sh
-WORKDIR /etc/glossematics
 ENTRYPOINT ["./start.sh"]

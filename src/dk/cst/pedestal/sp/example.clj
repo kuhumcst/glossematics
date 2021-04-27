@@ -1,6 +1,5 @@
 (ns dk.cst.pedestal.sp.example
   (:require [clojure.set :as set]
-            [clojure.java.io :as io]
             [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.http :as http]
@@ -11,6 +10,10 @@
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
+
+(defn in-home
+  [path]
+  (str (System/getProperty "user.home") path))
 
 (defn- resource
   [ctx path description]
@@ -87,7 +90,7 @@
 
 (defn load-sp-conf!
   ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
-  ([] (load-sp-conf! (io/resource "conf.edn"))))
+  ([] (load-sp-conf! (in-home "/.glossematics/repl-conf.edn"))))
 
 (defn start []
   (when (not @sp-conf)

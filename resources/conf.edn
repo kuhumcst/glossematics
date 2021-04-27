@@ -1,4 +1,0 @@
-{:sp-url     #env PEDESTALSP_SP_URL
- :idp-url    #env PEDESTALSP_IDP_URL
- :idp-cert   #env PEDESTALSP_IDP_CERT
- :credential #include #env PEDESTALSP_CREDENTIAL}

@@ -9,7 +9,6 @@
            luminus/ring-ttl-session         {:mvn/version "0.3.3"}
            org.slf4j/slf4j-simple           {:mvn/version "1.7.30"}
            hiccup                           {:mvn/version "1.0.5"}
-           aero/aero                        {:mvn/version "1.1.6"}
            org.clojure/data.csv             {:mvn/version "1.0.0"}
            semantic-csv/semantic-csv        {:mvn/version "0.2.1-alpha1"}
 

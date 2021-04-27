@@ -46,7 +46,7 @@
 
 (defn load-sp-conf!
   ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
-  ([] (load-sp-conf! (io/resource "conf.edn"))))
+  ([] (load-sp-conf! (example/in-home "/.glossematics/repl-conf.edn"))))
 
 (defn start []
   (when (not @sp-conf)
@@ -70,19 +70,18 @@
 
 (defn -main
   [& [conf-source]]
-  (let [conf-source* (or conf-source (System/getenv "GLOSSEMATICS_CONF"))]
-    (cond
-      (.exists (io/file conf-source*))
-      (do
-        (log/info :conf/exists {:source conf-source*})
-        (load-sp-conf! conf-source*)
-        (start))
+  (cond
+    (.exists (io/file conf-source))
+    (do
+      (log/info :conf/exists {:source conf-source})
+      (load-sp-conf! conf-source)
+      (start))
 
-      conf-source*
-      (log/error :conf/unreadable {:source conf-source*})
+    conf-source
+    (log/error :conf/unreadable {:source conf-source})
 
-      :else
-      (log/error :conf/missing {:source conf-source*}))))
+    :else
+    (log/error :conf/missing {:source conf-source})))
 
 (comment
   @sp-conf
