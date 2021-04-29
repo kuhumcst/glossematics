@@ -1,13 +1,34 @@
 version: '3'
+
 services:
+
+  nginx-reverse-proxy:
+    build:
+      context: nginx-reverse-proxy
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - CERTBOT_EMAIL=simongray@hum.ku.dk
+      - STAGING=0
+      - DHPARAM_SIZE
+      - RSA_KEY_SIZE
+      - RENEWAL_INTERVAL
+    ports:
+      - 80:80
+      - 443:443
+      - 8080
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+
   glossematics:
     build:
+      # need to include files from parent dir (see Dockerfile)
       context: ../
       dockerfile: docker/glossematics/Dockerfile
+    restart: unless-stopped
     volumes:
       - ${GLOSSEMATICS_CONF}:/etc/glossematics/conf.edn
       - ${GLOSSEMATICS_IDP_CERTIFICATE}:/etc/glossematics/idp-certificate.pem
       - ${GLOSSEMATICS_SAML_KEYSTORE}:/etc/glossematics/saml-keystore.jks
     ports:
-      - "80:8080"
-      - "7000"
+      - 8080:8080
