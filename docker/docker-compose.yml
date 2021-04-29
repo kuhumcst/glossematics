@@ -1,7 +1,9 @@
 version: '3'
 services:
   glossematics:
-    build: .
+    build:
+      context: ../
+      dockerfile: docker/glossematics/Dockerfile
     volumes:
       - ${GLOSSEMATICS_CONF}:/etc/glossematics/conf.edn
       - ${GLOSSEMATICS_IDP_CERTIFICATE}:/etc/glossematics/idp-certificate.pem

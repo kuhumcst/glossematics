@@ -31,6 +31,6 @@ COPY ./shadow-cljs.edn /etc/glossematics/shadow-cljs.edn
 WORKDIR /etc/glossematics
 RUN clojure -Spath
 
-COPY ./start.sh /etc/glossematics/start.sh
+COPY ./docker/glossematics/start.sh /etc/glossematics/start.sh
 RUN chmod +x /etc/glossematics/start.sh
 ENTRYPOINT ["./start.sh"]
