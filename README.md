@@ -6,26 +6,32 @@ The web app includes a facsimile viewer implemented as a [reagent](https://githu
 
 Server setup
 ------------
-The backend is a Pedestal web service that uses SAML for authentication/authorisation by way of **Pedestal SP**.
+The backend is a Pedestal web service that uses SAML for authentication/authorisation by way of **Pedestal SP**. Jetty is used to serve the raw content, while nginx acts as a reverse proxy/gateway in production (using HTTPS). The production system is built and run using Docker.
 
-In order for HTTPS and SAML encryption to work, two separate Java keystores need to be created:
+In order for SAML encryption to work, a Java keystore needs to be created. I generate a new one from scratch in both production and on the development machine:
 
-* A keystore containing certificates for HTTPS; for the production server we use Let's Encrypt's certbot to generate them and then place the resulting .pem-files in a keystore; for local development we must generate and verify the certificates ourselves.
-* A keystore for SAML encryption; we generate a new from scratch in both production and on the development machine: `keytool -keystore /etc/glossematics/keystore.jks -keyalg RSA -genkey -alias glossematics`.
+```shell
+keytool -keystore /etc/glossematics/keystore.jks -keyalg RSA -genkey -alias glossematics`.
+```
 
-In addition to the two keystores, the IdP's certificate needs to be present on disk too. In our case, we need the [WAYF certificate](https://www.wayf.dk/da/metadata) for the production server and a self-supplied one for development.
+I also install and run the certbot tool from Let's Encrypt precisely _once_ to get an initial set of SSL certificates for HTTPS (located in the default location). These are picked up by the docker-compose setup as part of the [nginx-reverse-proxy](https://github.com/kuhumcst/glossematics/blob/master/docker/nginx-reverse-proxy/conf.d/reverse-proxy.conf) service. All future renewal is handled automatically by this Docker service running nginx and certbot.
 
-### Docker
-The supplied `Dockerfile` and `docker-compose.yml` are used to build and run the system in production. Some environment variables must be set to establish volumes in the Docker container:
+In addition to the keystore and the SSL certificates, the IdP's certificate needs to be present on disk too. In our case, we need the [WAYF certificate](https://www.wayf.dk/da/metadata) for the production server and a self-supplied one for development.
+
+### Running the backend in production
+The supplied `docker-compose.yml` file is used to build and run the system in production.
+
+Some environment variables must be set to establish volumes in the Docker container:
 
 ```dotenv
 GLOSSEMATICS_CONF=${HOME}/.glossematics/conf.edn
 GLOSSEMATICS_IDP_CERTIFICATE=${HOME}/.glossematics/idp-certificate.pem
 GLOSSEMATICS_SAML_KEYSTORE=${HOME}/.glossematics/saml-keystore.jks
-GLOSSEMATICS_HTTPS_KEYSTORE=${HOME}/.glossematics/https-keystore.jks
 ```
 
-Assuming the files all exist in those locations, these lines can be put inside a `.env` file. The `docker-compose` command is then used to build and start the project:
+Assuming the files all exist in those locations, these lines can be put inside a `.env` file.
+
+The `docker-compose` command is then used to build and start the project:
 
 ```shell
 # build, start, write output to shell
@@ -35,36 +41,8 @@ docker-compose up --build
 docker-compose up -d --build
 ```
 
-### Environment variables
-TODO: rewrite
-
-The following environment variables determine the SAML configuration:
-
-| VARIABLE | VALUE |
-| ------------- | ------------- |
-| PEDESTALSP_APP_NAME | Glossematics |
-| PEDESTALSP_SP_URL | https://glossematics.org |
-| PEDESTALSP_IDP_URL | https://wayf.wayf.dk/saml2/idp/SSOService2.php |
-| PEDESTALSP_IDP_CERT | /etc/glossematics/wayf-cert.pem |
-| PEDESTALSP_CREDENTIAL | /etc/glossematics/credential.edn |
-| PEDESTALSP_HTTPS_CREDENTIAL | /etc/glossematics/https-credential.edn |
-
-`PEDESTALSP_CREDENTIAL` is itself a path to an EDN file describing the SAML keystore:
-
-```clojure
-{:alias    "glossematics"
- :filename "/etc/glossematics/keystore.jks"
- :password "<PASSWORD CENSORED>"}
-```
-
-`PEDESTALSP_HTTPS_CREDENTIAL` is similar, but does not contain an alias:
-
-```clojure
-{:filename "/etc/letsencrypt/live/glossematics.org/glossematics.org.keystore"
- :password "<PASSWORD CENSORED>"}
-```
-
-For the local development system the same environment values must be set, although their values can of course differ from the production ones.
+### Running the backend locally
+The Docker setup is only meant to run in production as it relies on an HTTPS setup using authenticated certificates. For local development, the backend server should be started in the REPL and accessed via [port 8080](http://localhost:8080) (regular HTTP). This is the same port that is proxied in the Docker setup. 
 
 Development prerequisites
 -------------------------

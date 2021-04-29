@@ -39,8 +39,7 @@ Here's an example using a minimal config:
          '[dk.cst.pedestal.sp.conf :as sp.conf])
 
 (def base-conf
-  {:app-name   "ExampleServiceProvider"
-   :sp-url     "https://localhost:4433"
+  {:sp-url     "https://localhost:4433"
    :idp-url    "https://localhost:7000"
    :idp-cert   (slurp "/path/to/idp-public-cert.pem")
    :credential {:alias    "mylocalsp"
@@ -61,7 +60,7 @@ While developing your SAML SP, your probably want a mock IdP to develop up again
 https://github.com/quephird/saml-test#getting-things-running), specifically the parts related to getting the Node-based IdP running and creating a certificate for it. Once you have generated a certificate you can set the following keys in the config map:
 
 ```clojure
-:idp-url  "http://localhost:7000"
+:idp-url  "https://localhost:7000"
 :idp-cert (slurp "/path/to/idp-public-cert.pem")
 ```
 
@@ -81,14 +80,13 @@ The KeyStore provides the credentials needed to properly sign your SAML requests
 > _Note: make sure to add `-keyalg RSA` to the keytool command that use to create your keystore. This is expected by the underlying saml20-clj library._ 
 
 ### Your service
-Now all that remains is defining the name of your web service and the URL. While developing you will want to use a local URL, but obviously for a production system you will want to use the proper URL:
+Now all that remains is defining the identity of your web service. While developing you will want to use a local URL, but obviously for a production system you will want to use the proper URL:
 
 ```clojure
-:app-name "Test SAML app" ; EntityId in meta, ProviderName in request
-:sp-url   "http://localhost:8080"
+:sp-url "http://localhost:8080"
 ```
 
-Altogether, these 5 keys (`:idp-url`, `:idp-cert`, `:credential`, `:app-name`, `:sp-url`) make up the required parts of the base config. The remaining keys are all optional.
+Altogether, these 4 keys (`:idp-url`, `:idp-cert`, `:credential`, `:sp-url`) make up the required parts of the base config. The remaining keys are all optional.
 
 > _<a name="idp-caveat"><sup>†</sup></a> Depending on what IdP you're integrating with, additional steps might need to be taken. That is beyond the scope of this little setup guide._
 
