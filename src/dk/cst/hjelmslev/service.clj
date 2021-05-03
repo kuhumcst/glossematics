@@ -6,6 +6,7 @@
             [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
+            [dk.cst.hjelmslev.index :as index]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.auth :as sp.auth]
@@ -16,7 +17,8 @@
 
 (defn hjelmslev-routes
   [conf]
-  #{["/" :get [(sp.auth/session conf) (example/login-page conf)] :route-name ::login]})
+  #{["/" :get (conj (sp.auth/permit conf :authenticated) index/handler) :route-name ::index]
+    ["/login" :get [(sp.auth/session conf) (example/login-page conf)] :route-name ::login]})
 
 (defn routes
   [sp-conf]

@@ -1,11 +1,13 @@
 {:deps     {:aliases [:app :test]}
- :dev-http {9000 "classpath:public"}
+ :dev-http {9000 {:root    "resources/public"
+                  :handler dk.cst.hjelmslev.index/handler}}
  :nrepl    {:port    9900
             :init-ns dev}
- :builds   {:app  {:target     :browser
-                   :output-dir "resources/public/js/compiled"
-                   :asset-path "/js/compiled"
-                   :modules    {:main {:init-fn user/start-dev}}}
+ :builds   {:app  {:target            :browser
+                   :output-dir        "resources/public/js/compiled"
+                   :asset-path        "/js/compiled"
+                   :module-hash-names true
+                   :modules           {:main {:init-fn user/start-dev}}}
             :test {:target   :browser-test
                    :test-dir "resources/public/js/test"
                    :devtools {:http-port 9100
