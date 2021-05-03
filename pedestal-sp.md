@@ -20,6 +20,10 @@ Personally, I like keep things more tightly integrated and simpler to understand
 
 > _<a name="saml-overview"><sup>†</sup></a> Take a look at [this video](https://www.youtube.com/watch?v=SvppXbpv-5k) to get a quick overview of how SAML works._
 
+Be aware...
+-----------
+To make this library work with an IdP you will most likely also need to make sure your content is served as HTTPS. You can use one of the servers supported by Pedestal for this, but personally I prefer using something like nginx or caddy to handle this aspect of modern web development.
+
 Setup
 -----
 **Pedestal SP** is divided into the following namespaces:
