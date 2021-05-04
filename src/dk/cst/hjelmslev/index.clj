@@ -17,6 +17,7 @@
    [:head
     [:meta {:charset "utf-8"}]
     [:title "Louis Hjelmslev development"]
+    [:link {:rel "icon" :href "favicon.svg"}]
 
     ;; These styles are used by the Simile Timeline API
     [:link {:rel "stylesheet" :href "styles.css" :type "text/css"}]
@@ -71,7 +72,6 @@
    [:body
     [:div#app]
     [:script {:src (str "js/compiled/" index-filename)}]]])
-
 
 (def index-html
   (hiccup/html index-hiccup))
