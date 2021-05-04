@@ -30,23 +30,22 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# Glossematics source code files
-COPY ./src /etc/glossematics/src
-COPY ./resources /etc/glossematics/resources
-COPY ./deps.edn /etc/glossematics/deps.edn
-COPY ./shadow-cljs.edn /etc/glossematics/shadow-cljs.edn
-
-# TODO: remove in the future - currently in use
-COPY ./dev /etc/glossematics/dev
-
 WORKDIR /etc/glossematics
 
-# Create a release build of the ClojureScript app
-RUN shadow-cljs release app
-
-# Create a Java classpath, i.e. fetch required Clojure library dependencies
+# Download Clojure(Script) dependencies
+COPY ./deps.edn /etc/glossematics/deps.edn
+COPY ./shadow-cljs.edn /etc/glossematics/shadow-cljs.edn
+RUN shadow-cljs classpath
 RUN clojure -Spath
 
+# TODO: remove dev/ in the future (currently in use)
+# Create a release build of the ClojureScript app
+COPY ./dev /etc/glossematics/dev
+COPY ./src /etc/glossematics/src
+COPY ./resources /etc/glossematics/resources
+RUN shadow-cljs release app
+
+# Run the backend web service
 COPY ./docker/glossematics/start.sh /etc/glossematics/start.sh
 RUN chmod +x /etc/glossematics/start.sh
 ENTRYPOINT ["./start.sh"]
