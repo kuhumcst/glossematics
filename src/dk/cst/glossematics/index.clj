@@ -22,7 +22,6 @@
     [:link {:rel "mask-icon" :href "favicon.svg" :color "#a02c2c"}]
 
     ;; These styles are used by the Simile Timeline API
-    [:link {:rel "stylesheet" :href "styles.css" :type "text/css"}]
     [:link {:rel "stylesheet" :href "/api/styles/ethers.css" :type "text/css"}]
     [:link {:rel "stylesheet" :href "/api/styles/events.css" :type "text/css"}]
     [:link {:rel "stylesheet" :href "/api/styles/timeline.css" :type "text/css"}]
@@ -58,18 +57,7 @@
     [:script {:src "/api/scripts/compact-painter.js" :type "text/javascript"}]
     [:script {:src "/api/scripts/decorators.js" :type "text/javascript"}]
     [:script {:src "/api/scripts/l10n/en/labellers.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/l10n/en/timeline.js" :type "text/javascript"}]
-
-    ;; TODO: remove
-    ;; (some CSS that was grandfathered in from the original HTML example)
-    [:style {:type "text/css"} ".t-highlight1 { background-color: #ccf; }
-        .p-highlight1 { background-color: #fcc; }
-
-        .timeline-highlight-label-start .label_t-highlight1 { color: #f00; }
-        .timeline-highlight-label-end .label_t-highlight1 { color: #aaf; }
-
-        .timeline-band-events .important { color: #f00; }
-        .timeline-band-events .small-important { background: #c00; }"]]
+    [:script {:src "/api/scripts/l10n/en/timeline.js" :type "text/javascript"}]]
 
    [:body
     [:div#app]
