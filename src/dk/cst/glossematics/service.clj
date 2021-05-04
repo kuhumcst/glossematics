@@ -1,4 +1,4 @@
-(ns dk.cst.hjelmslev.service
+(ns dk.cst.glossematics.service
   (:require [clojure.set :as set]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
@@ -6,7 +6,7 @@
             [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
-            [dk.cst.hjelmslev.index :as index]
+            [dk.cst.glossematics.index :as index]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.auth :as sp.auth]
@@ -15,7 +15,7 @@
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
 
-(defn hjelmslev-routes
+(defn glossematics-routes
   [conf]
   #{["/" :get (conj (sp.auth/permit conf :authenticated) index/handler) :route-name ::index]
     ["/login" :get [(sp.auth/session conf) (example/login-page conf)] :route-name ::login]})
@@ -23,7 +23,7 @@
 (defn routes
   [sp-conf]
   (route/expand-routes
-    (set/union (hjelmslev-routes sp-conf)
+    (set/union (glossematics-routes sp-conf)
                (sp.routes/all sp-conf))))
 
 (defn ->service-map

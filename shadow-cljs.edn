@@ -1,6 +1,6 @@
 {:deps     {:aliases [:app :test]}
  :dev-http {9000 {:root    "resources/public"
-                  :handler dk.cst.hjelmslev.index/handler}}
+                  :handler dk.cst.glossematics.index/handler}}
  :nrepl    {:port    9900
             :init-ns dev}
  :builds   {:app  {:target            :browser

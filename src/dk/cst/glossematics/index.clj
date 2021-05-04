@@ -1,4 +1,4 @@
-(ns dk.cst.hjelmslev.index
+(ns dk.cst.glossematics.index
   "Generate the index.html file using Clojure. This is mostly done to streamline
   fingerprinting of any included files in the release version."
   (:require [clojure.java.io :as io]
@@ -16,7 +16,8 @@
   [:html {:lang "da"}
    [:head
     [:meta {:charset "utf-8"}]
-    [:title "Louis Hjelmslev development"]
+    [:title (str "Glossematics" (when (= index-filename "main.js")
+                                  " (development)"))]
     [:link {:rel "icon" :href "favicon.svg"}]
     [:link {:rel "mask-icon" :href "favicon.svg" :color "#a02c2c"}]
 
@@ -78,7 +79,7 @@
   (hiccup/html index-hiccup))
 
 (defn handler
-  [{:keys [http-config] :as req}]
+  [_]
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    index-html})

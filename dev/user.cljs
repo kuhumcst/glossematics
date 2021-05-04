@@ -7,7 +7,7 @@
             [reagent.dom :as rdom]
             [recap.component.widget.tabs :as tabs]
             [tei-facsimile.core :as facsimile]
-            [dk.cst.hjelmslev.timeline :as timeline :refer [timeline]]))
+            [dk.cst.glossematics.timeline :as timeline :refer [timeline]]))
 
 (def hjemslev-events
   (load/timeline))
@@ -196,5 +196,5 @@
 
 (defn start-dev
   []
-  (println "Started development environment for kuhumcst/louis-hjelmslev.")
+  (println "Started development environment for kuhumcst/glossematics.")
   (render))

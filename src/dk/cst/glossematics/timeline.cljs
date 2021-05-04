@@ -1,4 +1,4 @@
-(ns dk.cst.hjelmslev.timeline
+(ns dk.cst.glossematics.timeline
   "Wrapper for the Simile Timeline widget. Depends on some ancient JS libs."
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]))

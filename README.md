@@ -105,4 +105,4 @@ clj -A:update
 ```
 
 ### Backend
-The namespace `dk.cst.hjelmslev.service` defines the backend web service. This Pedestal web service can be started, stopped, restarted, and updated entirely through the Clojure REPL using the utility functions located inside that namespace. There is no need to install and setup a separate web server since Pedestal dynamically sets up a Jetty instance for this purpose.
+The namespace `dk.cst.glossematics.service` defines the backend web service. This Pedestal web service can be started, stopped, restarted, and updated entirely through the Clojure REPL using the utility functions located inside that namespace. There is no need to install and setup a separate web server since Pedestal dynamically sets up a Jetty instance for this purpose.
