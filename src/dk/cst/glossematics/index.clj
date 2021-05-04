@@ -20,6 +20,7 @@
                                   " (development)"))]
     [:link {:rel "icon" :href "favicon.svg"}]
     [:link {:rel "mask-icon" :href "favicon.svg" :color "#a02c2c"}]
+    [:link {:rel "stylesheet" :href "/main.css" :type "text/css"}]
 
     ;; These styles are used by the Simile Timeline API
     [:link {:rel "stylesheet" :href "/api/styles/ethers.css" :type "text/css"}]

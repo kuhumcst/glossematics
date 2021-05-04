@@ -142,6 +142,17 @@
 (defn app
   []
   [:<>
+   [:h1 {:style {:color          "black"
+                 :letter-spacing "4px"
+                 :font-family    "PoiretOne"
+                 :font-size      "64px"
+                 :text-align     "left"
+                 :text-transform "uppercase"
+                 :border-bottom  "16px solid darkred"}}
+    "Glossematics"
+    [:span {:style {:color     "#DDBBBB"
+                    :font-size "40px"}}
+     ".org"]]
    [:form {:style {:padding       20
                    :margin-bottom -40}}
     [:p [:label [:strong "Primary: "] [interval-select hjemslev-bands :primary]]]
