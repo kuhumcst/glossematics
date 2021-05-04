@@ -18,8 +18,8 @@ I also install the certbot tool from Let's Encrypt and run it precisely _once_ t
 
 In addition to the keystore and the SSL certificates, the IdP's certificate needs to be present on disk too. In our case, we need the [WAYF certificate](https://www.wayf.dk/da/metadata) for the production server (and a self-supplied one for development). This public certificate doesn't need to be put inside a keystore. For local development, I run a "fake" IdP on localhost:7000 that I set up based on [the guide found here](https://github.com/quephird/saml-test).
 
-### Running the backend in production
-The supplied `docker-compose.yml` file is used to build and run the system in production. It sets up two containers: one that contains the Clojure web service and one running nginx+certbot that facilitates public HTTPS access to the content.
+### Running the system in production
+The supplied `docker-compose.yml` file is used to build and run the system in production. It sets up two containers: one that contains the backend Clojure web service and one running nginx+certbot that facilitates public HTTPS access to the content. The ClojureScript frontend is also compiled as part of the build and subsequently served by the backend.
 
 Some environment variables must be set to establish volumes in the Docker container:
 
