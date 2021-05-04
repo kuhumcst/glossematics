@@ -18,6 +18,7 @@
     [:meta {:charset "utf-8"}]
     [:title "Louis Hjelmslev development"]
     [:link {:rel "icon" :href "favicon.svg"}]
+    [:link {:rel "mask-icon" :href "favicon.svg" :color "#a02c2c"}]
 
     ;; These styles are used by the Simile Timeline API
     [:link {:rel "stylesheet" :href "styles.css" :type "text/css"}]
