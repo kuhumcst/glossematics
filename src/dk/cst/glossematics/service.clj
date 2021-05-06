@@ -35,6 +35,7 @@
              :script-src  "'self' 'unsafe-inline'"
              :connect-src "'self'"
              :img-src     "'self'"
+             :font-src    "'self'"
              :style-src   "'self' 'unsafe-inline'"
              :base-uri    "'self'"}]
     {::http/routes         (routes sp-conf)
