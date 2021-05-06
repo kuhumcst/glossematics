@@ -80,37 +80,6 @@ Timeline.DefaultEventSource.prototype._fire = function(handlerName, args) {
     }
 };
 
-Timeline.DefaultEventSource.prototype._getBaseURL = function(url) {
-    if (url.indexOf("://") < 0) {
-        var url2 = this._getBaseURL(document.location.href);
-        if (url.substr(0,1) == "/") {
-            url = url2.substr(0, url2.indexOf("/", url2.indexOf("://") + 3)) + url;
-        } else {
-            url = url2 + url;
-        }
-    }
-    
-    var i = url.lastIndexOf("/");
-    if (i < 0) {
-        return "";
-    } else {
-        return url.substr(0, i+1);
-    }
-};
-
-Timeline.DefaultEventSource.prototype._resolveRelativeURL = function(url, base) {
-    if (url == null || url == "") {
-        return url;
-    } else if (url.indexOf("://") > 0) {
-        return url;
-    } else if (url.substr(0,1) == "/") {
-        return base.substr(0, base.indexOf("/", base.indexOf("://") + 3)) + url;
-    } else {
-        return base + url;
-    }
-};
-
-
 Timeline.DefaultEventSource.Event = function(args) {
   //
   // Attention developers!
