@@ -39,40 +39,6 @@ SimileAjax.Platform.getDefaultLocale=function(){return SimileAjax.Platform.clien
 
 
 /* data-structure.js */
-SimileAjax.Set=function(A){this._hash={};
-this._count=0;
-if(A instanceof Array){for(var B=0;
-B<A.length;
-B++){this.add(A[B]);
-}}else{if(A instanceof SimileAjax.Set){this.addSet(A);
-}}};
-SimileAjax.Set.prototype.add=function(A){if(!(A in this._hash)){this._hash[A]=true;
-this._count++;
-return true;
-}return false;
-};
-SimileAjax.Set.prototype.addSet=function(B){for(var A in B._hash){this.add(A);
-}};
-SimileAjax.Set.prototype.remove=function(A){if(A in this._hash){delete this._hash[A];
-this._count--;
-return true;
-}return false;
-};
-SimileAjax.Set.prototype.removeSet=function(B){for(var A in B._hash){this.remove(A);
-}};
-SimileAjax.Set.prototype.retainSet=function(B){for(var A in this._hash){if(!B.contains(A)){delete this._hash[A];
-this._count--;
-}}};
-SimileAjax.Set.prototype.contains=function(A){return(A in this._hash);
-};
-SimileAjax.Set.prototype.size=function(){return this._count;
-};
-SimileAjax.Set.prototype.toArray=function(){var A=[];
-for(var B in this._hash){A.push(B);
-}return A;
-};
-SimileAjax.Set.prototype.visit=function(A){for(var B in this._hash){if(A(B)==true){break;
-}}};
 SimileAjax.SortedArray=function(B,A){this._a=(A instanceof Array)?A:[];
 this._compare=B;
 };
