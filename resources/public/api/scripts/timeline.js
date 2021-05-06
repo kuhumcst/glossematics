@@ -389,16 +389,7 @@ Timeline._Impl.prototype._initialize = function() {
     while (containerDiv.firstChild) {
         containerDiv.removeChild(containerDiv.firstChild);
     }
-    
-    /*
-     *  inserting copyright and link
-     */
-    var elmtCopyright = SimileAjax.Graphics.createTranslucentImage(Timeline.urlPrefix + (this.isHorizontal() ? "images/copyright-vertical.png" : "images/copyright.png"));
-    elmtCopyright.className = "timeline-copyright";
-    elmtCopyright.title = "SIMILE Timeline - http://www.simile-widgets.org/";
-    SimileAjax.DOM.registerEvent(elmtCopyright, "click", function() { window.location = "http://www.simile-widgets.org/"; });
-    containerDiv.appendChild(elmtCopyright);
-    
+
     /*
      *  creating bands
      */
