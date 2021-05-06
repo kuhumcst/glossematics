@@ -1392,29 +1392,6 @@ SimileAjax.Platform.getDefaultLocale=function(){return SimileAjax.Platform.clien
 };
 
 
-/* ajax.js */
-SimileAjax.ListenerQueue=function(A){this._listeners=[];
-this._wildcardHandlerName=A;
-};
-SimileAjax.ListenerQueue.prototype.add=function(A){this._listeners.push(A);
-};
-SimileAjax.ListenerQueue.prototype.remove=function(C){var B=this._listeners;
-for(var A=0;
-A<B.length;
-A++){if(B[A]==C){B.splice(A,1);
-break;
-}}};
-SimileAjax.ListenerQueue.prototype.fire=function(B,A){var D=[].concat(this._listeners);
-for(var C=0;
-C<D.length;
-C++){var E=D[C];
-if(B in E){try{E[B].apply(E,A);
-}catch(F){SimileAjax.Debug.exception("Error firing event of name "+B,F);
-}}else{if(this._wildcardHandlerName!=null&&this._wildcardHandlerName in E){try{E[this._wildcardHandlerName].apply(E,[B]);
-}catch(F){SimileAjax.Debug.exception("Error firing event of name "+B+" to wildcard handler",F);
-}}}}};
-
-
 /* data-structure.js */
 SimileAjax.Set=function(A){this._hash={};
 this._count=0;
