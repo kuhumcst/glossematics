@@ -27,7 +27,6 @@
  *  Timeline
  *==================================================
  */
-Timeline.strings = {}; // localization string tables
 Timeline.HORIZONTAL = 0;
 Timeline.VERTICAL = 1;
 Timeline._defaultTheme = null;

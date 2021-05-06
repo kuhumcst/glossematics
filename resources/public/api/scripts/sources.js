@@ -504,7 +504,7 @@ Timeline.DefaultEventSource.Event.prototype = {
         var a = document.createElement("a");
         a.href = url;
         a.target = "new";
-        a.innerHTML = Timeline.strings[Timeline.clientLocale].wikiLinkLabel;
+        a.innerHTML = "Discuss";
         
         elmt.appendChild(document.createTextNode("["));
         elmt.appendChild(a);
