@@ -21,11 +21,6 @@
                       :timeZone       1
                       :date           "1952-06-01"}}))
 
-;; Only left here in case I need to call (.loadXML ...) again.
-(defonce jfk-xml
-  (let [source (sr/inline "public/examples/jfk/jfk.xml")]
-    (.parseFromString (js/DOMParser.) source "text/xml")))
-
 (defonce jfk-events
   (as-> (sr/inline "public/examples/jfk/jfk.xml") $
         (.parseFromString (js/DOMParser.) $ "text/xml")
