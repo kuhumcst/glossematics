@@ -81,12 +81,6 @@ Timeline.DefaultEventSource.prototype._fire = function(handlerName, args) {
 };
 
 Timeline.DefaultEventSource.Event = function(args) {
-  //
-  // Attention developers!
-  // If you add a new event attribute, please be sure to add it to
-  // all three load functions: loadXML, loadSPARCL, loadJSON. 
-  // Thanks!
-  //
   // args is a hash/object. It supports the following keys. Most are optional
   //   id            -- an internal id. Really shouldn't be used by events.
   //                    Timeline library clients should use eventID
