@@ -411,12 +411,12 @@ Timeline.DefaultEventSource.Event = function(args) {
           err.push("earliestEnd is > end");}  
   
   this._eventID = cleanArg('eventID');
-  this._text = (args.text != null) ? SimileAjax.HTML.deEntify(args.text) : ""; // Change blank titles to ""
+  this._text = args.text;
   if (err.length > 0) {
           this._text += " PROBLEM: " + err.join(", ");
   }
 
-  this._description = SimileAjax.HTML.deEntify(args.description);
+  this._description = args.description;
   this._image = cleanArg('image');
   this._link =  cleanArg('link');
   this._title = cleanArg('hoverText');
