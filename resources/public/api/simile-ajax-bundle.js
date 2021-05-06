@@ -2514,52 +2514,6 @@ C=C.replace(B,D[A[1]]);
 }return C;
 };
 
-
-/* json.js */
-SimileAjax.JSON=new Object();
-(function(){var m={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"};
-var s={array:function(x){var a=["["],b,f,i,l=x.length,v;
-for(i=0;
-i<l;
-i+=1){v=x[i];
-f=s[typeof v];
-if(f){v=f(v);
-if(typeof v=="string"){if(b){a[a.length]=",";
-}a[a.length]=v;
-b=true;
-}}}a[a.length]="]";
-return a.join("");
-},"boolean":function(x){return String(x);
-},"null":function(x){return"null";
-},number:function(x){return isFinite(x)?String(x):"null";
-},object:function(x){if(x){if(x instanceof Array){return s.array(x);
-}var a=["{"],b,f,i,v;
-for(i in x){v=x[i];
-f=s[typeof v];
-if(f){v=f(v);
-if(typeof v=="string"){if(b){a[a.length]=",";
-}a.push(s.string(i),":",v);
-b=true;
-}}}a[a.length]="}";
-return a.join("");
-}return"null";
-},string:function(x){if(/["\\\x00-\x1f]/.test(x)){x=x.replace(/([\x00-\x1f\\"])/g,function(a,b){var c=m[b];
-if(c){return c;
-}c=b.charCodeAt();
-return"\\u00"+Math.floor(c/16).toString(16)+(c%16).toString(16);
-});
-}return'"'+x+'"';
-}};
-SimileAjax.JSON.toJSONString=function(o){if(o instanceof Object){return s.object(o);
-}else{if(o instanceof Array){return s.array(o);
-}else{return o.toString();
-}}};
-SimileAjax.JSON.parseJSON=function(){try{return !(/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/.test(this.replace(/"(\\.|[^"\\])*"/g,"")))&&eval("("+this+")");
-}catch(e){return false;
-}};
-})();
-
-
 /* string.js */
 String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");
 };
@@ -2785,43 +2739,3 @@ SimileAjax.WindowManager._findDropTarget=function(A){while(A!=null){if("ondrop" 
 }A=A.parentNode;
 }return A;
 };
-
-
-/* xmlhttp.js */
-SimileAjax.XmlHttp=new Object();
-SimileAjax.XmlHttp._onReadyStateChange=function(A,D,B){switch(A.readyState){case 4:try{if(A.status==0||A.status==200){if(B){B(A);
-}}else{if(D){D(A.statusText,A.status,A);
-}}}catch(C){SimileAjax.Debug.exception("XmlHttp: Error handling onReadyStateChange",C);
-}break;
-}};
-SimileAjax.XmlHttp._createRequest=function(){if(SimileAjax.Platform.browser.isIE){var A=["Msxml2.XMLHTTP","Microsoft.XMLHTTP","Msxml2.XMLHTTP.4.0"];
-for(var B=0;
-B<A.length;
-B++){try{var C=A[B];
-var D=function(){return new ActiveXObject(C);
-};
-var F=D();
-SimileAjax.XmlHttp._createRequest=D;
-return F;
-}catch(E){}}}try{var D=function(){return new XMLHttpRequest();
-};
-var F=D();
-SimileAjax.XmlHttp._createRequest=D;
-return F;
-}catch(E){throw new Error("Failed to create an XMLHttpRequest object");
-}};
-SimileAjax.XmlHttp.get=function(A,D,C){var B=SimileAjax.XmlHttp._createRequest();
-B.open("GET",A,true);
-B.onreadystatechange=function(){SimileAjax.XmlHttp._onReadyStateChange(B,D,C);
-};
-B.send(null);
-};
-SimileAjax.XmlHttp.post=function(B,A,E,D){var C=SimileAjax.XmlHttp._createRequest();
-C.open("POST",B,true);
-C.onreadystatechange=function(){SimileAjax.XmlHttp._onReadyStateChange(C,E,D);
-};
-C.send(A);
-};
-SimileAjax.XmlHttp._forceXML=function(A){try{A.overrideMimeType("text/xml");
-}catch(B){A.setrequestheader("Content-Type","text/xml");
-}};

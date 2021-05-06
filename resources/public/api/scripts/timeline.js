@@ -210,41 +210,6 @@ Timeline.setDefaultTheme = function(theme) {
     Timeline._defaultTheme = theme;
 };
 
-Timeline.loadXML = function(url, f) {
-    var fError = function(statusText, status, xmlhttp) {
-        alert("Failed to load data xml from " + url + "\n" + statusText);
-    };
-    var fDone = function(xmlhttp) {
-        var xml = xmlhttp.responseXML;
-        if (!xml.documentElement && xmlhttp.responseStream) {
-            xml.load(xmlhttp.responseStream);
-        } 
-        f(xml, url);
-    };
-    SimileAjax.XmlHttp.get(url, fError, fDone);
-};
-
-
-Timeline.loadJSON = function(url, f) {
-    var fError = function(statusText, status, xmlhttp) {
-        alert("Failed to load json data from " + url + "\n" + statusText);
-    };
-    var fDone = function(xmlhttp) {
-        f(eval('(' + xmlhttp.responseText + ')'), url);
-    };
-    SimileAjax.XmlHttp.get(url, fError, fDone);
-};
-
-Timeline.getTimelineFromID = function(timelineID) {
-    return Timeline.timelines[timelineID];
-};
-
-// Write the current Timeline version as the contents of element with id el_id
-Timeline.writeVersion = function(el_id) {
-  document.getElementById(el_id).innerHTML = this.display_version;    
-};
-
-
 
 /*==================================================
  *  Timeline Implementation object
@@ -359,50 +324,6 @@ Timeline._Impl.prototype.getWidthStyle = function() {
     // which element.style attribute should be changed to affect Timeline's "width"
     return this._orientation == Timeline.HORIZONTAL ? 'height' : 'width';
 };
-
-Timeline._Impl.prototype.loadXML = function(url, f) {
-    var tl = this;
-    
-    
-    var fError = function(statusText, status, xmlhttp) {
-        alert("Failed to load data xml from " + url + "\n" + statusText);
-        tl.hideLoadingMessage();
-    };
-    var fDone = function(xmlhttp) {
-        try {
-            var xml = xmlhttp.responseXML;
-            if (!xml.documentElement && xmlhttp.responseStream) {
-                xml.load(xmlhttp.responseStream);
-            } 
-            f(xml, url);
-        } finally {
-            tl.hideLoadingMessage();
-        }
-    };
-    
-    this.showLoadingMessage();
-    window.setTimeout(function() { SimileAjax.XmlHttp.get(url, fError, fDone); }, 0);
-};
-
-Timeline._Impl.prototype.loadJSON = function(url, f) {
-    var tl = this;
-    
-    var fError = function(statusText, status, xmlhttp) {
-        alert("Failed to load json data from " + url + "\n" + statusText);
-        tl.hideLoadingMessage();
-    };
-    var fDone = function(xmlhttp) {
-        try {
-            f(eval('(' + xmlhttp.responseText + ')'), url);
-        } finally {
-            tl.hideLoadingMessage();
-        }
-    };
-    
-    this.showLoadingMessage();
-    window.setTimeout(function() { SimileAjax.XmlHttp.get(url, fError, fDone); }, 0);
-};
-
 
 //
 // Private functions used by Timeline object functions
