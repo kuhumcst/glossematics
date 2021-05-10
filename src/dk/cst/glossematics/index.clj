@@ -55,8 +55,6 @@
     [:script {:src "/api/scripts/original-painter.js" :type "text/javascript"}]
     [:script {:src "/api/scripts/detailed-painter.js" :type "text/javascript"}]
     [:script {:src "/api/scripts/overview-painter.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/compact-painter.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/decorators.js" :type "text/javascript"}]
     [:script {:src "/api/scripts/l10n/en/labellers.js" :type "text/javascript"}]]
 
    [:body
