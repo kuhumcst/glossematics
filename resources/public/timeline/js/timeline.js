@@ -374,8 +374,7 @@ Timeline._Impl.prototype._autoWidthCheck = function(okToShrink) {
 
 Timeline._Impl.prototype._initialize = function() {
     var containerDiv = this._containerDiv;
-    var doc = containerDiv.ownerDocument;
-    
+
     containerDiv.className = 
         containerDiv.className.split(" ").concat("timeline-container").join(" ");
     
@@ -419,20 +418,6 @@ Timeline._Impl.prototype._initialize = function() {
             this._bands[i].addOnScrollListener(this._autoWidthScrollListener);
         }
     }
-    
-    
-    /*
-     *  creating loading UI
-     */
-    var message = SimileAjax.Graphics.createMessageBubble(doc);
-    message.containerDiv.className = "timeline-message-container";
-    containerDiv.appendChild(message.containerDiv);
-    
-    message.contentDiv.className = "timeline-message";
-    message.contentDiv.innerHTML = "<img src='" + Timeline.urlPrefix + "images/progress-running.gif' /> Loading...";
-    
-    this.showLoadingMessage = function() { message.containerDiv.style.display = "block"; };
-    this.hideLoadingMessage = function() { message.containerDiv.style.display = "none"; };
 };
 
 Timeline._Impl.prototype._distributeWidths = function() {
