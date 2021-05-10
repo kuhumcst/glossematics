@@ -194,7 +194,7 @@
         </event>
     <event start="Fri Nov 22 1963 11:30:00 GMT-0600"
         title="Motorcade leaves Lovefield Airport"
-        image="motorcade.png"
+        image="examples/jfk/motorcade.png"
         link="http://en.wikipedia.org/wiki/Image:JFKmotorcade.jpg"
         >
         Presidential Motorcade leaves Lovefield Airport. 
@@ -288,7 +288,7 @@
         </event>
     <event start="Fri Nov 22 1963 12:30:00 GMT-0600"
         title="Kennedy shot"
-        icon="api/images/dark-red-circle.png"
+        icon="examples/jfk/dark-red-circle.png"
         id="Kennedy shot"
 		classname="important"
         >
