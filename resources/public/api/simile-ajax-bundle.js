@@ -839,7 +839,7 @@ SimileAjax.Graphics._FontRenderingContext.prototype.getLineHeight=function(){ret
 
 /* units.js */
 SimileAjax.NativeDateUnit=new Object();
-SimileAjax.NativeDateUnit.makeDefaultßValue=function(){return new Date();
+SimileAjax.NativeDateUnit.makeDefaultValue=function(){return new Date();
 };
 SimileAjax.NativeDateUnit.cloneValue=function(A){return new Date(A.getTime());
 };
