@@ -837,31 +837,9 @@ SimileAjax.Graphics._FontRenderingContext.prototype.getLineHeight=function(){ret
 };
 
 
-/* string.js */
-String.prototype.trim=function(){return this.replace(/^\s+|\s+$/g,"");
-};
-String.prototype.startsWith=function(A){return this.length>=A.length&&this.substr(0,A.length)==A;
-};
-String.prototype.endsWith=function(A){return this.length>=A.length&&this.substr(this.length-A.length)==A;
-};
-String.substitute=function(B,D){var A="";
-var F=0;
-while(F<B.length-1){var C=B.indexOf("%",F);
-if(C<0||C==B.length-1){break;
-}else{if(C>F&&B.charAt(C-1)=="\\"){A+=B.substring(F,C-1)+"%";
-F=C+1;
-}else{var E=parseInt(B.charAt(C+1));
-if(isNaN(E)||E>=D.length){A+=B.substring(F,C+2);
-}else{A+=B.substring(F,C)+D[E].toString();
-}F=C+2;
-}}}if(F<B.length){A+=B.substring(F);
-}return A;
-};
-
-
 /* units.js */
 SimileAjax.NativeDateUnit=new Object();
-SimileAjax.NativeDateUnit.makeDefaultValue=function(){return new Date();
+SimileAjax.NativeDateUnit.makeDefaultßValue=function(){return new Date();
 };
 SimileAjax.NativeDateUnit.cloneValue=function(A){return new Date(A.getTime());
 };

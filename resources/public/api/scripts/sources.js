@@ -110,7 +110,7 @@ Timeline.DefaultEventSource.Event = function(args) {
       return (args[arg] != null && args[arg] != "") ? args[arg] : null;
   }
    
-  var id = args.id ? args.id.trim() : "";
+  var id = args.id ? args.id.replace(/^\s+|\s+$/g,"") : "";
   this._id = id.length > 0 ? id : Timeline.EventUtils.getNewEventID();
   
   this._instant = args.instant || (args.end == null);
