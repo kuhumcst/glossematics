@@ -18,44 +18,44 @@
     [:meta {:charset "utf-8"}]
     [:title (str "Glossematics" (when (= index-filename "main.js")
                                   " (development)"))]
-    [:link {:rel "icon" :href "favicon.svg"}]
-    [:link {:rel "mask-icon" :href "favicon.svg" :color "#a02c2c"}]
-    [:link {:rel "stylesheet" :href "/main.css" :type "text/css"}]
+    [:link {:rel "icon" :href "images/favicon.svg"}]
+    [:link {:rel "mask-icon" :href "images/favicon.svg" :color "#a02c2c"}]
+    [:link {:rel "stylesheet" :href "css/main.css"}]
 
     ;; These styles are used by the Simile Timeline API
-    [:link {:rel "stylesheet" :href "/api/styles/ethers.css" :type "text/css"}]
-    [:link {:rel "stylesheet" :href "/api/styles/events.css" :type "text/css"}]
-    [:link {:rel "stylesheet" :href "/api/styles/timeline.css" :type "text/css"}]
-    [:link {:rel "stylesheet" :href "/api/styles/graphics.css" :type "text/css"}]
+    [:link {:rel "stylesheet" :href "timeline/css/ethers.css"}]
+    [:link {:rel "stylesheet" :href "timeline/css/events.css"}]
+    [:link {:rel "stylesheet" :href "timeline/css/timeline.css"}]
+    [:link {:rel "stylesheet" :href "timeline/css/graphics.css"}]
 
     ;; These singleton objects are required by the Timeline API
     [:script
      "Timeline = {
       serverLocale: \"en\",
       clientLocale: \"en\",
-      urlPrefix: \"api/\"
+      urlPrefix: \"timeline/\"
     };
 
     SimileAjax = {
         Platform:  new Object(),
-        urlPrefix: \"api/\"
+        urlPrefix: \"timeline/\"
     };"]
 
     ;; TODO: reduce these (minify, bundle, ...)
     ;; These imports are all Simile Timeline library files.
-    [:script {:src "/api/simile-ajax-bundle.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/timeline.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/band.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/themes.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/ethers.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/ether-painters.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/event-utils.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/labellers.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/sources.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/original-painter.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/detailed-painter.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/overview-painter.js" :type "text/javascript"}]
-    [:script {:src "/api/scripts/l10n/en/labellers.js" :type "text/javascript"}]]
+    [:script {:src "timeline/js/simile-ajax-bundle.js"}]
+    [:script {:src "timeline/js/timeline.js"}]
+    [:script {:src "timeline/js/band.js"}]
+    [:script {:src "timeline/js/themes.js"}]
+    [:script {:src "timeline/js/ethers.js"}]
+    [:script {:src "timeline/js/ether-painters.js"}]
+    [:script {:src "timeline/js/event-utils.js"}]
+    [:script {:src "timeline/js/labellers.js"}]
+    [:script {:src "timeline/js/sources.js"}]
+    [:script {:src "timeline/js/original-painter.js"}]
+    [:script {:src "timeline/js/detailed-painter.js"}]
+    [:script {:src "timeline/js/overview-painter.js"}]
+    [:script {:src "timeline/js/en-labellers.js"}]]
 
    [:body
     [:div#app]

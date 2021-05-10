@@ -1,4 +1,4 @@
-(ns tei-facsimile.core
+(ns dk.cst.glossematics.facsimile
   (:require [shadow.resource :as resource]
             [cuphic.core :as cup]
             [recap.css :as rc]
@@ -12,7 +12,7 @@
   "tei")
 
 (def tei-css
-  (style/prefix-css prefix (resource/inline "css/tei.css")))
+  (style/prefix-css prefix (resource/inline "public/css/tei.css")))
 
 (def recap+tei-css
   (str rc/shadow-style "\n\n/*\n\t === tei.css ===\n*/\n" tei-css))

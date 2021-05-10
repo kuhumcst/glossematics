@@ -57,7 +57,7 @@
 
 (defmacro timeline
   []
-  (with-open [reader (io/reader (io/resource "timeline.csv"))]
+  (with-open [reader (io/reader (io/resource "examples/timeline.csv"))]
     (-> (csv/read-csv reader :separator \;)
         sem/mappify
         (->> (map #(set/rename-keys % {:Personer                          :people

@@ -6,7 +6,7 @@
             [reagent.core :as r]
             [reagent.dom :as rdom]
             [recap.component.widget.tabs :as tabs]
-            [tei-facsimile.core :as facsimile]
+            [dk.cst.glossematics.facsimile :as facsimile]
             [dk.cst.glossematics.timeline :as timeline :refer [timeline]]))
 
 (def hjemslev-events
@@ -22,7 +22,7 @@
                       :date           "1952-06-01"}}))
 
 (defonce jfk-events
-  (as-> (sr/inline "public/examples/jfk/jfk.xml") $
+  (as-> (sr/inline "public/timeline/examples/jfk/jfk.xml") $
         (.parseFromString (js/DOMParser.) $ "text/xml")
         (.getElementsByTagName $ "event")
         (map (fn [node]
