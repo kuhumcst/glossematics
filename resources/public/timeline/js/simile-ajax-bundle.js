@@ -438,6 +438,7 @@ SimileAjax.DOM.getStyle=function(B,A){if(B.currentStyle){var C=B.currentStyle[A]
 }}return C;
 };
 SimileAjax.DOM.getEventRelativeCoordinates=function(A,B){
+    var C=SimileAjax.DOM.getPageCoordinates(B);
     return{x: A.pageX-C.left, y: A.pageY-C.top};};
 }
 SimileAjax.DOM.getEventPageCoordinates=function(A){
