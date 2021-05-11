@@ -40,7 +40,6 @@
     [:script {:src "timeline/js/labellers.js"}]
     [:script {:src "timeline/js/sources.js"}]
     [:script {:src "timeline/js/original-painter.js"}]
-    [:script {:src "timeline/js/detailed-painter.js"}]
     [:script {:src "timeline/js/overview-painter.js"}]
     [:script {:src "timeline/js/en-labellers.js"}]]
 

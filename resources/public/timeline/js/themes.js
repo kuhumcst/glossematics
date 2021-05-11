@@ -141,7 +141,6 @@ Timeline.ClassicTheme._Impl = function() {
       //      impreciseColor:   "#58A0DC",
         },
         label: {
-            backgroundOpacity: 50,// only used in detailed painter
                offsetFromLine:  3 // px left margin amount from icon's right edge
       //      backgroundColor:   "white",
       //      lineColor:         "#58A0DC",

@@ -99,9 +99,6 @@ Timeline.createBandInfo = function(params) {
             case "overview" :
                 eventPainter = new Timeline.OverviewEventPainter(eventPainterParams);
                 break;
-            case "detailed" :
-                eventPainter = new Timeline.DetailedEventPainter(eventPainterParams);
-                break;
             default:
                 eventPainter = new Timeline.OriginalEventPainter(eventPainterParams);
         }
@@ -166,9 +163,6 @@ Timeline.createHotZoneBandInfo = function(params) {
         switch (layout) {
             case "overview" :
                 eventPainter = new Timeline.OverviewEventPainter(eventPainterParams);
-                break;
-            case "detailed" :
-                eventPainter = new Timeline.DetailedEventPainter(eventPainterParams);
                 break;
             default:
                 eventPainter = new Timeline.OriginalEventPainter(eventPainterParams);
