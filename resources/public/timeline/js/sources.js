@@ -71,11 +71,7 @@ Timeline.DefaultEventSource.prototype._fire = function(handlerName, args) {
     for (var i = 0; i < this._listeners.length; i++) {
         var listener = this._listeners[i];
         if (handlerName in listener) {
-            try {
-                listener[handlerName].apply(listener, args);
-            } catch (e) {
-                SimileAjax.Debug.exception(e);
-            }
+            listener[handlerName].apply(listener, args);
         }
     }
 };

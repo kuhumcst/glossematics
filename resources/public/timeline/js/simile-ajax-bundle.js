@@ -217,7 +217,7 @@ H.setUTCMonth(G-1);
 }}}return H;
 };
 SimileAjax.DateTime.setIso8601Time=function(F,C){var G=C.match(SimileAjax.DateTime._timeRegexp);
-if(!G){SimileAjax.Debug.warn("Invalid time string: "+C);
+if(!G){console.warn("Invalid time string: "+C);
 return false;
 }var A=G[1];
 var E=Number((G[3])?G[3]:0);
@@ -351,54 +351,6 @@ SimileAjax.DateTime.removeTimeZoneOffset=function(B,A){return new Date(B.getTime
 SimileAjax.DateTime.getTimezone=function(){var A=new Date().getTimezoneOffset();
 return A/-60;
 };
-
-
-/* debug.js */
-SimileAjax.Debug={silent:false};
-SimileAjax.Debug.log=function(B){var A;
-if("console" in window&&"log" in window.console){A=function(C){console.log(C);
-};
-}else{A=function(C){if(!SimileAjax.Debug.silent){alert(C);
-}};
-}SimileAjax.Debug.log=A;
-A(B);
-};
-SimileAjax.Debug.warn=function(B){var A;
-if("console" in window&&"warn" in window.console){A=function(C){console.warn(C);
-};
-}else{A=function(C){if(!SimileAjax.Debug.silent){alert(C);
-}};
-}SimileAjax.Debug.warn=A;
-A(B);
-};
-SimileAjax.Debug.exception=function(B,D){var A,C=SimileAjax.parseURLParameters();
-if(C.errors=="throw"||SimileAjax.params.errors=="throw"){A=function(F,E){throw (F);
-};
-}else{if("console" in window&&"error" in window.console){A=function(F,E){if(E!=null){console.error(E+" %o",F);
-}else{console.error(F);
-}throw (F);
-};
-}else{A=function(F,E){if(!SimileAjax.Debug.silent){alert("Caught exception: "+E+"\n\nDetails: "+("description" in F?F.description:F));
-}throw (F);
-};
-}}SimileAjax.Debug.exception=A;
-A(B,D);
-};
-SimileAjax.Debug.objectToString=function(A){return SimileAjax.Debug._objectToString(A,"");
-};
-SimileAjax.Debug._objectToString=function(D,A){var C=A+" ";
-if(typeof D=="object"){var B="{";
-for(E in D){B+=C+E+": "+SimileAjax.Debug._objectToString(D[E],C)+"\n";
-}B+=A+"}";
-return B;
-}else{if(typeof D=="array"){var B="[";
-for(var E=0;
-E<D.length;
-E++){B+=SimileAjax.Debug._objectToString(D[E],C)+"\n";
-}B+=A+"]";
-return B;
-}else{return D;
-}}};
 
 
 /* dom.js */
@@ -667,9 +619,8 @@ SimileAjax.WindowManager.registerEventWithObject=function(D,A,E,B,C){SimileAjax.
 };
 SimileAjax.WindowManager.registerEvent=function(D,B,E,C){if(C==null){C=SimileAjax.WindowManager.getHighestLayer();
 }var A=function(G,F,I){if(SimileAjax.WindowManager._canProcessEventAtLayer(C)){SimileAjax.WindowManager._popToLayer(C.index);
-try{E(G,F,I);
-}catch(H){SimileAjax.Debug.exception(H);
-}}SimileAjax.DOM.cancelEvent(F);
+E(G,F,I);
+}SimileAjax.DOM.cancelEvent(F);
 return false;
 };
 SimileAjax.DOM.registerEvent(D,B,A);
