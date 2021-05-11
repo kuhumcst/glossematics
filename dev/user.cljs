@@ -12,14 +12,14 @@
 (def hjemslev-events
   (load/timeline))
 
-(defonce hjemslev-bands
-  (r/atom {:primary  {:width        "80%"
-                      :intervalUnit :month}
-           :overview {:width        "20%"
-                      :intervalUnit :decade}
-           :common   {:intervalPixels 400
-                      :timeZone       1
-                      :date           "1952-06-01"}}))
+(def hjemslev-bands
+  {:primary  {:width        "80%"
+              :intervalUnit :month}
+   :overview {:width        "20%"
+              :intervalUnit :decade}
+   :common   {:intervalPixels 400
+              :timeZone       1
+              :date           "1952-06-01"}})
 
 (defonce jfk-events
   (as-> (sr/inline "public/timeline/examples/jfk/jfk.xml") $
@@ -32,52 +32,51 @@
              $)))
 
 (defonce jfk-bands
-  (r/atom
-    {:primary  {:width        "80%"
-                :zones        [{:start   "Fri Nov 22 1963 00:00:00 GMT-0600"
-                                :end     "Mon Nov 25 1963 00:00:00 GMT-0600"
-                                :magnify 10
-                                :unit    js/SimileAjax.DateTime.DAY}
-                               {:start   "Fri Nov 22 1963 09:00:00 GMT-0600"
-                                :end     "Sun Nov 24 1963 00:00:00 GMT-0600"
-                                :magnify 5
-                                :unit    js/SimileAjax.DateTime.HOUR}
-                               {:start    "Fri Nov 22 1963 11:00:00 GMT-0600"
-                                :end      "Sat Nov 23 1963 00:00:00 GMT-0600"
-                                :magnify  5
-                                :unit     js/SimileAjax.DateTime.MINUTE,
-                                :multiple 10}
-                               {:start    "Fri Nov 22 1963 12:00:00 GMT-0600"
-                                :end      "Fri Nov 22 1963 14:00:00 GMT-0600"
-                                :magnify  3
-                                :unit     js/SimileAjax.DateTime.MINUTE
-                                :multiple 5}]
-                :intervalUnit :week}
-     :overview {:width        "20%"
-                :zones        [{:start   "Fri Nov 22 1963 00:00:00 GMT-0600"
-                                :end     "Mon Nov 25 1963 00:00:00 GMT-0600"
-                                :magnify 10
-                                :unit    js/SimileAjax.DateTime.WEEK}
-                               {:start   "Fri Nov 22 1963 09:00:00 GMT-0600"
-                                :end     "Sun Nov 24 1963 00:00:00 GMT-0600"
-                                :magnify 5
-                                :unit    js/SimileAjax.DateTime.DAY}
-                               {:start    "Fri Nov 22 1963 11:00:00 GMT-0600"
-                                :end      "Sat Nov 23 1963 00:00:00 GMT-0600"
-                                :magnify  5
-                                :unit     js/SimileAjax.DateTime.MINUTE
-                                :multiple 60}
-                               {:start    "Fri Nov 22 1963 12:00:00 GMT-0600"
-                                :end      "Fri Nov 22 1963 14:00:00 GMT-0600"
-                                :magnify  3
-                                :unit     js/SimileAjax.DateTime.MINUTE
-                                :multiple 15}]
+  {:primary  {:width        "80%"
+              :zones        [{:start   "Fri Nov 22 1963 00:00:00 GMT-0600"
+                              :end     "Mon Nov 25 1963 00:00:00 GMT-0600"
+                              :magnify 10
+                              :unit    js/SimileAjax.DateTime.DAY}
+                             {:start   "Fri Nov 22 1963 09:00:00 GMT-0600"
+                              :end     "Sun Nov 24 1963 00:00:00 GMT-0600"
+                              :magnify 5
+                              :unit    js/SimileAjax.DateTime.HOUR}
+                             {:start    "Fri Nov 22 1963 11:00:00 GMT-0600"
+                              :end      "Sat Nov 23 1963 00:00:00 GMT-0600"
+                              :magnify  5
+                              :unit     js/SimileAjax.DateTime.MINUTE,
+                              :multiple 10}
+                             {:start    "Fri Nov 22 1963 12:00:00 GMT-0600"
+                              :end      "Fri Nov 22 1963 14:00:00 GMT-0600"
+                              :magnify  3
+                              :unit     js/SimileAjax.DateTime.MINUTE
+                              :multiple 5}]
+              :intervalUnit :week}
+   :overview {:width        "20%"
+              :zones        [{:start   "Fri Nov 22 1963 00:00:00 GMT-0600"
+                              :end     "Mon Nov 25 1963 00:00:00 GMT-0600"
+                              :magnify 10
+                              :unit    js/SimileAjax.DateTime.WEEK}
+                             {:start   "Fri Nov 22 1963 09:00:00 GMT-0600"
+                              :end     "Sun Nov 24 1963 00:00:00 GMT-0600"
+                              :magnify 5
+                              :unit    js/SimileAjax.DateTime.DAY}
+                             {:start    "Fri Nov 22 1963 11:00:00 GMT-0600"
+                              :end      "Sat Nov 23 1963 00:00:00 GMT-0600"
+                              :magnify  5
+                              :unit     js/SimileAjax.DateTime.MINUTE
+                              :multiple 60}
+                             {:start    "Fri Nov 22 1963 12:00:00 GMT-0600"
+                              :end      "Fri Nov 22 1963 14:00:00 GMT-0600"
+                              :magnify  3
+                              :unit     js/SimileAjax.DateTime.MINUTE
+                              :multiple 15}]
 
 
-                :intervalUnit :month}
-     :common   {:intervalPixels 200
-                :timeZone       -6
-                :date           "Fri Nov 22 1963 13:00:00 GMT-0600"}}))
+              :intervalUnit :month}
+   :common   {:intervalPixels 200
+              :timeZone       -6
+              :date           "Fri Nov 22 1963 13:00:00 GMT-0600"}})
 
 (def initial-examples
   {"1151anno-anno-tei.xml"  (sr/inline "examples/tei/1151anno-anno-tei.xml")
@@ -118,21 +117,29 @@
   (swap! state assoc-in [:tabs :kvs] (mk-tabs filename)))
 
 (defn update-interval
-  [bands-atom band e]
+  [tl-state band e]
   (let [v (keyword (.-value (.-target e)))]
-    (swap! bands-atom assoc-in [band :intervalUnit] v)))
+    (swap! tl-state assoc-in [:bands band :intervalUnit] v)))
 
 (defn interval-select
-  [bands-atom band]
-  [:select {:on-change     #(update-interval bands-atom band %)
-            :default-value (-> @bands-atom
-                               (get-in [band :intervalUnit])
+  [tl-state band]
+  [:select {:on-change     #(update-interval tl-state band %)
+            :default-value (-> @tl-state
+                               (get-in [:bands band :intervalUnit])
                                (name))}
    (for [[k _] timeline/interval-kvs
          :let [str-k (name k)]]
      [:option {:value str-k
                :key   k}
       (str/capitalize str-k)])])
+
+(defonce hjelmslev-tl-state
+  (r/atom {:events hjemslev-events
+           :bands  hjemslev-bands}))
+
+(defonce jfk-tl-state
+  (r/atom {:events jfk-events
+           :bands  jfk-bands}))
 
 (defn app
   []
@@ -150,17 +157,15 @@
      ".org"]]
    [:form {:style {:padding       20
                    :margin-bottom -40}}
-    [:p [:label [:strong "Primary: "] [interval-select hjemslev-bands :primary]]]
-    [:p [:label [:strong "Overview: "] [interval-select hjemslev-bands :overview]]]]
+    [:p [:label [:strong "Primary: "] [interval-select hjelmslev-tl-state :primary]]]
+    [:p [:label [:strong "Overview: "] [interval-select hjelmslev-tl-state :overview]]]]
    [:div {:style {:padding "20px"}}
     [timeline {:style {:height 400}}
-     {:events hjemslev-events
-      :bands  @hjemslev-bands}]]
+     hjelmslev-tl-state]]
 
    [:div {:style {:padding "20px"}}
     [timeline {:style {:height 350}}
-     {:events jfk-events
-      :bands  @jfk-bands}]]]
+     jfk-tl-state]]]
   #_[:<>
      [:p {:style {:display         "flex"
                   :justify-content "flex-end"}}

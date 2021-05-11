@@ -100,34 +100,46 @@
 ;; TODO: optimise redrawing (store JS objects as state and reuse)
 (defn draw-timeline!
   "Draw a Simile Timeline in the HTML `element` based on `opts`."
-  [element {:keys [layout events bands]
-            :or   {layout :horizontal}
-            :as   opts}]
-  (let [event-source (js/Timeline.DefaultEventSource.)
-        band-infos   (connect-bands event-source bands)]
-    (js/Timeline.create element band-infos (->Layout layout))
-    (add-events! event-source events)))
+  [{:keys [layout bands event-source element]
+    :or   {layout :horizontal}
+    :as   opts}]
+  (let [band-infos (connect-bands event-source bands)]
+    (js/Timeline.create element band-infos (->Layout layout))))
 
 (defn timeline
-  "Display events inside a Simile Timeline based on HTML `attr` and `opts`.
+  "Display events inside a Simile Timeline based on HTML `attr` and `state`.
   Note that in order for the component to display a height must be set!
 
-  The available options are:
+  The available state options are:
 
     :events - events as Clojure maps (see the prepare-event fn).
-    :bands  - information about the bands (see the connect-bands fn)."
-  [attr opts]
-  (let [opts* (r/atom nil)]
+    :bands  - information about the bands (see the connect-bands fn).
+    :layout - either :horizontal or :vertical."
+  [attr state]
+  (let [state (if (map? state)
+                (r/atom state)
+                state)]
+    (swap! state assoc :event-source (js/Timeline.DefaultEventSource.))
     (r/create-class
       {:component-did-mount
        (fn [this]
-         (draw-timeline! (rdom/dom-node this) @opts*))
-
-       :component-did-update
-       (fn [this]
-         (draw-timeline! (rdom/dom-node this) @opts*))
+         (let [{:keys [event-source events]} @state
+               element (rdom/dom-node this)]
+           (add-events! event-source events)
+           (swap! state assoc
+                  :tl (atom nil)
+                  :element element)))
 
        :reagent-render
-       (fn [attr opts]
-         (reset! opts* opts)
+       (fn [attr _]
+         (let [{:keys [tl] :as state*} @state]
+           (when tl
+             (if-let [tl* @tl]
+               ;; Preserve scroll state of timeline when redrawing.
+               (let [band0 (.getBand ^js/Timeline tl* 0)
+                     date  (.getCenterVisibleDate band0)]
+                 (->> (assoc-in state* [:bands :common :date] date)
+                      (draw-timeline!)
+                      (reset! tl)))
+               (reset! tl (draw-timeline! state*)))))
          [:div attr])})))
