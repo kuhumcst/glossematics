@@ -93,7 +93,7 @@ Timeline._Band = function(timeline, bandInfo, index) {
      */
     this._div = this._timeline.getDocument().createElement("div");
     this._div.id = "timeline-band-" + index;
-    this._div.className = "timeline-band timeline-band-" + index;
+    this._div.className = "timeline-band";
     this._timeline.addDiv(this._div);
     
     SimileAjax.DOM.registerEventWithObject(this._div, "dblclick", this, "_onDblClick");
