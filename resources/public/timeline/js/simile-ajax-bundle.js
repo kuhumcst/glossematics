@@ -549,9 +549,6 @@ SimileAjax.Graphics.createTranslucentImage=function(A,C){
     }
     return B;
 };
-SimileAjax.Graphics.createTranslucentImageHTML=function(A,B){
-    return'<img src="'+A+'"'+(B!=null?' style="vertical-align: '+B+';"':"")+" />";
-}
 SimileAjax.Graphics.setOpacity=function(B,A){
     var C=(A/100).toString();
     B.style.opacity=C;
@@ -692,26 +689,6 @@ if(this.timePassed<this.duration){this.run();
 }else{this.f(this.to,0);
 this["cont"]();
 }};
-SimileAjax.Graphics.createStructuredDataCopyButton=function(F,D,A,E){var G=document.createElement("div");
-G.style.position="relative";
-G.style.display="inline";
-G.style.width=D+"px";
-G.style.height=A+"px";
-G.style.overflow="hidden";
-G.style.margin="2px";
-G.style.background="url("+F+") no-repeat";
-var C;
-C="opacity: 0";
-G.innerHTML="<textarea rows='1' autocomplete='off' value='none' style='"+C+"' />";
-var B=G.firstChild;
-B.style.width=D+"px";
-B.style.height=A+"px";
-B.onmousedown=function(H){H=(H)?H:((event)?event:null);
-if(H.button==2){B.value=E();
-B.select();
-}};
-return G;
-};
 SimileAjax.Graphics.getWidthHeight=function(C){var A,B;
 if(C.getBoundingClientRect==null){A=C.offsetWidth;
 B=C.offsetHeight;
@@ -779,8 +756,6 @@ SimileAjax.WindowManager.initialize=function(){if(SimileAjax.WindowManager._init
 }SimileAjax.DOM.registerEvent(document.body,"mousedown",SimileAjax.WindowManager._onBodyMouseDown);
 SimileAjax.DOM.registerEvent(document.body,"mousemove",SimileAjax.WindowManager._onBodyMouseMove);
 SimileAjax.DOM.registerEvent(document.body,"mouseup",SimileAjax.WindowManager._onBodyMouseUp);
-SimileAjax.DOM.registerEvent(document,"keydown",SimileAjax.WindowManager._onBodyKeyDown);
-SimileAjax.DOM.registerEvent(document,"keyup",SimileAjax.WindowManager._onBodyKeyUp);
 SimileAjax.WindowManager._layers.push({index:0});
 SimileAjax.WindowManager._initialized=true;
 };
@@ -842,19 +817,6 @@ SimileAjax.WindowManager._lastCoords={x:A.clientX,y:A.clientY};
 SimileAjax.DOM.cancelEvent(A);
 return false;
 };
-SimileAjax.WindowManager._onBodyKeyDown=function(C,A,D){if(SimileAjax.WindowManager._dragging){if(A.keyCode==27){SimileAjax.WindowManager._cancelDragging();
-}else{if((A.keyCode==17||A.keyCode==16)&&SimileAjax.WindowManager._draggingMode!="copy"){SimileAjax.WindowManager._draggingMode="copy";
-var B=SimileAjax.Graphics.createTranslucentImage("timeline/images/copy.png");
-B.style.position="absolute";
-B.style.left=(SimileAjax.WindowManager._ghostCoords.left-16)+"px";
-B.style.top=(SimileAjax.WindowManager._ghostCoords.top)+"px";
-document.body.appendChild(B);
-SimileAjax.WindowManager._draggingModeIndicatorElmt=B;
-}}}};
-SimileAjax.WindowManager._onBodyKeyUp=function(B,A,C){if(SimileAjax.WindowManager._dragging){if(A.keyCode==17||A.keyCode==16){SimileAjax.WindowManager._draggingMode="";
-if(SimileAjax.WindowManager._draggingModeIndicatorElmt!=null){document.body.removeChild(SimileAjax.WindowManager._draggingModeIndicatorElmt);
-SimileAjax.WindowManager._draggingModeIndicatorElmt=null;
-}}}};
 SimileAjax.WindowManager._onBodyMouseMove=function(A,N,H){if(SimileAjax.WindowManager._draggedElement!=null){var P=SimileAjax.WindowManager._draggedElementCallback;
 var E=SimileAjax.WindowManager._lastCoords;
 var M=N.clientX-E.x;
