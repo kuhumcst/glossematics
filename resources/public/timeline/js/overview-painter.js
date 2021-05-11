@@ -208,14 +208,11 @@ Timeline.OverviewEventPainter.prototype._paintEventTick = function(
     var width = 1;
     
     var tickDiv = this._timeline.getDocument().createElement("div");
-	  tickDiv.className = 'timeline-small-event-icon'
+	tickDiv.className = 'timeline-small-event-icon'
     tickDiv.style.left = left + "px";
     tickDiv.style.top = top + "px";
-  //  tickDiv.style.width = width + "px";
-  //  tickDiv.style.position = "absolute";
-  //  tickDiv.style.height = height + "px";
-  //  tickDiv.style.backgroundColor = color;
-  //  tickDiv.style.overflow = "hidden";
+    tickDiv.style.width = width + "px";
+    tickDiv.style.height = height + "px";
 
     var klassName = evt.getClassName()
     if (klassName) {tickDiv.className +=' small-' + klassName};
