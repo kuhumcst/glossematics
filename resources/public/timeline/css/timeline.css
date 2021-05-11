@@ -55,6 +55,7 @@
     margin: 2px;
     background: #666;
     position: relative;
+    cursor: grab;
 }
 
 .timeline-band-layer {
@@ -69,3 +70,10 @@
     height:     100%;
 }
 
+/* Set different cursors for overview and default bands. */
+.timeline-band-layer-inner {
+    cursor: grab;
+}
+.timeline-band-lines + * > .timeline-band-layer-inner {
+    cursor: move;
+}

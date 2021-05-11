@@ -156,7 +156,6 @@ Timeline._Band = function(timeline, bandInfo, index) {
         this._scrollBar.innerHTML = '<div class="timeline-band-scrollbar-thumb"> </div>'
         
         var scrollbarThumb = this._scrollBar.firstChild;
-        scrollbarThumb.style.cursor = "move";
         SimileAjax.DOM.registerEventWithObject(scrollbarThumb, "mousedown", this, "_onScrollBarMouseDown");
     }
 };
@@ -439,7 +438,6 @@ Timeline._Band.prototype.createLayerDiv = function(zIndex, className) {
     
     var innerDiv = this._timeline.getDocument().createElement("div");
     innerDiv.className = "timeline-band-layer-inner";
-    innerDiv.style.cursor = "move";
     div.appendChild(innerDiv);
     
     return innerDiv;
