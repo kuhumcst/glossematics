@@ -55,7 +55,7 @@ Timeline._Band = function(timeline, bandInfo, index) {
 
     this._dragging = false;
     this._changing = false;
-    this._originalScrollSpeed = 5; // pixels
+    this._originalScrollSpeed = 10; // pixels
     this._scrollSpeed = this._originalScrollSpeed;
     this._onScrollListeners = [];
     
@@ -635,12 +635,12 @@ Timeline._Band.prototype._onKeyDown = function(keyboardInput, evt, target) {
             break;
         case 37: // left arrow
         case 38: // up arrow
-            this._scrollSpeed = Math.min(50, Math.abs(this._scrollSpeed * 1.05));
+            this._scrollSpeed = Math.min(this._originalScrollSpeed * 20, Math.abs(this._scrollSpeed * 1.05));
             this._moveEther(this._scrollSpeed);
             break;
         case 39: // right arrow
         case 40: // down arrow
-            this._scrollSpeed = -Math.min(50, Math.abs(this._scrollSpeed * 1.05));
+            this._scrollSpeed = -Math.min(this._originalScrollSpeed * 20, Math.abs(this._scrollSpeed * 1.05));
             this._moveEther(this._scrollSpeed);
             break;
         default:
