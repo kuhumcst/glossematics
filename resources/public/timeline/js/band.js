@@ -103,15 +103,12 @@ Timeline._Band = function(timeline, bandInfo, index) {
     SimileAjax.DOM.registerEventWithObject(document.body, "mouseout", this, "_onMouseOut");
     
     var mouseWheel = this._theme!= null ? this._theme.mouseWheel : 'scroll'; // theme is not always defined
+
+    // TODO: fix - only scrolls backwards on Firefox
     if (mouseWheel === 'zoom' || mouseWheel === 'scroll' || this._zoomSteps) {
-        // capture mouse scroll
-        if (SimileAjax.Platform.browser.isFirefox) {
-            SimileAjax.DOM.registerEventWithObject(this._div, "DOMMouseScroll", this, "_onMouseScroll");
-        } else {
-            SimileAjax.DOM.registerEventWithObject(this._div, "mousewheel", this, "_onMouseScroll");
-        }
-    }    
-    
+        SimileAjax.DOM.registerEventWithObject(this._div, "wheel", this, "_onMouseScroll");
+    }
+
     /*
      *  The inner div that contains layers
      */
@@ -159,11 +156,7 @@ Timeline._Band = function(timeline, bandInfo, index) {
         this._scrollBar.innerHTML = '<div class="timeline-band-scrollbar-thumb"> </div>'
         
         var scrollbarThumb = this._scrollBar.firstChild;
-        if (SimileAjax.Platform.browser.isIE) {
-            scrollbarThumb.style.cursor = "move";
-        } else {
-            scrollbarThumb.style.cursor = "-moz-grab";
-        }
+        scrollbarThumb.style.cursor = "move";
         SimileAjax.DOM.registerEventWithObject(scrollbarThumb, "mousedown", this, "_onScrollBarMouseDown");
     }
 };
@@ -446,11 +439,7 @@ Timeline._Band.prototype.createLayerDiv = function(zIndex, className) {
     
     var innerDiv = this._timeline.getDocument().createElement("div");
     innerDiv.className = "timeline-band-layer-inner";
-    if (SimileAjax.Platform.browser.isIE) {
-        innerDiv.style.cursor = "move";
-    } else {
-        innerDiv.style.cursor = "-moz-grab";
-    }
+    innerDiv.style.cursor = "move";
     div.appendChild(innerDiv);
     
     return innerDiv;

@@ -123,7 +123,7 @@ Timeline.ClassicTheme._Impl = function() {
             height:         4 // px. For thicker tapes, remember to change track height too.
         },
         instant: {
-                           icon: Timeline.urlPrefix + "images/dull-blue-circle.png", 
+                           icon: "timeline/images/dull-blue-circle.png",
                                  // default icon. Icon can also be specified per event
                       iconWidth: 10,
                      iconHeight: 10,

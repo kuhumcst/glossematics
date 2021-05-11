@@ -27,12 +27,13 @@
  *  Timeline
  *==================================================
  */
+Timeline = {};
 Timeline.HORIZONTAL = 0;
 Timeline.VERTICAL = 1;
 Timeline._defaultTheme = null;
 
 Timeline.getDefaultLocale = function() {
-    return Timeline.clientLocale;
+    return "en";
 };
 
 Timeline.create = function(elmt, bandInfos, orientation, unit) {

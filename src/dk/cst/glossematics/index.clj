@@ -28,19 +28,6 @@
     [:link {:rel "stylesheet" :href "timeline/css/timeline.css"}]
     [:link {:rel "stylesheet" :href "timeline/css/graphics.css"}]
 
-    ;; These singleton objects are required by the Timeline API
-    [:script
-     "Timeline = {
-      serverLocale: \"en\",
-      clientLocale: \"en\",
-      urlPrefix: \"timeline/\"
-    };
-
-    SimileAjax = {
-        Platform:  new Object(),
-        urlPrefix: \"timeline/\"
-    };"]
-
     ;; TODO: reduce these (minify, bundle, ...)
     ;; These imports are all Simile Timeline library files.
     [:script {:src "timeline/js/simile-ajax-bundle.js"}]
