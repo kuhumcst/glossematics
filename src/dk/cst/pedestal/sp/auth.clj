@@ -1,4 +1,5 @@
 (ns dk.cst.pedestal.sp.auth
+  "Define restrictions at the route level and check them in decoupled manner."
   (:require [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.interceptor.chain :as chain]
@@ -17,6 +18,7 @@
   (memoize get-ic*))
 
 (defn ctx->router-ic
+  "Retrieve the router from the `ctx`."
   [ctx]
   (get-ic (::chain/stack ctx) ::route/router))
 
@@ -44,10 +46,14 @@
   (::restriction (meta (get-ic interceptors ::guard))))
 
 (defn authenticated?
+  "Has the user making this `request` authenticated via SAML?"
   [request]
   (get-in request [:session :saml :assertions]))
 
+;; TODO: allow restrictions to be defined as data too (map, set, vector)
 (defn restriction->auth-test
+  "Return a function that tests a request map based on a given `restriction`.
+  The restriction can be :authenticated, :all, :none, a function, or nil."
   [restriction]
   (cond
     (nil? restriction) (constantly true)
@@ -58,25 +64,28 @@
     (fn? restriction) restriction
     :else (throw (ex-info "Unknown restriction type" restriction))))
 
-(defn session
+(defn session-ic
+  "Interceptor that adds Ring session data to a request."
   [{:keys [session] :as conf}]
   (middlewares/session session))
 
-;; TODO: further check assertions?
-(defn guard
-  "Interceptor that will throw exceptions when auth fails."
-  [conf restriction]
+(defn guard-ic
+  "Interceptor that will throw exceptions based on the given `restriction`.
+
+  By also including the restriction as metadata other interceptors can look up
+  restrictions for different routes ahead of time (see permit? fn)."
+  [restriction]
   (with-meta
     (ic/interceptor
       {:name  ::guard
        :enter (fn [{:keys [request] :as ctx}]
-                (let [authorised? (restriction->auth-test restriction)]
-                  (if (not (authorised? request))
+                (let [ok? (restriction->auth-test restriction)]
+                  (if (not (ok? request))
                     (throw (ex-info "Failed auth" {::restriction restriction}))
                     ctx)))})
     {::restriction restriction}))
 
-(defn- no-authn
+(defn- ->no-authn-handler
   "Create a response handler to use when user is not authenticated. By default,
   the user is provided with a hyperlink to the SAML endpoint defined in `conf`."
   [{:keys [paths] :as conf}]
@@ -101,18 +110,17 @@
                 [:h1 "Forbidden"]
                 [:p "You do not have permission to access this resource."]]])})
 
-(defn failure
+(defn failure-ic
   "Error-handling interceptor creating responses for errors thrown by ::guard."
   [conf]
   (error/error-dispatch [{:keys [request] :as ctx} ex]
     [{:exception-type :clojure.lang.ExceptionInfo :interceptor ::guard}]
     (if (authenticated? request)
       (assoc ctx :response no-authz)
-      (assoc ctx :response ((no-authn conf) request)))
+      (assoc ctx :response ((->no-authn-handler conf) request)))
 
     :else (assoc ctx ::chain/error ex)))
 
-;; TODO: allow restrictions to be defined as data too (map, set, vector)
 (defn permit
   "Create an interceptor chain to make sure that a user is authorised to access
   a resource based on the expanded `conf` and a `restriction`.
@@ -122,17 +130,17 @@
   [conf restriction]
   (if (or (keyword? restriction)
           (fn? restriction))
-    [(failure conf) (session conf) (guard conf restriction)]
+    [(failure-ic conf) (session-ic conf) (guard-ic restriction)]
     (throw (ex-info "Unknown restriction type" restriction))))
 
 (defn permit?
   "Is a `route` or `query-string` allowed within the current interceptor `ctx`?
   Checks restrictions set by interceptor chain constructed with the permit fn."
   ([{:keys [request] :as ctx} query-string verb]
-   (let [auth-test (-> (routing-for ctx query-string verb)
-                       (routing->restriction)
-                       (restriction->auth-test))]
-     (auth-test request)))
+   (let [ok? (-> (routing-for ctx query-string verb)
+                 (routing->restriction)
+                 (restriction->auth-test))]
+     (ok? request)))
   ([ctx route]
    (let [query-string (if (keyword? route)
                         (url-for ctx route)

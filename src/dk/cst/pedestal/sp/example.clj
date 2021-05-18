@@ -73,7 +73,7 @@
 
 (defn example-routes
   [conf]
-  #{["/" :get [(sp.auth/session conf) (login-page conf)] :route-name ::login]
+  #{["/" :get [(sp.auth/session-ic conf) (login-page conf)] :route-name ::login]
     ["/forbidden" :any (sp.auth/permit conf :none) :route-name ::forbidden]})
 
 (defn routes
