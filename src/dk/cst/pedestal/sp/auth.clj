@@ -1,6 +1,7 @@
 (ns dk.cst.pedestal.sp.auth
   "Define restrictions at the route level and check them in decoupled manner."
-  (:require [hiccup.core :as hiccup]
+  (:require [clojure.data :as data]
+            [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.interceptor.chain :as chain]
             [io.pedestal.interceptor.error :as error]
@@ -37,32 +38,43 @@
   (let [*url-for* @(get bindings #'io.pedestal.http.route/*url-for*)]
     (apply *url-for* args)))
 
-(defn routing->restriction
+(defn routing->auth-test
   "Given a `routing` map for a single route, return the auth test attached as
   metadata to the ::session-guard interceptor.
 
   Note: routing maps are returned by `routing-for`."
   [{:keys [interceptors] :as routing}]
-  (::restriction (meta (get-ic interceptors ::guard))))
+  (or (::auth-test (meta (get-ic interceptors ::guard)))
+      (constantly true)))
 
 (defn authenticated?
   "Has the user making this `request` authenticated via SAML?"
   [request]
   (get-in request [:session :saml :assertions]))
 
-;; TODO: allow restrictions to be defined as data too (map, set, vector)
+(defn submap?
+  "Is `m` a submap of `parent`?"
+  [m parent]
+  (nil? (first (data/diff m parent))))
+
+(defn- assertions->auth-test
+  "Return a function taking a request that compares an `assertions` map to the
+  stored SAML assertions for the user making the request."
+  [assertions]
+  (fn [request]
+    (submap? assertions (get-in request [:session :saml :assertions]))))
+
 (defn restriction->auth-test
   "Return a function that tests a request map based on a given `restriction`.
   The restriction can be :authenticated, :all, :none, a function, or nil."
   [restriction]
   (cond
-    (nil? restriction) (constantly true)
     (keyword? restriction) (case restriction
                              :authenticated authenticated?
                              :all (constantly true)
                              :none (constantly false))
-    (fn? restriction) restriction
-    :else (throw (ex-info "Unknown restriction type" restriction))))
+    (map? restriction) (assertions->auth-test restriction)
+    (fn? restriction) restriction))
 
 (defn session-ic
   "Interceptor that adds Ring session data to a request."
@@ -75,15 +87,18 @@
   By also including the restriction as metadata other interceptors can look up
   restrictions for different routes ahead of time (see permit? fn)."
   [restriction]
-  (with-meta
-    (ic/interceptor
-      {:name  ::guard
-       :enter (fn [{:keys [request] :as ctx}]
-                (let [ok? (restriction->auth-test restriction)]
-                  (if (not (ok? request))
-                    (throw (ex-info "Failed auth" {::restriction restriction}))
-                    ctx)))})
-    {::restriction restriction}))
+  (let [auth-test (restriction->auth-test restriction)
+        auth-meta {::restriction restriction
+                   ::auth-test   auth-test}]
+    (assert auth-test (str "Invalid restriction: " restriction))
+    (with-meta
+      (ic/interceptor
+        {:name  ::guard
+         :enter (fn [{:keys [request] :as ctx}]
+                  (if (not (auth-test request))
+                    (throw (ex-info "Failed auth" auth-meta))
+                    ctx))})
+      auth-meta)))
 
 (defn- ->no-authn-handler
   "Create a response handler to use when user is not authenticated. By default,
@@ -128,19 +143,18 @@
   When no `restriction` is provided, simply returns an interceptor chain with
   the session interceptor."
   [conf restriction]
-  (if (or (keyword? restriction)
-          (fn? restriction))
-    [(failure-ic conf) (session-ic conf) (guard-ic restriction)]
-    (throw (ex-info "Unknown restriction type" restriction))))
+  [(failure-ic conf) (session-ic conf) (guard-ic restriction)])
 
 (defn permit?
   "Is a `route` or `query-string` allowed within the current interceptor `ctx`?
-  Checks restrictions set by interceptor chain constructed with the permit fn."
+  Checks restrictions set by interceptor chain constructed with the permit fn.
+
+  Note that unresolved routes will result in a truthy response, but the return
+  value will be :not-found in that case!"
   ([{:keys [request] :as ctx} query-string verb]
-   (let [ok? (-> (routing-for ctx query-string verb)
-                 (routing->restriction)
-                 (restriction->auth-test))]
-     (ok? request)))
+   (if-let [routing (routing-for ctx query-string verb)]
+     ((routing->auth-test routing) request)
+     :not-found))
   ([ctx route]
    (let [query-string (if (keyword? route)
                         (url-for ctx route)

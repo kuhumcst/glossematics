@@ -18,7 +18,7 @@
 (defn glossematics-routes
   [conf]
   #{["/" :get (conj (sp.auth/permit conf :authenticated) index/handler) :route-name ::index]
-    ["/login" :get [(sp.auth/session-ic conf) (example/login-page conf)] :route-name ::login]})
+    ["/login" :get [(sp.auth/session-ic conf) (example/login-page-ic conf)] :route-name ::login]})
 
 (defn routes
   [sp-conf]

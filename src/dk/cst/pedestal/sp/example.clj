@@ -1,5 +1,6 @@
 (ns dk.cst.pedestal.sp.example
   (:require [clojure.set :as set]
+            [clojure.data.json :as json]
             [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.http :as http]
@@ -17,11 +18,13 @@
 
 (defn- resource
   [ctx path description]
-  (if (sp.auth/permit? ctx path)
-    [:li [:a {:href path} description]]
-    [:li "⚠️ " [:a {:href path} [:del description]]]))
+  (if-let [permit-result (sp.auth/permit? ctx path)]
+    (if (= permit-result :not-found)
+      [:li "⚠️ " [:a {:href path} [:del description]]]
+      [:li [:a {:href path} description]])
+    [:li "🚫 " [:a {:href path} [:del description]]]))
 
-(defn login-page
+(defn login-page-ic
   "Example login page handler. Specifying the query-param RelayState will
   redirect there after successful SAML authentication."
   [conf]
@@ -69,12 +72,27 @@
                                            (resource ctx saml-request "SP request")
                                            (resource ctx saml-response "IdP response")
                                            (resource ctx saml-assertions "User assertions")
-                                           (resource ctx "/forbidden" "Always forbidden")]]])})))}))
+                                           (resource ctx "/api" "Fake API")
+                                           (resource ctx "/forbidden" "Always forbidden")
+                                           (resource ctx "/missing" "Missing resource")]]])})))}))
 
+(defn api-ic
+  "Example API endpoint."
+  [conf]
+  (ic/interceptor
+    {:name  ::api
+     :enter (fn [{:keys [request] :as ctx}]
+              (let [{:keys [query-params]} request]
+                (assoc ctx
+                  :response {:status  200
+                             :headers {"Content-Type" "application/json"}
+                             :body    (json/write-str {:glen "is the way"})})))}))
 (defn example-routes
   [conf]
-  #{["/" :get [(sp.auth/session-ic conf) (login-page conf)] :route-name ::login]
-    ["/forbidden" :any (sp.auth/permit conf :none) :route-name ::forbidden]})
+  (let [glen-restriction {:attrs {"firstName" #{"Glen"}}}]
+    #{["/" :get [(sp.auth/session-ic conf) (login-page-ic conf)] :route-name ::login]
+      ["/api" :any (conj (sp.auth/permit conf glen-restriction) (api-ic conf)) :route-name ::api]
+      ["/forbidden" :any (sp.auth/permit conf :none) :route-name ::forbidden]}))
 
 (defn routes
   [conf]
