@@ -84,7 +84,7 @@
 
 (defn service-map
   [conf]
-  {::http/routes (routes conf)
+  {::http/routes #((deref #'routes) conf)
    ::http/type   :jetty
    ::http/port   8080})
 
