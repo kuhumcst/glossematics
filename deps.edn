@@ -11,6 +11,7 @@
            hiccup                           {:mvn/version "1.0.5"}
            org.clojure/data.csv             {:mvn/version "1.0.0"}
            semantic-csv/semantic-csv        {:mvn/version "0.2.1-alpha1"}
+           time-literals/time-literals      {:mvn/version "0.1.5"}
 
            ;; Using the same version of Jetty as Pedestal, since upgrading will
            ;; create an incompatibility with newer versions of Jetty:

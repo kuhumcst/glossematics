@@ -1,9 +1,16 @@
 (ns dk.cst.pedestal.sp.interceptors
+  "Standard interceptors for the SAML login flow + some helper interceptors."
   (:require [clojure.pprint :refer [pprint]]
+            [clojure.walk :as walk]
+            [time-literals.data-readers]                    ; tagged literals
+            [time-literals.read-write :as tl]
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as coerce]
             [saml20-clj.encode-decode :as saml-decode]
             [io.pedestal.interceptor :as ic]))
+
+;; Make sure that echo-assertions prints timestamps in a nice way
+(tl/print-time-literals-clj!)
 
 (defn echo-response
   "Handler echoing full SAML response (including assertions) in session store."
@@ -74,6 +81,16 @@
         :session {:saml {:request     (coerce/->xml-string saml-request)
                          :relay-state relay-state*}}))))
 
+(defn massage-assertions
+  "Makes the saml20-clj `assertions` (a direct XML conversion) more palatable.
+  The returned map can more easily be queried e.g. for authorisation purposes."
+  [assertions]
+  (->> (first assertions)
+       (walk/postwalk (fn [x]
+                        (cond
+                          (seq? x) (set x)
+                          :else x)))))
+
 ;; TODO: add error handler
 ;; TODO: validate response some more?
 (defn response
@@ -89,7 +106,8 @@
                          saml-decode/base64->str
                          (saml/validate idp-cert sp-private-key validation))
           xml        (saml/->xml-string response)
-          assertions (saml/assertions response)]
+          assertions (-> (saml/assertions response)
+                         (massage-assertions))]
       {:status  303
        :session (update session :saml merge {:assertions assertions
                                              :response   xml})
