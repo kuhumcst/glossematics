@@ -14,10 +14,9 @@
                 saml-request
                 saml-response
                 saml-assertions]} paths
-        body-params    (body-params)
-        all            (sp.auth/chain conf :all)
-        authenticated  (sp.auth/chain conf :authenticated)
-        auth-requested (sp.auth/chain conf #(get-in % [:session :saml :request]))]
+        body-params   (body-params)
+        all           (sp.auth/chain conf :all)
+        authenticated (sp.auth/chain conf :authenticated)]
     #{;; Standard endpoints required for an sp-initiated SAML login flow
       [saml-meta :get (sp.ic/metadata conf) :route-name ::saml-meta]
       [saml-login :get (conj all (sp.ic/request conf)) :route-name ::saml-req]
@@ -28,6 +27,6 @@
 
       ;; User-centric metadata endpoints, not related to the SAML login flow
       [saml-session :get (conj all `sp.ic/echo-session)]
-      [saml-request :get (conj auth-requested `sp.ic/echo-request)]
+      [saml-request :get (conj authenticated `sp.ic/echo-request)]
       [saml-response :get (conj authenticated `sp.ic/echo-response)]
       [saml-assertions :get (conj authenticated `sp.ic/echo-assertions)]}))

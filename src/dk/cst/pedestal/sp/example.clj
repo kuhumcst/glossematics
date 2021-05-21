@@ -79,12 +79,13 @@
 (defn api-ic
   "Example API endpoint."
   [request]
-  {:status  200
-   :headers {"Content-Type" "application/json"}
-   :body    (sp.auth/only-permit [request {:attrs {"lastName" #{"Jackson"}}}]
-              (sp.auth/if-permit [request {:attrs {"firstName" #{"Glen"}}}]
-                (json/write-str {:glen "is the way"})
-                (json/write-str {:glen "is NOT the way"})))})
+  (let [assertions (-> request :session :saml :assertions)]
+    {:status  200
+     :headers {"Content-Type" "application/json"}
+     :body    (sp.auth/only-permit [assertions {:attrs {"lastName" #{"Jackson"}}}]
+                (sp.auth/if-permit [assertions {:attrs {"firstName" #{"Glen"}}}]
+                  (json/write-str {:glen "is the way"})
+                  (json/write-str {:glen "is NOT the way"})))}))
 
 (defn example-routes
   [conf]

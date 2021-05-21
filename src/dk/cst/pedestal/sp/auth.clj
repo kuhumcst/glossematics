@@ -61,16 +61,15 @@
   "Return a function taking a request that compares an `assertions` map to the
   stored SAML assertions for the user making the request."
   [assertions]
-  (fn [request]
-    (submap? assertions (get-in request [:session :saml :assertions]))))
+  #(submap? assertions %))
 
 (defn restriction->auth-test
-  "Return a function that tests a request map based on a given `restriction`.
-  The restriction can be :authenticated, :all, :none, a function, or nil."
+  "Return a function to test an assertions map based on a given `restriction`.
+  The restriction can be :authenticated, :all, :none, a submap, or a function."
   [restriction]
   (cond
     (keyword? restriction) (case restriction
-                             :authenticated authenticated?
+                             :authenticated some?
                              :all (constantly true)
                              :none (constantly false))
     (map? restriction) (assertions->auth-test restriction)
@@ -94,10 +93,11 @@
     (with-meta
       (ic/interceptor
         {:name  ::guard
-         :enter (fn [{:keys [request] :as ctx}]
-                  (if (not (auth-test request))
-                    (throw (ex-info "Failed auth" auth-meta))
-                    ctx))})
+         :enter (fn [ctx]
+                  (let [assertions (-> ctx :request :session :saml :assertions)]
+                    (if (not (auth-test assertions))
+                      (throw (ex-info "Failed auth" auth-meta))
+                      ctx)))})
       auth-meta)))
 
 (defn- ->no-authn-handler
@@ -164,16 +164,16 @@
      (permit? ctx query-string :get))))
 
 (defmacro if-permit
-  "Checks that `request` satisfies `restriction`. When true, returns the first
-  clause of `body`; else returns the second clause."
-  [[request restriction] & body]
-  `(if ((restriction->auth-test ~restriction) ~request)
+  "Checks that `assertions` satisfies `restriction`. When true, returns the
+  first clause of `body`; else returns the second clause."
+  [[assertions restriction] & body]
+  `(if ((restriction->auth-test ~restriction) ~assertions)
      ~@body))
 
 (defmacro only-permit
-  "Checks that `request` satisfies `restriction`. If true, returns `body`; else
-  throws an exception."
-  [[request restriction] & body]
-  `(if ((restriction->auth-test ~restriction) ~request)
+  "Checks that `assertions` satisfies `restriction`. If true, returns `body`;
+  else throws an exception."
+  [[assertions restriction] & body]
+  `(if ((restriction->auth-test ~restriction) ~assertions)
      (do ~@body)
      (throw (ex-info "Unsatisfied restriction" {::restriction ~restriction}))))
