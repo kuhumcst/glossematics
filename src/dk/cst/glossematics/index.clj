@@ -3,7 +3,8 @@
   fingerprinting of any included files in the release version."
   (:require [clojure.java.io :as io]
             [clojure.edn :as edn]
-            [hiccup.core :as hiccup]))
+            [hiccup.core :as hiccup]
+            [dk.cst.pedestal.sp.auth.interceptors :as sp.auth.ic]))
 
 (def index-filename
   (-> (io/resource "public/js/compiled/manifest.edn")
@@ -12,7 +13,8 @@
       first
       :output-name))
 
-(def index-hiccup
+(defn index-hiccup
+  [assertions]
   [:html {:lang "da"}
    [:head
     [:meta {:charset "utf-8"}]
@@ -45,13 +47,15 @@
 
    [:body
     [:div#app]
+    [:script (str "var SAMLAssertions = '" (pr-str assertions) "';")]
     [:script {:src (str "js/compiled/" index-filename)}]]])
 
-(def index-html
-  (hiccup/html index-hiccup))
+(defn index-html
+  [assertions]
+  (hiccup/html (index-hiccup assertions)))
 
 (defn handler
-  [_]
+  [request]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    index-html})
+   :body    (index-html (sp.auth.ic/request->assertions request))})

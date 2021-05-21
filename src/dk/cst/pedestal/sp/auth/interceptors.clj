@@ -1,12 +1,12 @@
-(ns dk.cst.pedestal.sp.auth
-  "Define restrictions at the route level and check them in decoupled manner."
-  (:require [clojure.data :as data]
-            [hiccup.core :as hiccup]
+(ns dk.cst.pedestal.sp.auth.interceptors
+  "Define restrictions at the route level and check them in a decoupled manner."
+  (:require [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.interceptor.chain :as chain]
             [io.pedestal.interceptor.error :as error]
             [io.pedestal.http.route :as route]
-            [io.pedestal.http.ring-middlewares :as middlewares]))
+            [io.pedestal.http.ring-middlewares :as middlewares]
+            [dk.cst.pedestal.sp.auth :as sp.auth]))
 
 (defn- get-ic*
   [interceptors ic-name]
@@ -47,33 +47,14 @@
   (or (::auth-test (meta (get-ic interceptors ::guard)))
       (constantly true)))
 
-(defn authenticated?
-  "Has the user making this `request` authenticated via SAML?"
+(defn request->assertions
   [request]
   (get-in request [:session :saml :assertions]))
 
-(defn submap?
-  "Is `m` a submap of `parent`?"
-  [m parent]
-  (nil? (first (data/diff m parent))))
-
-(defn- assertions->auth-test
-  "Return a function taking a request that compares an `assertions` map to the
-  stored SAML assertions for the user making the request."
-  [assertions]
-  #(submap? assertions %))
-
-(defn restriction->auth-test
-  "Return a function to test an assertions map based on a given `restriction`.
-  The restriction can be :authenticated, :all, :none, a submap, or a function."
-  [restriction]
-  (cond
-    (keyword? restriction) (case restriction
-                             :authenticated some?
-                             :all (constantly true)
-                             :none (constantly false))
-    (map? restriction) (assertions->auth-test restriction)
-    (fn? restriction) restriction))
+(defn authenticated?
+  "Has the user making this `request` authenticated via SAML?"
+  [request]
+  (boolean (request->assertions request)))
 
 (defn session-ic
   "Interceptor that adds Ring session data to a request."
@@ -86,7 +67,7 @@
   By also including the restriction as metadata other interceptors can look up
   restrictions for different routes ahead of time (see permit? fn)."
   [restriction]
-  (let [auth-test (restriction->auth-test restriction)
+  (let [auth-test (sp.auth/restriction->auth-test restriction)
         auth-meta {::restriction restriction
                    ::auth-test   auth-test}]
     (assert auth-test (str "Invalid restriction: " restriction))
@@ -147,7 +128,7 @@
   [conf restriction]
   [(failure-ic conf) (session-ic conf) (guard-ic restriction)])
 
-(defn permit?
+(defn permit-request?
   "Is a `route` or `query-string` allowed within the current interceptor `ctx`?
   Checks restrictions set by interceptor chain constructed with the permit fn.
 
@@ -161,19 +142,4 @@
    (let [query-string (if (keyword? route)
                         (url-for ctx route)
                         route)]
-     (permit? ctx query-string :get))))
-
-(defmacro if-permit
-  "Checks that `assertions` satisfies `restriction`. When true, returns the
-  first clause of `body`; else returns the second clause."
-  [[assertions restriction] & body]
-  `(if ((restriction->auth-test ~restriction) ~assertions)
-     ~@body))
-
-(defmacro only-permit
-  "Checks that `assertions` satisfies `restriction`. If true, returns `body`;
-  else throws an exception."
-  [[assertions restriction] & body]
-  `(if ((restriction->auth-test ~restriction) ~assertions)
-     (do ~@body)
-     (throw (ex-info "Unsatisfied restriction" {::restriction ~restriction}))))
+     (permit-request? ctx query-string :get))))

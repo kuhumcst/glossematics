@@ -1,16 +1,29 @@
 (ns user
   (:require [clojure.string :as str]
             [clojure.pprint :refer [pprint]]
+            [clojure.edn :as edn]
             [shadow.resource :as sr]
             [load :as load]
             [reagent.core :as r]
             [reagent.dom :as rdom]
             [recap.component.widget.tabs :as tabs]
+            [time-literals.data-readers]                    ; tagged literals
+            [time-literals.read-write :as tl]
+            [dk.cst.pedestal.sp.auth :as sp.auth]
             [dk.cst.glossematics.facsimile :as facsimile]
             [dk.cst.glossematics.timeline :as timeline :refer [timeline]]))
 
+;; Make sure that edn/read-string can process timestamp literals
+(time-literals.read-write/print-time-literals-cljs!)
+
 (def hjemslev-events
   (load/timeline))
+
+;; Loading assertions by passing an EDN string in index.html
+(def assertions
+  (if (exists? js/SAMLAssertions)
+    (edn/read-string js/SAMLAssertions)
+    {}))
 
 (def hjemslev-bands
   {:primary  {:width        "80%"
@@ -144,6 +157,9 @@
 (defn app
   []
   [:<>
+   [:p (sp.auth/if-permit [assertions {:attrs {"firstName" #{"Simon"}}}]
+         "Simon is the way"
+         "Simon is NOT the way")]
    [:h1 {:style {:color          "black"
                  :letter-spacing "4px"
                  :font-family    "PoiretOne"

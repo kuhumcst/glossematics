@@ -7,7 +7,8 @@
             [io.pedestal.http.route :as route]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
-            [dk.cst.pedestal.sp.auth :as sp.auth]))
+            [dk.cst.pedestal.sp.auth :as sp.auth]
+            [dk.cst.pedestal.sp.auth.interceptors :as sp.auth.ic]))
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
@@ -18,8 +19,8 @@
 
 (defn- resource
   [ctx path description]
-  (if-let [permit-result (sp.auth/permit? ctx path)]
-    (if (= permit-result :not-found)
+  (if-let [permitted (sp.auth.ic/permit-request? ctx path)]
+    (if (= permitted :not-found)
       [:li "⚠️ " [:a {:href path} [:del description]]]
       [:li [:a {:href path} description]])
     [:li "🚫 " [:a {:href path} [:del description]]]))
@@ -51,7 +52,7 @@
                                          [:body
                                           [:h1 app-name]
                                           [:p "Example login form for logging in through an IdP."]
-                                          (if (sp.auth/authenticated? request)
+                                          (if (sp.auth.ic/authenticated? request)
                                             [:form {:action saml-logout
                                                     :method "post"}
                                              [:input {:type  "hidden"
@@ -89,9 +90,9 @@
 
 (defn example-routes
   [conf]
-  #{["/" :get [(sp.auth/session-ic conf) (login-page-ic conf)] :route-name ::login]
-    ["/api" :any (conj (sp.auth/chain conf :authenticated) api-ic) :route-name ::api]
-    ["/forbidden" :any (sp.auth/chain conf :none) :route-name ::forbidden]})
+  #{["/" :get [(sp.auth.ic/session-ic conf) (login-page-ic conf)] :route-name ::login]
+    ["/api" :any (conj (sp.auth.ic/chain conf :authenticated) api-ic) :route-name ::api]
+    ["/forbidden" :any (sp.auth.ic/chain conf :none) :route-name ::forbidden]})
 
 (defn routes
   [conf]

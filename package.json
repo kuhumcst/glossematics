@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@js-joda/core": "3.2.0",
     "react": "16.13.0",
     "react-dom": "16.13.0",
     "scheduler": "^0.19.1"

@@ -1,7 +1,7 @@
 (ns dk.cst.pedestal.sp.routes
   (:require [io.pedestal.http.body-params :refer [body-params]]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
-            [dk.cst.pedestal.sp.auth :as sp.auth]))
+            [dk.cst.pedestal.sp.auth.interceptors :as sp.auth.ic]))
 
 ;; TODO: add function for creating a minimal routes set
 (defn all
@@ -15,8 +15,8 @@
                 saml-response
                 saml-assertions]} paths
         body-params   (body-params)
-        all           (sp.auth/chain conf :all)
-        authenticated (sp.auth/chain conf :authenticated)]
+        all           (sp.auth.ic/chain conf :all)
+        authenticated (sp.auth.ic/chain conf :authenticated)]
     #{;; Standard endpoints required for an sp-initiated SAML login flow
       [saml-meta :get (sp.ic/metadata conf) :route-name ::saml-meta]
       [saml-login :get (conj all (sp.ic/request conf)) :route-name ::saml-req]
