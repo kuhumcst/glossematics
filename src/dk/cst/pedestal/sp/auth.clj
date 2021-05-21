@@ -129,14 +129,16 @@
   "Error-handling interceptor creating responses for errors thrown by ::guard."
   [conf]
   (error/error-dispatch [{:keys [request] :as ctx} ex]
-    [{:exception-type :clojure.lang.ExceptionInfo :interceptor ::guard}]
-    (if (authenticated? request)
-      (assoc ctx :response no-authz)
-      (assoc ctx :response ((->no-authn-handler conf) request)))
+    [{:exception-type :clojure.lang.ExceptionInfo}]
+    (if (::restriction (ex-data ex))
+      (if (authenticated? request)
+        (assoc ctx :response no-authz)
+        (assoc ctx :response ((->no-authn-handler conf) request)))
+      (assoc ctx ::chain/error ex))
 
     :else (assoc ctx ::chain/error ex)))
 
-(defn permit
+(defn chain
   "Create an interceptor chain to make sure that a user is authorised to access
   a resource based on the expanded `conf` and a `restriction`.
 
@@ -160,3 +162,18 @@
                         (url-for ctx route)
                         route)]
      (permit? ctx query-string :get))))
+
+(defmacro if-permit
+  "Checks that `request` satisfies `restriction`. When true, returns the first
+  clause of `body`; else returns the second clause."
+  [[request restriction] & body]
+  `(if ((restriction->auth-test ~restriction) ~request)
+     ~@body))
+
+(defmacro only-permit
+  "Checks that `request` satisfies `restriction`. If true, returns `body`; else
+  throws an exception."
+  [[request restriction] & body]
+  `(if ((restriction->auth-test ~restriction) ~request)
+     (do ~@body)
+     (throw (ex-info "Unsatisfied restriction" {::restriction ~restriction}))))

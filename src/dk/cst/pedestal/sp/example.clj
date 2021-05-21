@@ -78,21 +78,19 @@
 
 (defn api-ic
   "Example API endpoint."
-  [conf]
-  (ic/interceptor
-    {:name  ::api
-     :enter (fn [{:keys [request] :as ctx}]
-              (let [{:keys [query-params]} request]
-                (assoc ctx
-                  :response {:status  200
-                             :headers {"Content-Type" "application/json"}
-                             :body    (json/write-str {:glen "is the way"})})))}))
+  [request]
+  {:status  200
+   :headers {"Content-Type" "application/json"}
+   :body    (sp.auth/only-permit [request {:attrs {"lastName" #{"Jackson"}}}]
+              (sp.auth/if-permit [request {:attrs {"firstName" #{"Glen"}}}]
+                (json/write-str {:glen "is the way"})
+                (json/write-str {:glen "is NOT the way"})))})
+
 (defn example-routes
   [conf]
-  (let [glen-restriction {:attrs {"firstName" #{"Glen"}}}]
-    #{["/" :get [(sp.auth/session-ic conf) (login-page-ic conf)] :route-name ::login]
-      ["/api" :any (conj (sp.auth/permit conf glen-restriction) (api-ic conf)) :route-name ::api]
-      ["/forbidden" :any (sp.auth/permit conf :none) :route-name ::forbidden]}))
+  #{["/" :get [(sp.auth/session-ic conf) (login-page-ic conf)] :route-name ::login]
+    ["/api" :any (conj (sp.auth/chain conf :authenticated) api-ic) :route-name ::api]
+    ["/forbidden" :any (sp.auth/chain conf :none) :route-name ::forbidden]})
 
 (defn routes
   [conf]
