@@ -7,7 +7,10 @@
                    :output-dir        "resources/public/js/compiled"
                    :asset-path        "/js/compiled"
                    :module-hash-names true
-                   :modules           {:main {:init-fn user/start-dev}}}
+                   :modules           {:main {:init-fn user/start-dev}}
+
+                   ;; https://shadow-cljs.github.io/docs/UsersGuide.html#build-report
+                   :build-hooks       [(shadow.cljs.build-report/hook)]}
             :test {:target   :browser-test
                    :test-dir "resources/public/js/test"
                    :devtools {:http-port 9100
