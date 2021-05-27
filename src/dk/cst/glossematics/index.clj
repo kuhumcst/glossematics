@@ -4,22 +4,26 @@
   (:require [clojure.java.io :as io]
             [clojure.edn :as edn]
             [hiccup.core :as hiccup]
-            [dk.cst.pedestal.sp.auth.interceptors :as sp.auth.ic]))
+            [dk.cst.pedestal.sp.auth :as sp.auth]))
 
-(def index-filename
-  (-> (io/resource "public/js/compiled/manifest.edn")
-      slurp
-      edn/read-string
-      first
-      :output-name))
+(def main-js
+  "When making a release, the filename will be appended with a hash;
+  that is not the case when running the regular shadow-cljs watch process.
+
+  This relies on the :module-hash-names being set to true in shadow-cljs.edn."
+  (if-let [url (io/resource "public/js/compiled/manifest.edn")]
+    (-> url slurp edn/read-string first :output-name)
+    "main.js"))
+
+(def development?
+  (= main-js "main.js"))
 
 (defn index-hiccup
   [assertions]
   [:html {:lang "da"}
    [:head
     [:meta {:charset "utf-8"}]
-    [:title (str "Glossematics" (when (= index-filename "main.js")
-                                  " (development)"))]
+    [:title (str (when development? "(dev) ") "Glossematics")]
     [:link {:rel "icon" :href "images/favicon.svg"}]
     [:link {:rel "mask-icon" :href "images/favicon.svg" :color "#a02c2c"}]
     [:link {:rel "stylesheet" :href "css/main.css"}]
@@ -48,7 +52,7 @@
    [:body
     [:div#app]
     [:script (str "var SAMLAssertions = '" (pr-str assertions) "';")]
-    [:script {:src (str "js/compiled/" index-filename)}]]])
+    [:script {:src (str "js/compiled/" main-js)}]]])
 
 (defn index-html
   [assertions]
@@ -58,4 +62,4 @@
   [request]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    (index-html (sp.auth.ic/request->assertions request))})
+   :body    (index-html (sp.auth/request->assertions request))})

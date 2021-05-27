@@ -30,14 +30,15 @@
   [sp-conf]
   (when-let [conf-error (s/explain-data ::sp.conf/config sp-conf)]
     (throw (ex-info "invalid configuration" conf-error)))
-  (let [;; TODO: make dev exception for shadow-cljs
-        csp {:default-src "'none'"
-             :script-src  "'self' 'unsafe-inline'"
-             :connect-src "'self'"
-             :img-src     "'self'"
-             :font-src    "'self'"
-             :style-src   "'self' 'unsafe-inline'"
-             :base-uri    "'self'"}]
+  (let [csp (if index/development?
+              {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* ws://localhost:*"}
+              {:default-src "'none'"
+               :script-src  "'self' 'unsafe-inline'" ; unsafe-eval possibly only needed for dev main.js
+               :connect-src "'self'"
+               :img-src     "'self'"
+               :font-src    "'self'"
+               :style-src   "'self' 'unsafe-inline'"
+               :base-uri    "'self'"})]
     {::http/routes         (routes sp-conf)
      ::http/type           :jetty
      ::http/host           "0.0.0.0"                        ; "localhost" won't work on a KU-IT server

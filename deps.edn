@@ -1,22 +1,22 @@
 {:paths   ["src" "resources"]
- :deps    {org.clojure/clojurescript        {:mvn/version "1.10.773"}
-           org.clojure/data.json            {:mvn/version "1.0.0"}
-           thheller/shadow-cljs             {:mvn/version "2.11.5"}
-           metabase/saml20-clj              {:mvn/version "2.0.0"}
-           io.pedestal/pedestal.service     {:mvn/version "0.5.8"}
-           io.pedestal/pedestal.route       {:mvn/version "0.5.8"}
-           io.pedestal/pedestal.jetty       {:mvn/version "0.5.8"}
-           luminus/ring-ttl-session         {:mvn/version "0.3.3"}
-           org.slf4j/slf4j-simple           {:mvn/version "1.7.30"}
-           hiccup                           {:mvn/version "1.0.5"}
+ :deps    {org.clojure/clojure              {:mvn/version "1.10.3"}
+           org.clojure/data.json            {:mvn/version "2.3.1"}
            org.clojure/data.csv             {:mvn/version "1.0.0"}
            semantic-csv/semantic-csv        {:mvn/version "0.2.1-alpha1"}
            time-literals/time-literals      {:mvn/version "0.1.5"}
 
+           io.pedestal/pedestal.service     {:mvn/version "0.5.9"}
+           io.pedestal/pedestal.route       {:mvn/version "0.5.9"}
+           io.pedestal/pedestal.jetty       {:mvn/version "0.5.9"}
+           luminus/ring-ttl-session         {:mvn/version "0.3.3"}
+           org.slf4j/slf4j-simple           {:mvn/version "1.7.30"}
+           hiccup                           {:mvn/version "1.0.5"}
+
            ;; Using the same version of Jetty as Pedestal, since upgrading will
            ;; create an incompatibility with newer versions of Jetty:
            ;; https://opennms.discourse.group/t/jetty-with-ssl-throws-error-with-keystores-with-multiple-certificates-are-not-supported/1489
-           org.eclipse.jetty/jetty-servlets {:mvn/version "9.4.18.v20190429"}
+           org.eclipse.jetty/jetty-servlets {:mvn/version "9.4.35.v20201120"}
+
 
            ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
@@ -27,6 +27,13 @@
                                              :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/recap                   {:git/url "https://github.com/kuhumcst/recap.git"
                                              :sha     "2668835572a5523bc5a9f0f5543dd85ab1c31681"}}
- :aliases {:app  {:extra-paths ["dev"]
-                  :extra-deps  {reagent {:mvn/version "0.10.0"}}}
-           :test {:extra-paths ["test"]}}}
+
+ ;; For now, the backend alias only contains metabase/saml20-clj since it
+ ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
+ ;; Using a separate alias for backend-only deps solves this.
+ :aliases {:backend  {:extra-deps {metabase/saml20-clj {:mvn/version "2.0.0"}}}
+           :frontend {:extra-paths ["dev"]
+                      :extra-deps  {org.clojure/clojurescript {:mvn/version "1.10.866"}
+                                    thheller/shadow-cljs      {:mvn/version "2.14.0"}
+                                    reagent                   {:mvn/version "1.0.0"}}}
+           :test     {:extra-paths ["test"]}}}

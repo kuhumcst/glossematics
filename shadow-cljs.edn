@@ -1,4 +1,4 @@
-{:deps     {:aliases [:app :test]}
+{:deps     {:aliases [:frontend :test]}
  :dev-http {9000 {:root    "resources/public"
                   :handler dk.cst.glossematics.index/handler}}
  :nrepl    {:port    9900

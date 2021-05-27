@@ -72,6 +72,8 @@ brew install node
 npm install -g shadow-cljs
 ```
 
+JavaScript dependencies [must be installed separately](https://shadow-cljs.github.io/docs/UsersGuide.html#_missing_js_dependency)!
+
 Workflow
 --------
 ### Frontend
@@ -106,3 +108,11 @@ clj -A:update
 
 ### Backend
 The namespace `dk.cst.glossematics.service` defines the backend web service. This Pedestal web service can be started, stopped, restarted, and updated entirely through the Clojure REPL using the utility functions located inside that namespace. There is no need to install and setup a separate web server since Pedestal dynamically sets up a Jetty instance for this purpose.
+
+The frontend being served is whichever frontend was last compiled which will usually be the development version that is created by running `shadow-cljs watch app`. The release version can be used instead by running:
+
+```
+shadow-cljs release app
+```
+
+... and making sure that `dk.cst.glossematics.index` is reloaded in the REPL.

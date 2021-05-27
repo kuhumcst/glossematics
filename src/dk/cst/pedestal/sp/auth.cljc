@@ -1,7 +1,16 @@
 (ns dk.cst.pedestal.sp.auth
-  "Build logic by comparing SAML assertions to restrictions."
+  "Build authorisation logic by branching according to SAML assertions."
   (:require [clojure.data :as data])
   #?(:cljs (:require-macros [dk.cst.pedestal.sp.auth])))
+
+(defn request->assertions
+  [request]
+  (get-in request [:session :saml :assertions]))
+
+(defn authenticated?
+  "Has the user making this `request` authenticated via SAML?"
+  [request]
+  (boolean (request->assertions request)))
 
 (defn submap?
   "Is `m` a submap of `parent`?"

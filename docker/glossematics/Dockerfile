@@ -36,7 +36,7 @@ WORKDIR /etc/glossematics
 COPY ./deps.edn /etc/glossematics/deps.edn
 COPY ./shadow-cljs.edn /etc/glossematics/shadow-cljs.edn
 RUN shadow-cljs classpath
-RUN clojure -Spath
+RUN clojure -A:backend -Spath
 
 # TODO: remove dev/ in the future (currently in use)
 # Create a release build of the ClojureScript app

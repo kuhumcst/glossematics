@@ -1,5 +1,5 @@
 (ns dk.cst.pedestal.sp.auth.interceptors
-  "Define restrictions at the route level and check them in a decoupled manner."
+  "Define restrictions at the route level and verify within an interceptor ctx."
   (:require [hiccup.core :as hiccup]
             [io.pedestal.interceptor :as ic]
             [io.pedestal.interceptor.chain :as chain]
@@ -47,15 +47,6 @@
   (or (::auth-test (meta (get-ic interceptors ::guard)))
       (constantly true)))
 
-(defn request->assertions
-  [request]
-  (get-in request [:session :saml :assertions]))
-
-(defn authenticated?
-  "Has the user making this `request` authenticated via SAML?"
-  [request]
-  (boolean (request->assertions request)))
-
 (defn session-ic
   "Interceptor that adds Ring session data to a request."
   [{:keys [session] :as conf}]
@@ -69,13 +60,13 @@
   [restriction]
   (let [auth-test (sp.auth/restriction->auth-test restriction)
         auth-meta {::restriction restriction
-                   ::auth-test   auth-test}]
+                   ::auth-test  auth-test}]
     (assert auth-test (str "Invalid restriction: " restriction))
     (with-meta
       (ic/interceptor
         {:name  ::guard
-         :enter (fn [ctx]
-                  (let [assertions (-> ctx :request :session :saml :assertions)]
+         :enter (fn [{:keys [request] :as ctx}]
+                  (let [assertions (sp.auth/request->assertions request)]
                     (if (not (auth-test assertions))
                       (throw (ex-info "Failed auth" auth-meta))
                       ctx)))})
@@ -112,7 +103,7 @@
   (error/error-dispatch [{:keys [request] :as ctx} ex]
     [{:exception-type :clojure.lang.ExceptionInfo}]
     (if (::restriction (ex-data ex))
-      (if (authenticated? request)
+      (if (sp.auth/authenticated? request)
         (assoc ctx :response no-authz)
         (assoc ctx :response ((->no-authn-handler conf) request)))
       (assoc ctx ::chain/error ex))
