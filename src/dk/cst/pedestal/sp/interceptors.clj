@@ -15,12 +15,14 @@
             [io.pedestal.interceptor.error :as error]
             [io.pedestal.http.route :as route]
             [io.pedestal.http.ring-middlewares :as middlewares]
+            [ring.util.codec :as codec]
             [hiccup.core :as hiccup]
             [time-literals.data-readers]                    ; tagged literals
             [time-literals.read-write :as tl]
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as coerce]
             [saml20-clj.encode-decode :as saml-decode]
+            [dk.cst.pedestal.sp.static :refer [never css-centred css-spaced]]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
 
 ;; Make sure that echo-assertions prints timestamps in a nice way
@@ -29,6 +31,14 @@
 (defn request->assertions
   [request]
   (get-in request [:session :saml :assertions]))
+
+;; The ring session wrapper grandfathers in the :cookies key in the request map.
+(defn request->consent-state
+  [request]
+  (when-let [consent (get-in request [:cookies "consent" :value])]
+    (->> (codec/form-decode consent)
+         (map (fn [[k v]] [(keyword k) v]))
+         (into {}))))
 
 (defn authenticated?
   "Has the user making this `request` authenticated via SAML?"
@@ -121,10 +131,13 @@
   Will treat RelayState as a location, redirecting there after authentication."
   [{:keys [idp-cert
            sp-private-key
-           validation]
+           validation
+           paths]
     :as   conf}]
-  (fn [{:keys [form-params session] :as req}]
+  (fn [{:keys [form-params session] :as request}]
     (let [{:keys [SAMLResponse RelayState]} form-params
+          {:keys [saml-consent]} paths
+          {:keys [pedestal-sp]} (request->consent-state request)
           response   (-> SAMLResponse
                          saml-decode/base64->str
                          (saml/validate idp-cert sp-private-key validation))
@@ -134,7 +147,10 @@
       {:status  303
        :session (update session :saml merge {:assertions assertions
                                              :response   xml})
-       :headers {"Location" RelayState}})))
+       :headers (if (and saml-consent
+                         (not= "on" pedestal-sp))
+                  {"Location" (str saml-consent "?RelayState=" RelayState)}
+                  {"Location" RelayState})})))
 
 (defn logout-ic
   "Delete current SAML-related session info related to the user, i.e. log out.
@@ -179,7 +195,7 @@
                       ctx)))})
       auth-meta)))
 
-(defn- ->no-authn-handler
+(defn- ->no-authentication-handler
   "Create a response handler to use when user is not authenticated. By default,
   the user is provided with a hyperlink to the SAML endpoint defined in `conf`."
   [{:keys [paths] :as conf}]
@@ -195,7 +211,7 @@
                     "log in"]
                    " before you can access this resource."]]])}))
 
-(def ^:private no-authz
+(def ^:private no-authorization-response
   {:status  403
    :headers {"Content-Type" "text/html"}
    :body    (hiccup/html
@@ -211,11 +227,126 @@
     [{:exception-type :clojure.lang.ExceptionInfo}]
     (if (::restriction (ex-data ex))
       (if (authenticated? request)
-        (assoc ctx :response no-authz)
-        (assoc ctx :response ((->no-authn-handler conf) request)))
+        (assoc ctx :response no-authorization-response)
+        (assoc ctx :response ((->no-authentication-handler conf) request)))
       (assoc ctx ::chain/error ex))
 
     :else (assoc ctx ::chain/error ex)))
+
+(defn consent-form
+  "Build a form for use with the 'consent-ic' based on a `consent-url`,
+  a `consent` map and a `RelayState`."
+  [consent-url
+   {:keys [agreed
+           pedestal-sp
+           summary
+           checkboxes]
+    :as   consent}
+   RelayState]
+  (hiccup/html
+    [:html
+     [:body {:style (str css-centred "height: 100vh;")}
+      [:form {:action consent-url
+              :method "get"}
+       [:fieldset {:style "min-width: 200px; max-width: 400px"}
+        [:legend
+         [:strong "Consent"]]
+        (cond
+          (not-empty checkboxes)
+          [:details {:open (not agreed)}
+           [:summary summary]
+           [:ul
+            (for [{:keys [name label checked]} checkboxes]
+              [:li
+               [:label {:style (str css-spaced)}
+                label
+                [:input {:type    "checkbox"
+                         :name    name
+                         :checked (boolean checked)}]]])]]
+
+          summary
+          [:p summary])
+
+        ;; Session cookie expiration is a special case.
+        (when consent [:hr])
+        [:label {:style css-spaced}
+         "Stay signed in?"
+         [:input {:type    "checkbox"
+                  :name    "pedestal-sp"
+                  :checked (boolean pedestal-sp)}]]
+        [:input {:type  "hidden"
+                 :name  "agreed"
+                 :value "on"}]
+        (when RelayState
+          [:input {:type  "hidden"
+                   :name  "RelayState"
+                   :value RelayState}])
+        [:p {:style "text-align: right;"}
+         [:input {:type  "submit"
+                  :value (if agreed
+                           "Update"
+                           "Confirm")}]]]]]]))
+
+(defn- merge-params
+  "Merge `params` into the checkboxes of a `consent` description."
+  [consent {:keys [agreed pedestal-sp] :as params}]
+  (let [params* (dissoc params :agreed :pedestal-sp :RelayState)
+        check   (fn [{:keys [name] :as checkbox}]
+                  (assoc checkbox :checked (boolean (get params* name false))))]
+    (-> consent
+        (assoc :agreed agreed)
+        (assoc :pedestal-sp pedestal-sp)
+        (update :checkboxes (partial mapv check)))))
+
+(defn consent-ic
+  "Interceptor used to request consent from authenticated users based on `conf`.
+  Only handles session expiration by default, but can be used for e.g. GDPR.
+
+  The interceptor has 3 states:
+    - The user is shown the 'initial' view as part of the authentication flow.
+    - The user agrees/disagrees to the specified policies by submitting the
+      form which will set up required cookies and 'redirect' to the RelayState.
+    - Subsequent visits to the consent url will all be the 'edit' view which
+      sources the consent from the consent cookie state."
+  [{:keys [consent paths] :as conf}]
+  (fn [{:keys [query-params headers cookies] :as request}]
+    (let [{:keys [RelayState pedestal-sp]} query-params
+          {:keys [saml-consent]} paths
+          {:strs [referer]} headers
+          consent-state (request->consent-state request)
+          consent*      (if consent-state
+                          (merge-params consent consent-state)
+                          (assoc consent :pedestal-sp "on"))
+          cookie-attrs  (get-in conf [:session :cookie-attrs])
+          query-params* (dissoc query-params :RelayState)]
+      (cond
+        ;; Initial state
+        (and (empty? query-params*) RelayState)
+        {:status  200
+         :headers {"Content-Type" "text/html"}
+         :body    (consent-form saml-consent consent* RelayState)}
+
+        ;; Redirect state
+        RelayState
+        {:status  302
+         :cookies (merge
+                    {"consent" (assoc cookie-attrs
+                                 :value query-params*)}
+
+                    ;; Control the expiration of the session cookie.
+                    (-> (select-keys cookies ["pedestal-sp"])
+                        (update "pedestal-sp"
+                                merge (if (= pedestal-sp "on")
+                                        cookie-attrs
+                                        (assoc (dissoc cookie-attrs :max-age)
+                                          :expires "")))))
+         :headers {"Location" RelayState}}
+
+        ;; Edit state
+        :else
+        {:status  200
+         :headers {"Content-Type" "text/html"}
+         :body    (consent-form saml-consent consent* referer)}))))
 
 (defn- get-ic*
   [interceptors ic-name]

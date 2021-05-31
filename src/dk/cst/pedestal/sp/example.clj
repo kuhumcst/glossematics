@@ -39,6 +39,7 @@
                             acs-url
                             paths]} conf
                     {:keys [saml-meta
+                            saml-consent
                             saml-request
                             saml-response
                             saml-assertions
@@ -74,6 +75,7 @@
                                            (resource ctx saml-request "SP request")
                                            (resource ctx saml-response "IdP response")
                                            (resource ctx saml-assertions "User assertions")
+                                           (resource ctx saml-consent "Consent")
                                            (resource ctx "/api" "Fake API")
                                            (resource ctx "/forbidden" "Always forbidden")
                                            (resource ctx "/missing" "Missing resource")]]])})))}))
@@ -107,8 +109,18 @@
    ::http/type   :jetty
    ::http/port   8080})
 
+(def consent
+  {:summary    "This is some standard GDPR explanation."
+   :checkboxes [{:name    :stuff
+                 :label   "Allow us to tickle your feet?"
+                 :checked true}
+                {:name    :other-stuff
+                 :label   "Let everyone know you're wonderful?"
+                 :checked false}]})
+
 (defn load-sp-conf!
-  ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
+  ([path] (reset! sp-conf (assoc (sp.conf/init (sp.conf/read-file! path))
+                            :consent consent)))
   ([] (load-sp-conf! (in-home "/.glossematics/repl-conf.edn"))))
 
 (defn start []

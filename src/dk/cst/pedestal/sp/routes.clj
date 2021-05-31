@@ -12,6 +12,7 @@
   (let [{:keys [saml-meta
                 saml-login
                 saml-logout
+                saml-consent
                 saml-session
                 saml-request
                 saml-response
@@ -26,6 +27,10 @@
 
       ;; Logout endpoint, similar to - but not part of - the standard endpoints
       [saml-logout :post (conj all body-params `sp.ic/logout-ic)]
+
+      ;; TODO: split into :get and :post?
+      ;; A generic consent interceptor is also included in the package.
+      [saml-consent :get (conj authenticated (sp.ic/consent-ic conf)) :route-name ::saml-consent]
 
       ;; User-centric metadata endpoints, not related to the SAML login flow
       [saml-session :get (conj all `sp.ic/echo-session-ic)]

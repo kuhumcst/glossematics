@@ -5,7 +5,9 @@
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as saml-coerce]
             [saml20-clj.state :as saml-state]
-            [ring-ttl-session.core :as ttl]))
+            [ring-ttl-session.core :as ttl]
+            [dk.cst.pedestal.sp.static :refer [never]])
+  (:import [com.sun.jndi.toolkit.url Uri]))
 
 ;; Fix StateManager print bug: https://github.com/metabase/saml20-clj/issues/27
 (prefer-method print-method pretty.core.PrettyPrintable saml-state/StateManager)
@@ -37,15 +39,39 @@
 (s/def ::credential
   (s/keys :req-un [::alias ::filename ::password]))
 
+(s/def ::summary
+  string?)
+
+(s/def ::name
+  keyword?)
+
+(s/def ::label
+  string?)
+
+(s/def ::checked
+  boolean?)
+
+(s/def ::checkbox
+  (s/keys :req-un [::name ::label]
+          :opt-un [::checked]))
+
+(s/def ::checkboxes
+  (s/coll-of ::checkbox))
+
+(s/def ::consent
+  (s/keys :opt-un [::summary ::checkboxes]))
+
 ;; TODO: add opt-un keys
 ;; TODO: split into minimal and complete versions
 (s/def ::config
-  (s/keys :req-un [::sp-url ::idp-url ::idp-cert ::credential]))
+  (s/keys :req-un [::sp-url ::idp-url ::idp-cert ::credential]
+          :opt-un [::consent]))
 
 (def ^:private default-paths
   {:saml-meta       "/saml/meta"
    :saml-login      "/saml/login"
    :saml-logout     "/saml/logout"
+   :saml-consent    "/saml/consent"
    :saml-session    "/saml/session"
    :saml-request    "/saml/session/request"
    :saml-response   "/saml/session/response"
@@ -72,6 +98,7 @@
            validation
            paths
            session
+           consent
            no-auth]
     :as   base-conf}]
   {:pre  [(s/valid? ::config base-conf)]
@@ -86,6 +113,8 @@
                                :state-manager state-manager}
                               validation)
         cookie-attrs*  (merge {:http-only true
+                               :expires   never
+                               :path      "/"
                                #_#_:secure true             ;TODO: re-enable to enforce https
                                :max-age   max-age*}
                               cookie-attrs)
