@@ -53,7 +53,7 @@
                                          [:body
                                           [:h1 app-name]
                                           [:p "Example login form for logging in through an IdP."]
-                                          (if (sp.auth/authenticated? request)
+                                          (if (sp.ic/authenticated? request)
                                             [:form {:action saml-logout
                                                     :method "post"}
                                              [:input {:type  "hidden"

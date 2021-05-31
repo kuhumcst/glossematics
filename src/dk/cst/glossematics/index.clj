@@ -4,7 +4,7 @@
   (:require [clojure.java.io :as io]
             [clojure.edn :as edn]
             [hiccup.core :as hiccup]
-            [dk.cst.pedestal.sp.auth :as sp.auth]))
+            [dk.cst.pedestal.sp.interceptors :as sp.ic]))
 
 (def main-js
   "When making a release, the filename will be appended with a hash;
@@ -62,4 +62,4 @@
   [request]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    (index-html (sp.auth/request->assertions request))})
+   :body    (index-html (sp.ic/request->assertions request))})

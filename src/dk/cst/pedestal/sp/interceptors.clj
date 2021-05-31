@@ -26,6 +26,15 @@
 ;; Make sure that echo-assertions prints timestamps in a nice way
 (tl/print-time-literals-clj!)
 
+(defn request->assertions
+  [request]
+  (get-in request [:session :saml :assertions]))
+
+(defn authenticated?
+  "Has the user making this `request` authenticated via SAML?"
+  [request]
+  (boolean (request->assertions request)))
+
 (defn echo-response-ic
   "Handler echoing full SAML response (including assertions) in session store."
   [req]
@@ -164,7 +173,7 @@
       (ic/interceptor
         {:name  ::guard
          :enter (fn [{:keys [request] :as ctx}]
-                  (let [assertions (sp.auth/request->assertions request)]
+                  (let [assertions (request->assertions request)]
                     (if (not (authorized? assertions))
                       (throw (ex-info "Failed auth" auth-meta))
                       ctx)))})
@@ -201,7 +210,7 @@
   (error/error-dispatch [{:keys [request] :as ctx} ex]
     [{:exception-type :clojure.lang.ExceptionInfo}]
     (if (::restriction (ex-data ex))
-      (if (sp.auth/authenticated? request)
+      (if (authenticated? request)
         (assoc ctx :response no-authz)
         (assoc ctx :response ((->no-authn-handler conf) request)))
       (assoc ctx ::chain/error ex))
@@ -250,7 +259,7 @@
   value will be :not-found in that case!"
   ([{:keys [request] :as ctx} query-string verb]
    (if-let [routing (routing-for ctx query-string verb)]
-     (let [assertions  (sp.auth/request->assertions request)
+     (let [assertions  (request->assertions request)
            authorized? (routing->auth-test routing)]
        (authorized? assertions))
      :not-found))
