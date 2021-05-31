@@ -34,7 +34,7 @@ Setup
 * `dk.cst.pedestal.sp.interceptors`: interceptors for SAML authentication and observability.
 * `dk.cst.pedestal.sp.example`: an example web service using **Pedestal SP**.
 
-Like Pedestal itself, **Pedestal SP** is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config is expanded using `sp.conf/init` and passed to the `sp.routes/all` function. The same config map should be reused when defining auth interceptor chains using `sp.auth/permit`.
+Like Pedestal itself, **Pedestal SP** is configured using a config map containing just a few required keys, mostly related to encryption. Before consumption, the base config is expanded using `sp.conf/init` and passed to the `sp.routes/all` function. The same config map should be reused when defining auth interceptor chains using `sp.ic/chain`.
 
 Here's an example using a minimal config:
 
@@ -104,20 +104,20 @@ By default, the act of logging in via a SAML IdP is treated as successful authen
 Once authenticated, the IdP response and its assertions are stored in an in-memory Ring session store with a limited TTL. The session store and other Ring session-related parameters can be customised via the `:session` key of the config map. Refer to `ring.middleware.session/wrap-session` for the available configuration options.
 
 ### Route authorisation
-Authorisation in **Pedestal SP** derives from the user assertions that have been provided by the IdP. Two authorisation helper functions - `permit` and `permit?` - can be found in the `dk.cst.pedestal.sp.auth` namespace.
+Authorisation in **Pedestal SP** derives from the user assertions that have been provided by the IdP. Two route-level authorisation helper functions - `chain` and `permit-request?` - can be found in the `dk.cst.pedestal.sp.interceptors` namespace (aliased as `sp.ic` in the examples below).
 
-The `sp.auth/permit` function can be used to build an interceptor chain to restrict a route, e.g.
+The `sp.ic/chain` function can be used to build an interceptor chain to restrict a route, e.g.
 
 ```clojure
-["/some/route" (conj (sp.auth/permit :authenticated) `protected-page)]
+["/some/route" (conj (sp.ic/chain conf :authenticated) `protected-page)]
 ```
 
 The above snippet defines a route that can only be accessed by an authenticated user. More stringent authorisation requirements can be specified too; these dig more deeply into the IdP assertions about the user.
 
-When generating dynamic content for the user, it quite often becomes necessary to know ahead of time if the user is authorised to access a specific resource. To solve this common issue, **Pedestal SP** also comes with the `sp.auth/permit?` function which can be used to check authorisation status within a `sp.auth/permit`-decorated interceptor chain:
+When generating dynamic content for the user, it quite often becomes necessary to know ahead of time if the user is authorised to access a specific resource. To solve this common issue, **Pedestal SP** also comes with the `sp.ic/permit-request?` function which can be used to check authorisation status within an `sp.ic/chain`:
 
 ```clojure
-(when (sp.auth/permit? ctx "/some/route")
+(when (sp.ic/permit-request? ctx "/some/route")
   [:p "You may visit " [:a {:href "/some/route"} "this route"]])
 ```
 

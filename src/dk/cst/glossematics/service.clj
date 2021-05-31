@@ -9,7 +9,7 @@
             [dk.cst.glossematics.index :as index]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
-            [dk.cst.pedestal.sp.auth.interceptors :as sp.auth.ic]
+            [dk.cst.pedestal.sp.interceptors :as sp.ic]
             [dk.cst.pedestal.sp.example :as example]))
 
 (defonce server (atom nil))
@@ -17,8 +17,8 @@
 
 (defn glossematics-routes
   [conf]
-  #{["/" :get (conj (sp.auth.ic/chain conf :authenticated) index/handler) :route-name ::index]
-    ["/login" :get [(sp.auth.ic/session-ic conf) (example/login-page-ic conf)] :route-name ::login]})
+  #{["/" :get (conj (sp.ic/chain conf :authenticated) index/handler) :route-name ::index]
+    ["/login" :get [(sp.ic/session-ic conf) (example/login-page-ic conf)] :route-name ::login]})
 
 (defn routes
   [sp-conf]

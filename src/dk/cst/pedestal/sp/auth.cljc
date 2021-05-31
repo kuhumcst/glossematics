@@ -1,5 +1,9 @@
 (ns dk.cst.pedestal.sp.auth
-  "Build authorisation logic by branching according to SAML assertions."
+  "Create inline authorisation logic using SAML assertions. The `if-permit` and
+  `only-permit` macros can be used from both Clojure and ClojureScript.
+
+  For route-level authorisation + ahead-of-time checks from within interceptors,
+  use the `permit-request?` function from `dk.cst.pedestal.sp.interceptors`."
   (:require [clojure.data :as data])
   #?(:cljs (:require-macros [dk.cst.pedestal.sp.auth])))
 

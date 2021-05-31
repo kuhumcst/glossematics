@@ -1,4 +1,5 @@
 (ns dk.cst.pedestal.sp.example
+  "An example SAML Service Provider demoing the functionality of Pedestal SP."
   (:require [clojure.set :as set]
             [clojure.data.json :as json]
             [hiccup.core :as hiccup]
@@ -8,7 +9,7 @@
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.pedestal.sp.auth.interceptors :as sp.auth.ic]))
+            [dk.cst.pedestal.sp.interceptors :as sp.ic]))
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
@@ -19,7 +20,7 @@
 
 (defn- resource
   [ctx path description]
-  (if-let [permitted (sp.auth.ic/permit-request? ctx path)]
+  (if-let [permitted (sp.ic/permit-request? ctx path)]
     (if (= permitted :not-found)
       [:li "⚠️ " [:a {:href path} [:del description]]]
       [:li [:a {:href path} description]])
@@ -90,9 +91,9 @@
 
 (defn example-routes
   [conf]
-  #{["/" :get [(sp.auth.ic/session-ic conf) (login-page-ic conf)] :route-name ::login]
-    ["/api" :any (conj (sp.auth.ic/chain conf :authenticated) api-ic) :route-name ::api]
-    ["/forbidden" :any (sp.auth.ic/chain conf :none) :route-name ::forbidden]})
+  #{["/" :get [(sp.ic/session-ic conf) (login-page-ic conf)] :route-name ::login]
+    ["/api" :any (conj (sp.ic/chain conf :authenticated) api-ic) :route-name ::api]
+    ["/forbidden" :any (sp.ic/chain conf :none) :route-name ::forbidden]})
 
 (defn routes
   [conf]

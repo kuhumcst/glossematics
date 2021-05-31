@@ -1,4 +1,5 @@
 (ns dk.cst.pedestal.sp.conf
+  "Validate and load configurations for Pedestal SP."
   (:require [clojure.spec.alpha :as s]
             [clojure.edn :as edn]
             [saml20-clj.core :as saml]
@@ -51,8 +52,8 @@
    :saml-assertions "/saml/session/assertions"})
 
 (defn read-file!
-  "Load an Aero `edn-file` with the given `profile`. The contents of this
-  file may then be passed to sp.conf/init."
+  "Load an `edn-file` with the given `profile`. The contents of this file may
+  then be passed to the init function."
   [edn-file]
   (let [conf (edn/read-string (slurp edn-file))]
     (if (s/valid? ::config conf)
