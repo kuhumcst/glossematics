@@ -268,7 +268,8 @@
           [:p summary])
 
         ;; Session cookie expiration is a special case.
-        (when consent [:hr])
+        (when (or summary (not-empty checkboxes))
+          [:hr])
         [:label {:style css-spaced}
          "Stay signed in?"
          [:input {:type    "checkbox"
