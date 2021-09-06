@@ -3,15 +3,17 @@
             [clojure.pprint :refer [pprint]]
             [clojure.edn :as edn]
             [shadow.resource :as sr]
-            [load :as load]
-            [reagent.core :as r]
-            [reagent.dom :as rdom]
-            [recap.component.widget.tabs :as tabs]
             [time-literals.data-readers]                    ; tagged literals
             [time-literals.read-write :as tl]
+            [reagent.core :as r]
+            [reagent.dom :as rdom]
+            [load :as load]
+            [dk.cst.stucco.plastic :as plastic]
+            [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
             [dk.cst.glossematics.facsimile :as facsimile]
-            [dk.cst.glossematics.timeline :as timeline :refer [timeline]]))
+            [dk.cst.glossematics.timeline :as timeline :refer [timeline]]
+            [cuphic.core :as cup]))
 
 ;; Make sure that edn/read-string can process timestamp literals
 (time-literals.read-write/print-time-literals-cljs!)
@@ -92,18 +94,19 @@
               :date           "Fri Nov 22 1963 13:00:00 GMT-0600"}})
 
 (def initial-examples
-  {"1151anno-anno-tei.xml"  (sr/inline "examples/tei/1151anno-anno-tei.xml")
-   "1152anno-anno-tei.xml"  (sr/inline "examples/tei/1152anno-anno-tei.xml")
-   "1153anno-anno-tei.xml"  (sr/inline "examples/tei/1153anno-anno-tei.xml")
-   "1154anno-anno-tei.xml"  (sr/inline "examples/tei/1154anno-anno-tei.xml")
-   "1155anno-anno-tei.xml"  (sr/inline "examples/tei/1155anno-anno-tei.xml")
-   "1156anno-anno-tei.xml"  (sr/inline "examples/tei/1156anno-anno-tei.xml")
-   "1157anno-anno-tei.xml"  (sr/inline "examples/tei/1157anno-anno-tei.xml")
-   "1158anno-anno-tei.xml"  (sr/inline "examples/tei/1158anno-anno-tei.xml")
-   "1159anno-anno-tei.xml"  (sr/inline "examples/tei/1159anno-anno-tei.xml")
-   "1160anno-anno-tei.xml"  (sr/inline "examples/tei/1160anno-anno-tei.xml")
-   "tei_example.xml"        (sr/inline "examples/tei/tei_example.xml")
-   "test-1307-anno-tei.xml" (sr/inline "examples/tei/test-1307-anno-tei.xml")})
+  {"1151anno-anno-tei.xml"             (sr/inline "examples/tei/1151anno-anno-tei.xml")
+   "1152anno-anno-tei.xml"             (sr/inline "examples/tei/1152anno-anno-tei.xml")
+   "1153anno-anno-tei.xml"             (sr/inline "examples/tei/1153anno-anno-tei.xml")
+   "1154anno-anno-tei.xml"             (sr/inline "examples/tei/1154anno-anno-tei.xml")
+   "1155anno-anno-tei.xml"             (sr/inline "examples/tei/1155anno-anno-tei.xml")
+   "1156anno-anno-tei.xml"             (sr/inline "examples/tei/1156anno-anno-tei.xml")
+   "1157anno-anno-tei.xml"             (sr/inline "examples/tei/1157anno-anno-tei.xml")
+   "1158anno-anno-tei.xml"             (sr/inline "examples/tei/1158anno-anno-tei.xml")
+   "1159anno-anno-tei.xml"             (sr/inline "examples/tei/1159anno-anno-tei.xml")
+   "1160anno-anno-tei.xml"             (sr/inline "examples/tei/1160anno-anno-tei.xml")
+   "tei_example.xml"                   (sr/inline "examples/tei/tei_example.xml")
+   "test-1307-anno-tei.xml"            (sr/inline "examples/tei/test-1307-anno-tei.xml")
+   "DJtilHJU-1931-02-14-tei-final.xml" (sr/inline "examples/tei/DJtilHJU-1931-02-14-tei-final.xml")})
 
 (def examples
   (r/atom initial-examples))
@@ -111,17 +114,17 @@
 (defn mk-tabs
   [filename]
   (let [tei (get @examples filename)]
-    [["Tidslinje" [timeline {:style {:height 350}}
-                   {:events jfk-events
-                    :bands  jfk-bands}]]
+    [#_["Tidslinje" [timeline {:style {:height 350}}
+                     {:events jfk-events
+                      :bands  jfk-bands}]]
      ["Indhold" ^{:key tei} [facsimile/tei-xml tei]]
      ["XML" [:pre {:style {:white-space "pre-wrap"}}
              [:code
               tei]]]]))
 
 (defonce state
-  (r/atom {:current-file "test-1307-anno-tei.xml"
-           :tabs         {:kvs (mk-tabs "test-1307-anno-tei.xml")
+  (r/atom {:current-file "DJtilHJU-1931-02-14-tei-final.xml"
+           :tabs         {:kvs (mk-tabs "DJtilHJU-1931-02-14-tei-final.xml")
                           :i   0}}))
 
 (defn set-content!
@@ -156,56 +159,65 @@
 
 (defn app
   []
-  [:<>
-   [:p (sp.auth/if-permit [assertions {:attrs {"firstName" #{"Simon"}}}]
-         "Simon is the way"
-         "Simon is NOT the way")]
-   [:h1 {:style {:color          "black"
-                 :letter-spacing "4px"
-                 :font-family    "PoiretOne"
-                 :font-size      "64px"
-                 :text-align     "left"
-                 :text-transform "uppercase"
-                 :border-bottom  "16px solid darkred"}}
-    "Glossematics"
-    [:span {:style {:color     "#DDBBBB"
-                    :font-size "40px"}}
-     ".org"]]
-   [:form {:style {:padding       20
-                   :margin-bottom -40}}
-    [:p [:label [:strong "Primary: "] [interval-select hjelmslev-tl-state :primary]]]
-    [:p [:label [:strong "Overview: "] [interval-select hjelmslev-tl-state :overview]]]]
-   [:div {:style {:padding "20px"}}
-    [timeline {:style {:height 400}}
-     hjelmslev-tl-state]]
-
-   [:div {:style {:padding "20px"}}
-    [timeline {:style {:height 350}}
-     jfk-tl-state]]]
   #_[:<>
-     [:p {:style {:display         "flex"
-                  :justify-content "flex-end"}}
-      (let [current-file (r/cursor state [:current-file])]
-        [:label "TEI-fil: "
-         [:select {:key           @current-file
-                   :default-value @current-file
-                   :on-change     (fn [e] (set-content! (.. e -target -value)))}
-          (for [[k _] (sort @examples)]
-            ^{:key k} [:option {:value k}
-                       k])]
-         " "
-         [:input {:aria-label "Lokal TEI-fil"
-                  :type       "file"
-                  :on-change  (fn [e]
-                                (when-let [file (.item e.target.files 0)]
-                                  (.then (.text file)
-                                         (fn [s]
-                                           (swap! examples assoc (.-name file) s)
-                                           (set-content! (.-name file))))))}]])]
-     [:div {:style {:max-width "100ch"
-                    :min-width "40ch"
-                    :margin    "0 auto"}}
-      [tabs/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
+     [:p (sp.auth/if-permit [assertions {:attrs {"firstName" #{"Simon"}}}]
+           "Simon is the way"
+           "Simon is NOT the way")]
+     [:h1 {:style {:color          "black"
+                   :letter-spacing "4px"
+                   :font-family    "PoiretOne"
+                   :font-size      "64px"
+                   :text-align     "left"
+                   :text-transform "uppercase"
+                   :border-bottom  "16px solid darkred"}}
+      "Glossematics"
+      [:span {:style {:color     "#DDBBBB"
+                      :font-size "40px"}}
+       ".org"]]
+     [:form {:style {:padding       20
+                     :margin-bottom -40}}
+      [:p [:label [:strong "Primary: "] [interval-select hjelmslev-tl-state :primary]]]
+      [:p [:label [:strong "Overview: "] [interval-select hjelmslev-tl-state :overview]]]]
+     [:div {:style {:padding "20px"}}
+      [timeline {:style {:height 400}}
+       hjelmslev-tl-state]]
+
+     [:div {:style {:padding "20px"}}
+      [timeline {:style {:height 350}}
+       jfk-tl-state]]]
+  #_[:<>
+     [:pre (with-out-str
+             (as-> (get initial-examples "test-1307-anno-tei.xml") $
+                   (cuphic.xml/parse $)
+                   (cuphic.core/rewrite $ facsimile/outer-stage)
+                   (cljs.pprint/pprint $)))]]
+  ;[facsimile/tei-xml (get initial-examples "test-1307-anno-tei.xml")]
+  [:<>
+   [:p {:style {:display         "flex"
+                :justify-content "flex-end"}}
+    (let [current-file (r/cursor state [:current-file])]
+      [:label "TEI-fil: "
+       ;; TODO: switching file -> index out of bounds
+       [:select {:key           @current-file
+                 :default-value @current-file
+                 :on-change     (fn [e] (set-content! (.. e -target -value)))}
+        (for [[k _] (sort @examples)]
+          ^{:key k} [:option {:value k}
+                     k])]
+       " "
+       [:input {:aria-label "Lokal TEI-fil"
+                :type       "file"
+                :on-change  (fn [e]
+                              (when-let [file (.item e.target.files 0)]
+                                (.then (.text file)
+                                       (fn [s]
+                                         (swap! examples assoc (.-name file) s)
+                                         (set-content! (.-name file))))))}]])]
+   [:div {:style {:max-width "100ch"
+                  :min-width "40ch"
+                  :margin    "0 auto"}}
+    ;; TODO: carousel state not kept while switching tabs
+    [plastic/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
 
 (def root
   (js/document.getElementById "app"))
@@ -215,7 +227,7 @@
   ;; TODO: dumb hack - do this another way
   (defonce add-recap-styles
     (let [style      (js/document.createElement "style")
-          root-style (str/replace-first recap.css/shadow-style ":host" ":root")]
+          root-style (str/replace-first css/shadow-style ":host" ":root")]
       (set! (.-innerHTML style) root-style)
       (js/document.head.appendChild style)))
 

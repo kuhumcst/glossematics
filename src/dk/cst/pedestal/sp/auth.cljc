@@ -12,6 +12,10 @@
   [m parent]
   (nil? (first (data/diff m parent))))
 
+(defn request->assertions
+  [request]
+  (get-in request [:session :saml :assertions]))
+
 (defn- assertions->auth-test
   "Return a function taking a request that compares an `assertions` map to the
   stored SAML assertions for the user making the request."

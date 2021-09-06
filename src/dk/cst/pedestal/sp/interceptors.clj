@@ -28,10 +28,6 @@
 ;; Make sure that echo-assertions prints timestamps in a nice way
 (tl/print-time-literals-clj!)
 
-(defn request->assertions
-  [request]
-  (get-in request [:session :saml :assertions]))
-
 ;; The ring session wrapper grandfathers in the :cookies key in the request map.
 (defn request->consent-state
   [request]
@@ -43,7 +39,7 @@
 (defn authenticated?
   "Has the user making this `request` authenticated via SAML?"
   [request]
-  (boolean (request->assertions request)))
+  (boolean (sp.auth/request->assertions request)))
 
 (defn echo-response-ic
   "Handler echoing full SAML response (including assertions) in session store."
@@ -189,7 +185,7 @@
       (ic/interceptor
         {:name  ::guard
          :enter (fn [{:keys [request] :as ctx}]
-                  (let [assertions (request->assertions request)]
+                  (let [assertions (sp.auth/request->assertions request)]
                     (if (not (authorized? assertions))
                       (throw (ex-info "Failed auth" auth-meta))
                       ctx)))})
@@ -391,7 +387,7 @@
   value will be :not-found in that case!"
   ([{:keys [request] :as ctx} query-string verb]
    (if-let [routing (routing-for ctx query-string verb)]
-     (let [assertions  (request->assertions request)
+     (let [assertions  (sp.auth/request->assertions request)
            authorized? (routing->auth-test routing)]
        (authorized? assertions))
      :not-found))

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:t="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc xml:lang="da">
+            <titleStmt>
+                <title>DJtilHJU-1931-02-14.txt</title>
+                <author ref="#xx">Daniel Jones</author>
+                <editor ref="#xx" role="commenting"><!-- kommentator --></editor>
+                <funder>Carlsbergfondet, Forskningsinfrastruktur, Infrastrukturalisme,
+                    2018-2021</funder>
+
+                <respStmt>
+                    <resp>Transskription</resp>
+                    <persName ref="#carolinehvboolsen">Caroline H.V. Boolsen</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>Digitalisering</resp>
+                    <orgName>Digitaliseringsafdelingen, Det Kongelige Bibliotek</orgName>
+                </respStmt>
+            </titleStmt>
+
+            <publicationStmt>
+                <publisher>Henrik Jørgensen, Aarhus Universitet</publisher>
+                <pubPlace>CLARIN-DK</pubPlace>
+                <date when="2020"><!-- udfyldes når vi ved hvornår det bliver publiceret--></date>
+            </publicationStmt>
+
+            <sourceDesc>
+                <msDesc>
+                    <msIdentifier>
+                        <placeName ref="#npl283">København</placeName>
+                        <repository ref="#xx">Det Kongelige Bibliotek</repository>
+                        <idno><!-- KB-id --></idno>
+                    </msIdentifier>
+                    <physDesc>
+                        <objectDesc form="letter">
+                            <supportDesc>
+                                <support>original</support>
+                                <extent>
+                                    <note>5 pages</note>
+                                </extent>
+                            </supportDesc>
+                        </objectDesc>
+                        <handDesc>
+                            <p>handwritten</p>
+                        </handDesc>
+                    </physDesc>
+                </msDesc>
+            </sourceDesc>
+        </fileDesc>
+
+        <profileDesc>
+            <correspDesc>
+                <correspAction type="sent">
+                    <persName ref="#xx">Daniel Jones</persName>
+                    <placeName ref="#npl1095">London</placeName>
+                    <date>1931-02-14</date>
+                </correspAction>
+                <correspAction type="received">
+                    <persName ref="#xx">Hans Jørgen Uldall</persName>
+                </correspAction>
+            </correspDesc>
+            <langUsage>
+                <language ident="en">English</language>
+            </langUsage>
+        </profileDesc>
+        <revisionDesc>
+            <listChange>
+                <change when="2020" who="#dortehaltruphansen">Automatisk generering af
+                    TEI-format</change>
+                <change when="2020" who="#carolinehvboolsen">Opmærkning og korrekturlæsning</change>
+            </listChange>
+        </revisionDesc>
+
+    </teiHeader>
+    <facsimile>
+        <graphic xml:id="DJtilHJU-1931-02-14-1.tif" mimeType="image/pdf"
+            url="DJtilHJU-1931-02-14-1.tif"/>
+        <graphic xml:id="DJtilHJU-1931-02-14-2.tif" mimeType="image/pdf"
+            url="DJtilHJU-1931-02-14-2.tif"/>
+        <graphic xml:id="DJtilHJU-1931-02-14-3.tif" mimeType="image/pdf"
+            url="DJtilHJU-1931-02-14-3.tif"/>
+        <graphic xml:id="DJtilHJU-1931-02-14-4.tif" mimeType="image/pdf"
+            url="DJtilHJU-1931-02-14-4.tif"/>
+        <graphic xml:id="DJtilHJU-1931-02-14-5.tif" mimeType="image/pdf"
+            url="DJtilHJU-1931-02-14-5.tif"/>
+    </facsimile>
+
+    <text>
+        <body>
+            <div type="letter">
+                <pb n="1" facs="#DJtilHJU-1931-02-14-1.tif"/>
+                <fw>STATION : GOLDERS GREEN. </fw>
+                <fw>TELEPHONE : SPEEDWELL 3497. </fw>
+                <opener xml:id="xx">
+                    <dateline>
+                        <address>
+                            <street>90, LYTTELTON ROAD </street>
+                            <placeName ref="#npl1095">LONDON </placeName>
+                            <postCode>N.W.II.</postCode>
+                        </address>
+                        <date when="1931-02-14">14th Feb. 1931</date>
+                    </dateline>
+                    <salute>Dear Mr <persName type="receiver" ref="#np145">Uldall</persName>
+                       </salute>
+                </opener>
+                <p xml:id="p1">I am sorry to have been so remiss about writing to you The fact is
+                    I have been forcing the pace rather in order to finish the " <rs
+                        type="publication" ref="#npub86">Outline</rs> " That is now done + sent to the
+                    publisher so I can get on with my arrears of correspondence. </p>
+                <p xml:id="p2">About your book I am trying to get a grant from the University to
+                    enable it to be published but shall not know til <date when="1931-04">April</date> how much they will
+                    contribute. ( <rs>The Grants Committee</rs> does not meet till then. ) I have hopes
+                    however that they will be able <pb n="2" facs="#DJtilHJU-1931-02-14-2.tif"/>
+                    to do what is necessary. </p>
+                <p xml:id="p3">I think your introduction is quite all right but I have ventured to
+                    add some short explanation about the principal vowels Also I think the vowel
+                    chart may want some slight alterations In it you have shown some distinctions
+                    so minute as to be practically inappreciable I mean for instance that if
+                    your i is appreciably lower + more retracted than Cardinal i the dot should be
+                    further away from the corner Thus <figure/> is practically meaningless I
+                    hardly think you can get an appreciable distinction with a less distance than
+                    <figure/> or <figure/>
+                    <pb n="p4" facs="#DJtilHJU-1931-02-14-3.tif"/> Similarly with the degree of
+                    advancement of some of your back vowels An u placed thus <figure/> is not
+                    appreciably different from Cardinal u To get an appreciable distinction you
+                    must have a distance of say <figure/> Some time I will go over them with Miss
+                        <persName ref="#np378">Lund</persName> + send you such emendations as seem
+                    to me desirable. </p>
+                <p xml:id="p4">It is most kind of you to suggest dedicating the book to me
+                    Certainly you may do so if you like. </p>
+                <p xml:id="p5">Your suggestion of it is ingenious but I think hardly feasible Ø is
+                    already not a very good letter and it is still less good ( from the legibility
+                    point of view ); the little hole at the bottom would always get <pb n="4"
+                        facs="#DJtilHJU-1931-02-14-4.tif"/> filled with ink in printing Also there
+                    is no satisfying handwriting form that I can see. </p>
+                <p xml:id="p6">My impression is that the proper symbol for y is <figure/> ( script
+                    <figure/>, involving using <figure/> regularly for <figure/>) This symbol
+                    already exists ( for <note type="language" n="#nsrus">Russian</note> ), + the
+                    likeness between it and <figure/> doesn ' t matter since <note type="language"
+                        n="#nsfre">French</note>
+                    <figure/> is not a separate phoneme. </p>
+                <p xml:id="p7">I think the time is not yet ripe for mentioning this matter to the
+                    <rs>Council</rs> But it will have to be faced sooner or later. </p>
+                <p xml:id="p8">About your book on General Phonetics which I am very glad to hear
+                    of you may certainly reproduce the I.P.A. versions of the " North Wind "
+                    Some of them want a little revising If you let me know in due course which
+                    ones you want I could send you the emendations. </p>
+                <p xml:id="p9">Can you get American publishers to cut I.P.A. type properly If
+                    your book is for Americans you might consider the advisability of using
+                    African transcription ( y for j c for tʃ j for dʒ ɣ for y ). </p>
+                <p xml:id="p10">I shall be seeing <persName ref="#np340">Westermann</persName>
+                    shortly ( <date when="1931-03">in March</date> ), + will enquire <pb n="5"
+                        facs="#DJtilHJU-1931-02-14-5.tif"/>
+                </p>
+                <p xml:id="p11">about your prospects I have an idea that they are good but of
+                    course you must manage to get a degree somehow. </p>
+                <p xml:id="p12">I hope you won ' t stay in <placeName ref="#npl1957">America</placeName>
+                    longer than you can possibly help I feel strongly that your proper place (
+                    from the point of view of the promotion of phonetics ) is <placeName ref="#npl2030"
+                        >Europe</placeName> Your work in <placeName ref="#npl1957">America</placeName>
+                    may be interesting + the life may be pleasant but you will be able to do
+                    work of wider and more permanent value on this side of the Atlantic. </p>
+                <p xml:id="p13">I trust you are both very fit + enjoying life. </p>
+
+                <closer xml:id="yy">
+                    <salute>Yours sincerely <persName type="sender" ref="#np68">Daniel
+                            Jones</persName></salute>
+                </closer>
+            </div>
+        </body>
+    </text>
+</TEI>
