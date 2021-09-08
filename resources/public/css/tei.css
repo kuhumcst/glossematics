@@ -8,8 +8,19 @@ div {
     display: block;
 }
 
+/* Forme work, a running header/footer. */
+fw {
+  display: block;
+  text-align: center;
+}
+fw:last-of-type {
+    border-bottom: 1px solid lightgrey;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 /* HTML address. */
-fw, addrLine, dateline, street, placename, postcode {
+address > *, dateline > * {
   display: block;
   font-style: italic;
 }
