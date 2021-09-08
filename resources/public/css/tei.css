@@ -14,6 +14,16 @@ fw, addrLine, dateline, street, placename, postcode {
   font-style: italic;
 }
 
+/* Or to be more precise: figure *MISSING*. */
+figure {
+  display: inline-block;
+  width: 1ch;
+  height: 1ch;
+  border: 1px dashed grey;
+  margin: 0 0.5ch;
+  vertical-align: middle;
+}
+
 /* HTML p. */
 p, opener, closer, postscript, salute {
     display: block;
