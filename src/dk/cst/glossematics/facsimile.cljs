@@ -69,7 +69,7 @@
   (cup/->transformer
     (fn [hv]
       (when (= :p (first hv))
-        (let [partitions (partition-by pb? (rest (rest hv)))]
+        (let [partitions (partition-by pb? (drop 2 hv))]
           (when (> (count partitions) 1)
             {:p-attr     (second hv)
              :partitions partitions}))))
