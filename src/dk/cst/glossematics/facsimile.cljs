@@ -47,6 +47,14 @@
              :title (da-type ?type)}
          [:slot]]))))
 
+(def date-as-time
+  (cup/->transformer
+    '[:date {:when when} ???]
+
+    (fn [{:syms [when]}]
+      [:time {:date-time when}
+       [:slot]])))
+
 (def default-fn
   (helpers/default-fn {:prefix    "tei"
                        :attr-kmap {:xml:lang :lang
@@ -90,7 +98,8 @@
 
 (def inner-stage
   {:transformers [ref-as-anchor
-                  list-as-ul]
+                  list-as-ul
+                  date-as-time]
    :wrapper      custom-wrapper
    :default      default-fn})
 
@@ -129,6 +138,7 @@
 (def outer-stage
   {:transformers [ref-as-anchor
                   list-as-ul
+                  date-as-time
                   carousel-pbs]
    :wrapper      custom-wrapper
    :default      default-fn})
