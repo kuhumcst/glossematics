@@ -102,7 +102,7 @@
   (if (pb? (ffirst sections))
     sections
     (let [[rogue-content pb page] sections]
-      (into [pb (into rogue-content page)] (drop 3 sections)))))
+      (into [pb (concat rogue-content page)] (drop 3 sections)))))
 
 ;; Fairly complex transformer that restructures sibling-level page content into
 ;; an interactive carousel recap component. The large amount of content captured
