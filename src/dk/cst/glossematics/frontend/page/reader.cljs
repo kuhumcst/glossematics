@@ -1,8 +1,8 @@
-(ns dk.cst.glossematics.views.reader
+(ns dk.cst.glossematics.frontend.page.reader
   (:require [shadow.resource :as sr]
             [reagent.core :as r]
             [dk.cst.stucco.plastic :as plastic]
-            [dk.cst.glossematics.facsimile :as facsimile]))
+            [dk.cst.glossematics.frontend.facsimile :as facsimile]))
 
 (def initial-examples
   {"1151anno-anno-tei.xml"             (sr/inline "examples/tei/1151anno-anno-tei.xml")
@@ -40,7 +40,7 @@
   (swap! state assoc :current-file filename)
   (swap! state assoc-in [:tabs :kvs] (mk-tabs filename)))
 
-(defn view
+(defn page
   []
   [:<>
    [:p {:style {:display         "flex"

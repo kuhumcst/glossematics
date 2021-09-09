@@ -1,9 +1,9 @@
-(ns dk.cst.glossematics.views.timeline
+(ns dk.cst.glossematics.frontend.page.timeline
   (:require [clojure.string :as str]
             [shadow.resource :as sr]
             [reagent.core :as r]
             [load :as load]
-            [dk.cst.glossematics.timeline :as timeline :refer [timeline]]))
+            [dk.cst.glossematics.frontend.timeline :as timeline :refer [timeline]]))
 
 (def hjemslev-events
   (load/timeline))
@@ -99,7 +99,7 @@
   (r/atom {:events jfk-events
            :bands  jfk-bands}))
 
-(defn view
+(defn page
   []
   [:<>
    [:form {:style {:padding       20

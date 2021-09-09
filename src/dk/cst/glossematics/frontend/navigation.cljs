@@ -1,4 +1,4 @@
-(ns dk.cst.glossematics.navigation
+(ns dk.cst.glossematics.frontend.navigation
   "The main namespace of the frontend app."
   (:require [clojure.string :as str]
             [clojure.edn :as edn]
@@ -10,9 +10,9 @@
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.glossematics.views.main :as main]
-            [dk.cst.glossematics.views.reader :as reader]
-            [dk.cst.glossematics.views.timeline :as timeline]))
+            [dk.cst.glossematics.frontend.page.main :as main]
+            [dk.cst.glossematics.frontend.page.reader :as reader]
+            [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
 (defonce location
   (r/atom nil))
@@ -26,18 +26,18 @@
 (def routes
   [["/"
     {:name ::main
-     :view main/view}]
+     :page main/page}]
 
    ["/reader"
     {:name ::reader
-     :view reader/view}]
+     :page reader/page}]
 
    ["/timeline"
     {:name ::timeline
-     :view timeline/view}]])
+     :page timeline/page}]])
 
 (defn app
-  "A container component that wraps the various views of the app."
+  "A container component that wraps the various pages of the app."
   []
   [:<>
    [:h1 {:style {:color          "black"
@@ -61,9 +61,9 @@
     [:li [:a {:href (href ::reader)} (href ::reader)]]
     [:li [:a {:href (href ::timeline)} (href ::timeline)]]]
 
-   (if-let [view (:view (:data @location))]
-     [view]
-     [:p "unknown location"])])
+   (if-let [page (:page (:data @location))]
+     [page]
+     [:p "unknown page"])])
 
 (defn ^:dev/after-load render
   []

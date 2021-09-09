@@ -1,4 +1,4 @@
-(ns dk.cst.glossematics.facsimile
+(ns dk.cst.glossematics.frontend.facsimile
   (:require [shadow.resource :as resource]
             [cuphic.core :as cup]
             [cuphic.xml :as xml]

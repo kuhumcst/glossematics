@@ -1,4 +1,4 @@
-(ns dk.cst.glossematics.service
+(ns dk.cst.glossematics.backend.service
   (:require [clojure.set :as set]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
@@ -6,7 +6,7 @@
             [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
-            [dk.cst.glossematics.index :as index]
+            [dk.cst.glossematics.backend.index :as index]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
@@ -33,7 +33,7 @@
   (let [csp (if index/development?
               {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* ws://localhost:*"}
               {:default-src "'none'"
-               :script-src  "'self' 'unsafe-inline'" ; unsafe-eval possibly only needed for dev main.js
+               :script-src  "'self' 'unsafe-inline'"        ; unsafe-eval possibly only needed for dev main.js
                :connect-src "'self'"
                :img-src     "'self'"
                :font-src    "'self'"

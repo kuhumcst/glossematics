@@ -1,4 +1,4 @@
-(ns dk.cst.glossematics.index
+(ns dk.cst.glossematics.backend.index
   "Generate the index.html file using Clojure. This is mostly done to streamline
   fingerprinting of any included files in the release version."
   (:require [clojure.java.io :as io]

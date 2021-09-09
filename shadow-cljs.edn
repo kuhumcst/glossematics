@@ -1,13 +1,13 @@
 {:deps     {:aliases [:frontend :test]}
  :dev-http {9000 {:root    "resources/public"
-                  :handler dk.cst.glossematics.index/handler}}
+                  :handler dk.cst.glossematics.backend.index/handler}}
  :nrepl    {:port    9900
             :init-ns dev}
  :builds   {:app  {:target            :browser
                    :output-dir        "resources/public/js/compiled"
                    :asset-path        "/js/compiled"
                    :module-hash-names true
-                   :modules           {:main {:init-fn dk.cst.glossematics.navigation/init!}}
+                   :modules           {:main {:init-fn dk.cst.glossematics.frontend.navigation/init!}}
 
                    ;; https://shadow-cljs.github.io/docs/UsersGuide.html#build-report
                    :build-hooks       [(shadow.cljs.build-report/hook)]}
