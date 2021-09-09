@@ -42,10 +42,9 @@
          :type ?type} ???]
 
     (fn [{:syms [ref ?type]}]
-      (when ref
-        [:a {:href  ref
-             :title (da-type ?type)}
-         [:slot]]))))
+      [:a {:href  ref
+           :title (da-type ?type)}
+       [:slot]])))
 
 (def date-as-time
   (cup/->transformer
@@ -54,16 +53,6 @@
     (fn [{:syms [when]}]
       [:time {:date-time when}
        [:slot]])))
-
-(def default-fn
-  (helpers/default-fn {:prefix    "tei"
-                       :attr-kmap {:xml:lang :lang
-                                   :xml:id   :id}}))
-
-(defn custom-wrapper
-  [old-node new-node]
-  (let [styled-slide (constantly [:<> [:style recap+tei-css] new-node])]
-    (vary-meta old-node assoc :ref (rescope/shadow-ref styled-slide))))
 
 (defn- pb?
   [x]
@@ -93,16 +82,6 @@
                              partition)))
                    partitions))))
 
-(def pre-stage
-  {:transformers [inlined-pbs]})
-
-(def inner-stage
-  {:transformers [ref-as-anchor
-                  list-as-ul
-                  date-as-time]
-   :wrapper      custom-wrapper
-   :default      default-fn})
-
 (defn- fix-rogue-content
   "In some TEI documents, a <PB> tag doesn't always figure as the first elemnent
   inside the <DIV>, so this helper function ensures that any rogue opening
@@ -112,6 +91,8 @@
     sections
     (let [[rogue-content pb page] sections]
       (into [pb (concat rogue-content page)] (drop 3 sections)))))
+
+(declare inner-stage)
 
 ;; Fairly complex transformer that restructures sibling-level page content into
 ;; an interactive carousel recap component. The large amount of content captured
@@ -135,12 +116,32 @@
           :kvs kvs}
          {:aria-label "Facsimile"}]))))
 
-(def outer-stage
+(def default-fn
+  (helpers/default-fn {:prefix    "tei"
+                       :attr-kmap {:xml:lang :lang
+                                   :xml:id   :id}}))
+
+(defn shadow-dom-wrapper
+  [old-node new-node]
+  (let [node-with-css (constantly [:<> [:style recap+tei-css] new-node])]
+    (vary-meta old-node assoc :ref (rescope/shadow-ref node-with-css))))
+
+(def pre-stage
+  "Makes actual structurual changes to the structure of the TEI content."
+  {:transformers [inlined-pbs]})
+
+(def inner-stage
+  "Makes virtual changes to TEI document features using the shadow DOM."
   {:transformers [ref-as-anchor
                   list-as-ul
-                  date-as-time
-                  carousel-pbs]
-   :wrapper      custom-wrapper
+                  date-as-time]
+   :wrapper      shadow-dom-wrapper
+   :default      default-fn})
+
+(def outer-stage
+  "Places all TEI pages inside a carousel component in a shadow DOM."
+  {:transformers [carousel-pbs]
+   :wrapper      shadow-dom-wrapper
    :default      default-fn})
 
 (def rewrite
