@@ -118,8 +118,8 @@
 
 (def default-fn
   (helpers/default-fn {:prefix    "tei"
-                       :attr-kmap {:xml:lang :lang
-                                   :xml:id   :id}}))
+                       :attr-kmap {:xml/lang :lang
+                                   :xml/id   :id}}))
 
 (defn shadow-dom-wrapper
   [old-node new-node]
