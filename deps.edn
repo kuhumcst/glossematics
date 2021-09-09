@@ -13,6 +13,7 @@
            luminus/ring-ttl-session         {:mvn/version "0.3.3"}
            org.slf4j/slf4j-simple           {:mvn/version "1.7.32"}
            hiccup                           {:mvn/version "1.0.5"}
+           ring/ring-core                   {:mvn/version "1.9.4"}
 
            ;; Using the same version of Jetty as Pedestal, since upgrading will
            ;; create an incompatibility with newer versions of Jetty:

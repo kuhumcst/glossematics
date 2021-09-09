@@ -7,6 +7,7 @@
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [dk.cst.glossematics.backend.index :as index]
+            [dk.cst.glossematics.backend.files :as files]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
@@ -16,9 +17,10 @@
 (defonce sp-conf (atom nil))
 
 (defn glossematics-routes
-  [conf]
+  [{:keys [files-dir] :as conf}]
   #{["/" :get (conj (sp.ic/chain conf :authenticated) index/handler) :route-name ::index]
-    ["/login" :get [(sp.ic/session-ic conf) (example/login-page-ic conf)] :route-name ::login]})
+    ["/login" :get [(sp.ic/session-ic conf) (example/login-page-ic conf)] :route-name ::login]
+    ["/files/:fmt/:filename" :get (conj (sp.ic/chain conf :authenticated) (files/->handler files-dir)) :route-name ::files]})
 
 (defn routes
   [sp-conf]
@@ -39,7 +41,7 @@
                :font-src    "'self'"
                :style-src   "'self' 'unsafe-inline'"
                :base-uri    "'self'"})]
-    {::http/routes         (routes sp-conf)
+    {::http/routes         #((deref #'routes) sp-conf)
      ::http/type           :jetty
      ::http/host           "0.0.0.0"                        ; "localhost" won't work on a KU-IT server
      ::http/port           8080
