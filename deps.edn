@@ -20,11 +20,11 @@
            org.eclipse.jetty/jetty-servlets {:mvn/version "9.4.35.v20201120"}
 
 
-           kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
+           ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
            ;kuhumcst/recap            {:local/root "/Users/rqf595/Code/recap"}}
-           ;kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
-           ;                                  :sha     "79a4c25de8a82a047bde830ae5537ad640f97d39"}
+           kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
+                                             :sha     "6b728e2d964eeeb20c7795bb8d299e33401cce37"}
            kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
                                              :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/stucco                  {:git/url "https://github.com/kuhumcst/stucco.git"
@@ -37,5 +37,6 @@
            :frontend {:extra-paths ["dev"]
                       :extra-deps  {org.clojure/clojurescript {:mvn/version "1.10.879"}
                                     thheller/shadow-cljs      {:mvn/version "2.15.8"}
+                                    metosin/reitit            {:mvn/version "0.5.15"}
                                     reagent                   {:mvn/version "1.1.0"}}}
            :test     {:extra-paths ["test"]}}}
