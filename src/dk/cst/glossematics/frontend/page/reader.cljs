@@ -56,6 +56,19 @@
           ^{:key k} [:option {:value k}
                      k])]
        " "
+       [:input {:aria-label   "Ekstern TEI-fil (URL)"
+                :type         "url"
+                :on-key-press (fn [e]
+                                (when (= "Enter" (.-key e))
+                                  (let [url (.-value (.-target e))]
+                                    (doto (js/fetch url #js {:mode "no-cors"})
+                                      (.then (fn [response]
+                                               (doto (.text response)
+                                                 (.then (fn [text]
+                                                          (prn text)
+                                                          (swap! examples assoc url text)
+                                                          (set-content! url))))))))))}]
+       " "
        [:input {:aria-label "Lokal TEI-fil"
                 :type       "file"
                 :on-change  (fn [e]
