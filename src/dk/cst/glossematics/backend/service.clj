@@ -20,6 +20,7 @@
   [{:keys [files-dir] :as conf}]
   #{["/" :get (conj (sp.ic/chain conf :authenticated) index/handler) :route-name ::index]
     ["/login" :get [(sp.ic/session-ic conf) (example/login-page-ic conf)] :route-name ::login]
+    ["/files/:fmt" :get (conj (sp.ic/chain conf :authenticated) (files/->handler files-dir)) :route-name ::dir]
     ["/files/:fmt/:filename" :get (conj (sp.ic/chain conf :authenticated) (files/->handler files-dir)) :route-name ::files]})
 
 (defn routes
