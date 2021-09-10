@@ -94,23 +94,31 @@
 
 (declare inner-stage)
 
+(defn rewrite-page
+  [page]
+  (cup/rewrite page inner-stage))
+
+;; TODO: display notes? (currently excluded)
 ;; Fairly complex transformer that restructures sibling-level page content into
 ;; an interactive carousel recap component. The large amount of content captured
 ;; as page content has to be explicitly rewritten in a separate call. Otherwise,
 ;; it will be skipped entirely.
-(def carousel-pbs
+(def pages-in-carousel
   (cup/->transformer
-    '[:div (... content)]
+    '[:body (... content)]
 
     (fn [{:syms [content]}]
-      (let [pages (->> (partition-by pb? content)
-                       (fix-rogue-content)
-                       (partition 2)
-                       (map (partial apply concat)))
-            pp    (count pages)
-            kvs   (for [[[_ {:keys [n facs]}] :as page] pages]
-                    [(str "Side " n " af " pp "; facs. " facs ".")
-                     (into [:<>] (map #(cup/rewrite % inner-stage) page))])]
+      (let [not-notes?   (comp #(not= "notes" %) :type second)
+            [divs notes] (split-with not-notes? content)
+            divs-content (apply concat (map #(subvec % 2) divs))
+            pages        (->> (partition-by pb? divs-content)
+                              (fix-rogue-content)
+                              (partition 2)
+                              (map (partial apply concat)))
+            pp           (count pages)
+            kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
+                           [(str "Side " n " af " pp "; facs. " facs ".")
+                            (into [:<>] (map rewrite-page page))])]
         [plastic/carousel
          {:i   0
           :kvs kvs}
@@ -127,7 +135,7 @@
     (vary-meta old-node assoc :ref (rescope/shadow-ref node-with-css))))
 
 (def pre-stage
-  "Makes actual structurual changes to the structure of the TEI content."
+  "Makes actual structural changes to the TEI content."
   {:transformers [inlined-pbs]})
 
 (def inner-stage
@@ -140,7 +148,7 @@
 
 (def outer-stage
   "Places all TEI pages inside a carousel component in a shadow DOM."
-  {:transformers [carousel-pbs]
+  {:transformers [pages-in-carousel]
    :wrapper      shadow-dom-wrapper
    :default      default-fn})
 
