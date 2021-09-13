@@ -36,6 +36,10 @@
            :tabs         {:kvs (mk-tabs "DJtilHJU-1931-02-14-tei-final.xml")
                           :i   0}}))
 
+;; TODO: temporary - only here because Stucco bugs out when using a map directly
+(defonce tabs-state
+  (r/cursor state [:tabs]))
+
 (defn set-content!
   [filename]
   (swap! state assoc :current-file filename)
@@ -43,14 +47,13 @@
 
 (defn page
   []
-  [:<>
-   [:p {:style {:display         "flex"
-                :justify-content "flex-end"}}
-    (let [current-file (r/cursor state [:current-file])]
+  (let [{:keys [current-file]} @state]
+    [:<>
+     [:p
       [:label "TEI-fil: "
        ;; TODO: switching file -> index out of bounds
-       [:select {:key           @current-file
-                 :default-value @current-file
+       [:select {:key           current-file
+                 :default-value current-file
                  :on-change     (fn [e] (set-content! (.. e -target -value)))}
         (for [[k _] (sort @examples)]
           ^{:key k} [:option {:value k}
@@ -76,9 +79,8 @@
                                 (.then (.text file)
                                        (fn [s]
                                          (swap! examples assoc (.-name file) s)
-                                         (set-content! (.-name file))))))}]])]
-   [:div {:style {:max-width "100ch"
-                  :min-width "40ch"
-                  :margin    "0 auto"}}
-    ;; TODO: carousel state not kept while switching tabs
-    [plastic/tabs (r/cursor state [:tabs]) {:id "tei-tabs"}]]])
+                                         (set-content! (.-name file))))))}]]]
+     [:div {:style {:max-width "100ch"
+                    :min-width "40ch"
+                    :margin    "0 auto"}}
+      [plastic/tabs tabs-state {:id "tei-tabs"}]]]))

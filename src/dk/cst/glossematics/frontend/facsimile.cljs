@@ -1,5 +1,6 @@
 (ns dk.cst.glossematics.frontend.facsimile
   (:require [shadow.resource :as resource]
+            [reagent.core :as r]
             [cuphic.core :as cup]
             [cuphic.xml :as xml]
             [dk.cst.stucco.util.css :as css]
@@ -7,6 +8,9 @@
             [rescope.core :as rescope]
             [rescope.helpers :as helpers]
             [rescope.style :as style]))
+
+(defonce carousel-state
+  (r/atom nil))
 
 (def prefix
   "tei")
@@ -98,6 +102,13 @@
   [page]
   (cup/rewrite page inner-stage))
 
+(defn update-content!
+  "Updates the `carousel-state` when new `kvs` are detected."
+  [carousel-state kvs]
+  (let [old-kvs (:kvs @carousel-state)]
+    (when (not= (map first kvs) (map first old-kvs))
+      (reset! carousel-state {:i 0 :kvs kvs}))))
+
 ;; TODO: display notes? (currently excluded)
 ;; Fairly complex transformer that restructures sibling-level page content into
 ;; an interactive carousel recap component. The large amount of content captured
@@ -119,9 +130,8 @@
             kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
                            [(str "Side " n " af " pp "; facs. " facs ".")
                             (into [:<>] (map rewrite-page page))])]
-        [plastic/carousel
-         {:i   0
-          :kvs kvs}
+        (update-content! carousel-state kvs)
+        [plastic/carousel carousel-state
          {:aria-label "Facsimile"}]))))
 
 (def default-fn
