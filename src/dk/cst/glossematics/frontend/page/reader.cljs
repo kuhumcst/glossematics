@@ -1,6 +1,8 @@
 (ns dk.cst.glossematics.frontend.page.reader
   (:require [shadow.resource :as sr]
             [reagent.core :as r]
+            [lambdaisland.fetch :as fetch]
+            [kitchen-async.promise :as p]
             [dk.cst.stucco.plastic :as plastic]
             [dk.cst.glossematics.frontend.facsimile :as facsimile]))
 
@@ -51,7 +53,6 @@
     [:<>
      [:p
       [:label "TEI-fil: "
-       ;; TODO: switching file -> index out of bounds
        [:select {:key           current-file
                  :default-value current-file
                  :on-change     (fn [e] (set-content! (.. e -target -value)))}
@@ -64,13 +65,9 @@
                 :on-key-press (fn [e]
                                 (when (= "Enter" (.-key e))
                                   (let [url (.-value (.-target e))]
-                                    (doto (js/fetch url #js {:mode "no-cors"})
-                                      (.then (fn [response]
-                                               (doto (.text response)
-                                                 (.then (fn [text]
-                                                          (prn text)
-                                                          (swap! examples assoc url text)
-                                                          (set-content! url))))))))))}]
+                                    (p/let [r (fetch/get url)]
+                                      (swap! examples assoc url (:body r))
+                                      (set-content! url)))))}]
        " "
        [:input {:aria-label "Lokal TEI-fil"
                 :type       "file"
