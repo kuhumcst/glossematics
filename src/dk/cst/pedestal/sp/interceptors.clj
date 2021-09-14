@@ -397,7 +397,7 @@
                         route)]
      (permit-request? ctx query-string :get))))
 
-(defn chain
+(defn auth-chain
   "Create an interceptor chain to make sure that a user is authorized to access
   a resource based on the expanded `conf` and a `restriction`."
   [conf restriction]

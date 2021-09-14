@@ -6,7 +6,6 @@
            time-literals/time-literals      {:mvn/version "0.1.5"}
            org.clojars.quoll/asami          {:mvn/version "2.1.2"}
 
-
            io.pedestal/pedestal.service     {:mvn/version "0.5.9"}
            io.pedestal/pedestal.route       {:mvn/version "0.5.9"}
            io.pedestal/pedestal.jetty       {:mvn/version "0.5.9"}
@@ -14,6 +13,7 @@
            org.slf4j/slf4j-simple           {:mvn/version "1.7.32"}
            hiccup                           {:mvn/version "1.0.5"}
            ring/ring-core                   {:mvn/version "1.9.4"}
+           com.wsscode/transito             {:mvn/version "2021.07.04"}
 
            ;; Using the same version of Jetty as Pedestal, since upgrading will
            ;; create an incompatibility with newer versions of Jetty:

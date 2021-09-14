@@ -94,8 +94,8 @@
 (defn example-routes
   [conf]
   #{["/" :get [(sp.ic/session-ic conf) (login-page-ic conf)] :route-name ::login]
-    ["/api" :any (conj (sp.ic/chain conf :authenticated) api-ic) :route-name ::api]
-    ["/forbidden" :any (sp.ic/chain conf :none) :route-name ::forbidden]})
+    ["/api" :any (conj (sp.ic/auth-chain conf :authenticated) api-ic) :route-name ::api]
+    ["/forbidden" :any (sp.ic/auth-chain conf :none) :route-name ::forbidden]})
 
 (defn routes
   [conf]

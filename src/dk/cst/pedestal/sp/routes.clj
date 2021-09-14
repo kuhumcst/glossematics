@@ -18,8 +18,8 @@
                 saml-response
                 saml-assertions]} paths
         body-params   (body-params)
-        all           (sp.ic/chain conf :all)
-        authenticated (sp.ic/chain conf :authenticated)]
+        all           (sp.ic/auth-chain conf :all)
+        authenticated (sp.ic/auth-chain conf :authenticated)]
     #{;; Standard endpoints required for an sp-initiated SAML login flow
       [saml-meta :get (sp.ic/metadata-ic conf) :route-name ::saml-meta]
       [saml-login :get (conj all (sp.ic/request-ic conf)) :route-name ::saml-req]

@@ -18,10 +18,20 @@
 
 (defn glossematics-routes
   [{:keys [files-dir] :as conf}]
-  #{["/" :get (conj (sp.ic/chain conf :authenticated) index/handler) :route-name ::index]
-    ["/login" :get [(sp.ic/session-ic conf) (example/login-page-ic conf)] :route-name ::login]
-    ["/files/:fmt" :get (conj (sp.ic/chain conf :authenticated) (files/->handler files-dir)) :route-name ::dir]
-    ["/files/:fmt/:filename" :get (conj (sp.ic/chain conf :authenticated) (files/->handler files-dir)) :route-name ::files]})
+  #{["/"
+     :get (conj (sp.ic/auth-chain conf :authenticated) index/handler)
+     :route-name ::index]
+    ["/login"
+     :get [(sp.ic/session-ic conf) (example/login-page-ic conf)]
+     :route-name ::login]
+    ["/files/:fmt"
+     :get (into (sp.ic/auth-chain conf :authenticated)
+                (files/files-chain files-dir))
+     :route-name ::dir]
+    ["/files/:fmt/:filename"
+     :get (conj (sp.ic/auth-chain conf :authenticated)
+                (files/->file-handler files-dir))
+     :route-name ::file]})
 
 (defn routes
   [sp-conf]
