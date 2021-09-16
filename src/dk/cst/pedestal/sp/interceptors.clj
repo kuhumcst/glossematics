@@ -171,6 +171,14 @@
   [{:keys [session] :as conf}]
   (middlewares/session session))
 
+(defn override-ic
+  "Interceptor that adds a `restriction` override to the SAML assertions map."
+  [restriction]
+  {:name  ::override
+   :enter (fn [ctx]
+            (assoc-in ctx [:request :session :saml :assertions :restriction]
+                      restriction))})
+
 (defn guard-ic
   "Interceptor that will throw exceptions based on the given `restriction`.
 
@@ -185,7 +193,9 @@
       (ic/interceptor
         {:name  ::guard
          :enter (fn [{:keys [request] :as ctx}]
-                  (let [assertions (sp.auth/request->assertions request)]
+                  (let [assertions  (sp.auth/request->assertions request)
+                        authorized? (or (sp.auth/auth-override assertions)
+                                        authorized?)]
                     (if (not (authorized? assertions))
                       (throw (ex-info "Failed auth" auth-meta))
                       ctx)))})
@@ -388,7 +398,8 @@
   ([{:keys [request] :as ctx} query-string verb]
    (if-let [routing (routing-for ctx query-string verb)]
      (let [assertions  (sp.auth/request->assertions request)
-           authorized? (routing->auth-test routing)]
+           authorized? (or (sp.auth/auth-override assertions)
+                           (routing->auth-test routing))]
        (authorized? assertions))
      :not-found))
   ([ctx route]
@@ -399,8 +410,17 @@
 
 (defn auth-chain
   "Create an interceptor chain to make sure that a user is authorized to access
-  a resource based on the expanded `conf` and a `restriction`."
-  [conf restriction]
-  [(failure-ic conf)
-   (session-ic conf)
-   (guard-ic restriction)])
+  a resource based on the expanded `conf` and a `restriction`.
+
+  During development, the required authorisation can be modified by setting
+  the :auth-override key of the conf to a different restriction, e.g. :all."
+  [{:keys [auth-override] :as conf} restriction]
+  (if auth-override
+    [(failure-ic conf)
+     (session-ic conf)
+     (override-ic auth-override)
+     (guard-ic restriction)]
+
+    [(failure-ic conf)
+     (session-ic conf)
+     (guard-ic restriction)]))

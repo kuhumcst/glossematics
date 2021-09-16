@@ -34,17 +34,27 @@
     (map? restriction) (assertions->auth-test restriction)
     (fn? restriction) restriction))
 
+(defn auth-override
+  "Create an auth test override from the `assertions` map.
+
+  During development the assertions map may contain a :restriction key defining
+  an alternative test used to override the restrictions of a production system."
+  [assertions]
+  (restriction->auth-test (:restriction assertions)))
+
 (defmacro if-permit
   "Checks that `assertions` satisfies `restriction`. When true, returns the
   first clause of `body`; else returns the second clause."
   [[assertions restriction] & body]
-  `(if ((restriction->auth-test ~restriction) ~assertions)
+  `(if ((or (auth-override ~assertions)
+            (restriction->auth-test ~restriction)) ~assertions)
      ~@body))
 
 (defmacro only-permit
   "Checks that `assertions` satisfies `restriction`. If true, returns `body`;
   else throws an exception."
   [[assertions restriction] & body]
-  `(if ((restriction->auth-test ~restriction) ~assertions)
+  `(if ((or (auth-override ~assertions)
+            (restriction->auth-test ~restriction)) ~assertions)
      (do ~@body)
      (throw (ex-info "Unsatisfied restriction" {::restriction ~restriction}))))

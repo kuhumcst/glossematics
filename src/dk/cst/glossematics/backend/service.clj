@@ -19,10 +19,12 @@
 (defn glossematics-routes
   [{:keys [files-dir] :as conf}]
   #{["/"
-     :get (conj (sp.ic/auth-chain conf :authenticated) index/handler)
+     :get (conj (sp.ic/auth-chain conf :authenticated)
+                index/handler)
      :route-name ::index]
     ["/login"
-     :get [(sp.ic/session-ic conf) (example/login-page-ic conf)]
+     :get (conj (sp.ic/auth-chain conf :all)
+                (example/login-page-ic conf))
      :route-name ::login]
     ["/files/:fmt"
      :get (into (sp.ic/auth-chain conf :authenticated)
@@ -65,7 +67,10 @@
       index/development? (assoc ::http/allowed-origins (constantly true)))))
 
 (defn load-sp-conf!
-  ([path] (reset! sp-conf (sp.conf/init (sp.conf/read-file! path))))
+  ([path] (reset! sp-conf (cond-> (sp.conf/init (sp.conf/read-file! path))
+                            ;; Comment out this line to use auth during dev.
+                            ;; Make sure to reload the sp-conf and restart!
+                            index/development? (assoc :auth-override :all))))
   ([] (load-sp-conf! (example/in-home "/.glossematics/repl-conf.edn"))))
 
 (defn start []
