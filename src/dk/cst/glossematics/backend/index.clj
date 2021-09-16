@@ -16,6 +16,7 @@
     "main.js"))
 
 (def development?
+  "Source of truth for whether this is a development build or not. "
   (= main-js "main.js"))
 
 (defn index-hiccup
