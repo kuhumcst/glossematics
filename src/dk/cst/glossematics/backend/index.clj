@@ -52,7 +52,9 @@
 
    [:body
     [:div#app]
-    [:script (str "var SAMLAssertions = '" (pr-str assertions) "';")]
+    [:script
+     (str "var SAMLAssertions = '" (pr-str assertions) "';"
+          "var inDevelopmentEnvironment = " development? ";")]
     [:script {:src (str "js/compiled/" main-js)}]]])
 
 (defn index-html
