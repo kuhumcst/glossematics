@@ -1,4 +1,4 @@
-(ns load
+(ns dk.cst.glossematics.frontend.page.timeline.data
   (:require [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.string :as str]
@@ -55,7 +55,7 @@
                       people
                       source])))
 
-(defmacro timeline
+(defmacro load-timeline
   []
   (with-open [reader (io/reader (io/resource "examples/timeline.csv"))]
     (-> (csv/read-csv reader :separator \;)

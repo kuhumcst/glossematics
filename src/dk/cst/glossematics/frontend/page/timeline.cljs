@@ -2,11 +2,11 @@
   (:require [clojure.string :as str]
             [shadow.resource :as sr]
             [reagent.core :as r]
-            [load :as load]
+            [dk.cst.glossematics.frontend.page.timeline.data :as tld]
             [dk.cst.glossematics.frontend.timeline :as timeline :refer [timeline]]))
 
 (def hjemslev-events
-  (load/timeline))
+  (tld/load-timeline))
 
 (def hjemslev-bands
   {:primary  {:width        "80%"
