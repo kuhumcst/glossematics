@@ -66,3 +66,8 @@
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    (index-html (sp.auth/request->assertions request))})
+
+(defn shadow-handler
+  "Handler used by the shadow-cljs watch process which overrides auth."
+  [request]
+  (handler (assoc-in request [:session :saml :assertions :restriction] :all)))
