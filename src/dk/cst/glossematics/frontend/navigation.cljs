@@ -30,7 +30,8 @@
 
    ["/reader"
     {:name ::reader
-     :page reader/page}]
+     :page reader/page
+     :prep reader/fetch-data!}]
 
    ["/timeline"
     {:name ::timeline
@@ -82,7 +83,10 @@
 
   (rfe/start!
     (rf/router routes)
-    (fn [m] (reset! location m))
+    (fn [m]
+      (reset! location m)
+      (when-let [prep (get-in m [:data :prep])]
+        (prep)))
     {:use-fragment false})
 
   (render))
