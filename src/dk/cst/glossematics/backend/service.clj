@@ -46,7 +46,7 @@
   (when-let [conf-error (s/explain-data ::sp.conf/config sp-conf)]
     (throw (ex-info "invalid configuration" conf-error)))
   (let [csp (if index/development?
-              {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* ws://localhost:*"}
+              {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* 0.0.0.0:* ws://localhost:* ws://0.0.0.0:*"}
               {:default-src "'none'"
                :script-src  "'self' 'unsafe-inline'"        ; unsafe-eval possibly only needed for dev main.js
                :connect-src "'self'"
