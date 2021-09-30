@@ -1,4 +1,5 @@
 (ns dk.cst.glossematics.frontend.facsimile
+  "Rendering TEI files in Hiccup using Cuphic and Rescope."
   (:require [shadow.resource :as resource]
             [reagent.core :as r]
             [cuphic.core :as cup]
