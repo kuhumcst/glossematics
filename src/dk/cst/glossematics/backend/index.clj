@@ -25,37 +25,37 @@
    [:head
     [:meta {:charset "utf-8"}]
     [:title (str (when development? "(dev) ") "Glossematics")]
-    [:link {:rel "icon" :href "images/favicon.svg"}]
-    [:link {:rel "mask-icon" :href "images/favicon.svg" :color "#a02c2c"}]
-    [:link {:rel "stylesheet" :href "css/main.css"}]
+    [:link {:rel "icon" :href "/images/favicon.svg"}]
+    [:link {:rel "mask-icon" :href "/images/favicon.svg" :color "#a02c2c"}]
+    [:link {:rel "stylesheet" :href "/css/main.css"}]
 
     ;; These styles are used by the Simile Timeline API
-    [:link {:rel "stylesheet" :href "timeline/css/ethers.css"}]
-    [:link {:rel "stylesheet" :href "timeline/css/events.css"}]
-    [:link {:rel "stylesheet" :href "timeline/css/timeline.css"}]
-    [:link {:rel "stylesheet" :href "timeline/css/graphics.css"}]
+    [:link {:rel "stylesheet" :href "/timeline/css/ethers.css"}]
+    [:link {:rel "stylesheet" :href "/timeline/css/events.css"}]
+    [:link {:rel "stylesheet" :href "/timeline/css/timeline.css"}]
+    [:link {:rel "stylesheet" :href "/timeline/css/graphics.css"}]
 
     ;; TODO: reduce these (minify, bundle, ...)
     ;; These imports are all Simile Timeline library files.
-    [:script {:src "timeline/js/simile-ajax-bundle.js"}]
-    [:script {:src "timeline/js/timeline.js"}]
-    [:script {:src "timeline/js/band.js"}]
-    [:script {:src "timeline/js/themes.js"}]
-    [:script {:src "timeline/js/ethers.js"}]
-    [:script {:src "timeline/js/ether-painters.js"}]
-    [:script {:src "timeline/js/event-utils.js"}]
-    [:script {:src "timeline/js/labellers.js"}]
-    [:script {:src "timeline/js/sources.js"}]
-    [:script {:src "timeline/js/original-painter.js"}]
-    [:script {:src "timeline/js/overview-painter.js"}]
-    [:script {:src "timeline/js/en-labellers.js"}]]
+    [:script {:src "/timeline/js/simile-ajax-bundle.js"}]
+    [:script {:src "/timeline/js/timeline.js"}]
+    [:script {:src "/timeline/js/band.js"}]
+    [:script {:src "/timeline/js/themes.js"}]
+    [:script {:src "/timeline/js/ethers.js"}]
+    [:script {:src "/timeline/js/ether-painters.js"}]
+    [:script {:src "/timeline/js/event-utils.js"}]
+    [:script {:src "/timeline/js/labellers.js"}]
+    [:script {:src "/timeline/js/sources.js"}]
+    [:script {:src "/timeline/js/original-painter.js"}]
+    [:script {:src "/timeline/js/overview-painter.js"}]
+    [:script {:src "/timeline/js/en-labellers.js"}]]
 
    [:body
     [:div#app]
     [:script
      (str "var SAMLAssertions = '" (pr-str assertions) "';"
           "var inDevelopmentEnvironment = " development? ";")]
-    [:script {:src (str "js/compiled/" main-js)}]]])
+    [:script {:src (str "/js/compiled/" main-js)}]]])
 
 (defn index-html
   [assertions]

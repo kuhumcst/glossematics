@@ -1,5 +1,5 @@
 (ns dk.cst.glossematics.frontend.navigation
-  "The central namespace the frontend app."
+  "The central namespace of the frontend app."
   (:require [clojure.string :as str]
             [reagent.core :as r]
             [reagent.dom :as rdom]
@@ -18,16 +18,14 @@
   (r/cursor db [:location]))
 
 (def routes
-  [["/"
+  [["/app"
     {:name ::main
      :page main/page}]
-
-   ["/reader"
+   ["/app/reader"
     {:name ::reader
      :page reader/page
      :prep reader/fetch-data!}]
-
-   ["/timeline"
+   ["/app/timeline"
     {:name ::timeline
      :page timeline/page}]])
 
@@ -60,9 +58,9 @@
      ".org"]]
 
    [:ul
-    [:li [:a {:href (href ::main)} (href ::main)]]
-    [:li [:a {:href (href ::reader)} (href ::reader)]]
-    [:li [:a {:href (href ::timeline)} (href ::timeline)]]]
+    [:li [:a {:href (href ::main)} "Main page"]]
+    [:li [:a {:href (href ::reader)} "Reader"]]
+    [:li [:a {:href (href ::timeline)} "Timeline"]]]
 
    (if-let [page (get-in @location [:data :page])]
      [page]

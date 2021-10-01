@@ -17,23 +17,27 @@
 (defonce sp-conf (atom nil))
 
 (defn glossematics-routes
+  "Most of the routing happens on the frontend inside the SPA. The API routes
+   are an exception (as well as the SAML routes required for Pedestal SP)."
   [{:keys [files-dir] :as conf}]
-  #{["/"
-     :get (conj (sp.ic/auth-chain conf :authenticated)
-                index/handler)
-     :route-name ::index]
-    ["/login"
-     :get (conj (sp.ic/auth-chain conf :all)
-                (example/login-page-ic conf))
-     :route-name ::login]
-    ["/files/:fmt"
-     :get (into (sp.ic/auth-chain conf :authenticated)
-                (files/files-chain files-dir))
-     :route-name ::dir]
-    ["/files/:fmt/:filename"
-     :get (conj (sp.ic/auth-chain conf :authenticated)
-                (files/->file-handler files-dir))
-     :route-name ::file]})
+  (let [redirect-to-spa [(fn [_] {:status  301
+                                  :headers {"Location" "/app"}})]
+        single-page-app (conj (sp.ic/auth-chain conf :authenticated)
+                              index/handler)]
+    ;; These first few routes all lead to the SPA
+    #{["/" :get redirect-to-spa :route-name ::root]
+      ["/app" :get single-page-app :route-name ::spa]
+      ["/app/*" :get single-page-app :route-name ::spa-path]
+
+      ;; API routes
+      ["/files/:fmt"
+       :get (into (sp.ic/auth-chain conf :authenticated)
+                  (files/files-chain files-dir))
+       :route-name ::dir]
+      ["/files/:fmt/:filename"
+       :get (conj (sp.ic/auth-chain conf :authenticated)
+                  (files/->file-handler files-dir))
+       :route-name ::file]}))
 
 (defn routes
   [sp-conf]
