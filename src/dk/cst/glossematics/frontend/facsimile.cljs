@@ -64,6 +64,7 @@
   (and (vector? x)
        (= :pb (first x))))
 
+;; TODO: doesn't work properly for acc-1992_0005_032_Uldall_1000-tei-final.xml
 (def inlined-pbs
   "In certain cases, <pb> tags don't appear at the same level as <p> tags, but
   rather nested inside them. This transformer splits those <p> tags into
