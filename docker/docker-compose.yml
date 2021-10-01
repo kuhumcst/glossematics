@@ -7,6 +7,8 @@ services:
       context: nginx-reverse-proxy
       dockerfile: Dockerfile
     restart: unless-stopped
+    depends_on:
+      - glossematics
     environment:
       - CERTBOT_EMAIL=simongray@hum.ku.dk
       - STAGING=0
@@ -30,5 +32,6 @@ services:
       - ${GLOSSEMATICS_CONF}:/etc/glossematics/conf.edn
       - ${GLOSSEMATICS_IDP_CERTIFICATE}:/etc/glossematics/idp-certificate.pem
       - ${GLOSSEMATICS_SAML_KEYSTORE}:/etc/glossematics/saml-keystore.jks
+      - ${GLOSSEMATICS_FILES_DIR}:/etc/glossematics/files
     ports:
       - 8080:8080
