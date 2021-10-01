@@ -24,6 +24,7 @@
            [:code
             tei]]]])
 
+;; TODO: fix - doesn't work on repeat invocations
 (defn set-content!
   [filename]
   (p/let [url (get @tei-files filename)
@@ -31,6 +32,7 @@
     (swap! reader-state assoc :current-file filename)
     (swap! reader-state assoc-in [:tabs :kvs] (mk-tabs tei))))
 
+;;TODO: should not re-fetch files data
 (defn fetch-data!
   []
   (p/let [files (api/transit-get "/files/tei")]
@@ -38,7 +40,8 @@
            [(last (str/split url #"/")) url])
          (into {})
          (reset! tei-files))
-    (set-content! "acc-1992_0005_024_Holt_0020-final.xml")))
+    (when (not (:current-file @reader-state))
+      (set-content! "acc-1992_0005_024_Holt_0020-final.xml"))))
 
 (defn page
   []
