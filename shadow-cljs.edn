@@ -7,7 +7,7 @@
                    :output-dir        "resources/public/js/compiled"
                    :asset-path        "/js/compiled"
                    :module-hash-names true
-                   :modules           {:main {:init-fn dk.cst.glossematics.frontend.navigation/init!}}
+                   :modules           {:main {:init-fn dk.cst.glossematics.frontend.app/init!}}
 
                    ;; https://shadow-cljs.github.io/docs/UsersGuide.html#build-report
                    :build-hooks       [(shadow.cljs.build-report/hook)]}

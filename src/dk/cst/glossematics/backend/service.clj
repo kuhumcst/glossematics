@@ -1,4 +1,5 @@
 (ns dk.cst.glossematics.backend.service
+  "The central namespace of the backend app."
   (:require [clojure.set :as set]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]

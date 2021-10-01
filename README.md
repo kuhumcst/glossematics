@@ -2,9 +2,29 @@ Glossematics
 ============
 [Infrastrukturalisme](https://cst.ku.dk/projekter/infrastrukturalisme/) is a joint project between the University of Copenhagen and Aarhus University. The project has the goal of publishing a web app on [glossematics.org](https://glossematics.org) to allow researchers from around the world to explore the life of the Danish linguist [Louis Hjelmslev](https://en.wikipedia.org/wiki/Louis_Hjelmslev) by making material available from previously unpublished primary sources, e.g. letters sent and received by the linguist.
 
-The web app includes a facsimile viewer implemented as a [reagent](https://github.com/reagent-project/reagent) component using [stucco](https://github.com/kuhumcst/stucco) and [rescope](https://github.com/kuhumcst/rescope). The viewer displays facsimiles and transcriptions in parallel. It supports transcriptions written in a subset of the [TEI standard](https://tei-c.org/).
+Architecture
+------------
+The source code has been split into separate backend and frontend directories located within `/src/dk/cst/glossematics`. The backend and frontend are written in Clojure and ClojureScript, respectively.
 
-The backend is a [Pedestal](https://github.com/pedestal/pedestal) web service that uses SAML for authentication/authorisation by way of **Pedestal SP**. Jetty is used to serve the raw content, while nginx acts as a reverse proxy/gateway in production with SSL certificates regularly updated by Let's Encrypt's certbot. The production multi-container system is built and run using Docker.
+* `dk.cst.glossematics.backend.service` is the core namespace of the backend service.
+* `dk.cst.glossematics.frontend.app` is the core namespace of the frontend app.
+
+These two namespaces contain the routing tables and are therefore natural entry points for anyone wanting to explore the source code.
+
+For now, the source code of **Pedestal SP** is also included in this repository (at `/src/dk/cst/pedestal/sp`), but it will eventually be spun off into its own git repository.
+
+### Frontend
+The frontend is a so-called [single-page app (SPA)](https://en.wikipedia.org/wiki/Single-page_application) written in ClojureScript, built with [reitit](https://github.com/metosin/reitit) and [reagent](https://github.com/reagent-project/reagent). This app includes a facsimile viewer implemented using [stucco](https://github.com/kuhumcst/stucco) and [rescope](https://github.com/kuhumcst/rescope). The viewer displays facsimiles and transcriptions in parallel. It supports transcriptions written in a subset of the [TEI standard](https://tei-c.org/).
+
+When someone visits the Glossematics website they will _always_ be served the exact same HTML page. This page embeds a blob of JavaScript code which has been compiled from ClojureScript. It is this JavaScript code that creates the actual content on the page, occasionally fetching data from the backend in the background.
+
+### Backend
+The backend is a [Pedestal](https://github.com/pedestal/pedestal) web service written in Clojure that uses SAML for authentication/authorisation by way of **Pedestal SP**. [Jetty](https://www.eclipse.org/jetty/) is used to serve the raw content, while [nginx](https://www.nginx.com/) acts as a reverse proxy/gateway in production with SSL certificates regularly updated by [Let's Encrypt's](https://letsencrypt.org/) certbot. The production multi-container system is built and run using [Docker](https://www.docker.com/).
+
+The primary responsibility of the backend is
+
+1. serving the HTML page containing the frontend SPA and
+2. responding to API calls made from the SPA.
 
 Server setup
 ------------

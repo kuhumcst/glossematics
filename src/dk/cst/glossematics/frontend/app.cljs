@@ -1,4 +1,4 @@
-(ns dk.cst.glossematics.frontend.navigation
+(ns dk.cst.glossematics.frontend.app
   "The central namespace of the frontend app."
   (:require [clojure.string :as str]
             [reagent.core :as r]
@@ -41,7 +41,7 @@
    [:details [:summary "@db"]
     [:pre (with-out-str (cljs.pprint/pprint @db))]]])
 
-(defn app
+(defn shell
   "A container component that wraps the various pages of the app."
   []
   [:<>
@@ -70,7 +70,7 @@
 
 (defn ^:dev/after-load render
   []
-  (rdom/render [app] (js/document.getElementById "app")))
+  (rdom/render [shell] (js/document.getElementById "app")))
 
 (defn init!
   "The entry point of the frontend app."
