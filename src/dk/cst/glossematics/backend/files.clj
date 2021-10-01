@@ -45,7 +45,7 @@
 
    "text/plain"
    (fn [hrefs]
-     (apply str (interleave hrefs (repeat "\n"))))
+     (str/join "\n" hrefs))
 
    "text/html"
    (fn [hrefs]
