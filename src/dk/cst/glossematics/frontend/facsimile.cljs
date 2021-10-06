@@ -8,10 +8,8 @@
             [dk.cst.stucco.plastic :as plastic]
             [rescope.core :as rescope]
             [rescope.helpers :as helpers]
-            [rescope.style :as style]))
-
-(defonce carousel-state
-  (r/atom nil))
+            [rescope.style :as style]
+            [dk.cst.glossematics.frontend.state :as db]))
 
 (def prefix
   "tei")
@@ -132,8 +130,8 @@
             kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
                            [(str "Side " n " af " pp "; facs. " facs ".")
                             (into [:<>] (map rewrite-page page))])]
-        (update-content! carousel-state kvs)
-        [plastic/carousel carousel-state
+        (update-content! db/reader-pages kvs)
+        [plastic/carousel db/reader-pages
          {:aria-label "Facsimile"}]))))
 
 (def default-fn
@@ -172,5 +170,5 @@
 
 (defn tei-xml
   "Parse, postprocess, and display TEI."
-  [xml]
-  [rescope/scope (-> xml parse rewrite) tei-css])
+  [hiccup]
+  [rescope/scope (rewrite hiccup) tei-css])

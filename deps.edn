@@ -11,7 +11,7 @@
            io.pedestal/pedestal.jetty       {:mvn/version "0.5.9"}
            luminus/ring-ttl-session         {:mvn/version "0.3.3"}
            org.slf4j/slf4j-simple           {:mvn/version "1.7.32"}
-           hiccup                           {:mvn/version "1.0.5"}
+           hiccup/hiccup                    {:mvn/version "1.0.5"}
            ring/ring-core                   {:mvn/version "1.9.4"}
            com.wsscode/transito             {:mvn/version "2021.07.04"}
 
@@ -23,13 +23,13 @@
 
            ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
-           ;kuhumcst/recap            {:local/root "/Users/rqf595/Code/recap"}}
+           ;kuhumcst/stucco            {:local/root "/Users/rqf595/Code/stucco"}
            kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
                                              :sha     "6b728e2d964eeeb20c7795bb8d299e33401cce37"}
            kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
                                              :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/stucco                  {:git/url "https://github.com/kuhumcst/stucco.git"
-                                             :sha     "46f46d8b394b72e531000429d47456e520e1b327"}}
+                                             :sha     "a1126126876f2d78a4ab3bfd168f9d5ae423026e"}}
 
  ;; For now, the backend alias only contains metabase/saml20-clj since it
  ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
@@ -39,7 +39,7 @@
                       :extra-deps  {org.clojure/clojurescript   {:mvn/version "1.10.879"}
                                     thheller/shadow-cljs        {:mvn/version "2.15.8"}
                                     metosin/reitit              {:mvn/version "0.5.15"}
-                                    reagent                     {:mvn/version "1.1.0"}
+                                    reagent/reagent             {:mvn/version "1.1.0"}
                                     lambdaisland/fetch          {:mvn/version "1.0.41"}
                                     kitchen-async/kitchen-async {:mvn/version "0.1.0-SNAPSHOT"}}}
            :test     {:extra-paths ["test"]}}}

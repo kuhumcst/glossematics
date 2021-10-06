@@ -3,7 +3,7 @@
   (:require [reagent.core :as r]
             [clojure.edn :as edn]))
 
-(def development?
+(defonce development?
   (when (exists? js/inDevelopmentEnvironment)
     js/inDevelopmentEnvironment))
 
@@ -15,4 +15,13 @@
 
 ;; Local page data should all be cursors into this central data structure.
 (defonce db
-  (r/atom {}))
+  (r/atom {:reader {:pages {:i 0}}}))
+
+(defonce tei-files
+  (r/cursor db [:files :tei]))
+
+(defonce reader
+  (r/cursor db [:reader]))
+
+(defonce reader-pages
+  (r/cursor db [:reader :pages]))
