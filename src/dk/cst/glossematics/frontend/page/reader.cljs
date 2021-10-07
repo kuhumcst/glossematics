@@ -40,7 +40,6 @@
   (->> (:graphic (cup/scrape hiccup {:graphic '[:graphic {:xml/id id}]}))
        (map (comp facs-id->facs-page #(get % 'id)))))
 
-;; TODO: fix - doesn't work on repeat invocations
 (defn set-content!
   [filename]
   (p/let [url    (get @state/tei-files filename)

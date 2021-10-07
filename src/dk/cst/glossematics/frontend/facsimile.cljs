@@ -162,8 +162,9 @@
    :wrapper      shadow-dom-wrapper
    :default      default-fn})
 
+;; Memoization sadly not feasible - 'pages-in-carousel' relies on a side-effect!
 (def rewrite
-  (memoize #(cup/rewrite % pre-stage outer-stage)))
+  #(cup/rewrite % pre-stage outer-stage))
 
 (def parse
   (memoize xml/parse))
