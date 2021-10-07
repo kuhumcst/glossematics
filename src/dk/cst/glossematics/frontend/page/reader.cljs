@@ -21,8 +21,9 @@
 
 (defn mk-tabs
   [tei hiccup]
-  [["Indhold" ^{:key tei} [facsimile/tei-xml hiccup]]
-   ["XML" [:pre {:style {:white-space "pre-wrap"}}
+  [["Content" ^{:key tei} [facsimile/tei-xml hiccup]]
+   ["TEI" [:pre {:style {:white-space "pre-wrap"
+                         :padding     "1ch"}}
            [:code
             tei]]]])
 
