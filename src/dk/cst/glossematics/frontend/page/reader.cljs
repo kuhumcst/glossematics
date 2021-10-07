@@ -46,7 +46,9 @@
           tei    (api/transit-get url)
           hiccup (facsimile/parse tei)]
     (swap! state/reader assoc :current-file filename)
-    (swap! facsimile-pages assoc :kvs (get-facs hiccup))
+    (swap! facsimile-pages assoc
+           :i 0
+           :kvs (get-facs hiccup))
     (swap! state/reader assoc-in [:tabs :kvs] (mk-tabs tei hiccup))))
 
 ;;TODO: should not re-fetch files data
