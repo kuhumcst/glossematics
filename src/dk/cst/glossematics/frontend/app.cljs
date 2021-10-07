@@ -45,22 +45,22 @@
   "A container component that wraps the various pages of the app."
   []
   [:<>
-   [:h1 {:style {:color          "black"
-                 :letter-spacing "4px"
-                 :font-family    "PoiretOne"
-                 :font-size      "64px"
-                 :text-align     "left"
-                 :text-transform "uppercase"
-                 :border-bottom  "16px solid darkred"}}
-    "Glossematics"
-    [:span {:style {:color     "#DDBBBB"
-                    :font-size "40px"}}
-     ".org"]]
-
-   [:ul
-    [:li [:a {:href (href ::main)} "Main page"]]
-    [:li [:a {:href (href ::reader)} "Reader"]]
-    [:li [:a {:href (href ::timeline)} "Timeline"]]]
+   [:a {:href  (href ::main)
+        :style {:text-decoration "none"}}
+    [:h1 {:style {:color          "black"
+                  :letter-spacing "4px"
+                  :font-family    "PoiretOne"
+                  :font-size      "48px"
+                  :text-align     "left"
+                  :text-transform "uppercase"
+                  :border-bottom  "16px solid darkred"}}
+     "Glossematics"
+     [:span {:style {:color     "#DDBBBB"
+                     :font-size "32px"}}
+      ".org"]]]
+   [:div
+    [:a {:href (href ::reader)} "Reader"] ", "
+    [:a {:href (href ::timeline)} "Timeline"]]
 
    (if-let [page (get-in @location [:data :page])]
      [page]
