@@ -11,8 +11,9 @@
             [dk.cst.stucco.surface :as surface]
             [dk.cst.glossematics.frontend.facsimile :as facsimile]))
 
-;; TODO: acc-1992_0005_024_Holt_0230-final.xml - facs and pb order switched!
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
+;; TODO: acc-1992_0005_032_Uldall_1000-final.xml - pbs not captured
+;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
 
 (defonce tabs-state
   (r/cursor state/reader [:tabs]))
