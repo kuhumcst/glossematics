@@ -12,6 +12,7 @@
             [dk.cst.glossematics.frontend.facsimile :as facsimile]))
 
 ;; TODO: acc-1992_0005_024_Holt_0230-final.xml - facs and pb order switched!
+;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
 
 (defonce tabs-state
   (r/cursor state/reader [:tabs]))
@@ -21,11 +22,12 @@
 
 (defn mk-tabs
   [tei hiccup]
-  [["Content" ^{:key tei} [facsimile/tei-xml hiccup]]
-   ["TEI" [:pre {:style {:white-space "pre-wrap"
-                         :padding     "1ch"}}
-           [:code
-            tei]]]])
+  (plastic/heterostyled
+    [["Content" ^{:key tei} [facsimile/tei-xml hiccup]]
+     ["TEI" [:pre {:style {:white-space "pre-wrap"
+                           :padding     "1ch"}}
+             [:code
+              tei]]]]))
 
 (defn facs-id->facs-page
   [id]
@@ -38,7 +40,7 @@
 (defn get-facs
   [hiccup]
   (->> (:graphic (cup/scrape hiccup {:graphic '[:graphic {:xml/id id}]}))
-       (map (comp facs-id->facs-page #(get % 'id)))))
+       (mapv (comp facs-id->facs-page #(get % 'id)))))
 
 (defn set-content!
   [filename]
@@ -48,7 +50,7 @@
     (swap! state/reader assoc :current-file filename)
     (swap! facsimile-pages assoc
            :i 0
-           :kvs (get-facs hiccup))
+           :kvs (plastic/heterostyled (get-facs hiccup) shuffle))
     (swap! state/reader assoc-in [:tabs :kvs] (mk-tabs tei hiccup))))
 
 ;;TODO: should not re-fetch files data

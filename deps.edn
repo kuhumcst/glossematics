@@ -29,7 +29,7 @@
            kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
                                              :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/stucco                  {:git/url "https://github.com/kuhumcst/stucco.git"
-                                             :sha     "a1126126876f2d78a4ab3bfd168f9d5ae423026e"}}
+                                             :sha     "6436325f046d85cef05f8d73bc145210fe8199e4"}}
 
  ;; For now, the backend alias only contains metabase/saml20-clj since it
  ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
