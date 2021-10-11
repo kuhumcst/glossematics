@@ -44,29 +44,20 @@
 (defn shell
   "A container component that wraps the various pages of the app."
   []
-  [:<>
-   [:a {:href  (href ::main)
-        :style {:text-decoration "none"}}
-    [:h1 {:style {:color          "black"
-                  :letter-spacing "4px"
-                  :font-family    "PoiretOne"
-                  :font-size      "48px"
-                  :text-align     "left"
-                  :text-transform "uppercase"
-                  :border-bottom  "16px solid darkred"}}
-     "Glossematics"
-     [:span {:style {:color     "#DDBBBB"
-                     :font-size "32px"}}
-      ".org"]]]
-   [:div
-    [:a {:href (href ::reader)} "Reader"] ", "
-    [:a {:href (href ::timeline)} "Timeline"]]
+  [:div.shell
+   [:div.shell__logo
+    [:a {:href (href ::main)}
+     [:h1 "Glossematics" [:span ".org"]]]]
+   [:div.shell__content
+    [:div
+     [:a {:href (href ::reader)} "Reader"] ", "
+     [:a {:href (href ::timeline)} "Timeline"]]
 
-   (if-let [page (get-in @location [:data :page])]
-     [page]
-     [:p "unknown page"])
+    (if-let [page (get-in @location [:data :page])]
+      [page]
+      [:p "unknown page"])
 
-   [debug-view]])
+    [debug-view]]])
 
 (defn ^:dev/after-load render
   []

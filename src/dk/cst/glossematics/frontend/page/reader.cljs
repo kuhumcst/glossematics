@@ -77,9 +77,7 @@
         (for [[k _] (sort @state/tei-files)]
           ^{:key k} [:option {:value k}
                      k])]]]
-     [:div {:style {:max-width "200ch"
-                    :min-width "80ch"
-                    :margin    "0 auto"}}
+     [:div.reader
       (when (not-empty (:kvs @tabs-state))
         [foundation/combination
          {:vs      [[plastic/carousel facsimile-pages]

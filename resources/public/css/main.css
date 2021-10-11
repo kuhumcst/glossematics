@@ -2,3 +2,41 @@
     font-family: PoiretOne;
     src: url(/fonts/PoiretOne-aD0x.ttf);
 }
+
+body {
+    margin: 0;
+    background: #EDEDED;
+}
+
+.shell__logo {
+    background: #333;
+}
+
+.shell__logo a {
+    text-decoration: none;
+}
+
+.shell__logo h1 {
+    color: #DDD;
+    letter-spacing: 4px;
+    font-family: PoiretOne;
+    font-size: 48px;
+    text-align: left;
+    text-transform: uppercase;
+    padding: 24px 24px 4px 24px;
+    border-bottom: 24px solid #8d5050;
+}
+
+.shell__logo span {
+    color: #EEAAAA;
+    font-size: 24px;
+}
+
+.shell__content {
+    padding: 0 24px;
+}
+
+.reader {
+    min-width: 80ch;
+    margin: 0 auto;
+}
