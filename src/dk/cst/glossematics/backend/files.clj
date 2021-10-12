@@ -58,6 +58,8 @@
                       :href  href}
                   href]])]]]))})
 
+;; TODO: should probably specify Cache-control header in response
+;; See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
 (defn ->files-dir-ic
   "Return an interceptor to handle directory listing based on a `files-dir`.
   Expects the Pedestal content negotiator in the interceptor chain."
