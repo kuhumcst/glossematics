@@ -33,7 +33,7 @@
 (defn facs-id->facs-page
   [id]
   (let [[filename ext] (str/split id #"\.")
-        url (api/sanitize-url (str "/files/facsimile/" filename ".jpg"))]
+        url (api/normalize-url (str "/files/facsimile/" filename ".jpg"))]
     [filename
      [surface/illustration {:src url
                             :alt (str "Illustration of " filename)}]]))
@@ -46,7 +46,7 @@
 (defn set-content!
   [filename]
   (p/let [url    (get @state/tei-files filename)
-          tei    (api/transit-get url)
+          tei    (api/fetch url)
           hiccup (facsimile/parse tei)]
     (swap! state/reader assoc :current-file filename)
     (swap! facsimile-pages assoc
@@ -57,7 +57,7 @@
 ;;TODO: should not re-fetch files data
 (defn fetch-data!
   []
-  (p/let [files (api/transit-get "/files/tei")]
+  (p/let [files (api/fetch "/files/tei")]
     (->> (for [url files]
            [(last (str/split url #"/")) url])
          (into {})

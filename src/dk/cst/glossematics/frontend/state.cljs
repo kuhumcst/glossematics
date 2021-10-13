@@ -13,6 +13,9 @@
     (edn/read-string js/SAMLAssertions)
     {}))
 
+;; Some state to keep track of modals to avoid concurrent instances.
+(def ^:dynamic *modal-dialog*)
+
 ;; Local page data should all be cursors into this central data structure.
 (defonce db
   (r/atom {:reader {:pages {:i 0}}}))

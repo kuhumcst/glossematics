@@ -4,10 +4,7 @@
             [dk.cst.glossematics.frontend.state :as state]
             [kitchen-async.promise :as p]))
 
-;; Some state to keep track of modals to avoid concurrent instances.
-(def ^:dynamic *modal-dialog*)
-
-(defn refresh-dialog-msg
+(defn- refresh-dialog-msg
   [status]
   (str "Cannot fetch necessary data from the server. "
        (case status
@@ -17,25 +14,28 @@
        "Do you want to refresh the page?\n\n"))
 
 (defn refresh-dialog
-  "Display a modal dialog asking the user to reload the page in a `msg`."
+  "Display a dialog based on the HTTP `status` asking to refresh the page."
   [status]
-  (when-not *modal-dialog*
-    (set! *modal-dialog* true)
+  (when-not state/*modal-dialog*
+    (set! state/*modal-dialog* true)
     (if (js/confirm (refresh-dialog-msg status))
       (js/location.reload)
-      (set! *modal-dialog* false))))
+      (set! state/*modal-dialog* false))))
 
-(defn sanitize-url
+(defn normalize-url
   [url]
   (if state/development?
     (str "http://0.0.0.0:8080" url)
     url))
 
-(defn transit-get
-  "Do a GET request for expected transit data at `url`, returning the body.
-  If a request is bad (e.g. 403), display a dialog asking the user to refresh."
+(defn fetch
+  "Do a GET request for the resource at `url`, returning the response body.
+  Bad response codes result in a dialog asking the user to refresh the page.
+
+  Usually, bad responses (e.g. 403) are caused by frontend-server mismatch
+  which can be resolved by loading the latest version of the frontend app."
   [url]
-  (p/let [{:keys [status body]} (fetch/get (sanitize-url url))]
+  (p/let [{:keys [status body]} (fetch/get (normalize-url url))]
     (if (not= status 200)
       (refresh-dialog status)
       body)))
