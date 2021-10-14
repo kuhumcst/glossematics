@@ -19,6 +19,13 @@
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
 ;; TODO: acc-1992_0005_032_Uldall_1000-final.xml - pbs not captured
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
+;; TODO: acc-1992_0005_024_Holt_0900-final.xml - error on line 150 at column 25
+;; TODO: acc-1992_0005_024_Holt_0230-final.xml - note in note?
+;; TODO: acc-1992_0005_024_Holt_0180-final.xml - multiple notes?
+;; TODO: acc-1992_0005_024_Holt_0170-final.xml - facs wrong order
+;; TODO: acc-1992_0005_024_Holt_0530-final.xml - note type=top vs type=above
+;; TODO: acc-1992_0005_024_Holt_1330-final.xml - just div, not div type=notes
+;; TODO: in general: why resp attr used for hand/machine, while hand attr used for people?
 
 (defonce tabs-state
   (r/cursor state/reader [:tabs]))
@@ -143,8 +150,9 @@
                               (map (partial apply concat)))
             pp           (count pages)
             kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
-                           [(str "Side " n " af " pp "; facs. " facs ".")
-                            (into [:<>] (map rewrite-page page))])]
+                           (let [page+notes (concat page notes)]
+                             [(str "Side " n " af " pp "; facs. " facs ".")
+                              (into [:<>] (map rewrite-page page+notes))]))]
         (update-content! state/reader-pages kvs)
         [plastic/carousel state/reader-pages
          {:aria-label "Facsimile"}]))))
@@ -236,6 +244,7 @@
   []
   (let [{:keys [current-file]} @state/reader]
     [:<>
+     [:h2 current-file]
      [:p
       [:label "TEI-fil: "
        [:select {:key           current-file

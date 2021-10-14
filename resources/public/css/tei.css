@@ -1,5 +1,5 @@
 /* Hide all TEI metadata. */
-teiHeader, facsimile, [type=notes] {
+teiHeader, facsimile {
     display: none;
 }
 
@@ -108,5 +108,35 @@ add[place=above] {
 }
 
 [rend=underline] {
+    text-decoration: underline;
+}
+
+/* TODO: docs should preferably only contain a single <div type=notes>... */
+[type=notes] {
+    font-style: italic;
+    background: #EFEFEF;
+    padding: 1ch;
+    border: 1px solid lightgrey;
+    border-top: none;
+    border-bottom: none;
+}
+
+[type=notes]:first-of-type {
+    border-top: 1px solid lightgrey;
+}
+
+[type=notes]:last-of-type {
+    border-bottom: 1px solid lightgrey;
+}
+
+note[place]::before {
+    content: attr(data-place);
+    margin-right: 1ch;
+    text-decoration: underline;
+}
+
+[type=transcribernote]::before {
+    content: attr(data-resp);
+    margin-right: 1ch;
     text-decoration: underline;
 }
