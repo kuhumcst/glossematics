@@ -7,13 +7,20 @@
             [com.wsscode.transito :as transito]
             [hiccup.core :as hiccup]))
 
+(def one-month-cache
+  "private, max-age=2592000")
+
+(def one-day-cache
+  "private, max-age=86400")
+
 (defn ->file-handler
   "Return a handler to serve individual files based on a `files-dir`."
   [files-dir]
   (fn [{:keys [path-params] :as request}]
     (let [{:keys [fmt filename]} path-params
           filepath (str "/" fmt "/" filename)]
-      (ring/file-response filepath {:root files-dir}))))
+      (assoc-in (ring/file-response filepath {:root files-dir})
+                [:headers "Cache-Control"] one-day-cache))))
 
 (defn- safe-dir-path
   "Don't just accept any subdirectory."
@@ -58,8 +65,6 @@
                       :href  href}
                   href]])]]]))})
 
-;; TODO: should probably specify Cache-control header in response
-;; See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
 (defn ->files-dir-ic
   "Return an interceptor to handle directory listing based on a `files-dir`.
   Expects the Pedestal content negotiator in the interceptor chain."
@@ -69,10 +74,13 @@
             (let [content-type (get-in request [:accept :field] "text/plain")
                   hrefs        (build-hrefs request files-dir)
                   hrefs->body  (content-type->body-fn content-type)]
-              (assoc ctx
-                :response {:status  200
-                           :headers {"Content-Type" content-type}
-                           :body    (hrefs->body hrefs)})))})
+              (-> ctx
+                  (update :response assoc
+                          :status 200
+                          :body (hrefs->body hrefs))
+                  (update-in [:response :headers] assoc
+                             "Content-Type" content-type
+                             "Cache-Control" one-day-cache))))})
 
 (defn files-chain
   [files-dir]
