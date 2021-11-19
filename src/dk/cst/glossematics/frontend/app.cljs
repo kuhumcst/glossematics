@@ -1,7 +1,6 @@
 (ns dk.cst.glossematics.frontend.app
   "The central namespace of the frontend app."
   (:require [clojure.string :as str]
-            [reagent.core :as r]
             [reagent.dom :as rdom]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe :refer [href]]
@@ -14,17 +13,18 @@
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
-(defonce location
-  (r/cursor db [:location]))
-
 (def routes
   [["/app"
     {:name ::main
      :page main/page}]
    ["/app/reader"
-    {:name ::reader
+    {:name ::reader/empty
      :page reader/page
-     :prep reader/fetch-data!}]
+     :prep reader/fetch-document-list!}]
+   ["/app/reader/:document"
+    {:name ::reader/document
+     :page reader/page
+     :prep reader/fetch-document-list!}]
    ["/app/timeline"
     {:name ::timeline
      :page timeline/page}]])
@@ -50,10 +50,10 @@
      [:h1 "Glossematics" [:span ".org"]]]]
    [:div.shell__content
     [:div
-     [:a {:href (href ::reader)} "Reader"] ", "
+     [:a {:href (href ::reader/empty)} "Reader"] ", "
      [:a {:href (href ::timeline)} "Timeline"]]
 
-    (if-let [page (get-in @location [:data :page])]
+    (if-let [page (get-in @state/location [:data :page])]
       [page]
       [:p "unknown page"])
 
@@ -77,7 +77,7 @@
   (rfe/start!
     (rf/router routes)
     (fn [m]
-      (reset! location m)
+      (reset! state/location m)
       (when-let [prep (get-in m [:data :prep])]
         (prep)))
     {:use-fragment false})

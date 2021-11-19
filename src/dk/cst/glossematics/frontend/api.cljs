@@ -1,8 +1,8 @@
 (ns dk.cst.glossematics.frontend.api
   "Common API access operations."
   (:require [lambdaisland.fetch :as fetch]
-            [dk.cst.glossematics.frontend.state :as state]
-            [kitchen-async.promise :as p]))
+            [kitchen-async.promise :as p]
+            [dk.cst.glossematics.frontend.state :as state]))
 
 (defn- refresh-dialog-msg
   [status]

@@ -1,7 +1,8 @@
 (ns dk.cst.glossematics.frontend.state
   "Contains both static and dynamic frontend state."
   (:require [reagent.core :as r]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [dk.cst.stucco.util.state :as su]))
 
 (defonce development?
   (when (exists? js/inDevelopmentEnvironment)
@@ -18,7 +19,10 @@
 
 ;; Local page data should all be cursors into this central data structure.
 (defonce db
-  (r/atom {:reader {:pages {:i 0}}}))
+  (r/atom {:reader nil}))
+
+(defonce location
+  (r/cursor db [:location]))
 
 (defonce tei-files
   (r/cursor db [:files :tei]))
@@ -26,5 +30,10 @@
 (defonce reader
   (r/cursor db [:reader]))
 
-(defonce reader-pages
-  (r/cursor db [:reader :pages]))
+(defonce facs-carousel
+  (su/ghost reader {:i        :i
+                    :facs-kvs :kvs}))
+
+(defonce tei-carousel
+  (su/ghost reader {:i       :i
+                    :tei-kvs :kvs}))

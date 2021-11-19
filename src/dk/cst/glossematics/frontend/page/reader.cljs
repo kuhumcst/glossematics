@@ -2,16 +2,16 @@
   (:require [clojure.string :as str]
             [shadow.resource :as resource]
             [reagent.core :as r]
+            [reitit.frontend.easy :as rfe]
             [kitchen-async.promise :as p]
             [cuphic.core :as cup]
             [cuphic.xml :as xml]
             [rescope.core :as rescope]
             [rescope.helpers :as helpers]
             [rescope.style :as style]
-            [dk.cst.stucco.util.state :as state-util]
-            [dk.cst.stucco.plastic :as plastic]
-            [dk.cst.stucco.foundation :as foundation]
-            [dk.cst.stucco.surface :as surface]
+            [dk.cst.stucco.pattern :as pattern]
+            [dk.cst.stucco.group :as group]
+            [dk.cst.stucco.document :as document]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]))
@@ -27,17 +27,8 @@
 ;; TODO: acc-1992_0005_024_Holt_1330-final.xml - just div, not div type=notes
 ;; TODO: in general: why resp attr used for hand/machine, while hand attr used for people?
 
-(defonce tabs-state
-  (r/cursor state/reader [:tabs]))
-
-(defonce facsimile-pages
-  (state-util/derive state/reader-pages {:kvs [[]]}))
-
-(def prefix
-  "tei")
-
 (def tei-css
-  (style/prefix-css prefix (resource/inline "public/css/tei.css")))
+  (style/prefix-css "tei" (resource/inline "public/css/tei.css")))
 
 (def theme+tei-css
   (str css/shadow-style "\n\n/*\n\t === tei.css ===\n*/\n" tei-css))
@@ -153,8 +144,8 @@
                            (let [page+notes (concat page notes)]
                              [(str "Side " n " af " pp "; facs. " facs ".")
                               (into [:<>] (map rewrite-page page+notes))]))]
-        (update-content! state/reader-pages kvs)
-        [plastic/carousel state/reader-pages
+        (update-content! state/tei-carousel kvs)
+        [pattern/carousel state/tei-carousel
          {:aria-label "Facsimile"}]))))
 
 (def default-fn
@@ -189,15 +180,10 @@
 (def parse
   (memoize xml/parse))
 
-(defn tei-xml
-  "Parse, postprocess, and display TEI."
-  [hiccup]
-  [rescope/scope (cup/rewrite hiccup pre-stage outer-stage) tei-css])
-
 (defn mk-tabs
   [tei hiccup]
-  (plastic/heterostyled
-    [["Content" ^{:key tei} [tei-xml hiccup]]
+  (pattern/heterostyled
+    [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
      ["TEI" [:pre {:style {:white-space "pre-wrap"
                            :margin      "1ch"
                            :padding     "1ch"
@@ -210,52 +196,64 @@
   (let [[filename ext] (str/split id #"\.")
         url (api/normalize-url (str "/files/facsimile/" filename ".jpg"))]
     [filename
-     [surface/illustration {:src url
-                            :alt (str "Illustration of " filename)}]]))
+     [document/illustration {:src url
+                             :alt (str "Illustration of " filename)}]]))
 
 (defn get-facs
   [hiccup]
   (->> (:graphic (cup/scrape hiccup {:graphic '[:graphic {:xml/id id}]}))
        (mapv (comp facs-id->facs-page #(get % 'id)))))
 
+;; NOTE: :tei-kvs is loaded as a side-effect of the cup/rewrite call!
 (defn set-content!
-  [filename]
-  (p/let [url    (get @state/tei-files filename)
-          tei    (api/fetch url)
-          hiccup (parse tei)]
-    (swap! state/reader assoc :current-file filename)
-    (swap! facsimile-pages assoc
+  [document]
+  (p/let [url              (api/normalize-url (str "/files/tei/" document))
+          tei              (api/fetch url)
+          raw-hiccup       (parse tei)
+          facs             (get-facs raw-hiccup)
+          rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)]
+    (swap! state/reader assoc
            :i 0
-           :kvs (plastic/heterostyled (get-facs hiccup) shuffle))
-    (swap! state/reader assoc-in [:tabs :kvs] (mk-tabs tei hiccup))))
+           :document document
+           :tei tei
+           :hiccup rewritten-hiccup
+           :facs-kvs (pattern/heterostyled facs shuffle))))
 
 ;; Currently, relies on browser caching to avoid re-fires.
-(defn fetch-data!
+(defn fetch-document-list!
   []
   (p/let [files (api/fetch "/files/tei")]
     (->> (for [url files]
            [(last (str/split url #"/")) url])
          (into {})
-         (reset! state/tei-files))
-    (when (not (:current-file @state/reader))
-      (set-content! "acc-1992_0005_024_Holt_0230-final.xml"))))
+         (reset! state/tei-files))))
 
 (defn page
   []
-  (let [{:keys [current-file]} @state/reader]
+  (let [location*        @state/location
+        document?        (= ::document (get-in location* [:data :name]))
+        current-document (get-in location* [:path-params :document])
+        {:keys [hiccup tei document] :as reader*} @state/reader]
+    (when (and document? (not= document current-document))
+      (set-content! current-document))
     [:<>
-     [:h2 current-file]
+     [:h2 current-document]
      [:p
       [:label "TEI-fil: "
-       [:select {:key           current-file
-                 :default-value current-file
-                 :on-change     (fn [e] (set-content! (.. e -target -value)))}
+       [:select {:key           current-document
+                 :default-value current-document
+                 :on-change     (fn [e]
+                                  (let [v (.. e -target -value)]
+                                    (rfe/push-state ::document {:document v})))}
         (for [[k _] (sort @state/tei-files)]
           ^{:key k} [:option {:value k}
                      k])]]]
-     [:div.reader
-      (when (not-empty (:kvs @tabs-state))
-        [foundation/combination
-         {:vs      [[plastic/carousel facsimile-pages]
-                    [plastic/tabs tabs-state {:id "tei-tabs"}]]
-          :weights [1 1]}])]]))
+     (when (and document? reader*)
+       [:div.reader
+        [group/combination
+         {:vs      [[pattern/carousel state/facs-carousel]
+                    [pattern/tabs
+                     (r/atom {:i   0
+                              :kvs (mk-tabs tei hiccup)})
+                     {:id "tei-tabs"}]]
+          :weights [1 1]}]])]))

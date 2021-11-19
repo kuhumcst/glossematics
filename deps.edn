@@ -4,7 +4,6 @@
            org.clojure/data.csv             {:mvn/version "1.0.0"}
            semantic-csv/semantic-csv        {:mvn/version "0.2.1-alpha1"}
            time-literals/time-literals      {:mvn/version "0.1.5"}
-           org.clojars.quoll/asami          {:mvn/version "2.1.2"}
 
            io.pedestal/pedestal.service     {:mvn/version "0.5.9"}
            io.pedestal/pedestal.route       {:mvn/version "0.5.9"}
@@ -29,7 +28,7 @@
            kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
                                              :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/stucco                  {:git/url "https://github.com/kuhumcst/stucco.git"
-                                             :sha     "db1a12baacd3b29ef94e517fa18c92e66746ee6c"}}
+                                             :sha     "1caa519cabed7e316693f470e878ad3487ac04b6"}}
 
  ;; For now, the backend alias only contains metabase/saml20-clj since it
  ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
