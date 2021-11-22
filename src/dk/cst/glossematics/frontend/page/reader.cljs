@@ -220,7 +220,6 @@
   (->> (:graphic (cup/scrape hiccup {:graphic '[:graphic {:xml/id id}]}))
        (mapv (comp facs-id->facs-page #(get % 'id)))))
 
-;; NOTE: :tei-kvs is loaded as a side-effect of the cup/rewrite call!
 (defn set-content!
   "Change the `document` currently displayed in the reader."
   [document]
@@ -228,13 +227,26 @@
           tei              (api/fetch url)
           raw-hiccup       (parse tei)
           facs             (get-facs raw-hiccup)
-          rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)]
+          rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)
+          tei-kvs          (:kvs @state/tei-carousel)
+          missing-count    (- (count facs) (count tei-kvs))
+          placeholder      ["N/A" "[content missing]"]]
     (swap! state/reader assoc
            :i 0
            :document document
            :tei tei
            :hiccup rewritten-hiccup
-           :facs-kvs (pattern/heterostyled facs shuffle))))
+           :facs-kvs (pattern/heterostyled facs shuffle)
+
+           ;; Perhaps a bit confusingly, the value of the :tei-kvs key is set as
+           ;; a side-effect of the cup/rewrite call above. Below, the count of
+           ;; :tei-kvs is compared to the count of the :facs-kvs and placeholder
+           ;; content is inserted for any missing pages. This is done to ensure
+           ;; that the two carousel widgets are able to stay synchronized in
+           ;; situations where the system *doesn't* produce valid TEI content.
+           :tei-kvs (if (not= 0 missing-count)
+                      (concat tei-kvs (repeat missing-count placeholder))
+                      tei-kvs))))
 
 ;; Currently, relies on browser caching to avoid re-fires.
 (defn fetch-document-list!
@@ -271,6 +283,7 @@
           ^{:key k} [:option {:value k}
                      k])]]]
 
+     ;; TODO: support metadata-only documents
      (when (and document-selected? hiccup)
        [:div.reader
         [group/combination
