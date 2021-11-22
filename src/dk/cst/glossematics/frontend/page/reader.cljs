@@ -28,9 +28,12 @@
 ;; TODO: in general: why resp attr used for hand/machine, while hand attr used for people?
 
 (def tei-css
+  "Styles used for TEI documents specifically. They are written in a regular CSS
+  file and then processed to work on the generated HTML."
   (style/prefix-css "tei" (resource/inline "public/css/tei.css")))
 
 (def theme+tei-css
+  "The complete set of styles (widgets and TEI documents)."
   (str css/shadow-style "\n\n/*\n\t === tei.css ===\n*/\n" tei-css))
 
 (defn da-type
@@ -111,18 +114,18 @@
 
 (declare inner-stage)
 
-(defn rewrite-page
-  [page]
-  (cup/rewrite page inner-stage))
+;; Unlike the 'outer-stage', the 'inner-stage' transformations can be safely
+;; memoised since they don't have any side-effects.
+(def rewrite-page
+  (memoize #(cup/rewrite % inner-stage)))
 
-(defn update-content!
+(defn update-tei-carousel!
   "Updates the `carousel-state` when new `kvs` are detected."
   [carousel-state kvs]
   (let [old-kvs (:kvs @carousel-state)]
     (when (not= (map first kvs) (map first old-kvs))
       (reset! carousel-state {:i 0 :kvs kvs}))))
 
-;; TODO: display notes? (currently excluded)
 ;; Fairly complex transformer that restructures sibling-level page content into
 ;; an interactive carousel recap component. The large amount of content captured
 ;; as page content has to be explicitly rewritten in a separate call. Otherwise,
@@ -144,17 +147,28 @@
                            (let [page+notes (concat page notes)]
                              [(str "Side " n " af " pp "; facs. " facs ".")
                               (into [:<>] (map rewrite-page page+notes))]))]
-        (update-content! state/tei-carousel kvs)
+
+        ;; Currently, TEI data is updated on the page by way of a side-effect.
+        ;; I'm unsure if there is a better way to do this.
+        (update-tei-carousel! state/tei-carousel kvs)
         [pattern/carousel state/tei-carousel
          {:aria-label "Facsimile"}]))))
 
 (def default-fn
+  "This function is applied as a final step in every transformation. Each XML
+  tag is prefixed with 'tei-' making it a valid HTML tag name, while xml:lang
+  and xml:id are both converted into the non-namespaced HTML varieties."
   (helpers/default-fn {:prefix    "tei"
                        :attr-kmap {:xml/lang :lang
                                    :xml/id   :id}}))
 
 ;; TODO: investigate possibility of having fewer components wrapped
 (defn shadow-dom-wrapper
+  "Each node is wrapped in a shadow DOM, allowing for an inlined style element
+  and general isolation from the outer document style.
+
+  This mostly preserves the XML structure in the generated HTML, while also
+  allowing for discreet structural changes using <slot>."
   [old-node new-node]
   (let [node-with-css (constantly [:<> [:style theme+tei-css] new-node])]
     (vary-meta old-node assoc :ref (rescope/shadow-ref node-with-css))))
@@ -171,6 +185,8 @@
    :wrapper      shadow-dom-wrapper
    :default      default-fn})
 
+;; Note that this step *cannot* be memoised since the document rendering relies
+;; on side-effects executed inside the 'pages-in-carousel' transformation.
 (def outer-stage
   "Places all TEI pages inside a carousel component in a shadow DOM."
   {:transformers [pages-in-carousel]
@@ -206,6 +222,7 @@
 
 ;; NOTE: :tei-kvs is loaded as a side-effect of the cup/rewrite call!
 (defn set-content!
+  "Change the `document` currently displayed in the reader."
   [document]
   (p/let [url              (api/normalize-url (str "/files/tei/" document))
           tei              (api/fetch url)
@@ -233,9 +250,13 @@
   (let [location*        @state/location
         document?        (= ::document (get-in location* [:data :name]))
         current-document (get-in location* [:path-params :document])
-        {:keys [hiccup tei document] :as reader*} @state/reader]
+        {:keys [hiccup tei document]} @state/reader]
+
+    ;; Uses a side-effect of the rendering function to load new documents.
+    ;; Probably a bad way to do this...
     (when (and document? (not= document current-document))
       (set-content! current-document))
+
     [:<>
      [:h2 current-document]
      [:p
@@ -248,7 +269,7 @@
         (for [[k _] (sort @state/tei-files)]
           ^{:key k} [:option {:value k}
                      k])]]]
-     (when (and document? reader*)
+     (when (and document? hiccup)
        [:div.reader
         [group/combination
          {:vs      [[pattern/carousel state/facs-carousel]
