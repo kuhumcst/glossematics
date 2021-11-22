@@ -17,7 +17,6 @@
             [dk.cst.glossematics.frontend.api :as api]))
 
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
-;; TODO: acc-1992_0005_032_Uldall_1000-final.xml - pbs not captured
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
 ;; TODO: acc-1992_0005_024_Holt_0900-final.xml - error on line 150 at column 25
 ;; TODO: acc-1992_0005_024_Holt_0230-final.xml - note in note?
@@ -103,7 +102,7 @@
                    partitions))))
 
 (defn- fix-rogue-content
-  "In some TEI documents, a <PB> tag doesn't always figure as the first elemnent
+  "In some TEI documents, a <PB> tag doesn't always figure as the first element
   inside the <DIV>, so this helper function ensures that any rogue opening
   section is placed inside the first *real* content section after the <PB>."
   [sections]
@@ -111,6 +110,19 @@
     sections
     (let [[rogue-content pb page] sections]
       (into [pb (concat rogue-content page)] (drop 3 sections)))))
+
+;; e.g. acc-1992_0005_032_Uldall_1000-final.xml
+;;      acc-1992_0005_032_Uldall_0830-tei-final.xml
+(defn- fix-rogue-div
+  "In some TEI documents, there is <DIV> inserted as a containing element inside
+  the document <DIV>. The contents of this div is pulled out and placed inside
+  the parent <DIV>."
+  [divs]
+  (when (= (count divs) 1)
+    (let [div (first divs)]
+      (when-let [[tag attr & content :as rogue-div] (get div 4)]
+        (when (= tag :div)
+          [(into (subvec div 0 4) (concat content (drop 4 divs)))])))))
 
 (declare inner-stage)
 
@@ -137,6 +149,7 @@
     (fn [{:syms [content]}]
       (let [not-notes?   (comp #(not= "notes" %) :type second)
             [divs notes] (split-with not-notes? content)
+            divs         (or (fix-rogue-div divs) divs)
             divs-content (apply concat (map #(subvec % 2) divs))
             pages        (->> (partition-by pb? divs-content)
                               (fix-rogue-content)
@@ -284,6 +297,7 @@
                      k])]]]
 
      ;; TODO: support metadata-only documents
+     ;; TODO: fix TEI source tab not updating reactively
      (when (and document-selected? hiccup)
        [:div.reader
         [group/combination
