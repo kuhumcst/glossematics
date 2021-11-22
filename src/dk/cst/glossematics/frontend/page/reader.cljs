@@ -247,29 +247,31 @@
 
 (defn page
   []
-  (let [location*        @state/location
-        document?        (= ::document (get-in location* [:data :name]))
-        current-document (get-in location* [:path-params :document])
-        {:keys [hiccup tei document]} @state/reader]
+  (let [{:keys [hiccup tei document]} @state/reader
+        location*          @state/location
+        current-document   (get-in location* [:path-params :document])
+        document-selected? (= ::document (get-in location* [:data :name]))
+        new-document?      (not= document current-document)]
 
     ;; Uses a side-effect of the rendering function to load new documents.
     ;; Probably a bad way to do this...
-    (when (and document? (not= document current-document))
+    (when (and document-selected? new-document?)
       (set-content! current-document))
 
     [:<>
      [:h2 current-document]
      [:p
       [:label "TEI-fil: "
-       [:select {:key           current-document
-                 :default-value current-document
-                 :on-change     (fn [e]
-                                  (let [v (.. e -target -value)]
-                                    (rfe/push-state ::document {:document v})))}
+       [:select {:value     (or (and document-selected? document) "")
+                 :on-change (fn [e]
+                              (let [v (.. e -target -value)]
+                                (rfe/push-state ::document {:document v})))}
+        [:option {:value "" :disabled true} "--"]
         (for [[k _] (sort @state/tei-files)]
           ^{:key k} [:option {:value k}
                      k])]]]
-     (when (and document? hiccup)
+
+     (when (and document-selected? hiccup)
        [:div.reader
         [group/combination
          {:vs      [[pattern/carousel state/facs-carousel]
