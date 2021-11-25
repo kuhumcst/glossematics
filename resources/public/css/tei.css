@@ -111,22 +111,24 @@ add[place=above] {
     text-decoration: underline;
 }
 
-/* TODO: docs should preferably only contain a single <div type=notes>... */
+/*  The trailing <notes> of the TEI documents is re-assembled into a single
+    notes container containing all of the child <note> elements. */
 [type=notes] {
     font-style: italic;
     background: #EFEFEF;
     padding: 1ch;
     border: 1px solid lightgrey;
-    border-top: none;
-    border-bottom: none;
 }
 
-[type=notes]:first-of-type {
-    border-top: 1px solid lightgrey;
+[type=notes] note {
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+    margin-left: 8px;
 }
 
-[type=notes]:last-of-type {
-    border-bottom: 1px solid lightgrey;
+[type=notes]  note + note {
+    margin-top: 8px;
 }
 
 note[place]::before {

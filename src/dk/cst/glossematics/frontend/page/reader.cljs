@@ -124,6 +124,36 @@
         (when (= tag :div)
           [(into (subvec div 0 4) (concat content (drop 4 divs)))])))))
 
+(defn- flatten-notes
+  "Given a polymorphic coll of `notes` return a coll of single note elements.
+
+  This function is needed to deal with the messy situation caused by TEI files
+  compiled by hand, where trailing notes are written rather inconsistently."
+  [notes]
+  (mapcat (fn [[tag attr & content :as item]]
+            (case tag
+              :div content
+              :note [item]
+              nil))
+          notes))
+
+(defn- with-target
+  "Return a predicate that returns true if the note is in the target `document`.
+  Note that notes without a specific target document also return true!"
+  [document]
+  (fn [[tag {:keys [target]}]]
+    (if target
+      (= target document)
+      true)))
+
+(defn collect-notes
+  "Put `notes` in a single container, filtering them by `document`."
+  [document notes]
+  (let [notes (->> (flatten-notes notes)
+                   (filter (with-target document)))]
+    (when (not-empty notes)
+      (into [:div {:type "notes"}] notes))))
+
 (declare inner-stage)
 
 ;; Unlike the 'outer-stage', the 'inner-stage' transformations can be safely
@@ -157,7 +187,8 @@
                               (map (partial apply concat)))
             pp           (count pages)
             kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
-                           (let [page+notes (concat page notes)]
+                           (let [notes*     (collect-notes facs notes)
+                                 page+notes (concat page [notes*])]
                              [(str "Side " n " af " pp "; facs. " facs ".")
                               (into [:<>] (map rewrite-page page+notes))]))]
 
