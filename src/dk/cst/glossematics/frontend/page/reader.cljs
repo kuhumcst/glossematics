@@ -186,12 +186,12 @@
                               (partition 2)
                               (map (partial apply concat)))
             pp           (count pages)
+            container    (subvec (first divs) 0 2)
             kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
                            (let [notes*     (collect-notes facs notes)
                                  page+notes (concat page [notes*])]
                              [(str "Side " n " af " pp "; facs. " facs ".")
-                              (into [:<>] (map rewrite-page page+notes))]))]
-
+                              (rewrite-page (into container page+notes))]))]
         ;; Currently, TEI data is updated on the page by way of a side-effect.
         ;; I'm unsure if there is a better way to do this.
         (update-tei-carousel! state/tei-carousel kvs)

@@ -71,6 +71,16 @@ unclear {
     text-decoration: red wavy underline;
 }
 
+unclear[reason=illegible] {
+    text-decoration: none;
+}
+
+/* Otherwise seems to be mostly left empty. This adds some dimensionality. */
+unclear[reason=illegible]::after {
+    content: " ��� ";
+    text-decoration: none;
+}
+
 /* Gaps of missing content. */
 gap {
     display: inline-block;
@@ -98,12 +108,13 @@ add[place=above] {
     font-size: 70%;
 }
 
-/* Assuming letters are written on a typewriter. */
-[type=letter] {
+div {
     font-family: Georgia, serif;
+    font-size: 16px;
 }
 
-[rend=handwritten] {
+[rend=handwritten],
+[resp=hand] {
     font-family: cursive;
 }
 
@@ -114,7 +125,6 @@ add[place=above] {
 /*  The trailing <notes> of the TEI documents is re-assembled into a single
     notes container containing all of the child <note> elements. */
 [type=notes] {
-    font-style: italic;
     background: #EFEFEF;
     padding: 1ch;
     border: 1px solid lightgrey;
@@ -127,7 +137,7 @@ add[place=above] {
     margin-left: 8px;
 }
 
-[type=notes]  note + note {
+[type=notes] note + note {
     margin-top: 8px;
 }
 
@@ -135,6 +145,7 @@ note[place]::before {
     content: attr(data-place);
     margin-right: 1ch;
     text-decoration: underline;
+    font-variant: small-caps;
 }
 
 [type=transcribernote]::before {
