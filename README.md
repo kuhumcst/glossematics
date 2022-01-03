@@ -62,6 +62,17 @@ docker-compose up --build
 docker-compose up -d --build
 ```
 
+#### The systemd unit file
+While `docker-compose` is the actual _process_ used to start the service, automatic startup on boot is facilitated by [systemd](https://en.wikipedia.org/wiki/Systemd).
+
+The `docker/` directory includes the systemd unit file `glossematics.service` used to register the service. This file should be copied to `/etc/systemd/system/glossematics.service` and the relevant services enabled:
+
+```
+systemctl enable docker
+systemctl enable glossematics
+```
+When this is done (assuming the paths in the file are correct), the Glossematics service will start automatically on boot and be managed according to the `docker-compose.yml` specification.
+
 ### Running the backend locally
 The Docker setup is only meant to run in production as it relies on an HTTPS setup using authenticated certificates. For local development, the backend server should be started in the REPL and accessed via [port 8080](http://localhost:8080) (regular HTTP). This is the same port that is proxied in the Docker setup.
 
