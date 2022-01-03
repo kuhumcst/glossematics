@@ -20,10 +20,8 @@
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
 ;; TODO: acc-1992_0005_024_Holt_0900-final.xml - error on line 150 at column 25
 ;; TODO: acc-1992_0005_024_Holt_0230-final.xml - note in note?
-;; TODO: acc-1992_0005_024_Holt_0180-final.xml - multiple notes?
 ;; TODO: acc-1992_0005_024_Holt_0170-final.xml - facs wrong order
 ;; TODO: acc-1992_0005_024_Holt_0530-final.xml - note type=top vs type=above
-;; TODO: acc-1992_0005_024_Holt_1330-final.xml - just div, not div type=notes
 ;; TODO: in general: why resp attr used for hand/machine, while hand attr used for people?
 
 (def tei-css
