@@ -24,7 +24,7 @@
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
            ;kuhumcst/stucco            {:local/root "/Users/rqf595/Code/stucco"}
            kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
-                                             :sha     "6b728e2d964eeeb20c7795bb8d299e33401cce37"}
+                                             :sha     "f2b96835004467628351355a77fc3207a5beb557"}
            kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
                                              :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
            kuhumcst/stucco                  {:git/url "https://github.com/kuhumcst/stucco.git"
