@@ -59,8 +59,23 @@
 
     [debug-view]]])
 
+(defn set-up-navigation!
+  []
+  (rfe/start!
+    (rf/router routes)
+    (fn [{:keys [path] :as m}]
+      (let [old-path (-> @state/location :path)]
+        (reset! state/location m)
+
+        ;; Don't re-fetch prep data on soft reloads, e.g. by shadow-cljs.
+        (when (not= path old-path)
+          (when-let [prep (get-in m [:data :prep])]
+            (prep)))))
+    {:use-fragment false}))
+
 (defn ^:dev/after-load render
   []
+  (set-up-navigation!)                                      ; keep up-to-date
   (rdom/render [shell] (js/document.getElementById "app")))
 
 (defn init!
@@ -73,13 +88,5 @@
         root-style (str/replace-first css/shadow-style ":host" ":root")]
     (set! (.-innerHTML style) root-style)
     (js/document.head.appendChild style))
-
-  (rfe/start!
-    (rf/router routes)
-    (fn [m]
-      (reset! state/location m)
-      (when-let [prep (get-in m [:data :prep])]
-        (prep)))
-    {:use-fragment false})
 
   (render))
