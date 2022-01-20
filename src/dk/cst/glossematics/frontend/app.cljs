@@ -11,12 +11,17 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
             [dk.cst.glossematics.frontend.page.reader :as reader]
+            [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
 (def routes
   [["/app"
     {:name ::main
      :page main/page}]
+   ["/app/encyclopedia/:ref"
+    {:name ::encyclopedia/entry
+     :page encyclopedia/page
+     :prep #(prn 'encyclopedia @state/location)}]
    ["/app/reader"
     {:name ::reader/empty
      :page reader/page

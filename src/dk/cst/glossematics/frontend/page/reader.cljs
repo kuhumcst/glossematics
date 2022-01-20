@@ -13,6 +13,7 @@
             [dk.cst.stucco.group :as group]
             [dk.cst.stucco.document :as document]
             [dk.cst.stucco.util.css :as css]
+            [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]))
 
@@ -52,13 +53,19 @@
       (into [:ul] (for [[tag attr & content] list-items]
                     (into [:li] content))))))
 
+(defn- encyclopedia-href
+  [ref]
+  (rfe/href ::encyclopedia/entry {:ref (if (str/starts-with? ref "#")
+                                         (subs ref 1)
+                                         ref)}))
+
 (def ref-as-anchor
   (cup/->transformer
     '[_ {:ref  ref
          :type ?type} ???]
 
     (fn [{:syms [ref ?type]}]
-      [:a {:href  ref
+      [:a {:href  (encyclopedia-href ref)
            :title (da-type ?type)}
        [:slot]])))
 
