@@ -258,11 +258,8 @@
 
 (defn facs-id->facs-page
   [id]
-  (let [[filename ext] (str/split id #"\.")
-        url (api/normalize-url (str "/files/facsimile/" filename ".jpg"))]
-    [filename
-     [document/illustration {:src url
-                             :alt (str "Illustration of " filename)}]]))
+  (let [url (api/normalize-url (str "/file/" id ".jpg"))]
+    [id [document/illustration {:src url :alt (str "Illustration of " id)}]]))
 
 (defn get-facs
   [hiccup]
@@ -272,7 +269,7 @@
 (defn set-content!
   "Change the `document` currently displayed in the reader."
   [document]
-  (p/let [url              (api/normalize-url (str "/files/tei/" document))
+  (p/let [url              (api/normalize-url (str "/file/" document))
           tei              (api/fetch url)
           raw-hiccup       (parse tei)
           facs             (get-facs raw-hiccup)
@@ -300,7 +297,7 @@
 ;; Currently, relies on browser caching to avoid re-fires.
 (defn fetch-document-list!
   []
-  (p/let [files (api/fetch "/files/tei")]
+  (p/let [files (api/fetch "/files/xml")]
     (->> (for [url files]
            [(last (str/split url #"/")) url])
          (into {})

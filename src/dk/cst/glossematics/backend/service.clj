@@ -8,7 +8,8 @@
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [dk.cst.glossematics.backend.index :as index]
-            [dk.cst.glossematics.backend.files :as files]
+            [dk.cst.glossematics.backend.file :as file]
+            [dk.cst.glossematics.backend.db.bootstrap :refer [bootstrap!]]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
@@ -20,7 +21,7 @@
 (defn glossematics-routes
   "Most of the routing happens on the frontend inside the SPA. The API routes
    are an exception (as well as the SAML routes required for Pedestal SP)."
-  [{:keys [files-dir] :as conf}]
+  [conf]
   (let [redirect-to-spa [(fn [_] {:status  301
                                   :headers {"Location" "/app"}})]
         single-page-app (conj (sp.ic/auth-chain conf :authenticated)
@@ -31,14 +32,14 @@
       ["/app/*" :get single-page-app :route-name ::spa-path]
 
       ;; API routes
-      ["/files/:fmt"
+      ["/files/:extension"
        :get (into (sp.ic/auth-chain conf :authenticated)
-                  (files/files-chain files-dir))
-       :route-name ::dir]
-      ["/files/:fmt/:filename"
-       :get (conj (sp.ic/auth-chain conf :authenticated)
-                  (files/->file-handler files-dir))
-       :route-name ::file]}))
+                  file/file-list-chain)
+       :route-name ::file/list]
+      ["/file/:filename"
+       :get (into (sp.ic/auth-chain conf :authenticated)
+                  file/file-chain)
+       :route-name ::file/file]}))
 
 (defn routes
   [sp-conf]
@@ -81,12 +82,14 @@
 (defn start []
   (when (not @sp-conf)
     (load-sp-conf!))
+  (bootstrap! @sp-conf)
   (let [service-map (->service-map @sp-conf)]
     (http/start (http/create-server service-map))))
 
 (defn start-dev []
   (when (not @sp-conf)
     (load-sp-conf!))
+  (bootstrap! @sp-conf)
   (reset! server (http/start (http/create-server (assoc (->service-map @sp-conf)
                                                    ::http/join? false)))))
 

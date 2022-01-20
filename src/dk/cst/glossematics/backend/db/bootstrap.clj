@@ -1,9 +1,48 @@
 (ns dk.cst.glossematics.backend.db.bootstrap
-  (:require [dk.cst.cuphic :as cup]
-            [dk.cst.cuphic.xml :as xml]
-            [clojure.string :as str]
-            [clojure.java.io :as io])
+  (:require [clojure.string :as str]
+            [clojure.java.io :as io]
+            [asami.core :as d]
+            [dk.cst.cuphic :as cup]
+            [dk.cst.cuphic.xml :as xml])
   (:import [java.io File]))
+
+(defonce db-uri
+  (doto "asami:mem://glossematics"
+    (d/create-database)))
+
+(defonce conn
+  (d/connect db-uri))
+
+(defn file-entities
+  "Recursively list all file entities found in `dir`, ignoring directories."
+  [dir]
+  (->> (file-seq (io/file dir))
+       (remove #(.isDirectory ^File %))
+       (map (fn [file]
+              (let [filename  (.getName ^File file)
+                    extension (last (str/split filename #"\."))
+                    path      (.getPath ^File file)]
+                {:file/name      filename
+                 :file/extension extension
+                 :file/path      path})))))
+
+(defn bootstrap!
+  "Asynchronously bootstrap an in-memory Asami database from a `conf`."
+  [{:keys [files-dir] :as conf}]
+  (d/transact conn {:tx-data (file-entities files-dir)}))
+
+(comment
+  (file-entities "/Users/rqf595/Desktop/Data-FINAL")
+  (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
+  (bootstrap! "/Users/rqf595/Desktop/Data-FINAL")
+
+  (count (d/q '[:find ?name ?path
+                :where
+                [?e :file/extension "tif"]
+                [?e :file/name ?name]
+                [?e :file/path ?path]]
+              (d/db conn)))
+  #_.)
 
 (def tei-files
   (let [dir (io/file "/Users/rqf595/Desktop/glossematics-files/tei")]
@@ -66,7 +105,7 @@
 (defn single-triple
   [result filename rel k]
   (when-let [v (single-val result k)]
-    (when true #_(not (blank-ref? v)) ;TODO don't include blanks
+    (when true #_(not (blank-ref? v))                       ;TODO don't include blanks
       [filename rel v])))
 
 (defn document-triples
