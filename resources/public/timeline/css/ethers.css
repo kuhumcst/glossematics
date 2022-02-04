@@ -67,6 +67,7 @@
 
 /*-------------------------------- DATE LABELS --------------------------------*/
 .timeline-date-label {
+  font-family: PoiretOne, Helvetica, sans-serif;
   position: absolute;
   border: solid #aaa;
   color: #aaa;
@@ -111,7 +112,21 @@
   
 /*--------------------------------- TIMELINE-------------------------*/
 .timeline-ether-bg{width:100%; height:100%;}
+.timeline-container { background-color:#333;}
 #timeline-band-0 .timeline-ether-bg{background-color:#333}
 #timeline-band-1 .timeline-ether-bg{background-color:#555}
 #timeline-band-2 .timeline-ether-bg{background-color:#ccc}
 #timeline-band-3 .timeline-ether-bg{background-color:#aaa}
+.timeline-event-icon > img {
+    height: 12px;
+    padding: 2px;
+    background: #DDD;
+    border-radius: 12px;
+    margin: 6px 0 0 -8px;
+}
+.timeline-event-label {
+    font-family: Helvetica, sans-serif;
+    font-weight: lighter;
+    font-size: 16px;
+    line-height: 32px;
+}

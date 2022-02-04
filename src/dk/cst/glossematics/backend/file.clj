@@ -16,12 +16,17 @@
 (def one-day-cache
   "private, max-age=86400")
 
-(def event-type->color
-  {:life       "#EECCEE"
-   :teaching   "#CCDDEE"
-   :lecture    "#CCFFCC"
-   :travel     "#FFFFBB"
-   :networking "#FFBBBB"
+(def event-styling
+  {:life       {:icon  "/images/heart-2-fill.svg"
+                :color "#EECCEE"}
+   :teaching   {:icon  "/images/book-fill.svg"
+                :color "#CCDDEE"}
+   :lecture    {:icon  "/images/book-open-line.svg"
+                :color "#CCFFCC"}
+   :travel     {:icon  "/images/earth-fill.svg"
+                :color "#FFFFBB"}
+   :networking {:icon  "/images/group-fill.svg"
+                :color "#FFBBBB"}
    #_#_nil "#FFDDBB"})
 
 (defn timeline-handler
@@ -36,11 +41,13 @@
                            [?e :event/end ?end]]
                          (d/db conn))
                     (map (fn [[?type ?title ?description ?start ?end]]
-                           {:color       (event-type->color ?type)
-                            :title       ?title
-                            :description ?description
-                            :start       ?start
-                            :end         ?end}))
+                           (let [{:keys [color icon]} (event-styling ?type)]
+                             {:color       color
+                              :icon        icon
+                              :title       ?title
+                              :description ?description
+                              :start       ?start
+                              :end         ?end})))
                     (map #(if (nil? (:end %))
                             (dissoc % :end)
                             (assoc % :isDuration true))))]
