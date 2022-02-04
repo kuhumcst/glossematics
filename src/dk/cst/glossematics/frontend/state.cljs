@@ -24,6 +24,9 @@
 (defonce location
   (r/cursor db [:location]))
 
+(defonce timeline
+  (r/cursor db [:timeline]))
+
 (defonce tei-files
   (r/cursor db [:files :tei]))
 

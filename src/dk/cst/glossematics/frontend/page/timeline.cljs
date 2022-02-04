@@ -3,14 +3,17 @@
             [shadow.resource :as sr]
             [reagent.core :as r]
             [dk.cst.glossematics.frontend.page.timeline.data :as tld]
-            [dk.cst.glossematics.frontend.timeline :as timeline :refer [timeline]]))
+            [dk.cst.glossematics.frontend.timeline :as timeline :refer [timeline]]
+            [kitchen-async.promise :as p]
+            [dk.cst.glossematics.frontend.api :as api]
+            [dk.cst.glossematics.frontend.state :as state]))
 
 (def hjemslev-events
   (tld/load-timeline))
 
 (def hjemslev-bands
   {:primary  {:width        "80%"
-              :intervalUnit :month}
+              :intervalUnit :year}
    :overview {:width        "20%"
               :intervalUnit :decade}
    :common   {:intervalPixels 400
@@ -99,17 +102,25 @@
   (r/atom {:events jfk-events
            :bands  jfk-bands}))
 
+;; Currently, relies on browser caching to avoid re-fires.
+(defn fetch-timeline-data!
+  []
+  (p/let [events (api/fetch "/timeline")]
+    (reset! state/timeline {:events events
+                            :bands  hjemslev-bands})))
+
 (defn page
   []
-  [:<>
-   [:form {:style {:padding       20
-                   :margin-bottom -40}}
-    [:p [:label [:strong "Primary: "] [interval-select hjelmslev-tl-state :primary]]]
-    [:p [:label [:strong "Overview: "] [interval-select hjelmslev-tl-state :overview]]]]
-   [:div {:style {:padding "20px"}}
-    [timeline {:style {:height 400}}
-     hjelmslev-tl-state]]
+  (when (not-empty @state/timeline)
+    [:<>
+     [:form {:style {:padding       20
+                     :margin-bottom -40}}
+      [:p [:label [:strong "Primary: "] [interval-select state/timeline :primary]]]
+      [:p [:label [:strong "Overview: "] [interval-select state/timeline :overview]]]]
+     [:div {:style {:padding "20px"}}
+      [timeline {:style {:height 400}}
+       state/timeline]]
 
-   [:div {:style {:padding "20px"}}
-    [timeline {:style {:height 350}}
-     jfk-tl-state]]])
+     #_[:div {:style {:padding "20px"}}
+        [timeline {:style {:height 350}}
+         jfk-tl-state]]]))
