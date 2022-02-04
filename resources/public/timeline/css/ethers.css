@@ -124,6 +124,21 @@
     border-radius: 12px;
     margin: 6px 0 0 -8px;
 }
+.timeline-event-icon > img[src="/images/heart-2-fill.svg"] {
+    background: #EECCEE;
+}
+.timeline-event-icon > img[src="/images/book-fill.svg"] {
+    background: #CCDDEE;
+}
+.timeline-event-icon > img[src="/images/book-open-line.svg"] {
+    background: #CCFFCC;
+}
+.timeline-event-icon > img[src="/images/earth-fill.svg"] {
+    background: #FFFFBB;
+}
+.timeline-event-icon > img[src="/images/group-fill.svg"] {
+    background: #FFBBBB;
+}
 .timeline-event-label {
     font-family: Helvetica, sans-serif;
     font-weight: lighter;
