@@ -245,3 +245,5 @@ temp/
 package-lock.json
 *.DS_store
 *.iml
+
+~*.xlsx

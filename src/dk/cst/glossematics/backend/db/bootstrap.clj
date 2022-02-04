@@ -2,9 +2,81 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [asami.core :as d]
+            [dk.ative.docjure.spreadsheet :as xlsx]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml])
-  (:import [java.io File]))
+  (:import [java.io File]
+           [java.text DateFormat]
+           [java.util Locale]))
+
+(def chronology-columns
+  {:A :event/start
+   :B :event/restored-start?
+   :C :event/end
+   :D :event/restored-end?
+   :E :event/type
+   :F :event/title
+   :G :event/description
+   :H :event/title-more
+   :I :event/?1
+   :J :location/country
+   :K :location/city
+   :L :location/institution
+   :M :event/?2
+   #_#_:N :event/title                                      ; duplicate column
+   :O :event/?3
+   :P :event/description-more
+   :Q :event/people
+   :R :event/source})
+
+(def chronology-import
+  #{:event/start
+    :event/restored-start?
+    :event/end
+    :event/restored-end?
+    :event/type
+    :event/title
+    :event/description
+    :location/country
+    :location/city
+    :location/institution
+    :event/people})
+
+(def event-type-longform
+  {"L" :life
+   "U" :teaching
+   "F" :lecture
+   "R" :travel
+   "N" :networking})
+
+(def danish-df
+  (DateFormat/getDateInstance DateFormat/SHORT (Locale. "da")))
+
+(defn parse-date
+  [d]
+  (if (string? d)
+    (.parse danish-df (str/replace d #"-" "."))
+    d))
+
+(defn normalize-chronology-data
+  [event]
+  (-> event
+      (update-vals #(if (string? %) (str/trim %) %))
+      (update :event/type event-type-longform)
+      (update :event/restored-start? (comp boolean not-empty))
+      (update :event/restored-end? (comp boolean not-empty))
+      (update :event/start parse-date)
+      (update :event/end parse-date)))
+
+(defn timeline-entities
+  []
+  (->> (io/file (io/resource "Reconstructed Hjelmslev kronologi 250122.xlsx"))
+       (xlsx/load-workbook)
+       (xlsx/select-sheet "Ark1")
+       (xlsx/select-columns chronology-columns)
+       (rest)                                             ; skip title
+       (map normalize-chronology-data)
+       (map #(select-keys % chronology-import))))
 
 (defonce db-uri
   (doto "asami:mem://glossematics"
@@ -29,12 +101,22 @@
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
   [{:keys [files-dir] :as conf}]
-  (d/transact conn {:tx-data (file-entities files-dir)}))
+  (d/transact conn {:tx-data (file-entities files-dir)})
+  (d/transact conn {:tx-data (timeline-entities)}))
 
 (comment
   (file-entities "/Users/rqf595/Desktop/Data-FINAL")
   (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
-  (bootstrap! "/Users/rqf595/Desktop/Data-FINAL")
+  (bootstrap! {:files-dir "/Users/rqf595/Desktop/Data-FINAL"})
+
+  (d/q '[:find ?type ?title ?description ?start ?end
+         :where
+         [?e :event/type ?type]
+         [?e :event/title ?title]
+         [?e :event/description ?description]
+         [?e :event/start ?start]
+         [?e :event/end ?end]]
+       (d/db conn))
 
   (count (d/q '[:find ?name ?path
                 :where
