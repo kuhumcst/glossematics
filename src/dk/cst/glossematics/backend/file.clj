@@ -2,18 +2,42 @@
   "Basic endpoint for retrieving non-public, static files (TEI and facsimile)."
   (:require [clojure.string :as str]
             [io.pedestal.http.content-negotiation :refer [negotiate-content]]
+            [io.pedestal.http.route :refer [path-params-decoder]]
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
             [hiccup.core :as hiccup]
             [asami.core :as d]
-            ;; TODO: attach this in an interceptor instead, reducing decoupling?
-            [dk.cst.glossematics.backend.db.bootstrap :refer [conn]]))
+            [dk.cst.glossematics.backend.db.bootstrap :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
 
 (def one-month-cache
   "private, max-age=2592000")
 
 (def one-day-cache
   "private, max-age=86400")
+
+(defn timeline-handler
+  "A handler to serve individual files."
+  [{:as request}]
+  (let [events (->> (d/q '[:find ?type ?title ?description ?start ?end
+                           :where
+                           [?e :event/type ?type]
+                           [?e :event/title ?title]
+                           [?e :event/start ?start]
+                           (optional [?e :event/description ?description])
+                           (optional [?e :event/end ?end])]
+                         (d/db conn))
+                    (map (fn [[?type ?title ?description ?start ?end]]
+                           (cond-> {:type        ?type
+                                    :title       ?title
+                                    :description ?description
+                                    :start       ?start}
+                             ?end (assoc
+                                    :isDuration true
+                                    :end ?end)))))]
+    {:status  200
+     :body    (transito/write-str events)
+     :headers {"Content-Type"  "application/transit+json"
+               "Cache-Control" one-month-cache}}))
 
 (defn file-handler
   "A handler to serve individual files."
@@ -80,11 +104,15 @@
                              "Content-Type" content-type
                              "Cache-Control" one-day-cache))))})
 
+
+(def timeline-chain
+  [timeline-handler])
+
 (def file-list-chain
   [(negotiate-content (keys content-type->body-fn))
-   io.pedestal.http.route/path-params-decoder
+   path-params-decoder
    file-list-ic])
 
 (def file-chain
-  [io.pedestal.http.route/path-params-decoder
+  [path-params-decoder
    file-handler])

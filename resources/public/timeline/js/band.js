@@ -541,8 +541,9 @@ Timeline._Band.prototype._onMouseUp = function(elmt, evt, target) {
     }
     this._keyboardInput.focus();
     this._bounceBack();
-    
-    return this._cancelEvent(evt);
+
+    // Commented out to allow event to bubble up to reagent :on-mouse-up handler
+    /*return this._cancelEvent(evt);*/
 };
 
 Timeline._Band.prototype._onMouseOut = function(elmt, evt, target) {

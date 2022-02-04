@@ -148,3 +148,16 @@ shadow-cljs release app
 ```
 
 ... and making sure that `dk.cst.glossematics.backend.index` is reloaded in the REPL.
+
+Development notes
+-----------------
+### Timeline widget
+The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline.cljs).
+
+However, the JavaScript source is still quite huge and written in a fairly incoherent style. For this reason, the visual style of the timeline must be handled by editing primarily
+
+* [ethers.css](/resources/public/timeline/css/ethers.css)
+* [themes.js](/resources/public/timeline/js/themes.js)
+* [ether-painters.js](/resources/public/timeline/js/ether-painters.js)
+
+but also various other JS/CSS files depending on what needs to be changed.

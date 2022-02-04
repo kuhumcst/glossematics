@@ -32,6 +32,10 @@
       ["/app/*" :get single-page-app :route-name ::spa-path]
 
       ;; API routes
+      ["/timeline"
+       :get (into (sp.ic/auth-chain conf :authenticated)
+                  file/timeline-chain)
+       :route-name ::file/timeline]
       ["/files/:extension"
        :get (into (sp.ic/auth-chain conf :authenticated)
                   file/file-list-chain)

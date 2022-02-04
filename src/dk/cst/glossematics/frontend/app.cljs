@@ -32,7 +32,8 @@
      :prep reader/fetch-document-list!}]
    ["/app/timeline"
     {:name ::timeline
-     :page timeline/page}]])
+     :page timeline/page
+     :prep timeline/fetch-timeline-data!}]])
 
 (defn debug-view
   []

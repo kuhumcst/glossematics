@@ -566,7 +566,7 @@ Timeline.EtherHighlight = function(timeline, band, theme, backgroundLayer) {
         var startPixel = Math.round(band.dateToPixelOffset(startDate));
         var endPixel = Math.round(band.dateToPixelOffset(endDate));
         var length = Math.max(endPixel - startPixel, 3);
-        var totalWidth = band.getViewWidth() - 4;
+        var totalWidth = band.getViewWidth();
         if (horizontal) {
             this._highlightDiv.style.left = startPixel + "px";
             this._highlightDiv.style.width = length + "px";
