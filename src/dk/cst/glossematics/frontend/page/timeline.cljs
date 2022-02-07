@@ -2,23 +2,19 @@
   (:require [clojure.string :as str]
             [shadow.resource :as sr]
             [reagent.core :as r]
-            [dk.cst.glossematics.frontend.page.timeline.data :as tld]
             [dk.cst.glossematics.frontend.timeline :as timeline :refer [timeline]]
             [kitchen-async.promise :as p]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.state :as state]))
 
-(def hjemslev-events
-  (tld/load-timeline))
-
-(def hjemslev-bands
+(def default-bands
   {:primary  {:width        "80%"
               :intervalUnit :year}
    :overview {:width        "20%"
               :intervalUnit :decade}
    :common   {:intervalPixels 400
               :timeZone       1
-              :date           "1952-06-01"}})
+              :date           "1950-03-01"}})
 
 (defonce jfk-events
   (as-> (sr/inline "public/timeline/examples/jfk/jfk.xml") $
@@ -94,32 +90,51 @@
                :key   k}
       (str/capitalize str-k)])])
 
-(defonce hjelmslev-tl-state
-  (r/atom {:events hjemslev-events
-           :bands  hjemslev-bands}))
-
 (defonce jfk-tl-state
   (r/atom {:events jfk-events
            :bands  jfk-bands}))
 
+(def event-styling
+  {:life       {:icon  "/images/heart-2-fill.svg"
+                :color "#EECCEE"}
+   :teaching   {:icon  "/images/book-fill.svg"
+                :color "#CCDDEE"}
+   :lecture    {:icon  "/images/book-open-line.svg"
+                :color "#CCFFCC"}
+   :travel     {:icon  "/images/earth-fill.svg"
+                :color "#FFFFBB"}
+   :networking {:icon  "/images/group-fill.svg"
+                :color "#FFBBBB"}
+   nil         {:color "white"}})
+
+(defn- add-styling
+  "Set icon and color for a timeline `event` based on its :type."
+  [event]
+  (let [{:keys [color icon]} (event-styling (:type event))]
+    (assoc (dissoc event :type)
+      :color color
+      :icon icon)))
+
 ;; Currently, relies on browser caching to avoid re-fires.
 (defn fetch-timeline-data!
   []
-  (p/let [events (api/fetch "/timeline")]
-    (reset! state/timeline {:events events
-                            :bands  hjemslev-bands})))
+  (p/let [events (api/fetch "/timeline")
+          zones  (timeline/find-hotzones :month events)]
+    (reset! state/timeline {:events (map add-styling events)
+                            :bands  (-> default-bands
+                                        (assoc-in [:primary :zones] zones)
+                                        (assoc-in [:overview :zones] zones))})))
 
 (defn page
   []
   (when (not-empty @state/timeline)
     [:<>
      [:form {:style {:padding       20
-                     :margin-bottom -40}}
+                     :margin-bottom -20}}
       [:p [:label [:strong "Primary: "] [interval-select state/timeline :primary]]]
       [:p [:label [:strong "Overview: "] [interval-select state/timeline :overview]]]]
-     [:div {:style {:padding "20px"}}
-      [timeline {:style {:height 400}}
-       state/timeline]]
+     [timeline {:style {:height 400}}
+      state/timeline]
 
      #_[:div {:style {:padding "20px"}}
         [timeline {:style {:height 350}}

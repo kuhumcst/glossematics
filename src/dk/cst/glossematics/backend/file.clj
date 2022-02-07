@@ -7,27 +7,13 @@
             [com.wsscode.transito :as transito]
             [hiccup.core :as hiccup]
             [asami.core :as d]
-            ;; TODO: attach this in an interceptor instead, reducing decoupling?
-            [dk.cst.glossematics.backend.db.bootstrap :refer [conn]]))
+            [dk.cst.glossematics.backend.db.bootstrap :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
 
 (def one-month-cache
   "private, max-age=2592000")
 
 (def one-day-cache
   "private, max-age=86400")
-
-(def event-styling
-  {:life       {:icon  "/images/heart-2-fill.svg"
-                :color "#EECCEE"}
-   :teaching   {:icon  "/images/book-fill.svg"
-                :color "#CCDDEE"}
-   :lecture    {:icon  "/images/book-open-line.svg"
-                :color "#CCFFCC"}
-   :travel     {:icon  "/images/earth-fill.svg"
-                :color "#FFFFBB"}
-   :networking {:icon  "/images/group-fill.svg"
-                :color "#FFBBBB"}
-   #_#_nil "#FFDDBB"})
 
 (defn timeline-handler
   "A handler to serve individual files."
@@ -36,21 +22,18 @@
                            :where
                            [?e :event/type ?type]
                            [?e :event/title ?title]
-                           [?e :event/description ?description]
                            [?e :event/start ?start]
-                           [?e :event/end ?end]]
+                           (optional [?e :event/description ?description])
+                           (optional [?e :event/end ?end])]
                          (d/db conn))
                     (map (fn [[?type ?title ?description ?start ?end]]
-                           (let [{:keys [color icon]} (event-styling ?type)]
-                             {:color       color
-                              :icon        icon
-                              :title       ?title
-                              :description ?description
-                              :start       ?start
-                              :end         ?end})))
-                    (map #(if (:end %)
-                            (assoc % :isDuration true)
-                            (dissoc % :end))))]
+                           (cond-> {:type        ?type
+                                    :title       ?title
+                                    :description ?description
+                                    :start       ?start}
+                             ?end (assoc
+                                    :isDuration true
+                                    :end ?end)))))]
     {:status  200
      :body    (transito/write-str events)
      :headers {"Content-Type"  "application/transit+json"

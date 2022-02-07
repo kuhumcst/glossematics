@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [asami.core :as d]
-            [dk.ative.docjure.spreadsheet :as xlsx]
+            [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml])
   (:import [java.io File]
@@ -79,10 +79,10 @@
 (defn timeline-entities
   []
   (->> (io/file (io/resource "Reconstructed Hjelmslev kronologi 250122.xlsx"))
-       (xlsx/load-workbook)
-       (xlsx/select-sheet "Ark1")
-       (xlsx/select-columns chronology-columns)
-       (rest)                                             ; skip title
+       (xl/load-workbook)
+       (xl/select-sheet "Ark1")
+       (xl/select-columns chronology-columns)
+       (rest)                                               ; skip title
        (map normalize-chronology-data)
        (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
@@ -117,15 +117,6 @@
   (file-entities "/Users/rqf595/Desktop/Data-FINAL")
   (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Data-FINAL"})
-
-  (d/q '[:find ?type ?title ?description ?start ?end
-         :where
-         [?e :event/type ?type]
-         [?e :event/title ?title]
-         [?e :event/description ?description]
-         [?e :event/start ?start]
-         [?e :event/end ?end]]
-       (d/db conn))
 
   (count (d/q '[:find ?name ?path
                 :where
