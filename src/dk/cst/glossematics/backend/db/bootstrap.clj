@@ -68,6 +68,14 @@
       (update :event/start parse-date)
       (update :event/end parse-date)))
 
+(defn- remove-nil-vals
+  "Remove kvs from `m` where v is nil.
+
+  Asami treats a nil v different from an absent v in an input entity. The former
+  comes out as :tg/nil in queries while the latter comes out as a true nil."
+  [m]
+  (into {} (remove (comp nil? second) m)))
+
 (defn timeline-entities
   []
   (->> (io/file (io/resource "Reconstructed Hjelmslev kronologi 250122.xlsx"))
@@ -76,6 +84,7 @@
        (xlsx/select-columns chronology-columns)
        (rest)                                             ; skip title
        (map normalize-chronology-data)
+       (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
 
 (defonce db-uri

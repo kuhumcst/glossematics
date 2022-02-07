@@ -48,9 +48,9 @@
                               :description ?description
                               :start       ?start
                               :end         ?end})))
-                    (map #(if (= :tg/nil (:end %))
-                            (dissoc % :end)
-                            (assoc % :isDuration true))))]
+                    (map #(if (:end %)
+                            (assoc % :isDuration true)
+                            (dissoc % :end))))]
     {:status  200
      :body    (transito/write-str events)
      :headers {"Content-Type"  "application/transit+json"
