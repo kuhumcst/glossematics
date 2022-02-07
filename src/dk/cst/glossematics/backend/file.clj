@@ -48,7 +48,7 @@
                               :description ?description
                               :start       ?start
                               :end         ?end})))
-                    (map #(if (nil? (:end %))
+                    (map #(if (= :tg/nil (:end %))
                             (dissoc % :end)
                             (assoc % :isDuration true))))]
     {:status  200

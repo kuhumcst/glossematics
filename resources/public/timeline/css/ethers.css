@@ -117,12 +117,14 @@
 #timeline-band-1 .timeline-ether-bg{background-color:#555}
 #timeline-band-2 .timeline-ether-bg{background-color:#ccc}
 #timeline-band-3 .timeline-ether-bg{background-color:#aaa}
+
+/*  16*16 px icon dimensions.
+    Must be aligned with dimensions set in themes.js */
 .timeline-event-icon > img {
-    height: 12px;
-    padding: 2px;
+    height: 10px;
+    padding: 3px;
     background: #DDD;
-    border-radius: 12px;
-    margin: 6px 0 0 -8px;
+    border-radius: 8px;
 }
 .timeline-event-icon > img[src="/images/heart-2-fill.svg"] {
     background: #EECCEE;
@@ -143,5 +145,5 @@
     font-family: Helvetica, sans-serif;
     font-weight: lighter;
     font-size: 16px;
-    line-height: 32px;
+    line-height: 24px;
 }

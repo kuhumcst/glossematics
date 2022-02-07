@@ -31,7 +31,7 @@
   [{:keys [isDuration durationEvent title start] :as event}]
   (let [date     (js/Date. start)
         ;; TODO: figure out how :instant field should be properly handled
-        defaults {:instant true #_(not (or isDuration durationEvent))
+        defaults {:instant (not (or isDuration durationEvent))
                   :caption (str (.toLocaleDateString date) ": " title)}
         date-ks  #{:start :end :latestStart :earliestEnd}
         dates    (->> (filter (comp date-ks first) event)
