@@ -49,7 +49,7 @@ Timeline.ClassicTheme._Impl = function() {
         //    "#AAA"
         ],
      //   highlightColor:     "white",
-        highlightOpacity:   50,
+        highlightOpacity:   20,
         interval: {
             line: {
                 show:       true,
@@ -113,9 +113,9 @@ Timeline.ClassicTheme._Impl = function() {
           */
         },
         overviewTrack: {
-                  offset: 4, // px -- top margin above tapes
-              tickHeight:  4, // px
-                  height:  4, // px
+                  offset: 8, // px -- top margin above tapes
+              tickHeight:  2, // px
+                  height:  2, // px
                      gap:  2, // px
          autoWidthMargin:  4 // This attribute is only used if autoWidth (see above) is true.
         },
