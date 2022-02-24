@@ -1,0 +1,26 @@
+/* === COMBINATION === */
+
+.combination {
+    display: grid;
+}
+
+.combination--resize {
+    user-select: none;
+    -webkit-user-select: none; /* Safari support. */
+    cursor: col-resize;
+}
+
+.combination__separator {
+    transition: var(--transition);
+    cursor: col-resize;
+    background-color: black;
+    background-clip: content-box; /* stops background bleeding into border. */
+    border-radius: var(--grid-8);
+    border: 4px solid transparent;
+    opacity: 0;
+}
+
+.combination__separator:hover,
+.combination__separator--resize {
+    opacity: 0.1;
+}

@@ -1,0 +1,280 @@
+/* === TABS === */
+
+.tab-list {
+    display: flex;
+    height: 36px; /* TODO: calculate dynamically? */
+
+    transition: var(--transition);
+
+    border: var(--transparent-border);
+    border-bottom: var(--border);
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+}
+
+.tab-list--drag-over {
+     background: var(--background);
+     border: var(--inactive-border);
+     border-bottom: var(--border);
+     box-shadow:
+         inset 8px 0px 16px -8px rgba(0,0,0,0.1),
+         inset -8px 0px 16px -8px rgba(0,0,0,0.1),
+         inset 0px -8px 16px -8px rgba(0,0,0,0.1);
+}
+
+.tab-list:empty {
+    background: var(--background);
+    border-radius: var(--border-radius);
+    border: var(--inactive-border);
+}
+
+.tab {
+    white-space: nowrap;
+    overflow: hidden; /* Also fixes internal drop area when dragging. */
+    text-overflow: ellipsis;
+    transition: var(--transition);
+    cursor: grab;
+    color: var(--color);
+    font-size: var(--font-size);
+    font-family: var(--font-family-heading);
+    padding: var(--padding) var(--padding-xl);
+    display: inline-block;
+    background: var(--background);
+    filter: var(--inactive-filter);
+    box-shadow:
+        inset -8px 0px 8px -8px rgba(0,0,0,0.4),
+        inset 0px -8px 8px -8px rgba(0,0,0,0.2);
+    border: var(--border);
+    border-right: none;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+
+    /* Cover tab-list borders. */
+    margin-bottom: calc(0px - var(--border-width));
+    margin-top: calc(0px - var(--border-width));
+}
+
+/* Cover tab-list borders. */
+.tab:first-child {
+    margin-left: calc(0px - var(--border-width));
+}
+.tab:last-child {
+    margin-right: calc(0px - var(--border-width));
+}
+
+.tab--drag {
+    pointer-events: none; /* Ignore certain strange hover events. */
+    transition:
+        var(--transition),
+        color 0s; /* Just looks better. */
+    border-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 0;
+    color: transparent;
+}
+
+/* Shouldn't transition at the end of tab-list. */
+.tab:last-child.tab--drag {
+    transition: all 0s;
+}
+
+/* TODO: doesn't seem relevant any longer, remove? */
+/* Fixes issue with border... somehow! */
+.tab:first-child:last-child.tab--drag {
+    border: none;
+}
+
+.tab[aria-selected="true"] ~ .tab {
+    box-shadow:
+        inset 8px 0px 8px -8px rgba(0,0,0,0.4),
+        inset 0px -8px 8px -8px rgba(0,0,0,0.2);
+}
+
+.tab:first-child {
+    border-top-left-radius: var(--border-radius);
+}
+
+.tab:last-child {
+    border-top-right-radius: var(--border-radius);
+    border-right: var(--border);
+}
+
+/* Keeping the outline (the default behaviour) sucks. */
+.tab:active {
+    outline: none;
+}
+
+/* :not(.tab-list--drag-parent) fixes Chrome :hover on adjacent element. */
+.tab-list:not(.tab-list--drag-parent) > .tab:hover,
+.tab:focus {
+    filter: var(--inactive-filter-focus);
+
+    /* Fix missing outline border on infixed labels. */
+    z-index: 1;
+}
+
+.tab[aria-selected="true"],
+.tab-list:not(.tab-list--drag-parent) > .tab[aria-selected="true"]:hover {
+    background: var(--background);
+    filter: var(--filter);
+    box-shadow: none;
+
+    /* Extra padding making up for missing border. */
+    border-bottom: none;
+    padding-bottom: calc(var(--padding) + var(--border-width));
+}
+
+.tab-panel {
+    background: var(--background);
+    padding: var(--padding);
+    border: var(--border);
+    border-radius:  var(--border-radius);
+}
+
+/* The visual merging of tab-list and tab-panel is only based on placement. */
+.tab-list + .tab-panel {
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+
+
+/* === CAROUSEL === */
+
+.slide-picker {
+    display: flex;
+    min-height: var(--grid-16);
+    justify-content: center;
+    align-items: center;
+    margin-left: var(--grid-8);
+}
+
+.slide-picker__dot {
+    transition: var(--transition);
+    cursor: pointer;
+    height: var(--grid-12);
+    width: var(--grid-12);
+    border-radius: 50%;
+    background: var(--color);
+    filter: opacity(0.5);
+    display: inline-block;
+}
+
+.slide-picker__dot:hover {
+    filter: opacity(1);
+}
+
+.slide-picker__dot[aria-selected=true] {
+    cursor: default;
+    height: var(--grid-16);
+    width: var(--grid-16);
+    filter: opacity(1);
+}
+
+.slide-picker__dot + .slide-picker__dot {
+    margin-left: var(--margin);
+}
+
+.carousel {
+    display: flex;
+    justify-content: center;
+}
+
+.carousel__slide {
+    transition: var(--transition);
+    flex-grow: 1;
+    padding: var(--padding-l);
+    background: var(--background);
+    border: var(--border);
+    border-radius: var(--border-radius);
+}
+
+.carousel__slide-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: var(--margin);
+}
+
+.carousel__slide-label {
+    color: var(--color);
+    font-family: var(--font-family-metadata);
+    font-size: var(--grid-12);
+}
+
+/* Used in lieu of header border style as it allows for alpha effects. */
+.carousel__slide-separator {
+    height: 1px;
+    width: 100%;
+    background: var(--color);
+    filter: opacity(0.25);
+    margin-bottom: var(--margin-l);
+}
+
+/* TODO: remove 1px invisible border */
+button.carousel__select {
+    min-width: 0; /* Dummy value to allow for transitions. */
+    margin: var(--grid-12) 0 var(--grid-12) 0;
+    padding: 0;
+    transition: var(--transition);
+    background: var(--background);
+    filter: var(--inactive-filter);
+    border: var(--border);
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    border-right: none; /* Only before visible slides. */
+    opacity: 0;
+    box-shadow: inset -4px 0px 8px 0px rgba(0,0,0,0.15);
+}
+
+/* Removes the left border instead of the right. */
+.carousel__slide ~ button.carousel__select {
+    border: var(--border);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    border-left: none;
+    box-shadow: inset 4px 0px 8px 0px rgba(0,0,0,0.15);
+}
+
+button.carousel__select[tabindex="0"] {
+    min-width: var(--grid-16);
+    opacity: 1;
+    cursor: pointer;
+}
+
+button.carousel__select[tabindex="0"]:hover {
+    margin: var(--grid-8) 0 var(--grid-8) 0;
+}
+
+button.carousel__select:hover,
+button.carousel__select:focus {
+    cursor: click;
+    filter: var(--inactive-filter-focus);
+}
+
+
+
+/* === LENS === */
+
+.code-lens {
+    display: block;
+    overflow: auto;
+    background: var(--background);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    padding: var(--padding);
+    font-size: var(--font-size);
+}
+
+.code-lens--empty {
+    display: inline-block;
+    color: var(--inactive-color);
+}
+
+.code-lens__meta {
+    color: darkblue; /* TODO: theme it? */
+    background: #EEEEFF; /* TODO: theme it? */
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-s);
+    font-style: italic;
+    margin-bottom: var(--margin);
+}

@@ -1,0 +1,57 @@
+:root {
+    /* Defaults. */
+    --background: #FFF;
+    --border: 1px solid #888;
+    --border-color: #888;
+    --border-radius: 2px;
+    --border-width: 1px;
+    --box-shadow: 0 0 8px 0 rgba(0,0,0,0.75);
+    --color: #222;
+    --filter: brightness(1);
+    --font-size: 14px;
+    --margin: 8px;
+    --padding: 8px;
+    --transition: all 0.2s;
+
+    /*  Grid sizing (for width and height).
+
+        The default grid is centred on 4px increments except for --grid-2.
+        For the higher values some of the 4px increments are skipped.
+        The system mirrors common font size choices in e.g. Word processors.
+    */
+    --grid-2: 2px;
+    --grid-4: 4px;
+    --grid-8: 8px;
+    --grid-12: 12px;
+    --grid-16: 16px;
+    --grid-24: 24px;
+    --grid-32: 32px;
+    --grid-48: 48px;
+    --grid-64: 64px;
+
+    /* Variations. */
+    --box-shadow-hidden: 0 0 0 0 rgba(0,0,0,0);
+    --color-subtle: #AAA;
+    --color-very-subtle: #DDD;
+    --font-family-heading: Futura, sans-serif;
+    --font-family-metadata: "Lucida Console", Monaco, monospace;
+    --font-size-s: 12px;
+    --inactive-filter: brightness(0.9);
+    --inactive-filter-focus: brightness(1);
+    --inactive-border: 1px solid #DDD;
+    --margin-s: 4px;
+    --margin-l: 16px;
+    --margin-xl: 32px;
+    --padding-s: 4px;
+    --padding-l: 16px;
+    --padding-xl: 32px;
+    --transparent-border: 1px solid transparent;
+
+    /* Custom. */
+    --tab-background-1: #EECCEE;
+    --tab-background-2: #CCDDEE;
+    --tab-background-3: #CCFFCC;
+    --tab-background-4: #FFFFBB;
+    --tab-background-5: #FFBBBB;
+    --tab-background-6: #FFDDBB;
+}

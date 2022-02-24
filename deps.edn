@@ -24,13 +24,10 @@
 
            ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
-           ;kuhumcst/stucco            {:local/root "/Users/rqf595/Code/stucco"}
            kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
                                              :sha     "f2b96835004467628351355a77fc3207a5beb557"}
            kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
-                                             :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
-           kuhumcst/stucco                  {:git/url "https://github.com/kuhumcst/stucco.git"
-                                             :sha     "8580283cd50660fe899f4afacadf71050e71431f"}}
+                                             :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}}
 
  ;; For now, the backend alias only contains metabase/saml20-clj since it
  ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
