@@ -67,7 +67,7 @@
     (cond-> {::http/routes         #((deref #'routes) sp-conf)
              ::http/type           :jetty
              ::http/host           "0.0.0.0"                ; "localhost" won't work on a KU-IT server
-             ::http/port           8080
+             ::http/port           8081
              ::http/resource-path  "/public"
 
              ;; Using the starter policy from https://content-security-policy.com/ as a basis
