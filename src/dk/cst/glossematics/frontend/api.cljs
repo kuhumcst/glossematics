@@ -25,7 +25,7 @@
 (defn normalize-url
   [url]
   (if state/development?
-    (str "http://0.0.0.0:8080" url)
+    (str "http://0.0.0.0:8081" url)
     url))
 
 (defn fetch
