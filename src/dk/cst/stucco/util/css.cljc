@@ -7,7 +7,6 @@
   {:document (resource/inline "public/css/document.css")
    :group    (resource/inline "public/css/group.css")
    :pattern  (resource/inline "public/css/pattern.css")
-   :landmark (resource/inline "public/css/landmark.css")
    :shared   (resource/inline "public/css/shared.css")})
 
 (def default-theme
