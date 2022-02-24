@@ -211,6 +211,7 @@
                        :attr-kmap {:xml/lang :lang
                                    :xml/id   :id}}))
 
+;; TODO: issue with ratom as attr when removing the wrapper
 ;; TODO: investigate possibility of having fewer components wrapped
 (defn shadow-dom-wrapper
   "Each node is wrapped in a shadow DOM, allowing for an inlined style element
@@ -244,17 +245,6 @@
 
 (def parse
   (memoize xml/parse))
-
-(defn mk-tabs
-  [tei hiccup]
-  (pattern/heterostyled
-    [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
-     ["TEI" [:pre {:style {:white-space "pre-wrap"
-                           :margin      "1ch"
-                           :padding     "1ch"
-                           :background  "white"}}
-             [:code
-              tei]]]]))
 
 (defn facs-id->facs-page
   [id]
@@ -336,7 +326,14 @@
         [group/combination
          {:vs      [[pattern/carousel state/facs-carousel]
                     [pattern/tabs
-                     (r/atom {:i   0
-                              :kvs (mk-tabs tei hiccup)})
+                     {:i   0
+                      :kvs (pattern/heterostyled
+                             [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
+                              ["TEI" [:pre {:style {:white-space "pre-wrap"
+                                                    :margin      "1ch"
+                                                    :padding     "1ch"
+                                                    :background  "white"}}
+                                      [:code
+                                       tei]]]])}
                      {:id "tei-tabs"}]]
           :weights [1 1]}]])]))

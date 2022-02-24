@@ -138,9 +138,10 @@
    {:keys [id] :as opts}]
   (let [state (state/prepare ::state/kvs+i state)
         opts  (assoc opts :id (or id (random-uuid)))]
-    [:article.tabs
-     [tab-list state opts]
-     [tab-panel state opts]]))
+    (fn [_ _]
+      [:article.tabs
+       [tab-list state opts]
+       [tab-panel state opts]])))
 
 
 ;;;; CAROUSEL
