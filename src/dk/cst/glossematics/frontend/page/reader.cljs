@@ -320,20 +320,18 @@
                      k])]]]
 
      ;; TODO: support metadata-only documents
-     ;; TODO: fix TEI source tab not updating reactively
      (when (and document-selected? hiccup)
        [:div.reader
-        [group/combination
-         {:vs      [[pattern/carousel state/facs-carousel]
-                    [pattern/tabs
-                     {:i   0
-                      :kvs (pattern/heterostyled
-                             [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
-                              ["TEI" [:pre {:style {:white-space "pre-wrap"
-                                                    :margin      "1ch"
-                                                    :padding     "1ch"
-                                                    :background  "white"}}
-                                      [:code
-                                       tei]]]])}
-                     {:id "tei-tabs"}]]
-          :weights [1 1]}]])]))
+        [group/combination {:weights [1 1]}
+         [pattern/carousel state/facs-carousel]
+         [pattern/tabs
+          {:i   0
+           :kvs (pattern/heterostyled
+                  [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
+                   ["TEI" [:pre {:style {:white-space "pre-wrap"
+                                         :margin      "1ch"
+                                         :padding     "1ch"
+                                         :background  "white"}}
+                           [:code
+                            tei]]]])}
+          {:id "tei-tabs"}]]])]))

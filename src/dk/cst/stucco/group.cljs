@@ -31,11 +31,10 @@
   "A combination of `vs`, with the space optionally partitioned by `weights`.
   If no `weights` are specified, each v will initially take up equal size.
   The `vs` will typically be various functionally related Stucco components."
-  [{:keys [vs weights]
-    :as   state}]
-  (r/with-let [state        (state/prepare ::state/vs+weights state)
+  [{:keys [weights] :as state} & vs]
+  (r/with-let [state        (state/normalize state)
                resize-state (r/atom nil)]
-    (let [{:keys [vs weights]
+    (let [{:keys [weights]
            :or   {weights (mapv (constantly 1) (range (count vs)))}} @state
           resizing     @resize-state
           key-prefix   (hash vs)
