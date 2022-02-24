@@ -99,30 +99,6 @@
   (doto (normalize state)
     (assert-valid spec)))
 
-;; TODO: what about drag-and-drop of state when mutation is restricted??
-(defn derive
-  "Derive a reactive map from existing `parent` state and any changes in `m`.
-
-  The keys found in the `parent` but not in `m` are synchronized between the
-  parent and the derived reaction. This effectively results in a two-way data
-  binding for these shared keys."
-  [parent m]
-  (let [parent-state @parent
-        shared-ks    (set/difference (set (keys parent-state))
-                                     (set (keys m)))
-        child        (atom (merge parent-state (apply dissoc m shared-ks)))]
-    (ratom/make-reaction
-      ;; The derived state updates when the parent changes, but ignores all
-      ;; changes not present in the keys shared with the child.
-      #(merge @parent (apply dissoc @child shared-ks))
-
-      ;; Child state updates are applied to the parent, but only shared keys!
-      :on-set (fn [_ newstate]
-                (reset! child newstate)
-                (swap! parent merge (select-keys newstate shared-ks)))
-
-      :auto-run true)))
-
 (defn ghost
   "Create a ghost of existing `src` state and a `kmap` of keys to be renamed.
   Optionally: provide a `path` to use a cursor rather than the `src` itself.
