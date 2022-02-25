@@ -1,7 +1,6 @@
 (ns dk.cst.glossematics.frontend.page.reader
   (:require [clojure.string :as str]
             [shadow.resource :as resource]
-            [reagent.core :as r]
             [reitit.frontend.easy :as rfe]
             [kitchen-async.promise :as p]
             [dk.cst.cuphic :as cup]
@@ -211,8 +210,10 @@
                        :attr-kmap {:xml/lang :lang
                                    :xml/id   :id}}))
 
-;; TODO: issue with ratom as attr when removing the wrapper
-;; TODO: investigate possibility of having fewer components wrapped
+;; For now, it seems impossible to not wrap every modified component, even if it
+;; is a bit ineffecient. The issues are
+;;   1) Cuphic deals poorly with Hiccup turning into reagent components.
+;;   2) the current Cuphic patterns rely on shadow-dom features, e.g. slot.
 (defn shadow-dom-wrapper
   "Each node is wrapped in a shadow DOM, allowing for an inlined style element
   and general isolation from the outer document style.
