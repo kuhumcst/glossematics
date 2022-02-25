@@ -22,12 +22,12 @@
            org.eclipse.jetty/jetty-servlets {:mvn/version "9.4.35.v20201120"}
 
 
-           kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
-           kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}}
-           ;kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
-           ;                                  :sha     "f2b96835004467628351355a77fc3207a5beb557"}
-           ;kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
-           ;                                  :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}}
+           ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
+           ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
+           kuhumcst/cuphic                  {:git/url "https://github.com/kuhumcst/cuphic.git"
+                                             :sha     "f2b96835004467628351355a77fc3207a5beb557"}
+           kuhumcst/rescope                 {:git/url "https://github.com/kuhumcst/rescope.git"
+                                             :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}}
 
  ;; For now, the backend alias only contains metabase/saml20-clj since it
  ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
