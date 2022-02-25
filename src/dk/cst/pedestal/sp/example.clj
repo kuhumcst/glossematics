@@ -107,7 +107,7 @@
   [conf]
   {::http/routes #((deref #'routes) conf)
    ::http/type   :jetty
-   ::http/port   8081})
+   ::http/port   8080})
 
 (def consent
   {:summary    "This is some standard GDPR explanation."
