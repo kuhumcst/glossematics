@@ -6,7 +6,7 @@ RUN apt-get clean && \
     apt-get install --no-install-recommends -y \
     git \
     npm \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     curl \
     rlwrap \
     locales
@@ -20,9 +20,9 @@ ENV LC_ALL en_US.UTF-8
 
 # The recommended way of installing Clojure CLI tools
 # https://clojure.org/guides/getting_started#_installation_on_linux
-RUN curl -O https://download.clojure.org/install/linux-install-1.10.3.986.sh
-RUN chmod +x linux-install-1.10.3.986.sh
-RUN ./linux-install-1.10.3.986.sh
+RUN curl -O https://download.clojure.org/install/linux-install-1.10.3.1075.sh
+RUN cchmod +x linux-install-1.10.3.1075.sh
+RUN ./linux-install-1.10.3.1075.sh
 
 WORKDIR /etc/glossematics
 
