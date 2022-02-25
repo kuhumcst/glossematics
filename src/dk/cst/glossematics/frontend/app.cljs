@@ -1,6 +1,7 @@
 (ns dk.cst.glossematics.frontend.app
   "The central namespace of the frontend app."
   (:require [clojure.string :as str]
+            [cljs.pprint :refer [pprint]]
             [reagent.dom :as rdom]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe :refer [href]]
@@ -43,9 +44,9 @@
       "firstName = Simon"
       "firstName != Simon")]
    [:details [:summary "assertions"]
-    [:pre (with-out-str (cljs.pprint/pprint state/assertions))]]
+    [:pre (with-out-str (pprint state/assertions))]]
    [:details [:summary "@db"]
-    [:pre (with-out-str (cljs.pprint/pprint @db))]]])
+    [:pre (with-out-str (pprint @db))]]])
 
 (defn shell
   "A container component that wraps the various pages of the app."
