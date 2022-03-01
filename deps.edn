@@ -5,6 +5,7 @@
            semantic-csv/semantic-csv        {:mvn/version "0.2.1-alpha1"}
            time-literals/time-literals      {:mvn/version "0.1.5"}
            dk.ative/docjure                 {:mvn/version "1.17.0"}
+           tick/tick                        {:mvn/version "0.5.0-RC5"}
 
            io.pedestal/pedestal.service     {:mvn/version "0.5.9"}
            io.pedestal/pedestal.route       {:mvn/version "0.5.9"}

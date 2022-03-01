@@ -2,12 +2,12 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [asami.core :as d]
+            [tick.core :as t]
             [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml])
   (:import [java.io File]
-           [java.text DateFormat]
-           [java.util Locale]))
+           [java.time.format DateTimeFormatter]))
 
 (def chronology-columns
   {:A :event/start
@@ -49,14 +49,19 @@
    "R" :travel
    "N" :networking})
 
-(def danish-df
-  (DateFormat/getDateInstance DateFormat/SHORT (Locale. "da")))
+(def excel-dtf
+  (t/formatter "dd-MM-yyyy"))
+
+(def tei-dtf
+  (t/formatter "yyyy-MM-dd"))
 
 (defn parse-date
-  [d]
-  (if (string? d)
-    (.parse danish-df (str/replace d #"-" "."))
-    d))
+  "Parse a `date-str` using the `formatter` of choice. Expects some noise in
+  the data (e.g. Viggo's Excel file) so all dots are converted into dashes."
+  [^DateTimeFormatter formatter date-str]
+  (if (string? date-str)
+    (t/parse-date (str/replace date-str #"\." "-") formatter)
+    date-str))
 
 (defn normalize-chronology-data
   [event]
@@ -65,8 +70,8 @@
       (update :event/type event-type-longform)
       (update :event/restored-start? (comp boolean not-empty))
       (update :event/restored-end? (comp boolean not-empty))
-      (update :event/start parse-date)
-      (update :event/end parse-date)))
+      (update :event/start (partial parse-date excel-dtf))
+      (update :event/end (partial parse-date excel-dtf))))
 
 (defn- remove-nil-vals
   "Remove kvs from `m` where v is nil.
@@ -117,6 +122,10 @@
   (file-entities "/Users/rqf595/Desktop/Data-FINAL")
   (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Data-FINAL"})
+  (timeline-entities)
+  (parse-date excel-dtf "03.10.1899")
+  (parse-date excel-dtf "03-10-1899")
+  (parse-date tei-dtf "1899-10-03")
 
   (count (d/q '[:find ?name ?path
                 :where
