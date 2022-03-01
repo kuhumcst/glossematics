@@ -135,10 +135,15 @@
               (d/db conn)))
   #_.)
 
-(def tei-files
-  (let [dir (io/file "/Users/rqf595/Desktop/glossematics-files/tei")]
-    (->> (file-seq dir)
-         (remove #{dir}))))
+(defn tei-files
+  "Return"
+  []
+  (->> (d/q '[:find [?path ...]
+              :where
+              [?e :file/extension "xml"]
+              [?e :file/path ?path]]
+            (d/db conn))
+       (map io/file)))
 
 (def rename
   {:placeName :place
@@ -196,7 +201,7 @@
 (defn single-triple
   [result filename rel k]
   (when-let [v (single-val result k)]
-    (when true #_(not (blank-ref? v))                       ;TODO don't include blanks
+    (when (not (blank-ref? v))                       ;TODO don't include blanks
       [filename rel v])))
 
 (defn document-triples
@@ -238,7 +243,7 @@
   (document-triples (.getName file) (scrape-document file)))
 
 (comment
-  (def example (nth tei-files 69))
+  (def example (nth (tei-files) 69))
   (xml/parse example)
   (nth (xml/parse example) 2)                               ; header
   (nth (xml/parse example) 3)                               ; facsimile
