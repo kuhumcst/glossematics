@@ -1,13 +1,18 @@
 (ns dk.cst.glossematics.backend.db.bootstrap
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
+            [clojure.set :as set]
             [asami.core :as d]
             [tick.core :as t]
             [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml])
   (:import [java.io File]
-           [java.time.format DateTimeFormatter]))
+           [java.time.format DateTimeFormatter
+                             DateTimeFormatterBuilder
+                             DateTimeParseException]
+           [java.time.temporal ChronoField]))
 
 (def chronology-columns
   {:A :event/start
@@ -53,14 +58,22 @@
   (t/formatter "dd-MM-yyyy"))
 
 (def tei-dtf
-  (t/formatter "yyyy-MM-dd"))
+  "NOTE: Defaults to 1 january in case either is missing."
+  (-> (DateTimeFormatterBuilder.)
+      (.appendPattern "yyyy[-MM[-dd]]")
+      (.parseDefaulting ChronoField/MONTH_OF_YEAR 1)
+      (.parseDefaulting ChronoField/DAY_OF_MONTH 1)
+      (.toFormatter)))
 
 (defn parse-date
   "Parse a `date-str` using the `formatter` of choice. Expects some noise in
   the data (e.g. Viggo's Excel file) so all dots are converted into dashes."
   [^DateTimeFormatter formatter date-str]
   (if (string? date-str)
-    (t/parse-date (str/replace date-str #"\." "-") formatter)
+    (try
+      (t/parse-date (str/replace date-str #"\." "-") formatter)
+      (catch DateTimeParseException e                       ; missing year?
+        (log/warn "Could not parse date: " date-str)))
     date-str))
 
 (defn normalize-chronology-data
@@ -108,42 +121,18 @@
               (let [filename  (.getName ^File file)
                     extension (last (str/split filename #"\."))
                     path      (.getPath ^File file)]
-                {:file/name      filename
+                {:db/ident       filename                   ; the entity ID
+                 :file/name      filename
                  :file/extension extension
                  :file/path      path})))))
 
-(defn bootstrap!
-  "Asynchronously bootstrap an in-memory Asami database from a `conf`."
-  [{:keys [files-dir] :as conf}]
-  (d/transact conn {:tx-data (file-entities files-dir)})
-  (d/transact conn {:tx-data (timeline-entities)}))
-
-(comment
-  (file-entities "/Users/rqf595/Desktop/Data-FINAL")
-  (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
-  (bootstrap! {:files-dir "/Users/rqf595/Desktop/Data-FINAL"})
-  (timeline-entities)
-  (parse-date excel-dtf "03.10.1899")
-  (parse-date excel-dtf "03-10-1899")
-  (parse-date tei-dtf "1899-10-03")
-
-  (count (d/q '[:find ?name ?path
-                :where
-                [?e :file/extension "tif"]
-                [?e :file/name ?name]
-                [?e :file/path ?path]]
-              (d/db conn)))
-  #_.)
-
 (defn tei-files
-  "Return"
-  []
-  (->> (d/q '[:find [?path ...]
-              :where
-              [?e :file/extension "xml"]
-              [?e :file/path ?path]]
-            (d/db conn))
-       (map io/file)))
+  [conn]
+  (d/q '[:find [?path ...]
+         :where
+         [?e :file/extension "xml"]
+         [?e :file/path ?path]]
+       (d/db conn)))
 
 (def rename
   {:placeName :place
@@ -201,7 +190,7 @@
 (defn single-triple
   [result filename rel k]
   (when-let [v (single-val result k)]
-    (when (not (blank-ref? v))                       ;TODO don't include blanks
+    (when (not (blank-ref? v))                              ;TODO don't include blanks
       [filename rel v])))
 
 (defn document-triples
@@ -228,22 +217,38 @@
          (for [{:syms [id]} facsimile]
            [filename :document/facsimile id])
          (for [{:syms [when]} body-dates]
-           [filename :mention/date when])
+           [filename :mention/date (parse-date tei-dtf when)])
          #_(for [{:syms [tag ref ?type]} header-refs]
              (when (str/starts-with? ref "#n")
                [filename (keyword "header" (ref-str tag ?type)) ref]))
-         #_(for [{:syms [tag ref ?type]} body-refs]
-             (when (str/starts-with? ref "#n")
-               (let []
-                 [filename (keyword "mention" (ref-str tag ?type)) ref])))])
+         (for [{:syms [tag ref ?type]} body-refs]
+           (when (str/starts-with? ref "#n")
+             (let []
+               [filename (keyword "mention" (ref-str tag ?type)) ref])))])
       nil)))
 
 (defn as-triples
-  [^File file]
-  (document-triples (.getName file) (scrape-document file)))
+  [filepath]
+  (let [file (io/file filepath)]
+    (document-triples (.getName file) (scrape-document file))))
+
+(defn as-entity
+  [filepath]
+  (let [triples (as-triples filepath)
+        ident   (ffirst triples)]
+    (->> (for [[_ k v] triples]
+           {k #{v}})
+         (apply merge-with set/union {:db/ident ident}))))
+
+(defn bootstrap!
+  "Asynchronously bootstrap an in-memory Asami database from a `conf`."
+  [{:keys [files-dir] :as conf}]
+  (d/transact conn {:tx-data (file-entities files-dir)})
+  (d/transact conn {:tx-data (timeline-entities)})
+  (d/transact conn {:tx-data (map as-entity (tei-files conn))}))
 
 (comment
-  (def example (nth (tei-files) 69))
+  (def example (nth (tei-files conn) 69))
   (xml/parse example)
   (nth (xml/parse example) 2)                               ; header
   (nth (xml/parse example) 3)                               ; facsimile
@@ -252,4 +257,19 @@
   (document-triples "example.xml" (scrape-document example))
   (as-triples example)
 
+  (file-entities "/Users/rqf595/Desktop/Data-FINAL")
+  (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
+  (bootstrap! {:files-dir "/Users/rqf595/Desktop/Data-FINAL"})
+  (count (tei-files conn))
+  (timeline-entities)
+  (parse-date excel-dtf "03.10.1899")
+  (parse-date excel-dtf "03-10-1899")
+  (parse-date tei-dtf "1899-10-03")
+
+  (count (d/q '[:find ?name ?path
+                :where
+                [?e :file/extension "tif"]
+                [?e :file/name ?name]
+                [?e :file/path ?path]]
+              (d/db conn)))
   #_.)
