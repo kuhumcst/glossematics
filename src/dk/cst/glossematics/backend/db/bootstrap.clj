@@ -14,6 +14,9 @@
                              DateTimeParseException]
            [java.time.temporal ChronoField]))
 
+;; Syntax errors (fixed)
+;; acc-1992_0005_025_Jakobson_0180-tei-final.xml:127:64
+
 (def chronology-columns
   {:A :event/start
    :B :event/restored-start?
