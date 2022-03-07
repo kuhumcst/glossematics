@@ -9,6 +9,8 @@
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml])
   (:import [java.io File]
+           [java.sql Date]
+           [java.time LocalDate]
            [java.time.format DateTimeFormatter
                              DateTimeFormatterBuilder
                              DateTimeParseException]
@@ -74,7 +76,9 @@
   [^DateTimeFormatter formatter date-str]
   (if (string? date-str)
     (try
-      (t/parse-date (str/replace date-str #"\." "-") formatter)
+      ;; TODO: converting to oldschool Date/inst now since - switch?
+      (-> ^LocalDate (t/parse-date (str/replace date-str #"\." "-") formatter)
+          (Date/valueOf))
       (catch DateTimeParseException e                       ; missing year?
         (log/warn "Could not parse date: " date-str)))
     date-str))
