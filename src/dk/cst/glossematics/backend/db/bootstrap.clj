@@ -120,18 +120,27 @@
   (d/connect db-uri))
 
 (defn file-entities
-  "Recursively list all file entities found in `dir`, ignoring directories."
+  "Recursively list all file entities found in `dir`, ignoring directories.
+  Duplicates of the transcribed TEI files with empty bodies are not included."
   [dir]
-  (->> (file-seq (io/file dir))
-       (remove #(.isDirectory ^File %))
-       (map (fn [file]
-              (let [filename  (.getName ^File file)
-                    extension (last (str/split filename #"\."))
-                    path      (.getPath ^File file)]
-                {:db/ident       filename                   ; the entity ID
-                 :file/name      filename
-                 :file/extension extension
-                 :file/path      path})))))
+  (let [body?      (fn [s] (str/ends-with? s "-final.xml"))
+        ->non-body (fn [s] (str (subs s 0 (- (count s) 10)) ".xml"))
+        entities   (->> (file-seq (io/file dir))
+                        (remove #(.isDirectory ^File %))
+                        (map (fn [file]
+                               (let [filename  (.getName ^File file)
+                                     extension (last (str/split filename #"\."))
+                                     path      (.getPath ^File file)]
+                                 {:db/ident       filename
+                                  :file/body?     (body? filename)
+                                  :file/name      filename
+                                  :file/extension extension
+                                  :file/path      path}))))
+        duplicates (->> (map :file/name entities)
+                        (filter body?)
+                        (map ->non-body)
+                        (set))]
+    (remove (comp duplicates :file/name) entities)))
 
 (defn tei-files
   [conn]
@@ -264,9 +273,9 @@
   (document-triples "example.xml" (scrape-document example))
   (as-triples example)
 
-  (file-entities "/Users/rqf595/Desktop/Data-FINAL")
-  (count (file-entities "/Users/rqf595/Desktop/Data-FINAL"))
-  (bootstrap! {:files-dir "/Users/rqf595/Desktop/Data-FINAL"})
+  (file-entities "/Users/rqf595/Desktop/Glossematics-data")
+  (count (file-entities "/Users/rqf595/Desktop/Glossematics-data"))
+  (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
   (timeline-entities)
   (parse-date excel-dtf "03.10.1899")
