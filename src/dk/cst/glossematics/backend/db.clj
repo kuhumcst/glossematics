@@ -20,6 +20,13 @@
 ;; Syntax errors (fixed)
 ;; acc-1992_0005_025_Jakobson_0180-tei-final.xml:127:64
 
+(defonce db-uri
+  (doto "asami:mem://glossematics"
+    (d/create-database)))
+
+(defonce conn
+  (d/connect db-uri))
+
 (def chronology-columns
   {:A :event/start
    :B :event/restored-start?
@@ -113,34 +120,36 @@
        (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
 
-(defonce db-uri
-  (doto "asami:mem://glossematics"
-    (d/create-database)))
+(defn- with-body?
+  "Does the file with `filename` contain a body of content?"
+  [filename]
+  (str/ends-with? filename "-final.xml"))
 
-(defonce conn
-  (d/connect db-uri))
+(def file-entities-xf
+  (comp
+    (remove #(.isDirectory ^File %))
+    (map (fn [file]
+           (let [filename  (.getName ^File file)
+                 extension (last (str/split filename #"\."))
+                 path      (.getPath ^File file)]
+             {:db/ident       filename
+              :file/body?     (with-body? filename)
+              :file/name      filename
+              :file/extension extension
+              :file/path      path})))))
+
+(def duplicates-xf
+  (comp
+    (map :file/name)
+    (filter with-body?)
+    (map (fn [s] (str (subs s 0 (- (count s) 10)) ".xml")))))
 
 (defn file-entities
   "Recursively list all file entities found in `dir`, ignoring directories.
   Duplicates of the transcribed TEI files with empty bodies are not included."
   [dir]
-  (let [body?      (fn [s] (str/ends-with? s "-final.xml"))
-        ->non-body (fn [s] (str (subs s 0 (- (count s) 10)) ".xml"))
-        entities   (->> (file-seq (io/file dir))
-                        (remove #(.isDirectory ^File %))
-                        (map (fn [file]
-                               (let [filename  (.getName ^File file)
-                                     extension (last (str/split filename #"\."))
-                                     path      (.getPath ^File file)]
-                                 {:db/ident       filename
-                                  :file/body?     (body? filename)
-                                  :file/name      filename
-                                  :file/extension extension
-                                  :file/path      path}))))
-        duplicates (->> (map :file/name entities)
-                        (filter body?)
-                        (map ->non-body)
-                        (set))]
+  (let [entities   (into [] file-entities-xf (file-seq (io/file dir)))
+        duplicates (into #{} duplicates-xf entities)]
     (remove (comp duplicates :file/name) entities)))
 
 (defn tei-files
