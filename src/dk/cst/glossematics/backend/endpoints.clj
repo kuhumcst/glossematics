@@ -7,7 +7,7 @@
             [com.wsscode.transito :as transito]
             [hiccup.core :as hiccup]
             [asami.core :as d]
-            [dk.cst.glossematics.backend.db :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
+            [dk.cst.glossematics.backend.db :as db :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
 
 (def one-month-cache
   "private, max-age=2592000")
@@ -62,6 +62,30 @@
           (assoc
             :status 200
             :body (transito/write-str entity))
+          (update :headers assoc
+                  "Content-Type" "application/transit+json"
+                  "Cache-Control" one-day-cache))
+      {:status  404
+       :body    nil
+       :headers {}})))
+
+(defn- explode-query-params
+  [query-params]
+  (update-vals query-params #(str/split % #",")))
+
+(defn- secure-entity
+  [entity]
+  (dissoc entity :file/path))
+
+(defn search-handler
+  "A handler to search for database entities, e.g. document or event metadata."
+  [{:keys [query-params] :as request}]
+  (let [entities (db/search conn (explode-query-params query-params))]
+    (if (not-empty entities)
+      (-> request
+          (assoc
+            :status 200
+            :body (transito/write-str (map secure-entity entities)))
           (update :headers assoc
                   "Content-Type" "application/transit+json"
                   "Cache-Control" one-day-cache))
@@ -136,3 +160,12 @@
 (def entity-chain
   [path-params-decoder
    entity-handler])
+
+(def search-chain
+  [path-params-decoder
+   search-handler])
+
+(comment
+  (explode-query-params {:glen "1,2,3"
+                         :john "something"})
+  #_.)

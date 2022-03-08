@@ -47,7 +47,11 @@
       ["/entity/:filename"
        :get (into (sp.ic/auth-chain conf :authenticated)
                   endpoints/entity-chain)
-       :route-name ::endpoints/entity]}))
+       :route-name ::endpoints/entity]
+      ["/search"
+       :get (into (sp.ic/auth-chain conf :authenticated)
+                  endpoints/search-chain)
+       :route-name ::endpoints/search]}))
 
 (defn routes
   [sp-conf]
