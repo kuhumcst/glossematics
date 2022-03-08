@@ -1,5 +1,5 @@
-(ns dk.cst.glossematics.frontend.app
-  "The central namespace of the frontend app."
+(ns dk.cst.glossematics.frontend
+  "The central namespace of the frontend client; defines frontend routing."
   (:require [clojure.string :as str]
             [cljs.pprint :refer [pprint]]
             [reagent.dom :as rdom]

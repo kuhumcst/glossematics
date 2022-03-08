@@ -1,4 +1,5 @@
 (ns dk.cst.glossematics.frontend.page.reader
+  "Page containing a synchronized facsimile & TEI transcription reader."
   (:require [clojure.string :as str]
             [shadow.resource :as resource]
             [reitit.frontend.easy :as rfe]

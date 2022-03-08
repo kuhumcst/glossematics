@@ -1,9 +1,10 @@
 (ns dk.cst.glossematics.frontend.page.timeline
+  "Page containing a chronological timeline of Louis Hjelmslev's life."
   (:require [clojure.string :as str]
             [shadow.resource :as sr]
             [reagent.core :as r]
-            [dk.cst.glossematics.frontend.timeline :as timeline :refer [timeline]]
             [kitchen-async.promise :as p]
+            [dk.cst.glossematics.frontend.timeline-widget :as tw]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.state :as state]))
 
@@ -84,7 +85,7 @@
             :default-value (-> @tl-state
                                (get-in [:bands band :intervalUnit])
                                (name))}
-   (for [[k _] timeline/interval-kvs
+   (for [[k _] tw/interval-kvs
          :let [str-k (name k)]]
      [:option {:value str-k
                :key   k}
@@ -119,7 +120,7 @@
 (defn fetch-timeline-data!
   []
   (p/let [events (api/fetch "/timeline")
-          zones  (timeline/find-hotzones :month events)]
+          zones  (tw/find-hotzones :month events)]
     (reset! state/timeline {:events (map add-styling events)
                             :bands  (-> default-bands
                                         (assoc-in [:primary :zones] zones)
@@ -133,9 +134,9 @@
                      :margin-bottom -20}}
       [:p [:label [:strong "Primary: "] [interval-select state/timeline :primary]]]
       [:p [:label [:strong "Overview: "] [interval-select state/timeline :overview]]]]
-     [timeline {:style {:height 400}}
+     [tw/timeline {:style {:height 400}}
       state/timeline]
 
      #_[:div {:style {:padding "20px"}}
-        [timeline {:style {:height 350}}
+        [tw/timeline {:style {:height 350}}
          jfk-tl-state]]]))

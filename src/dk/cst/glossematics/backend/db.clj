@@ -1,4 +1,5 @@
-(ns dk.cst.glossematics.backend.db.bootstrap
+(ns dk.cst.glossematics.backend.db
+  "Functions for populating & querying the Glossematics Asami database."
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]

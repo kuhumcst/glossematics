@@ -1,5 +1,5 @@
-(ns dk.cst.glossematics.backend.file
-  "Basic endpoint for retrieving non-public, static files (TEI and facsimile)."
+(ns dk.cst.glossematics.backend.endpoints
+  "The various handlers/interceptors provided by the backend web service."
   (:require [clojure.string :as str]
             [io.pedestal.http.content-negotiation :refer [negotiate-content]]
             [io.pedestal.http.route :refer [path-params-decoder]]
@@ -7,7 +7,7 @@
             [com.wsscode.transito :as transito]
             [hiccup.core :as hiccup]
             [asami.core :as d]
-            [dk.cst.glossematics.backend.db.bootstrap :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
+            [dk.cst.glossematics.backend.db :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
 
 (def one-month-cache
   "private, max-age=2592000")

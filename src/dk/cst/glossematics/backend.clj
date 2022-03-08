@@ -1,5 +1,5 @@
-(ns dk.cst.glossematics.backend.service
-  "The central namespace of the backend app."
+(ns dk.cst.glossematics.backend
+  "The central namespace of the backend app; defines backend routing."
   (:require [clojure.set :as set]
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
@@ -7,13 +7,13 @@
             [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
-            [dk.cst.glossematics.backend.index :as index]
-            [dk.cst.glossematics.backend.file :as file]
-            [dk.cst.glossematics.backend.db.bootstrap :refer [bootstrap!]]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
-            [dk.cst.pedestal.sp.example :as example]))
+            [dk.cst.pedestal.sp.example :as example]
+            [dk.cst.glossematics.backend.index :as index]
+            [dk.cst.glossematics.backend.endpoints :as file]
+            [dk.cst.glossematics.backend.db :refer [bootstrap!]]))
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))

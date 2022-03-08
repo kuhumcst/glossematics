@@ -6,8 +6,8 @@ Architecture
 ------------
 The source code has been split into separate backend and frontend directories located within `/src/dk/cst/glossematics`. The backend and frontend are written in Clojure and ClojureScript, respectively.
 
-* `dk.cst.glossematics.backend.service` is the core namespace of the backend service.
-* `dk.cst.glossematics.frontend.app` is the core namespace of the frontend app.
+* `dk.cst.glossematics.backend` is the core namespace of the backend service.
+* `dk.cst.glossematics.frontend` is the core namespace of the frontend app.
 
 These two namespaces contain the routing tables and are therefore natural entry points for anyone wanting to explore the source code.
 
@@ -139,7 +139,7 @@ clj -A:update
 ```
 
 ### Backend
-The namespace `dk.cst.glossematics.backend.service` defines the backend web service. This Pedestal web service can be started, stopped, restarted, and updated entirely through the Clojure REPL using the utility functions located inside that namespace. There is no need to install and setup a separate web server since Pedestal dynamically sets up a Jetty instance for this purpose.
+The namespace `dk.cst.glossematics.backend` defines the backend web service. This Pedestal web service can be started, stopped, restarted, and updated entirely through the Clojure REPL using the utility functions located inside that namespace. There is no need to install and setup a separate web server since Pedestal dynamically sets up a Jetty instance for this purpose.
 
 The frontend being served is whichever frontend was last compiled which will usually be the development version that is created by running `shadow-cljs watch app`. The release version can be used instead by running:
 
@@ -152,7 +152,7 @@ shadow-cljs release app
 Development notes
 -----------------
 ### Timeline widget
-The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline.cljs).
+The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline_widget.cljs).
 
 However, the JavaScript source is still quite huge and written in a fairly incoherent style. For this reason, the visual style of the timeline must be handled by editing primarily
 
