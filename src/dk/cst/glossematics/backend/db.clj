@@ -158,7 +158,7 @@
          :where
          [?e :file/extension "xml"]
          [?e :file/path ?path]]
-       (d/db conn)))
+       conn))
 
 (def rename
   {:placeName :place
@@ -216,7 +216,8 @@
 (defn single-triple
   [result filename rel k]
   (when-let [v (single-val result k)]
-    (when (not (blank-ref? v))                              ;TODO don't include blanks
+    (when (not (or (blank-ref? v)
+                   (str/blank? v)))
       [filename rel v])))
 
 (defn document-triples
@@ -292,9 +293,14 @@
   (parse-date excel-dtf "03-10-1899")
   (parse-date tei-dtf "1899-10-03")
 
+  ;; Test loading of file entities
+  (d/entity conn "acc-1992_0005_036_Uldall_0220-tei-final.xml")
+  (d/entity conn "acc-1992_0005_134_Sprogteor_0130-tei.xml")
+  (d/entity conn "acc-1992_0005_124_Cenematics_0100_098.tif.jpg")
+
   (count (d/q '[:find ?name ?path
                 :where
-                [?e :file/extension "tif"]
+                [?e :file/extension "jpg"]
                 [?e :file/name ?name]
                 [?e :file/path ?path]]
               (d/db conn)))
