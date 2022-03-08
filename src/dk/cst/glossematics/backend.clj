@@ -12,7 +12,7 @@
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
             [dk.cst.pedestal.sp.example :as example]
             [dk.cst.glossematics.backend.index :as index]
-            [dk.cst.glossematics.backend.endpoints :as file]
+            [dk.cst.glossematics.backend.endpoints :as endpoints]
             [dk.cst.glossematics.backend.db :refer [bootstrap!]]))
 
 (defonce server (atom nil))
@@ -34,16 +34,20 @@
       ;; API routes
       ["/timeline"
        :get (into (sp.ic/auth-chain conf :authenticated)
-                  file/timeline-chain)
-       :route-name ::file/timeline]
+                  endpoints/timeline-chain)
+       :route-name ::endpoints/timeline]
       ["/files/:extension"
        :get (into (sp.ic/auth-chain conf :authenticated)
-                  file/file-list-chain)
-       :route-name ::file/list]
+                  endpoints/file-list-chain)
+       :route-name ::endpoints/list]
       ["/file/:filename"
        :get (into (sp.ic/auth-chain conf :authenticated)
-                  file/file-chain)
-       :route-name ::file/file]}))
+                  endpoints/file-chain)
+       :route-name ::endpoints/file]
+      ["/entity/:filename"
+       :get (into (sp.ic/auth-chain conf :authenticated)
+                  endpoints/entity-chain)
+       :route-name ::endpoints/entity]}))
 
 (defn routes
   [sp-conf]

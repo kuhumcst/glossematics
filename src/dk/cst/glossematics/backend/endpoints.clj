@@ -52,6 +52,23 @@
     (assoc-in (ring/file-response path)
               [:headers "Cache-Control"] one-day-cache)))
 
+(defn entity-handler
+  "A handler to serve database entities, e.g. document or event metadata."
+  [{:keys [path-params] :as request}]
+  (let [{:keys [filename]} path-params
+        entity (d/entity conn filename)]
+    (if entity
+      (-> request
+          (assoc
+            :status 200
+            :body (transito/write-str entity))
+          (update :headers assoc
+                  "Content-Type" "application/transit+json"
+                  "Cache-Control" one-day-cache))
+      {:status  404
+       :body    nil
+       :headers {}})))
+
 (defn build-hrefs
   "Build hyperlinks for the 'files-ic' based on a specific file `extension`."
   [extension]
@@ -104,7 +121,6 @@
                              "Content-Type" content-type
                              "Cache-Control" one-day-cache))))})
 
-
 (def timeline-chain
   [timeline-handler])
 
@@ -116,3 +132,7 @@
 (def file-chain
   [path-params-decoder
    file-handler])
+
+(def entity-chain
+  [path-params-decoder
+   entity-handler])
