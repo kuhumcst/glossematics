@@ -273,6 +273,33 @@
   (d/transact conn {:tx-data (timeline-entities)})
   (d/transact conn {:tx-data (map as-entity (tei-files conn))}))
 
+(defn- entity->where-triples
+  "Deconstruct partial `entity` description into triples for a search query."
+  [entity]
+  (->> (for [[k v] entity]
+         (if (coll? v)
+           (map #(vector '?e k %) v)
+           [['?e k v]]))
+       (apply concat)
+       (set)))
+
+(defn- entity->search-query
+  "Build an entity search query from a partial `entity` description."
+  [entity]
+  (into '[:find [?id ...]
+          :where [?e :db/ident ?id]]
+        (entity->where-triples entity)))
+
+(defn match-entity
+  "Look up entity IDs in `conn` matching partial `entity` description."
+  [conn entity]
+  (d/q (entity->search-query entity) conn))
+
+(defn search
+  "Return matching entities in `conn` based on partial `entity` description."
+  [conn entity]
+  (map (partial d/entity conn) (match-entity conn entity)))
+
 (comment
   (def example (nth (tei-files conn) 69))
   (xml/parse example)
@@ -296,6 +323,10 @@
   (d/entity conn "acc-1992_0005_036_Uldall_0220-tei-final.xml")
   (d/entity conn "acc-1992_0005_134_Sprogteor_0130-tei.xml")
   (d/entity conn "acc-1992_0005_124_Cenematics_0100_098.tif.jpg")
+
+  ;; Test entity search
+  (match-entity conn {:document/mention #{"#npl837" "#npl1957" "#npub86"}})
+  (search conn {:document/mention #{"#np58" "#np64"}})
 
   (count (d/q '[:find ?name ?path
                 :where
