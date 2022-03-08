@@ -240,18 +240,17 @@
            (triple :document/language :language)
            (triple :document/settlement :settlement)])
         [(for [{:syms [when who]} changes]
-           [filename :document/changedBy who])
+           [filename :document/editor who])
          (for [{:syms [id]} facsimile]
            [filename :document/facsimile id])
          (for [{:syms [when]} body-dates]
-           [filename :mention/date (parse-date tei-dtf when)])
+           [filename :document/date-mention (parse-date tei-dtf when)])
          #_(for [{:syms [tag ref ?type]} header-refs]
              (when (str/starts-with? ref "#n")
                [filename (keyword "header" (ref-str tag ?type)) ref]))
          (for [{:syms [tag ref ?type]} body-refs]
            (when (str/starts-with? ref "#n")
-             (let []
-               [filename (keyword "mention" (ref-str tag ?type)) ref])))])
+             [filename :document/mention ref]))])
       nil)))
 
 (defn as-triples
