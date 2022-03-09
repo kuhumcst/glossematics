@@ -78,9 +78,18 @@
   (dissoc entity :file/path))
 
 (defn search-handler
-  "A handler to search for database entities, e.g. document or event metadata."
+  "A handler to search for database entities, e.g. document or event metadata.
+
+  The query params are translated directly into a partial entity description
+  used to find matching entities in the Asami database. Two special params,
+  limit and offset, can be used to limit and offset the search results."
   [{:keys [query-params] :as request}]
-  (let [entities (db/search conn (explode-query-params query-params))]
+  (let [{:keys [limit offset] :as params} (explode-query-params query-params)
+        limit    (first limit)
+        offset   (first offset)
+        entities (db/search conn (dissoc params :limit :offset)
+                            :limit (when limit (parse-long limit))
+                            :offset (when offset (parse-long offset)))]
     (if (not-empty entities)
       (-> request
           (assoc

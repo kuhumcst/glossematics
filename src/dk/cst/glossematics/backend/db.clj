@@ -295,10 +295,20 @@
   [conn entity]
   (d/q (entity->search-query entity) conn))
 
+;; TODO: use bounded memoization, e.g. core.memoize
+;; Since the function simply returns entity IDs the results can be memoised,
+;; in order to provide a way to implement efficient :limit and :offset params
+;; in the search function below.
+(alter-var-root #'match-entity memoize)
+
 (defn search
-  "Return matching entities in `conn` based on partial `entity` description."
-  [conn entity]
-  (map (partial d/entity conn) (match-entity conn entity)))
+  "Return matching entities in `conn` based on partial `entity` description.
+
+  Also accepts :limit and :offset params to return results gradually."
+  [conn entity & {:keys [limit offset]}]
+  (cond->> (map (partial d/entity conn) (match-entity conn entity))
+    offset (drop offset)
+    limit (take limit)))
 
 (comment
   (def example (nth (tei-files conn) 69))
@@ -326,7 +336,11 @@
 
   ;; Test entity search
   (match-entity conn {:document/mention #{"#npl837" "#npl1957" "#npub86"}})
-  (search conn {:document/mention #{"#np58" "#np64"}})
+  (search conn {:document/mention #{"#np58"}})
+  (count (search conn {:document/mention #{"#np58"}}))      ; 51 in total
+  (count (search conn {:document/mention #{"#np58"}}
+                 :offset 50
+                 :limit 10))                                ; 1 left
 
   (count (d/q '[:find ?name ?path
                 :where
