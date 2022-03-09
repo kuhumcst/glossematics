@@ -69,11 +69,13 @@
        :body    nil
        :headers {}})))
 
-(defn- explode-query-params
+(defn- split-params
+  "Split comma-separated strings in `query-params`."
   [query-params]
-  (update-vals query-params #(str/split % #",")))
+  (update-vals query-params #(str/split % #"\s*,\s*")))
 
-(defn- secure-entity
+(defn- clean-entity
+  "Remove private/unnecessary data from `entity`."
   [entity]
   (dissoc entity :file/path))
 
@@ -81,20 +83,24 @@
   "A handler to search for database entities, e.g. document or event metadata.
 
   The query params are translated directly into a partial entity description
-  used to find matching entities in the Asami database. Two special params,
-  limit and offset, can be used to limit and offset the search results."
+  used to find matching entities in the Asami database. Three special params,
+  limit, offset, and order-by are used to limit and sort the search results.
+
+  Refer to the 'search' function in the 'db' ns for more!"
   [{:keys [query-params] :as request}]
-  (let [{:keys [limit offset] :as params} (explode-query-params query-params)
-        limit    (first limit)
-        offset   (first offset)
-        entities (db/search conn (dissoc params :limit :offset)
-                            :limit (when limit (parse-long limit))
-                            :offset (when offset (parse-long offset)))]
+  (let [{:keys [limit
+                offset
+                order-by]
+         :as   params} (split-params query-params)
+        entities (db/search conn (dissoc params :limit :offset :order-by)
+                            :limit (when limit (parse-long (first limit)))
+                            :offset (when offset (parse-long (first offset)))
+                            :order-by (when order-by (map keyword order-by)))]
     (if (not-empty entities)
       (-> request
           (assoc
             :status 200
-            :body (transito/write-str (map secure-entity entities)))
+            :body (transito/write-str (map clean-entity entities)))
           (update :headers assoc
                   "Content-Type" "application/transit+json"
                   "Cache-Control" one-day-cache))
@@ -175,6 +181,6 @@
    search-handler])
 
 (comment
-  (explode-query-params {:glen "1,2,3"
-                         :john "something"})
+  (split-params {:glen   "1,2,   3"
+                 :john "something"})
   #_.)

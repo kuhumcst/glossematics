@@ -284,16 +284,42 @@
        (set)))
 
 (defn- entity->search-query
-  "Build an entity search query from a partial `entity` description."
-  [entity]
-  (into '[:find [?id ...]
-          :where [?e :db/ident ?id]]
-        (entity->where-triples entity)))
+  "Build an entity search query from a partial `entity` description.
+
+  A `sort-key` may also be supplied to allow sorting of the results afterwards.
+  When supplying a `sort-key` the result set is different (2-tuples rather than
+  strings) and requires postprocessing to perform the actual sorting operation."
+  ([entity sort-key]
+   (into [:find '?id '?sort-value
+          :where
+          ['?e :db/ident '?id]
+          (concat '(optional) [['?e sort-key '?sort-value]])]
+         (entity->where-triples entity)))
+  ([entity]
+   (into '[:find [?id ...]
+           :where [?e :db/ident ?id]]
+         (entity->where-triples entity))))
+
+(defn- sort-results
+  "Sort 2-tuple `search-results` containing sort values in the second position."
+  [search-results]
+  (->> search-results
+       (sort-by second)
+       (map first)
+       (apply sorted-set)))
 
 (defn match-entity
-  "Look up entity IDs in `conn` matching partial `entity` description."
-  [conn entity]
-  (d/q (entity->search-query entity) conn))
+  "Look up entity IDs in `conn` matching partial `entity` description.
+
+  An `order-by` vector of [k dir] may also be supplied to sort the results.
+  The sort direction can be either :asc (default) or :desc."
+  ([conn entity [k dir :as order-by]]
+   (let [results (sort-results (d/q (entity->search-query entity k) conn))]
+     (if (= dir :desc)
+       (reverse results)
+       results)))
+  ([conn entity]
+   (d/q (entity->search-query entity) conn)))
 
 ;; TODO: use bounded memoization, e.g. core.memoize
 ;; Since the function simply returns entity IDs the results can be memoised,
@@ -302,11 +328,15 @@
 (alter-var-root #'match-entity memoize)
 
 (defn search
-  "Return matching entities in `conn` based on partial `entity` description.
+  "Return matching entities in `conn` based on a partial `entity` description.
 
-  Also accepts :limit and :offset params to return results gradually."
-  [conn entity & {:keys [limit offset]}]
-  (cond->> (map (partial d/entity conn) (match-entity conn entity))
+  Also accepts :limit and :offset to return results gradually, as well as
+  :order-by which should be a vector of [k dir]."
+  [conn entity & {:keys [limit offset order-by]}]
+  (cond->> (if order-by
+             (match-entity conn entity order-by)
+             (match-entity conn entity))
+    true (map (partial d/entity conn))
     offset (drop offset)
     limit (take limit)))
 
@@ -341,6 +371,14 @@
   (count (search conn {:document/mention #{"#np58"}}
                  :offset 50
                  :limit 10))                                ; 1 left
+
+  ;; Test sorting of search results
+  (match-entity conn {:document/mention #{"#npl1957"}} [:file/name :desc])
+  (match-entity conn {:document/mention #{"#npl1957"}}
+                [:document/date-mention :asc])
+  (search conn {:document/mention #{"#npl1957"}}
+          :order-by [:document/date-mention :asc]
+          :limit 3)
 
   (count (d/q '[:find ?name ?path
                 :where
