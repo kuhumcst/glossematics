@@ -331,14 +331,17 @@
   "Return matching entities in `conn` based on a partial `entity` description.
 
   Also accepts :limit and :offset to return results gradually, as well as
-  :order-by which should be a vector of [k dir]."
+  :order-by which should be a vector of [k dir]. The :total amount of matches
+  regardless of :limit/:offset is always included as metadata."
   [conn entity & {:keys [limit offset order-by]}]
-  (cond->> (if order-by
-             (match-entity conn entity order-by)
-             (match-entity conn entity))
-    true (map (partial d/entity conn))
-    offset (drop offset)
-    limit (take limit)))
+  (let [matches (if order-by
+                  (match-entity conn entity order-by)
+                  (match-entity conn entity))]
+    (with-meta
+      (cond->> (map (partial d/entity conn) matches)
+        offset (drop offset)
+        limit (take limit))
+      {:total (count matches)})))
 
 (comment
   (def example (nth (tei-files conn) 69))

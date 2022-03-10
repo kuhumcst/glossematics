@@ -27,6 +27,9 @@
 (defonce timeline
   (r/cursor db [:timeline]))
 
+(defonce search
+  (r/cursor db [:search]))
+
 (defonce tei-files
   (r/cursor db [:files :tei]))
 

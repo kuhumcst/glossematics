@@ -90,23 +90,24 @@
   [{:keys [query-params] :as request}]
   (let [{:keys [limit
                 offset
-                order-by]
+                order-by
+                _]
          :as   params} (split-params query-params)
-        entities (db/search conn (dissoc params :limit :offset :order-by)
+        entity   (cond-> (dissoc (merge {:file/extension "xml"} params)
+                                 :limit :offset :order-by :_)
+                   _ (assoc '_ _))
+        entities (db/search conn entity
                             :limit (when limit (parse-long (first limit)))
                             :offset (when offset (parse-long (first offset)))
                             :order-by (when order-by (map keyword order-by)))]
-    (if (not-empty entities)
-      (-> request
-          (assoc
-            :status 200
-            :body (transito/write-str (map clean-entity entities)))
-          (update :headers assoc
-                  "Content-Type" "application/transit+json"
-                  "Cache-Control" one-day-cache))
-      {:status  404
-       :body    nil
-       :headers {}})))
+    (-> (assoc request
+          :status 200
+          :body (transito/write-str (with-meta
+                                      (map clean-entity entities)
+                                      (meta entities))))
+        (update :headers assoc
+                "Content-Type" "application/transit+json"
+                "Cache-Control" one-day-cache))))
 
 (defn build-hrefs
   "Build hyperlinks for the 'files-ic' based on a specific file `extension`."
@@ -181,6 +182,6 @@
    search-handler])
 
 (comment
-  (split-params {:glen   "1,2,   3"
+  (split-params {:glen "1,2,   3"
                  :john "something"})
   #_.)

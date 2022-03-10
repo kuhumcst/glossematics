@@ -11,6 +11,7 @@
             [dk.cst.pedestal.sp.auth :as sp.auth]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
+            [dk.cst.glossematics.frontend.page.search :as search]
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
@@ -23,6 +24,10 @@
     {:name ::encyclopedia/entry
      :page encyclopedia/page
      :prep #(prn 'encyclopedia @state/location)}]
+   ["/app/search"
+    {:name ::search/page
+     :page search/page
+     :prep search/fetch-search-results!}]
    ["/app/reader"
     {:name ::reader/empty
      :page reader/page
@@ -32,7 +37,7 @@
      :page reader/page
      :prep reader/fetch-document-list!}]
    ["/app/timeline"
-    {:name ::timeline
+    {:name ::timeline/page
      :page timeline/page
      :prep timeline/fetch-timeline-data!}]])
 
@@ -57,8 +62,9 @@
      [:h1 "Glossematics" [:span ".org"]]]]
    [:div.shell__content
     [:div
+     [:a {:href (href ::search/page)} "Search"] ", "
      [:a {:href (href ::reader/empty)} "Reader"] ", "
-     [:a {:href (href ::timeline)} "Timeline"]]
+     [:a {:href (href ::timeline/page)} "Timeline"]]
 
     (if-let [page (get-in @state/location [:data :page])]
       [page]
@@ -70,14 +76,15 @@
   []
   (rfe/start!
     (rf/router routes)
-    (fn [{:keys [path] :as m}]
-      (let [old-path (-> @state/location :path)]
+    (fn [{:keys [path query-params] :as m}]
+      (let [old-location @state/location]
         (reset! state/location m)
 
         ;; Don't re-fetch prep data on soft reloads, e.g. by shadow-cljs.
-        (when (not= path old-path)
+        (when (or (not= path (:path old-location))
+                  (not= query-params (:query-params old-location)))
           (when-let [prep (get-in m [:data :prep])]
-            (prep)))))
+            (prep m)))))
     {:use-fragment false}))
 
 (defn ^:dev/after-load render
