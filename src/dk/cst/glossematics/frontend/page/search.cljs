@@ -42,15 +42,36 @@
                    :results %
                    :query-params query-params))))
 
+(defn- parse-int
+  [s]
+  (js/parseInt (or s "0")))
+
+(defn- set-offset!
+  [f n]
+  (let [new-offset (fn [offset & args] (str (apply f (parse-int offset) args)))]
+    (swap! state/search update-in [:query-params :offset] new-offset n)
+    (rfe/push-state ::page {} (:query-params @state/search))))
+
 (defn page
   []
   (let [location* @state/location
-        search*   @state/search]
+        {:keys [results query-params]} @state/search
+        {:keys [offset limit]} query-params
+        offset-n  (parse-int offset)
+        limit-n   (parse-int limit)
+        results-n (count results)
+        total     (:total (meta results))]
     [:<>
      [:form {:role      "search"
              :action    (api/normalize-url "/search")
              :on-submit on-submit
              :method    "get"}
+      [:input {:type  "hidden"
+               :name  "limit"
+               :value (or limit "20")}]
+      [:input {:type  "hidden"
+               :name  "offset"
+               :value (or offset "0")}]
       [:label "Anything " [:input {:type "text"
                                    :name "_"}]]
       [:br]
@@ -66,17 +87,29 @@
         [:option {:value "asc"} "Ascending"]
         [:option {:value "desc"} "Descending"]]]
       [:input {:type "submit"}]]
-     (when-let [results (:results search*)]
+     (when results
        (if (empty? results)
          [:<>
           [:p "No matches for: "]
           [:dl
-           (for [[k v] (:query-params search*)]
+           (for [[k v] query-params]
              [:<> {:key k}
               [:dt (str k)]
               [:dd v]])]]
          [:<>
-          [:p (count results) " out of " (:total (meta results))]
+          [:p
+           (when (not= offset-n 0)
+             [:button {:on-click #(set-offset! - 20)}
+              "←"]) " "
+           (if offset-n
+             (str offset-n " to " (+ offset-n results-n))
+             results-n)
+           " out of "
+           total " "
+           (when (and (not= results-n total)
+                      (> total (+ offset-n limit-n)))
+             [:button {:on-click #(set-offset! + 20)}
+              "→"])]
           [:ul
            (for [{:keys [file/name]} results]
              [:li {:key name}
