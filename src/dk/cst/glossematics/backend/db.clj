@@ -300,11 +300,16 @@
            :where [?e :db/ident ?id]]
          (entity->where-triples entity))))
 
+;; Fixes sorting when there is a mix of e.g. dates and :tg/nil
+(defn- ignore-tg-nil
+  [x]
+  (when-not (= :tg/nil x) x))
+
 (defn- sort-results
   "Sort 2-tuple `search-results` containing sort values in the second position."
   [search-results]
   (->> search-results
-       (sort-by second)
+       (sort-by (comp ignore-tg-nil second))
        (map first)
        (apply sorted-set)))
 
