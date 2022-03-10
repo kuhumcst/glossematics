@@ -1,11 +1,9 @@
 (ns dk.cst.glossematics.backend.endpoints
   "The various handlers/interceptors provided by the backend web service."
   (:require [clojure.string :as str]
-            [io.pedestal.http.content-negotiation :refer [negotiate-content]]
             [io.pedestal.http.route :refer [path-params-decoder]]
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
-            [hiccup.core :as hiccup]
             [asami.core :as d]
             [dk.cst.glossematics.backend.db :as db :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
 
@@ -25,7 +23,7 @@
                            [?e :event/start ?start]
                            (optional [?e :event/description ?description])
                            (optional [?e :event/end ?end])]
-                         (d/db conn))
+                         conn)
                     (map (fn [[?type ?title ?description ?start ?end]]
                            (cond-> {:type        ?type
                                     :title       ?title
@@ -48,7 +46,7 @@
                     :where
                     [?e :file/name ?name]
                     [?e :file/path ?path]]
-                  (d/db conn) filename)]
+                  conn filename)]
     (assoc-in (ring/file-response path)
               [:headers "Cache-Control"] one-day-cache)))
 
@@ -109,65 +107,8 @@
                 "Content-Type" "application/transit+json"
                 "Cache-Control" one-day-cache))))
 
-(defn build-hrefs
-  "Build hyperlinks for the 'files-ic' based on a specific file `extension`."
-  [extension]
-  (->> (d/q '[:find [?name ...]
-              :in $ ?ext
-              :where
-              [?e :file/extension ?ext]
-              [?e :file/name ?name]]
-            (d/db conn) extension)
-       (sort-by (comp str/lower-case first))
-       (map (partial str "/file/"))))
-
-(def content-type->body-fn
-  {"application/edn"
-   (fn [hrefs]
-     (pr-str hrefs))
-
-   "application/transit+json"
-   (fn [hrefs]
-     (transito/write-str hrefs))
-
-   "text/plain"
-   (fn [hrefs]
-     (str/join "\n" hrefs))
-
-   "text/html"
-   (fn [hrefs]
-     (hiccup/html
-       [:html
-        [:body
-         [:ul
-          (for [href hrefs]
-            [:li [:a {:title (str "Download " href)
-                      :href  href}
-                  href]])]]]))})
-
-(def file-list-ic
-  "Expects the Pedestal content negotiator in the interceptor chain."
-  {:name  ::file-list
-   :leave (fn [{:keys [request] :as ctx}]
-            (let [content-type (get-in request [:accept :field] "text/plain")
-                  extension    (get-in request [:path-params :extension])
-                  hrefs        (build-hrefs extension)
-                  hrefs->body  (content-type->body-fn content-type)]
-              (-> ctx
-                  (update :response assoc
-                          :status 200
-                          :body (hrefs->body hrefs))
-                  (update-in [:response :headers] assoc
-                             "Content-Type" content-type
-                             "Cache-Control" one-day-cache))))})
-
 (def timeline-chain
   [timeline-handler])
-
-(def file-list-chain
-  [(negotiate-content (keys content-type->body-fn))
-   path-params-decoder
-   file-list-ic])
 
 (def file-chain
   [path-params-decoder

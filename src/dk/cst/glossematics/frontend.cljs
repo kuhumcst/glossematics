@@ -30,12 +30,10 @@
      :prep search/fetch-search-results!}]
    ["/app/reader"
     {:name ::reader/empty
-     :page reader/page
-     :prep reader/fetch-document-list!}]
+     :page reader/page}]
    ["/app/reader/:document"
     {:name ::reader/document
-     :page reader/page
-     :prep reader/fetch-document-list!}]
+     :page reader/page}]
    ["/app/timeline"
     {:name ::timeline/page
      :page timeline/page

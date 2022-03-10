@@ -286,15 +286,6 @@
                       (concat tei-kvs (repeat missing-count placeholder))
                       tei-kvs))))
 
-;; Currently, relies on browser caching to avoid re-fires.
-(defn fetch-document-list!
-  []
-  (p/let [files (api/fetch "/files/xml")]
-    (->> (for [url files]
-           [(last (str/split url #"/")) url])
-         (into {})
-         (reset! state/tei-files))))
-
 (defn page
   []
   (let [{:keys [hiccup tei document]} @state/reader
@@ -310,16 +301,6 @@
 
     [:<>
      [:h2 current-document]
-     [:p
-      [:label "TEI-fil: "
-       [:select {:value     (or (and document-selected? document) "")
-                 :on-change (fn [e]
-                              (let [v (.. e -target -value)]
-                                (rfe/push-state ::document {:document v})))}
-        [:option {:value "" :disabled true} "--"]
-        (for [[k _] (sort @state/tei-files)]
-          ^{:key k} [:option {:value k}
-                     k])]]]
 
      ;; TODO: support metadata-only documents
      (when (and document-selected? hiccup)

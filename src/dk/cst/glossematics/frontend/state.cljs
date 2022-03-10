@@ -30,9 +30,6 @@
 (defonce search
   (r/cursor db [:search]))
 
-(defonce tei-files
-  (r/cursor db [:files :tei]))
-
 (defonce reader
   (r/cursor db [:reader]))
 
