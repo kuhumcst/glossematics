@@ -17,6 +17,7 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]))
 
+;; TODO: missing facs http://localhost:8080/app/reader/acc-1992_0005_025_Jakobson_0160-tei-final.xml
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
 ;; TODO: acc-1992_0005_024_Holt_0900-final.xml - error on line 150 at column 25

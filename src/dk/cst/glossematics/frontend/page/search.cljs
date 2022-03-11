@@ -1,20 +1,21 @@
 (ns dk.cst.glossematics.frontend.page.search
   "Page containing a synchronized facsimile & TEI transcription reader."
   (:require [clojure.string :as str]
+            [reagent.core :as r]
             [reitit.frontend.easy :as rfe]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.api :as api]))
 
-(defn- form-elements->query-params
-  "Retrieve a map of query parameters from HTML `form-elements`."
-  [form-elements]
+(defn- elements->params
+  "Retrieve a map of query parameters from HTML form `elements`."
+  [elements]
   (let [{:keys [sort-key
                 sort-dir]
-         :as   m} (into {} (for [form-element form-elements]
-                             (when (not-empty (.-name form-element))
-                               [(keyword (.-name form-element))
-                                (.-value form-element)])))
+         :as   m} (into {} (for [element elements]
+                             (when (not-empty (.-name element))
+                               [(keyword (.-name element))
+                                (.-value element)])))
         order-by (when (not-empty sort-key)
                    (str/join "," [sort-key sort-dir]))
         entity   (->> (dissoc m :sort-key :sort-dir)
@@ -24,14 +25,6 @@
       (if order-by
         (assoc entity :order-by order-by)
         entity))))
-
-(defn on-submit
-  [e]
-  (let [query-params (form-elements->query-params (.. e -target -elements))]
-    (.preventDefault e)
-    (if query-params
-      (rfe/push-state ::page {} query-params)
-      (js/alert "Please specify search criteria before submitting!"))))
 
 (defn fetch-search-results!
   [{:keys [query-params]}]
@@ -52,6 +45,96 @@
     (swap! state/search update-in [:query-params :offset] new-offset n)
     (rfe/push-state ::page {} (:query-params @state/search))))
 
+(defn items->query-params
+  [items]
+  (->> (for [[k v] items]
+         {(keyword k) (str v)})
+       (apply merge-with (fn [& args] (str/join "," args)))))
+
+(defn- add-kv
+  [{:keys [unique] :as old-state} kv]
+  (if-not (get unique kv)
+    (-> old-state
+        (update :items conj kv)
+        (update :unique conj kv))
+    old-state))
+
+(defn- remove-kv
+  [{:keys [items] :as old-state} kv]
+  (-> old-state
+      (assoc :items (vec (remove (partial = kv) items)))
+      (update :unique disj kv)))
+
+(defn- not-empty-entity
+  "Like 'not-empty' for the partial entity hidden inside `params`."
+  [params]
+  (when-not (empty? (dissoc params :limit :offset :order-by))
+    params))
+
+(defn multi-input-form
+  [limit offset]
+  (let [ordered-set    (r/atom {:unique #{} :items []})
+        refs           (atom {:input nil :elements nil})
+        update-search! (fn []
+                         (let [{:keys [items]} @ordered-set
+                               {:keys [elements]} @refs]
+                           (->> (dissoc (elements->params elements) :k :v)
+                                (merge (items->query-params items))
+                                (not-empty-entity)
+                                (rfe/push-state ::page {}))))
+        form-ref       (fn [elem]
+                         (when elem
+                           (swap! refs assoc :elements (.-elements elem))))
+        input-ref      (fn [elem]
+                         (when elem
+                           (swap! refs assoc :input elem)))
+        on-change      (fn [e]
+                         (.preventDefault e)
+                         (update-search!))]
+    (fn [_ _]
+      (let [{:keys [items]} @ordered-set]
+        [:div
+         [:form {:on-submit (fn [e]
+                              (.preventDefault e)
+                              (let [{:keys [k v]} (-> (:elements @refs)
+                                                      (elements->params))]
+                                (swap! ordered-set add-kv [k v])
+                                (update-search!)
+                                (set! (.-value (:input @refs)) nil)))
+                 :ref       form-ref}
+          [:input {:type  "hidden"
+                   :name  "limit"
+                   :value (or limit "20")}]
+          [:input {:type  "hidden"
+                   :name  "offset"
+                   :value (or offset "0")}]
+          [:div (for [[k v :as kv] items]
+                  [:span {:key kv}
+                   v " (" k ") "
+                   [:button {:type     "button"             ; prevent submit
+                             :on-click (fn [e]
+                                         (.preventDefault e)
+                                         (swap! ordered-set remove-kv kv)
+                                         (update-search!))}
+                    "x"]])]
+          [:input {:type "text"
+                   :name "v"
+                   :ref  input-ref}]
+          [:select {:name "k"}
+           [:option {:value "_"} "Anything"]
+           [:option {:value "document/mention"} "Mention"]]
+          [:div
+           [:label "Order by "
+            [:select {:name      "sort-key"
+                      :on-change on-change}
+             [:option {:value ""} "Nothing"]
+             [:option {:value "document/date-mention"}
+              "Mentioned dates"]]
+            [:select {:name      "sort-dir"
+                      :on-change on-change}
+             [:option {:value "asc"} "Ascending"]
+             [:option {:value "desc"} "Descending"]]]]]]))))
+
 (defn page
   []
   (let [location* @state/location
@@ -62,31 +145,7 @@
         results-n (count results)
         total     (:total (meta results))]
     [:<>
-     [:form {:role      "search"
-             :action    (api/normalize-url "/search")
-             :on-submit on-submit
-             :method    "get"}
-      [:input {:type  "hidden"
-               :name  "limit"
-               :value (or limit "20")}]
-      [:input {:type  "hidden"
-               :name  "offset"
-               :value (or offset "0")}]
-      [:label "Anything " [:input {:type "text"
-                                   :name "_"}]]
-      [:br]
-      [:label "Mentions " [:input {:type "text"
-                                   :name "document/mention"}]]
-      [:br]
-      [:label "Order by "
-       [:select {:name "sort-key"}
-        [:option {:value ""} "Nothing"]
-        [:option {:value "document/date-mention"}
-         "Mentioned dates"]]
-       [:select {:name "sort-dir"}
-        [:option {:value "asc"} "Ascending"]
-        [:option {:value "desc"} "Descending"]]]
-      [:input {:type "submit"}]]
+     [multi-input-form limit offset]
      (when results
        (if (empty? results)
          [:<>
