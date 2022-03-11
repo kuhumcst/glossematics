@@ -98,18 +98,20 @@
               [:dd v]])]]
          [:<>
           [:p
-           (when (not= offset-n 0)
-             [:button {:on-click #(set-offset! - 20)}
-              "←"]) " "
+           [:button {:disabled (= offset-n 0)
+                     :on-click #(set-offset! - 20)}
+            "←"]
+           " "
            (if offset-n
              (str offset-n " to " (+ offset-n results-n))
              results-n)
            " out of "
-           total " "
-           (when (and (not= results-n total)
-                      (> total (+ offset-n limit-n)))
-             [:button {:on-click #(set-offset! + 20)}
-              "→"])]
+           total
+           " "
+           [:button {:disabled (or (= results-n total)
+                                   (< total (+ offset-n limit-n)))
+                     :on-click #(set-offset! + 20)}
+            "→"]]
           [:ul
            (for [{:keys [file/name]} results]
              [:li {:key name}
