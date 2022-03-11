@@ -113,7 +113,10 @@
                      :on-click #(set-offset! + 20)}
             "→"]]
           [:ul
-           (for [{:keys [file/name]} results]
+           (for [{:keys [file/name] :as entity} results]
              [:li {:key name}
               [:a {:href (rfe/href ::reader/document {:document name})}
-               name]])]]))]))
+               name]
+              [:br]
+              ;; This is only present while figuring things out...
+              [:pre (with-out-str (cljs.pprint/pprint entity))]])]]))]))
