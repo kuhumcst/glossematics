@@ -73,10 +73,10 @@
 
 (defn multi-input-form
   [limit offset]
-  (let [ordered-set    (r/atom {:unique #{} :items []})
+  (let [state          (r/atom {:unique #{} :items []})
         refs           (atom {:input nil :elements nil})
         update-search! (fn []
-                         (let [{:keys [items]} @ordered-set
+                         (let [{:keys [items]} @state
                                {:keys [elements]} @refs]
                            (->> (dissoc (elements->params elements) :k :v)
                                 (merge (items->query-params items))
@@ -92,13 +92,14 @@
                          (.preventDefault e)
                          (update-search!))]
     (fn [_ _]
-      (let [{:keys [items]} @ordered-set]
+      (let [{:keys [items in]} @state
+            no-input? (empty? in)]
         [:div
          [:form {:on-submit (fn [e]
                               (.preventDefault e)
                               (let [{:keys [k v]} (-> (:elements @refs)
                                                       (elements->params))]
-                                (swap! ordered-set add-kv [k v])
+                                (swap! state add-kv [k v])
                                 (update-search!)
                                 (set! (.-value (:input @refs)) nil)))
                  :ref       form-ref}
@@ -114,23 +115,28 @@
                    [:button {:type     "button"             ; prevent submit
                              :on-click (fn [e]
                                          (.preventDefault e)
-                                         (swap! ordered-set remove-kv kv)
+                                         (swap! state remove-kv kv)
                                          (update-search!))}
                     "x"]])]
-          [:input {:type "text"
-                   :name "v"
-                   :ref  input-ref}]
-          [:select {:name "k"}
+          [:input {:type      "text"
+                   :name      "v"
+                   :on-change (fn [e]
+                                (swap! state assoc :in (.-value (.-target e))))
+                   :ref       input-ref}]
+          [:select {:name     "k"
+                    :disabled no-input?}
            [:option {:value "_"} "Anything"]
            [:option {:value "document/mention"} "Mention"]]
           [:div
            [:label "Order by "
             [:select {:name      "sort-key"
+                      :disabled  no-input?
                       :on-change on-change}
              [:option {:value ""} "Nothing"]
              [:option {:value "document/date-mention"}
               "Mentioned dates"]]
             [:select {:name      "sort-dir"
+                      :disabled  no-input?
                       :on-change on-change}
              [:option {:value "asc"} "Ascending"]
              [:option {:value "desc"} "Descending"]]]]]]))))
