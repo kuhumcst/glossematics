@@ -53,8 +53,8 @@
 (defn entity-handler
   "A handler to serve database entities, e.g. document or event metadata."
   [{:keys [path-params] :as request}]
-  (let [{:keys [filename]} path-params
-        entity (d/entity conn filename)]
+  (let [{:keys [id]} path-params
+        entity (d/entity conn id)]
     (if entity
       (-> request
           (assoc
@@ -75,7 +75,7 @@
 (defn- clean-entity
   "Remove private/unnecessary data from `entity`."
   [entity]
-  (dissoc entity :file/path))
+  (dissoc entity :file/path :entity/type))
 
 (defn search-handler
   "A handler to search for database entities, e.g. document or event metadata.

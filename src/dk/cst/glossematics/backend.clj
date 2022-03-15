@@ -36,15 +36,11 @@
        :get (into (sp.ic/auth-chain conf :authenticated)
                   endpoints/timeline-chain)
        :route-name ::endpoints/timeline]
-      ["/files/:extension"
-       :get (into (sp.ic/auth-chain conf :authenticated)
-                  endpoints/file-list-chain)
-       :route-name ::endpoints/list]
       ["/file/:filename"
        :get (into (sp.ic/auth-chain conf :authenticated)
                   endpoints/file-chain)
        :route-name ::endpoints/file]
-      ["/entity/:filename"
+      ["/entity/:id"
        :get (into (sp.ic/auth-chain conf :authenticated)
                   endpoints/entity-chain)
        :route-name ::endpoints/entity]

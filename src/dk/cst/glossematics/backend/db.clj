@@ -99,7 +99,25 @@
       (update :event/restored-start? (comp boolean not-empty))
       (update :event/restored-end? (comp boolean not-empty))
       (update :event/start (partial parse-date excel-dtf))
-      (update :event/end (partial parse-date excel-dtf))))
+      (update :event/end (partial parse-date excel-dtf))
+      (assoc :entity/type :entity.type/event)))
+
+(defn normalize-name-data
+  [person]
+  (-> person
+      (update-vals #(cond
+                      (string? %)
+                      (let [s (str/trim %)]
+                        (when (not-empty s)
+                          (when-not (re-find #"\?|\-" s)
+                            s)))
+
+                      (number? %)
+                      (int %)
+
+                      :else %))
+      (update :db/ident #(when % (str "#np" %)))
+      (assoc :entity/type :entity.type/person)))
 
 (defn- remove-nil-vals
   "Remove kvs from `m` where v is nil.
@@ -120,6 +138,22 @@
        (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
 
+(defn person-entities
+  []
+  (->> (io/file (io/resource "20220302-Navneliste-Motherliste.xlsx"))
+       (xl/load-workbook)
+       (xl/select-sheet "Sheet1")
+       (xl/select-columns {:A :db/ident
+                           :B :person/first-name
+                           :C :person/last-name
+                           :D :person/full-name
+                           :E :person/birth
+                           :F :person/death})
+       (rest)                                               ; skip title
+       (map normalize-name-data)
+       (map remove-nil-vals)
+       (remove #(= {:entity/type :entity.type/person} %)))) ; empty
+
 (defn- with-body?
   "Does the file with `filename` contain a body of content?"
   [filename]
@@ -133,6 +167,7 @@
                  extension (last (str/split filename #"\."))
                  path      (.getPath ^File file)]
              {:db/ident       filename
+              :entity/type    :entity.type/file
               :file/body?     (with-body? filename)
               :file/name      filename
               :file/extension extension
@@ -271,6 +306,7 @@
   [{:keys [files-dir] :as conf}]
   (d/transact conn {:tx-data (file-entities files-dir)})
   (d/transact conn {:tx-data (timeline-entities)})
+  (d/transact conn {:tx-data (person-entities)})
   (d/transact conn {:tx-data (map as-entity (tei-files conn))}))
 
 (defn- entity->where-triples
@@ -363,9 +399,13 @@
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
   (timeline-entities)
+  (person-entities)
   (parse-date excel-dtf "03.10.1899")
   (parse-date excel-dtf "03-10-1899")
   (parse-date tei-dtf "1899-10-03")
+
+  ;; Multiple names registered for the same person (very common)
+  (d/entity conn "#np668")
 
   ;; Test loading of file entities
   (d/entity conn "acc-1992_0005_036_Uldall_0220-tei-final.xml")
