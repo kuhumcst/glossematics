@@ -27,7 +27,10 @@
    ["/app/search"
     {:name ::search/page
      :page search/page
-     :prep search/fetch-search-results!}]
+     :prep #(do
+              (search/fetch-results! %)
+              (when-not (:name->id @state/search)
+                (search/fetch-metadata!)))}]
    ["/app/reader"
     {:name ::reader/empty
      :page reader/page}]

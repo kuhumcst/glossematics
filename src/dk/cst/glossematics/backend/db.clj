@@ -4,6 +4,7 @@
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [clojure.set :as set]
+            [clojure.math.combinatorics :as combo]
             [asami.core :as d]
             [tick.core :as t]
             [dk.ative.docjure.spreadsheet :as xl]
@@ -137,6 +138,60 @@
        (map normalize-chronology-data)
        (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
+
+(defn- multiple?
+  [x]
+  (and (coll? x) (> (count x) 1)))
+
+(defn- as-set
+  [v]
+  (cond
+    (set? v) v
+    (some? v) #{v}))
+
+(defn name-permutations
+  "Get names sourced from the first, last, and full name of a `person-entity`."
+  [person-entity]
+  (let [{:keys [person/first-name
+                person/last-name
+                person/full-name]} (update-vals person-entity as-set)]
+    (set/union
+      (cond
+        (or (multiple? first-name) (multiple? last-name))
+        (->> (combo/cartesian-product first-name last-name)
+             (map (partial str/join " "))
+             (set))
+
+        (and (some? first-name) (some? last-name))
+        #{(str (first first-name) " " (first last-name))})
+      (if-not (or full-name (and last-name first-name))
+        (or last-name first-name)
+        full-name))))
+
+(defn name-lookup-kvs
+  "Return [name-str ident] for all names referenced in the TEI documents."
+  []
+  (->> (d/q '[:find [?id ...]
+              :where
+              [?p :entity/type :entity.type/person]
+              [?p :db/ident ?id]
+              [?f :entity/type :entity.type/file]
+              [?f _ ?id]]
+            conn)
+       (map #(assoc (d/entity conn %) :db/ident %))
+       (mapcat (fn [{:keys [db/ident] :as m}]
+                 (for [s (name-permutations m)]
+                   [s ident])))))
+
+;; For debugging source data
+(defn name-duplicates
+  []
+  (->> (name-lookup-kvs)
+       (group-by first)
+       (filter (comp multiple? second))
+       (map (fn [[k v]]
+              [k (map second v)]))
+       (sort)))
 
 (defn person-entities
   []
@@ -427,6 +482,10 @@
   (search conn {:document/mention #{"#npl1957"}}
           :order-by [:document/date-mention :asc]
           :limit 3)
+
+  ;; Print duplicates
+  (doseq [[k v] (name-duplicates)]
+    (println (str k ": " (str/join ", " v))))
 
   (count (d/q '[:find ?name ?path
                 :where

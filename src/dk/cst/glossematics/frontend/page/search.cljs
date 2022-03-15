@@ -26,10 +26,15 @@
         (assoc entity :order-by order-by)
         entity))))
 
-(defn fetch-search-results!
+(defn fetch-metadata!
+  []
+  (.then (api/fetch "/search/metadata")
+         #(swap! state/search assoc :name->id (:name->id %))))
+
+(defn fetch-results!
   [{:keys [query-params]}]
   (if (empty? query-params)
-    (reset! state/search {})
+    (swap! state/search dissoc :results :query-params)
     (.then (api/fetch "/search" {:query-params query-params})
            #(swap! state/search assoc
                    :results %
@@ -71,8 +76,16 @@
   (when-not (empty? (dissoc params :limit :offset :order-by))
     params))
 
+(defn multi-input-data
+  [name->id]
+  (fn [_]
+    [:datalist {:id "names"}
+     (for [[entity-name id] (sort name->id)]
+       [:option {:key   entity-name
+                 :value entity-name}])]))
+
 (defn multi-input-form
-  [limit offset]
+  [limit offset name->id]
   (let [state          (r/atom {:unique #{} :items []})
         refs           (atom {:input nil :elements nil})
         update-search! (fn []
@@ -88,70 +101,112 @@
         input-ref      (fn [elem]
                          (when elem
                            (swap! refs assoc :input elem)))
+        on-input       (fn [e]
+                         (swap! state assoc :in (.-value (.-target e))))
         on-change      (fn [e]
                          (.preventDefault e)
                          (update-search!))]
     (fn [_ _]
       (let [{:keys [items in]} @state
-            no-input? (empty? in)]
-        [:div
-         [:form {:on-submit (fn [e]
-                              (.preventDefault e)
-                              (let [{:keys [k v]} (-> (:elements @refs)
-                                                      (elements->params))]
-                                (swap! state add-kv [k v])
-                                (update-search!)
-                                (set! (.-value (:input @refs)) nil)))
-                 :ref       form-ref}
-          [:input {:type  "hidden"
-                   :name  "limit"
-                   :value (or limit "20")}]
-          [:input {:type  "hidden"
-                   :name  "offset"
-                   :value (or offset "0")}]
-          [:div (for [[k v :as kv] items]
-                  [:span {:key kv}
-                   v " (" k ") "
-                   [:button {:type     "button"             ; prevent submit
-                             :on-click (fn [e]
-                                         (.preventDefault e)
-                                         (swap! state remove-kv kv)
-                                         (update-search!))}
-                    "x"]])]
-          [:input {:type      "text"
-                   :name      "v"
-                   :on-change (fn [e]
-                                (swap! state assoc :in (.-value (.-target e))))
-                   :ref       input-ref}]
-          [:select {:name     "k"
-                    :disabled no-input?}
+            no-input? (empty? in)
+            no-items? (empty? items)]
+        [:form.search
+         {:on-submit (fn [e]
+                       (.preventDefault e)
+                       (let [{:keys [k v]} (-> (:elements @refs)
+                                               (elements->params))]
+                         (swap! state add-kv (with-meta
+                                               [k (name->id v)]
+                                               {:label v}))
+
+                         (update-search!)
+                         (set! (.-value (:input @refs)) nil)
+                         (swap! state assoc :in "")))
+          :ref       form-ref}
+
+         [:div.search__input
+          [:label {:for "v"} "Look for "]
+          [:input.search__input-value {:type      "list"
+                                       :list      "names"
+                                       :name      "v"
+                                       :id        "v"
+                                       :disabled  (nil? name->id)
+                                       :on-change on-input
+                                       :ref       input-ref}]
+          (when name->id
+            [multi-input-data name->id])
+          [:label {:for "k"} " as "]
+          [:select.search__input-attribute
+           {:name     "k"
+            :id       "k"
+            :disabled no-input?}
            [:option {:value "_"} "Anything"]
-           [:option {:value "document/mention"} "Mention"]]
-          [:div
-           [:label "Order by "
-            [:select {:name      "sort-key"
-                      :disabled  no-input?
-                      :on-change on-change}
-             [:option {:value ""} "Nothing"]
-             [:option {:value "document/date-mention"}
-              "Mentioned dates"]]
-            [:select {:name      "sort-dir"
-                      :disabled  no-input?
-                      :on-change on-change}
-             [:option {:value "asc"} "Ascending"]
-             [:option {:value "desc"} "Descending"]]]]]]))))
+           [:option {:value "document/mention"} "Mention"]]]
+
+         (when (not-empty items)
+           [:<>
+            [:div.search__order
+             [:label {:for "sort-key"} "Order by "]
+             [:select {:name      "sort-key"
+                       :id        "sort-key"
+                       :disabled  (and no-input? no-items?)
+                       :on-change on-change}
+              [:option {:value ""} "Nothing"]
+              [:option {:value "document/date-mention"}
+               "Mentioned dates"]]
+             [:label {:for "sort-dir"} " in direction "]
+             [:select {:name      "sort-dir"
+                       :id        "sort-dir"
+                       :disabled  (and no-input? no-items?)
+                       :on-change on-change}
+              [:option {:value "asc"} "Ascending"]
+              [:option {:value "desc"} "Descending"]]]
+
+            [:fieldset
+             [:legend "Search criteria"
+              [:button {:type     "button"                  ; prevent submit
+                        :title    "Clear all criteria"
+                        :on-click (fn [e]
+                                    (.preventDefault e)
+                                    (swap! state dissoc :items :unique)
+                                    (update-search!))}
+               "x"]]
+
+             [:div.search__list
+              (for [[k v :as kv] items
+                    :let [label (:label (meta kv))]]
+                [:span.search__item {:key kv}
+                 [:span.search__item-label label]
+                 (when (not= k "_")
+                   [:span.search__item-key k])
+                 [:button {:type     "button"               ; prevent submit
+                           :title    "Remove criterion"
+                           :on-click (fn [e]
+                                       (.preventDefault e)
+                                       (swap! state remove-kv kv)
+                                       (update-search!))}
+                  "x"]])]]])
+
+         [:input {:type  "hidden"
+                  :name  "limit"
+                  :value (or limit "20")}]
+         [:input {:type  "hidden"
+                  :name  "offset"
+                  :value (or offset "0")}]]))))
 
 (defn page
   []
   (let [location* @state/location
-        {:keys [results query-params]} @state/search
+        {:keys [results query-params name->id]} @state/search
         {:keys [offset limit]} query-params
         offset-n  (parse-int offset)
         limit-n   (parse-int limit)
         results-n (count results)
         total     (:total (meta results))]
     [:<>
-     [multi-input-form limit offset]
+     ;; React key needed for input to update after name->id has been fetched!
+     ^{:key (hash name->id)}
+     [multi-input-form limit offset name->id]
      (when results
        (if (empty? results)
          [:<>

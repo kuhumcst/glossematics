@@ -47,7 +47,11 @@
       ["/search"
        :get (into (sp.ic/auth-chain conf :authenticated)
                   endpoints/search-chain)
-       :route-name ::endpoints/search]}))
+       :route-name ::endpoints/search]
+      ["/search/metadata"
+       :get (into (sp.ic/auth-chain conf :authenticated)
+                  endpoints/search-metadata-chain)
+       :route-name ::endpoints/search-metadata]}))
 
 (defn routes
   [sp-conf]
@@ -89,15 +93,15 @@
 
 (defn start []
   (when (not @sp-conf)
-    (load-sp-conf!))
-  (bootstrap! @sp-conf)
+    (load-sp-conf!)
+    (bootstrap! @sp-conf))
   (let [service-map (->service-map @sp-conf)]
     (http/start (http/create-server service-map))))
 
 (defn start-dev []
   (when (not @sp-conf)
-    (load-sp-conf!))
-  (bootstrap! @sp-conf)
+    (load-sp-conf!)
+    (bootstrap! @sp-conf))
   (reset! server (http/start (http/create-server (assoc (->service-map @sp-conf)
                                                    ::http/join? false)))))
 

@@ -107,6 +107,15 @@
                 "Content-Type" "application/transit+json"
                 "Cache-Control" one-day-cache))))
 
+(defn search-metadata-handler
+  [request]
+  (-> (assoc request
+        :status 200
+        :body (transito/write-str {:name->id (into {} (db/name-lookup-kvs))}))
+      (update :headers assoc
+              "Content-Type" "application/transit+json"
+              "Cache-Control" one-day-cache)))
+
 (def timeline-chain
   [timeline-handler])
 
@@ -121,6 +130,10 @@
 (def search-chain
   [path-params-decoder
    search-handler])
+
+(def search-metadata-chain
+  [path-params-decoder
+   search-metadata-handler])
 
 (comment
   (split-params {:glen "1,2,   3"

@@ -40,3 +40,167 @@ body {
     min-width: 80ch;
     margin: 0 auto;
 }
+
+.search {
+    padding: 16px;
+    background-color: #662211;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    font-family: Georgia, serif;
+    letter-spacing: 1.25;
+    font-size: 16px;
+}
+
+.search > * + * {
+    margin-top: 16px;
+}
+
+.search label {
+    color: white;
+    opacity: 0.7;
+    letter-spacing: 1.5;
+    text-transform: uppercase;
+    padding: 4px;
+}
+
+.search label:hover {
+    opacity: 0.8;
+}
+
+.search__list {
+    line-height: 32px;
+}
+
+
+@keyframes item-fade-in {
+  from {opacity: 0;}
+  to {opacity: 0.5;}
+}
+
+.search__item {
+    animation: item-fade-in 1s;
+    transition: all 0.2s;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    opacity: 0.5;
+    background-color: rgba(255,255,255,0.2);
+    padding: 4px 4px 4px 12px;
+    white-space: nowrap;
+    font-style: italic;
+    color: white;
+}
+
+.search__item:hover {
+    opacity: 0.8;
+}
+
+.search__item > button {
+    all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
+    cursor: pointer;
+    outline: revert;
+    color: transparent;
+
+    transition: all 0.33s;
+    background: url(/images/x-white.svg) no-repeat center;
+    background-size: 12px;
+    line-height: 16px;
+    width: 20px;
+    vertical-align: text-bottom;
+    margin-left: 4px;
+}
+
+
+.search__item > button:hover {
+    transform: rotate(90deg);
+    background-size: 20px;
+}
+
+.search legend > button {
+    all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
+    cursor: pointer;
+    outline: revert;
+    color: transparent;
+
+    transition: all 0.33s;
+    background: url(/images/x-white.svg) no-repeat center;
+    background-size: 16px;
+    width: 20px;
+    vertical-align: text-bottom;
+    margin-left: 4px;
+}
+
+
+.search legend:hover {
+    opacity: 0.8;
+}
+
+.search legend > button:hover {
+    transform: rotate(90deg);
+    background-size: 24px;
+    opacity: 1;
+}
+
+.search__item {
+    margin-right: 8px;
+}
+
+.search__item:last-child {
+    margin-right: 0;
+}
+
+.search__input,
+.search__order
+{
+    display: flex;
+}
+
+.search__input > * + *,
+.search__order > * + *
+{
+    margin-left: 8px;
+}
+
+.search__input input[type=list],
+.search__order #sort-key {
+    flex-grow: 1;
+}
+
+.search input, select {
+    appearance:none;
+    -webkit-appearance:none;
+
+    padding: 4px 8px;
+    min-height: 26px;
+    font-size: 16px;
+    color: rgba(0,0,0,0.9);
+    border: 1px solid white;
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.6);
+}
+
+.search select:active {
+    color: black;
+}
+
+.search select:not(:disabled) {
+    cursor: pointer;
+}
+
+.search input:disabled, select:disabled {
+    opacity: 0.2;
+}
+
+.search fieldset {
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 12px 24px 16px 24px;
+}
+
+.search legend {
+    color: white;
+    opacity: 0.7;
+    padding: 0 8px;
+    text-transform: uppercase;
+}
