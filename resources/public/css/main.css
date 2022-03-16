@@ -142,12 +142,16 @@ body {
     opacity: 1;
 }
 
-.search__item {
-    margin-right: 8px;
+.search__item + .search__item {
+    margin-left: 8px;
 }
 
-.search__item:last-child {
-    margin-right: 0;
+.search__item-key {
+    font-weight: bold;
+    font-variant: small-caps;
+    opacity: 0.5;
+    border-right: 1px solid white;
+    margin-right: 8px;
 }
 
 .search__input,

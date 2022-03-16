@@ -84,6 +84,13 @@
        [:option {:key   entity-name
                  :value entity-name}])]))
 
+(def rel->description
+  {:document/mention "mentioned"})
+
+(defn- kw->str
+  [kw]
+  (subs (str kw) 1))
+
 (defn multi-input-form
   [limit offset name->id]
   (let [state          (r/atom {:unique #{} :items []})
@@ -140,8 +147,10 @@
            {:name     "k"
             :id       "k"
             :disabled no-input?}
-           [:option {:value "_"} "Anything"]
-           [:option {:value "document/mention"} "Mention"]]]
+           [:option {:value "_"} "anything"]
+           [:<>
+            (for [[rel description] (sort-by second rel->description)]
+              [:option {:key rel :value (kw->str rel)} description])]]]
 
          (when (not-empty items)
            [:<>
@@ -174,11 +183,12 @@
 
              [:div.search__list
               (for [[k v :as kv] items
-                    :let [label (:label (meta kv))]]
+                    :let [label (:label (meta kv))
+                          rel   (keyword k)]]
                 [:span.search__item {:key kv}
+                 (when (not= rel :_)
+                   [:span.search__item-key (rel->description rel) " "])
                  [:span.search__item-label label]
-                 (when (not= k "_")
-                   [:span.search__item-key k])
                  [:button {:type     "button"               ; prevent submit
                            :title    "Remove criterion"
                            :on-click (fn [e]
