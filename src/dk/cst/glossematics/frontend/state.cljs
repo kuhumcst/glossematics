@@ -17,9 +17,18 @@
 ;; Some state to keep track of modals to avoid concurrent instances.
 (def ^:dynamic *modal-dialog*)
 
+(def query-defaults
+  {:unique   #{} :items []         ; = ordered set
+   :in       ""
+   :rel      '_
+   :limit    20
+   :offset   0
+   :order-by [nil :asc]})
+
 ;; Local page data should all be cursors into this central data structure.
 (defonce db
-  (r/atom {:reader nil}))
+  (r/atom {:reader nil
+           :search {:query query-defaults}}))
 
 (defonce location
   (r/cursor db [:location]))
@@ -28,7 +37,10 @@
   (r/cursor db [:timeline]))
 
 (defonce search
-  (r/cursor db [:search]))
+  (r/cursor db [:search :meta]))
+
+(defonce query
+  (r/cursor db [:search :query]))
 
 (defonce reader
   (r/cursor db [:reader]))

@@ -292,7 +292,7 @@
   (let [{:keys [hiccup tei document]} @state/reader
         location*          @state/location
         current-document   (get-in location* [:path-params :document])
-        document-selected? (= ::document (get-in location* [:data :name]))
+        document-selected? (= ::page (get-in location* [:data :name]))
         new-document?      (not= document current-document)]
 
     ;; Uses a side-effect of the rendering function to load new documents.

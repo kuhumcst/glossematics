@@ -27,21 +27,16 @@
    ["/app/search"
     {:name ::search/page
      :page search/page
-     :prep #(do
-              (search/fetch-results! %)
-              (when-not (:name->id @state/search)
-                (search/fetch-metadata!)))}]
-   ["/app/reader"
-    {:name ::reader/empty
-     :page reader/page}]
+     :prep #(search/fetch-results! %)}]
    ["/app/reader/:document"
-    {:name ::reader/document
+    {:name ::reader/page
      :page reader/page}]
    ["/app/timeline"
     {:name ::timeline/page
      :page timeline/page
      :prep timeline/fetch-timeline-data!}]])
 
+;; TODO: remove...?
 (defn debug-view
   []
   [:details {:style {:opacity "0.33"}} [:summary "DEBUG"]
@@ -62,16 +57,20 @@
     [:a {:href (href ::main)}
      [:h1 "Glossematics" [:span ".org"]]]]
    [:div.shell__content
-    [:div
+    [:div {:style {:margin-bottom "20px"}}
      [:a {:href (href ::search/page)} "Search"] ", "
-     [:a {:href (href ::reader/empty)} "Reader"] ", "
      [:a {:href (href ::timeline/page)} "Timeline"]]
 
     (if-let [page (get-in @state/location [:data :page])]
       [page]
-      [:p "unknown page"])
+      [:p "unknown page"])]])
 
-    [debug-view]]])
+(defn universal-prep!
+  "Prepare widely needed state."
+  []
+  (let [{:keys [name->id]} @state/search]
+    (when-not name->id
+      (search/fetch-metadata!))))
 
 (defn set-up-navigation!
   []
@@ -84,6 +83,7 @@
         ;; Don't re-fetch prep data on soft reloads, e.g. by shadow-cljs.
         (when (or (not= path (:path old-location))
                   (not= query-params (:query-params old-location)))
+          (universal-prep!)
           (when-let [prep (get-in m [:data :prep])]
             (prep m)))))
     {:use-fragment false}))
