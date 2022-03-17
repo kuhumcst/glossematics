@@ -7,25 +7,6 @@
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.api :as api]))
 
-(defn- elements->params
-  "Retrieve a map of query parameters from HTML form `elements`."
-  [elements]
-  (let [{:keys [sort-key
-                sort-dir]
-         :as   m} (into {} (for [element elements]
-                             (when (not-empty (.-name element))
-                               [(keyword (.-name element))
-                                (.-value element)])))
-        order-by (when (not-empty sort-key)
-                   (str/join "," [sort-key sort-dir]))
-        entity   (->> (dissoc m :sort-key :sort-dir)
-                      (remove (comp empty? second))
-                      (into {}))]
-    (when (not-empty entity)
-      (if order-by
-        (assoc entity :order-by order-by)
-        entity))))
-
 (defn fetch-metadata!
   []
   (.then (api/fetch "/search/metadata")
@@ -53,7 +34,7 @@
 (defn items->query-params
   [items]
   (->> (for [[k v] items]
-         {(keyword k) (str v)})
+         {k v})
        (apply merge-with (fn [& args] (str/join "," args)))))
 
 (defn- add-kv
@@ -84,52 +65,71 @@
        [:option {:key   entity-name
                  :value entity-name}])]))
 
+(defn- e->v
+  [e]
+  (.-value (.-target e)))
+
+(defn- s->rel
+  [s]
+  (cond
+    (empty? s) nil
+    (= s "_") '_
+    :else (keyword s)))
+
+(defn- rel->s
+  [rel]
+  (cond
+    (nil? rel) ""
+    (= rel '_) "_"
+    :else (subs (str rel) 1)))
+
 (def rel->description
   {:document/mention "mentioned"})
 
-(defn- kw->str
-  [kw]
-  (subs (str kw) 1))
+(defn- update-search!
+  [state limit offset]
+  (let [{:keys [items order-by]} @state
+        [rel] order-by]
+    (if (not-empty items)
+      (->> (cond-> (items->query-params items)
+                   rel (assoc :order-by (str/join "," (map rel->s order-by)))
+                   limit (assoc :limit limit)
+                   offset (assoc :offset offset))
+           (rfe/push-state ::page {}))
+      (rfe/push-state ::page {} {}))))
 
-(defn multi-input-form
+(defn search-form
   [limit offset name->id]
-  (let [state          (r/atom {:unique #{} :items []})
-        refs           (atom {:input nil :elements nil})
-        update-search! (fn []
-                         (let [{:keys [items]} @state
-                               {:keys [elements]} @refs]
-                           (->> (dissoc (elements->params elements) :k :v)
-                                (merge (items->query-params items))
-                                (not-empty-entity)
-                                (rfe/push-state ::page {}))))
-        form-ref       (fn [elem]
-                         (when elem
-                           (swap! refs assoc :elements (.-elements elem))))
-        input-ref      (fn [elem]
-                         (when elem
-                           (swap! refs assoc :input elem)))
-        on-input       (fn [e]
-                         (swap! state assoc :in (.-value (.-target e))))
-        on-change      (fn [e]
-                         (.preventDefault e)
-                         (update-search!))]
+  (let [state        (r/atom {:unique   #{} :items []       ; = ordered set
+                              :in       ""
+                              :rel      '_
+                              :order-by [nil :asc]})
+        update!      #(update-search! state limit offset)
+        set-in!      (fn [e]
+                       (swap! state assoc :in (e->v e)))
+        submit-kv!   #(let [{:keys [rel in]} @state]
+                        ;; TODO: shake animation when bad input?
+                        (when-let [id (name->id in)]
+                          (swap! state add-kv (with-meta [rel id]
+                                                         {:label in}))
+                          (swap! state assoc :in "")
+                          (update!)))
+        set-rel!     (fn [e]
+                       (swap! state assoc :rel (s->rel (e->v e)))
+                       (submit-kv!))
+        ->set-order! #(fn [e]
+                        (swap! state assoc-in [:order-by %] (s->rel (e->v e)))
+                        (update!))]
     (fn [_ _]
-      (let [{:keys [items in]} @state
+      (let [{:keys [items in rel order-by]} @state
+            [order-rel order-dir] order-by
             no-input? (empty? in)
             no-items? (empty? items)]
         [:form.search
          {:on-submit (fn [e]
                        (.preventDefault e)
-                       (let [{:keys [k v]} (-> (:elements @refs)
-                                               (elements->params))]
-                         (swap! state add-kv (with-meta
-                                               [k (name->id v)]
-                                               {:label v}))
-
-                         (update-search!)
-                         (set! (.-value (:input @refs)) nil)
-                         (swap! state assoc :in "")))
-          :ref       form-ref}
+                       (submit-kv!))}
+         (str @state)
 
          [:div.search__input
           [:label {:for "v"} "Look for "]
@@ -138,19 +138,22 @@
                                        :name      "v"
                                        :id        "v"
                                        :disabled  (nil? name->id)
-                                       :on-change on-input
-                                       :ref       input-ref}]
+                                       :on-change set-in!
+                                       :value     in}]
           (when name->id
             [multi-input-data name->id])
+
           [:label {:for "k"} " as "]
           [:select.search__input-attribute
-           {:name     "k"
-            :id       "k"
-            :disabled no-input?}
+           {:name      "k"
+            :id        "k"
+            :value     (rel->s rel)
+            :on-change set-rel!
+            :disabled  (not (get name->id in))}
            [:option {:value "_"} "anything"]
            [:<>
             (for [[rel description] (sort-by second rel->description)]
-              [:option {:key rel :value (kw->str rel)} description])]]]
+              [:option {:key rel :value (rel->s rel)} description])]]]
 
          (when (not-empty items)
            [:<>
@@ -159,15 +162,18 @@
              [:select {:name      "sort-key"
                        :id        "sort-key"
                        :disabled  (and no-input? no-items?)
-                       :on-change on-change}
-              [:option {:value ""} "Nothing"]
+                       :value     (rel->s order-rel)
+                       :on-change (->set-order! 0)}
+              [:option {:value ""} ""]
               [:option {:value "document/date-mention"}
                "Mentioned dates"]]
+
              [:label {:for "sort-dir"} " in direction "]
              [:select {:name      "sort-dir"
                        :id        "sort-dir"
-                       :disabled  (and no-input? no-items?)
-                       :on-change on-change}
+                       :disabled  (nil? order-rel)
+                       :value     (rel->s order-dir)
+                       :on-change (->set-order! 1)}
               [:option {:value "asc"} "Ascending"]
               [:option {:value "desc"} "Descending"]]]
 
@@ -177,26 +183,28 @@
                         :title    "Clear all criteria"
                         :on-click (fn [e]
                                     (.preventDefault e)
-                                    (swap! state dissoc :items :unique)
-                                    (update-search!))}
+                                    (swap! state assoc
+                                           :items []
+                                           :unique #{})
+                                    (update!))}
                "x"]]
 
              [:div.search__list
               (for [[k v :as kv] items
-                    :let [label (:label (meta kv))
-                          rel   (keyword k)]]
+                    :let [label (:label (meta kv))]]
                 [:span.search__item {:key kv}
-                 (when (not= rel :_)
-                   [:span.search__item-key (rel->description rel) " "])
+                 (when (not= k '_)
+                   [:span.search__item-key (rel->description k) " "])
                  [:span.search__item-label label]
                  [:button {:type     "button"               ; prevent submit
                            :title    "Remove criterion"
                            :on-click (fn [e]
                                        (.preventDefault e)
                                        (swap! state remove-kv kv)
-                                       (update-search!))}
+                                       (update!))}
                   "x"]])]]])
 
+         ;; TODO: remove
          [:input {:type  "hidden"
                   :name  "limit"
                   :value (or limit "20")}]
@@ -216,7 +224,7 @@
     [:<>
      ;; React key needed for input to update after name->id has been fetched!
      ^{:key (hash name->id)}
-     [multi-input-form limit offset name->id]
+     [search-form (or limit "20") (or offset "0") name->id]
      (when results
        (if (empty? results)
          [:<>
