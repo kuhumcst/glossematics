@@ -129,8 +129,6 @@
          {:on-submit (fn [e]
                        (.preventDefault e)
                        (submit-kv!))}
-         (str @state)
-
          [:div.search__input
           [:label {:for "v"} "Look for "]
           [:input.search__input-value {:type      "list"
@@ -174,8 +172,8 @@
                        :disabled  (nil? order-rel)
                        :value     (rel->s order-dir)
                        :on-change (->set-order! 1)}
-              [:option {:value "asc"} "Ascending"]
-              [:option {:value "desc"} "Descending"]]]
+              [:option {:value "asc"} "ascending"]
+              [:option {:value "desc"} "descending"]]]
 
             [:fieldset
              [:legend "Search criteria"
@@ -189,20 +187,21 @@
                                     (update!))}
                "x"]]
 
-             [:div.search__list
-              (for [[k v :as kv] items
-                    :let [label (:label (meta kv))]]
-                [:span.search__item {:key kv}
+             (for [[k v :as kv] items
+                   :let [label (:label (meta kv))]]
+               [:<> {:key kv}
+                [:span.search__item
                  (when (not= k '_)
                    [:span.search__item-key (rel->description k) " "])
                  [:span.search__item-label label]
-                 [:button {:type     "button"               ; prevent submit
+                 [:button {:type     "button"              ; prevent submit
                            :title    "Remove criterion"
                            :on-click (fn [e]
                                        (.preventDefault e)
                                        (swap! state remove-kv kv)
                                        (update!))}
-                  "x"]])]]])
+                  "x"]]
+                " "])]])
 
          ;; TODO: remove
          [:input {:type  "hidden"
