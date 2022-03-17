@@ -86,17 +86,16 @@
 (def rel->description
   {:document/mention "mentioned"})
 
-(defn- update-search!
-  [state limit offset]
-  (let [{:keys [items order-by]} @state
-        [rel] order-by]
-    (if (not-empty items)
-      (->> (cond-> (items->query-params items)
-                   rel (assoc :order-by (str/join "," (map rel->s order-by)))
-                   limit (assoc :limit limit)
-                   offset (assoc :offset offset))
-           (rfe/push-state ::page {}))
-      (rfe/push-state ::page {} {}))))
+(defn- update-query!
+  "Modify the search query params to match the args."
+  [items limit offset [rel dir :as order-by]]
+  (if (not-empty items)
+    (->> (cond-> (items->query-params items)
+                 rel (assoc :order-by (str/join "," (map rel->s order-by)))
+                 limit (assoc :limit limit)
+                 offset (assoc :offset offset))
+         (rfe/push-state ::page {}))
+    (rfe/push-state ::page {} {})))
 
 (defn search-form
   [limit offset name->id]
@@ -104,7 +103,8 @@
                               :in       ""
                               :rel      '_
                               :order-by [nil :asc]})
-        update!      #(update-search! state limit offset)
+        update!      #(let [{:keys [items order-by]} @state]
+                        (update-query! items limit offset order-by))
         set-in!      (fn [e]
                        (swap! state assoc :in (e->v e)))
         submit-kv!   #(let [{:keys [rel in]} @state]
@@ -194,7 +194,7 @@
                  (when (not= k '_)
                    [:span.search__item-key (rel->description k) " "])
                  [:span.search__item-label label]
-                 [:button {:type     "button"              ; prevent submit
+                 [:button {:type     "button"               ; prevent submit
                            :title    "Remove criterion"
                            :on-click (fn [e]
                                        (.preventDefault e)
