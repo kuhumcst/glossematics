@@ -7,19 +7,6 @@
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.api :as api]))
 
-(defn fetch-metadata!
-  []
-  (.then (api/fetch "/search/metadata")
-         #(swap! state/search assoc
-                 :name->id (:name->id %)
-                 :id->name (set/map-invert (:name->id %)))))
-
-(defn items->query-params
-  [items]
-  (->> (for [[k v] items]
-         {k v})
-       (apply merge-with (fn [& args] (str/join "," args)))))
-
 (defn params->items
   [query-params id->name]
   (->> (dissoc query-params :limit :offset :order-by)
@@ -28,10 +15,6 @@
                          (with-meta [(if (= k :_) '_ k) id]
                                     {:label (get id->name id)}))
                        (str/split v #","))))))
-
-(defn- parse-int
-  [s]
-  (js/parseInt s))
 
 (defn parse-params
   [{:keys [order-by limit offset] :as query-params} id->name]
@@ -43,12 +26,46 @@
             limit (assoc :limit (js/parseInt limit))
             offset (assoc :offset (js/parseInt offset)))))
 
+(defn ?query-reset
+  "Conditionally reset the search query state from the query-params."
+  []
+  (let [{:keys [id->name]} @state/search
+        {:keys [query-params]} @state/location]
+    (when (and id->name query-params)
+      (let [query (merge state/query-defaults
+                         (parse-params query-params id->name))]
+        ;; The order of :items cannot be guaranteed, so it is dissoc'd.
+        ;; Checking :unique and the other keys should be enough, anyway.
+        (when (not= (dissoc query :items)
+                    (dissoc @state/query :items))
+          (reset! state/query query))))))
+
+(defn fetch-metadata!
+  []
+  (.then (api/fetch "/search/metadata")
+         #(do
+            (swap! state/search assoc
+                   :name->id (:name->id %)
+                   :id->name (set/map-invert (:name->id %)))
+            (?query-reset))))
+
+(defn items->query-params
+  [items]
+  (->> (for [[k v] items]
+         {k v})
+       (apply merge-with (fn [& args] (str/join "," args)))))
+
 (defn fetch-results!
   [{:keys [query-params]}]
   (if (empty? (dissoc query-params :limit :offset :order-by))
-    (swap! state/search dissoc :results)
+    (do
+      (swap! state/search dissoc :results)
+      (reset! state/query state/query-defaults)
+      (rfe/replace-state ::page {} {}))
     (.then (api/fetch "/search" {:query-params query-params})
-           #(swap! state/search assoc :results %))))
+           #(do
+              (swap! state/search assoc :results %)
+              (?query-reset)))))
 
 (defn- add-kv
   [{:keys [unique] :as old-state} kv]
@@ -138,15 +155,6 @@
         order-fn #(fn [e]
                     (swap! state/query assoc-in [:order-by %] (s->rel (e->v e)))
                     (update!))]
-
-    ;; Synchronize state with query params. As the search form needs to display
-    ;; entity labels rather than IDs, this runs after the search results have
-    ;; been fetched and updates separately. When there are multiple names
-    ;; available for an ID, a hard page reload won't always result in the same
-    ;; label being displayed!
-    (when (and id->name query-params)
-      (reset! state/query (merge state/query-defaults
-                                 (parse-params query-params id->name))))
 
     (fn [_ _]
       (let [{:keys [items in rel order-by]} @state/query
