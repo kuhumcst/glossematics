@@ -240,7 +240,7 @@
         total       (:total (meta results))]
     [:<>
      ;; React key needed for input to update after name->id has been fetched!
-     ^{:key (hash name->id)} [search-form]
+     ^{:key name->id} [search-form]
      (when results
        (if (empty? results)
          [:p "No matches found for query."]

@@ -9,7 +9,7 @@ body {
 }
 
 .shell__logo {
-    background: #333;
+    background: #111;
 }
 
 .shell__logo a {
@@ -24,7 +24,7 @@ body {
     text-align: left;
     text-transform: uppercase;
     padding: 24px 24px 4px 24px;
-    border-bottom: 24px solid #8d5050;
+    border-bottom: 24px solid #662211;
 }
 
 .shell__logo span {
@@ -168,7 +168,8 @@ body {
     flex-grow: 1;
 }
 
-.search input, select {
+.search input,
+.search  select {
     appearance:none;
     -webkit-appearance:none;
 
