@@ -195,7 +195,7 @@
 
 (defn person-entities
   []
-  (->> (io/file (io/resource "20220302-Navneliste-Motherliste.xlsx"))
+  (->> (io/file (io/resource "Navneliste_gennemgået-FINAL.xlsx"))
        (xl/load-workbook)
        (xl/select-sheet "Sheet1")
        (xl/select-columns {:A :db/ident
