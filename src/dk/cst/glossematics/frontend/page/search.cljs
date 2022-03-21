@@ -217,53 +217,52 @@
             :disabled  (not (get name->id in))}
            [select-opts id-rels [:option {:value (rel->s '_)} "anything"]]]]
 
+         [:div.search__order
+          [:label {:for "sort-key"} "Order by "]
+          [:select {:name      "sort-key"
+                    :id        "sort-key"
+                    :disabled  no-items?
+                    :value     (rel->s order-rel)
+                    :on-change (order-fn 0)}
+           [select-opts date-rels [:option {:value ""} ""]]]
+
+          [:label {:for "sort-dir"} " in direction "]
+          [:select {:name      "sort-dir"
+                    :id        "sort-dir"
+                    :disabled  (nil? order-rel)
+                    :value     (rel->s order-dir)
+                    :on-change (order-fn 1)}
+           [:option {:value "asc"} "ascending"]
+           [:option {:value "desc"} "descending"]]]
+
          (when (not-empty items)
-           [:<>
-            [:div.search__order
-             [:label {:for "sort-key"} "Order by "]
-             [:select {:name      "sort-key"
-                       :id        "sort-key"
-                       :disabled  (and no-input? no-items?)
-                       :value     (rel->s order-rel)
-                       :on-change (order-fn 0)}
-              [select-opts date-rels [:option {:value ""} ""]]]
+           [:fieldset
+            [:legend "Search criteria"
+             [:button {:type     "button"                   ; prevent submit
+                       :title    "Clear all criteria"
+                       :on-click (fn [e]
+                                   (.preventDefault e)
+                                   (swap! state/query assoc
+                                          :items []
+                                          :unique #{})
+                                   (update!))}
+              "x"]]
 
-             [:label {:for "sort-dir"} " in direction "]
-             [:select {:name      "sort-dir"
-                       :id        "sort-dir"
-                       :disabled  (nil? order-rel)
-                       :value     (rel->s order-dir)
-                       :on-change (order-fn 1)}
-              [:option {:value "asc"} "ascending"]
-              [:option {:value "desc"} "descending"]]]
-
-            [:fieldset
-             [:legend "Search criteria"
-              [:button {:type     "button"                  ; prevent submit
-                        :title    "Clear all criteria"
-                        :on-click (fn [e]
-                                    (.preventDefault e)
-                                    (swap! state/query assoc
-                                           :items []
-                                           :unique #{})
-                                    (update!))}
-               "x"]]
-
-             (for [[k v :as kv] items
-                   :let [label (:label (meta kv))]]
-               [:<> {:key kv}
-                [:span.search__item
-                 (when (not= k '_)
-                   [:span.search__item-key (:label (id-rels k)) " "])
-                 [:span.search__item-label label]
-                 [:button {:type     "button"               ; prevent submit
-                           :title    "Remove criterion"
-                           :on-click (fn [e]
-                                       (.preventDefault e)
-                                       (swap! state/query remove-kv kv)
-                                       (update!))}
-                  "x"]]
-                " "])]])]))))
+            (for [[k v :as kv] items
+                  :let [label (:label (meta kv))]]
+              [:<> {:key kv}
+               [:span.search__item
+                (when (not= k '_)
+                  [:span.search__item-key (:label (id-rels k)) " "])
+                [:span.search__item-label label]
+                [:button {:type     "button"                ; prevent submit
+                          :title    "Remove criterion"
+                          :on-click (fn [e]
+                                      (.preventDefault e)
+                                      (swap! state/query remove-kv kv)
+                                      (update!))}
+                 "x"]]
+               " "])])]))))
 
 (defn page
   []
