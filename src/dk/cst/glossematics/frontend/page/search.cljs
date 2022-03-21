@@ -96,7 +96,7 @@
   (fn [_]
     [:datalist {:id "names"}
      (for [[entity-name id] name-kvs]
-       [:option {:key   entity-name
+       [:option {:key   [entity-name id]
                  :value entity-name}])]))
 
 (defn- e->v
@@ -117,8 +117,12 @@
     (= rel '_) "_"
     :else (subs (str rel) 1)))
 
-(def rel->description
-  {:document/mention "mentioned"})
+(def id-rels
+  {:document/mention {:label "mentioned"}
+   :document/author  {:label "author"}})
+
+(def date-rels
+  {:document/date-mention {:label "mentioned date"}})
 
 (defn- state->params
   [{:keys [items limit offset order-by]}]
@@ -134,6 +138,14 @@
     (->> (swap! state/query update :offset new-offset n)
          (state->params)
          (rfe/replace-state ::page {}))))
+
+(defn- select-opts
+  [rels & [default-option]]
+  [:<>
+   default-option
+   (->> (sort-by (comp :label second) rels)
+        (map (fn [[rel {:keys [label]}]]
+               [:option {:key rel :value (rel->s rel)} label])))])
 
 (defn search-form
   []
@@ -203,10 +215,7 @@
             :value     (rel->s rel)
             :on-change set-rel
             :disabled  (not (get name->id in))}
-           [:option {:value "_"} "anything"]
-           [:<>
-            (for [[rel description] (sort-by second rel->description)]
-              [:option {:key rel :value (rel->s rel)} description])]]]
+           [select-opts id-rels [:option {:value (rel->s '_)} "anything"]]]]
 
          (when (not-empty items)
            [:<>
@@ -217,9 +226,7 @@
                        :disabled  (and no-input? no-items?)
                        :value     (rel->s order-rel)
                        :on-change (order-fn 0)}
-              [:option {:value ""} ""]
-              [:option {:value "document/date-mention"}
-               "Mentioned dates"]]
+              [select-opts date-rels [:option {:value ""} ""]]]
 
              [:label {:for "sort-dir"} " in direction "]
              [:select {:name      "sort-dir"
@@ -247,7 +254,7 @@
                [:<> {:key kv}
                 [:span.search__item
                  (when (not= k '_)
-                   [:span.search__item-key (rel->description k) " "])
+                   [:span.search__item-key (:label (id-rels k)) " "])
                  [:span.search__item-label label]
                  [:button {:type     "button"               ; prevent submit
                            :title    "Remove criterion"
