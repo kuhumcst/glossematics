@@ -89,15 +89,22 @@
   (let [{:keys [limit
                 offset
                 order-by
+                from
+                to
                 _]
          :as   params} (split-params query-params)
         entity   (cond-> (dissoc (merge {:file/extension "xml"} params)
-                                 :limit :offset :order-by :_)
+                                 :_ :limit :offset :order-by :from :to)
                    _ (assoc '_ _))
         entities (db/search conn entity
                             :limit (when limit (parse-long (first limit)))
                             :offset (when offset (parse-long (first offset)))
-                            :order-by (when order-by (map keyword order-by)))]
+                            :order-by (when order-by (map keyword order-by))
+                            :from (when from
+                                    (db/parse-date db/utc-dtf (first from)))
+                            :to (when to
+                                  (db/parse-date db/utc-dtf (first to))))]
+
     (-> (assoc request
           :status 200
           :body (transito/write-str (with-meta

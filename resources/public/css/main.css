@@ -132,7 +132,8 @@ body {
     background-size: 20px;
 }
 
-.search legend > button {
+.search legend > button,
+.search__between > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
     outline: revert;
@@ -166,34 +167,59 @@ body {
 }
 
 .search__input,
-.search__order
+.search__order,
+.search__between
 {
     display: flex;
+    align-items: center;
 }
 
 .search__input > * + *,
-.search__order > * + *
+.search__order > * + *,
+.search__between > * + *
 {
     margin-left: 8px;
 }
 
 .search__input input[type=list],
-.search__order #sort-key {
+.search__order #sort-key,
+.search__between input[type=date]
+{
     flex-grow: 1;
 }
 
-.search input,
-.search  select {
-    appearance:none;
-    -webkit-appearance:none;
+.search input[type=list],
+.search input[type=date],
+.search input[type=checkbox],
+.search select {
+    appearance: none;
 
-    padding: 4px 8px;
-    min-height: 26px;
+
+    min-height: 28px;
+    min-width: 28px;
     font-size: 16px;
     color: rgba(0,0,0,0.9);
     border: 1px solid white;
     border-radius: 4px;
     background-color: rgba(255,255,255,0.6);
+}
+
+.search input[type=list],
+.search input[type=checkbox],
+.search select {
+    padding: 4px 8px;
+}
+
+.search input[type=date]::placeholder {
+    color: red;
+    opacity: 1;
+}
+
+.search input[type=date] {
+    padding: 0 8px; /* TODO: something off about input[type=date] top-padding */
+
+    /* Safari weirdness: https://stackoverflow.com/questions/69888903/text-color-is-not-working-on-safari-iphone*/
+    -webkit-text-fill-color: rgba(0,0,0,0.9);
 }
 
 .search select:active {
@@ -219,16 +245,16 @@ body {
 }
 
 .search input.bad-input {
-    background-color: #DD6666;
+    background-color: #d64646;
 }
 
 .search input.good-input {
-    background-color: #99DD66;
+    background-color: #59ba4a;
 }
 
 /* yellow -- when e.g. input is technically valid, but already applied. */
 .search input.good-input.not-allowed {
-    background-color: #DDDD66;
+    background-color: #f6d348;
 }
 
 .search legend {

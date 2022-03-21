@@ -9,7 +9,7 @@
 
 (defn params->items
   [query-params id->name]
-  (->> (dissoc query-params :limit :offset :order-by)
+  (->> (dissoc query-params :limit :offset :order-by :from :to)
        (mapcat (fn [[k v]]
                  (map (fn [id]
                         (with-meta [(if (= k :_) '_ k) id]
@@ -17,14 +17,16 @@
                       (str/split v #","))))))
 
 (defn parse-params
-  [{:keys [order-by limit offset] :as query-params} id->name]
+  [{:keys [order-by limit offset from to] :as query-params} id->name]
   (let [items (params->items query-params id->name)]
     (cond-> {:items  (vec items)
              :unique (set items)}
             order-by (assoc :order-by (->> (str/split order-by #",")
-                                           (map (comp keyword str/trim))))
+                                           (mapv (comp keyword str/trim))))
             limit (assoc :limit (js/parseInt limit))
-            offset (assoc :offset (js/parseInt offset)))))
+            offset (assoc :offset (js/parseInt offset))
+            from (assoc :from from)
+            to (assoc :to to))))
 
 (defn ?query-reset
   "Conditionally reset the search query state from the query-params."
@@ -125,12 +127,15 @@
   {:document/date-mention {:label "mentioned date"}})
 
 (defn- state->params
-  [{:keys [items limit offset order-by]}]
-  (let [[rel] order-by]
-    (cond-> (items->query-params items)
-            rel (assoc :order-by (str/join "," (map rel->s order-by)))
-            limit (assoc :limit limit)
-            offset (assoc :offset offset))))
+  [{:keys [items limit offset order-by from to]}]
+  (when-let [params (items->query-params items)]            ; clear other params
+    (let [[rel] order-by]
+      (cond-> params
+              rel (assoc :order-by (str/join "," (map rel->s order-by)))
+              limit (assoc :limit limit)
+              offset (assoc :offset offset)
+              from (assoc :from from)
+              to (assoc :to to)))))
 
 (defn- set-offset
   [f n]
@@ -178,14 +183,19 @@
                    (submit))
         order-fn #(fn [e]
                     (swap! state/query assoc-in [:order-by %] (s->rel (e->v e)))
+                    (update!))
+        date-fn  #(fn [e]
+                    (if-let [v (not-empty (e->v e))]
+                      (swap! state/query assoc % v)
+                      (swap! state/query dissoc %))
                     (update!))]
 
     (fn [_ _]
-      (let [{:keys [items in rel order-by
+      (let [{:keys [items in rel order-by from to
                     bad-input? good-input? not-allowed?]} @state/query
             [order-rel order-dir] order-by
-            no-input? (empty? in)
-            no-items? (empty? items)]
+            no-items? (empty? items)
+            no-order? (nil? order-rel)]
         [:form.search
          {:on-submit (fn [e]
                        (.preventDefault e)
@@ -200,7 +210,6 @@
                                                      "bad-input")
                                                    (when good-input?
                                                      "good-input")]
-                                       :name      "v"
                                        :id        "v"
                                        :disabled  (nil? name->id)
                                        :on-change set-in
@@ -210,8 +219,7 @@
 
           [:label {:for "k"} " as "]
           [:select.search__input-attribute
-           {:name      "k"
-            :id        "k"
+           {:id        "k"
             :value     (rel->s rel)
             :on-change set-rel
             :disabled  (not (get name->id in))}
@@ -219,21 +227,45 @@
 
          [:div.search__order
           [:label {:for "sort-key"} "Order by "]
-          [:select {:name      "sort-key"
-                    :id        "sort-key"
+          [:select {:id        "sort-key"
                     :disabled  no-items?
                     :value     (rel->s order-rel)
                     :on-change (order-fn 0)}
            [select-opts date-rels [:option {:value ""} ""]]]
 
           [:label {:for "sort-dir"} " in direction "]
-          [:select {:name      "sort-dir"
-                    :id        "sort-dir"
-                    :disabled  (nil? order-rel)
+          [:select {:id        "sort-dir"
+                    :disabled  (or (nil? order-rel) no-items?)
                     :value     (rel->s order-dir)
                     :on-change (order-fn 1)}
            [:option {:value "asc"} "ascending"]
            [:option {:value "desc"} "descending"]]]
+
+         [:div.search__between
+          [:label {:for "from"} "From "]
+          [:input {:id        "from"
+                   :type      "date"
+                   :value     from
+                   :max       to
+                   :class     (when from
+                                "good-input")
+                   :on-change (date-fn :from)
+                   :disabled  (or no-order? no-items?)}]
+
+          [:label {:for "to"} " to "]
+          [:input {:id        "to"
+                   :type      "date"
+                   :value     to
+                   :min       from
+                   :class     (if (and from to
+                                       (> (js/Date.parse from)
+                                          (js/Date.parse to)))
+                                ["bad-input"
+                                 "not-allowed"]
+                                (when to
+                                  "good-input"))
+                   :on-change (date-fn :to)
+                   :disabled  (or no-order? no-items?)}]]
 
          (when (not-empty items)
            [:fieldset

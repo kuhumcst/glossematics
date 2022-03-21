@@ -72,6 +72,9 @@
 (def excel-dtf
   (t/formatter "dd-MM-yyyy"))
 
+(def utc-dtf
+  (t/formatter "yyyy-MM-dd"))
+
 (def tei-dtf
   "NOTE: Defaults to 1 january in case either is missing."
   (-> (DateTimeFormatterBuilder.)
@@ -408,6 +411,31 @@
        (apply concat)
        (set)))
 
+(defn- to-pred
+  "Return pred to check that date is on or before `to-date`."
+  [to-date]
+  (let [to-ms (inst-ms to-date)]
+    (fn [date]
+      (and (inst? date)
+           (<= (inst-ms date) to-ms)))))
+
+(defn- from-pred
+  "Return pred to check that date is on or after `from-date`."
+  [from-date]
+  (let [from-ms (inst-ms from-date)]
+    (fn [date]
+      (and (inst? date)
+           (<= from-ms (inst-ms date))))))
+
+(defn- between-pred
+  "Return pred to check that date is on or between `from-date` and `to-date`."
+  [from-date to-date]
+  (let [after-from-date? (from-pred from-date)
+        before-to-date?  (to-pred to-date)]
+    (fn [date]
+      (and (after-from-date? date)
+           (before-to-date? date)))))
+
 (defn- entity->search-query
   "Build an entity search query from a partial `entity` description.
 
@@ -431,9 +459,11 @@
   (when-not (= :tg/nil x) x))
 
 (defn- sort-results
-  "Sort 2-tuple `search-results` containing sort values in the second position."
-  [search-results]
+  "Sort 2-tuple `search-results` containing sort values in the second position.
+  A `sort-pred` may be supplied to filter the results prior to sorting."
+  [search-results & [sort-pred]]
   (->> search-results
+       (filter (comp (or sort-pred (constantly true)) second))
        (sort-by (comp ignore-tg-nil second))
        (map first)
        (apply sorted-set)))
@@ -441,11 +471,12 @@
 (defn match-entity
   "Look up entity IDs in `conn` matching partial `entity` description.
 
-  An `order-by` vector of [k dir] may also be supplied to sort the results.
+  An `order-by` vector of [sort-key sort-dir] may also be supplied.
   The sort direction can be either :asc (default) or :desc."
-  ([conn entity [k dir :as order-by]]
-   (let [results (sort-results (d/q (entity->search-query entity k) conn))]
-     (if (= dir :desc)
+  ([conn entity [sort-key sort-dir :as order-by] & [sort-pred]]
+   (let [results (sort-results (d/q (entity->search-query entity sort-key) conn)
+                               sort-pred)]
+     (if (= sort-dir :desc)
        (reverse results)
        results)))
   ([conn entity]
@@ -463,9 +494,20 @@
   Also accepts :limit and :offset to return results gradually, as well as
   :order-by which should be a vector of [k dir]. The :total amount of matches
   regardless of :limit/:offset is always included as metadata."
-  [conn entity & {:keys [limit offset order-by]}]
+  [conn entity & {:keys [limit offset order-by from to]}]
   (let [matches (if order-by
-                  (match-entity conn entity order-by)
+                  (cond
+                    (and from to)
+                    (match-entity conn entity order-by (between-pred from to))
+
+                    from
+                    (match-entity conn entity order-by (from-pred from))
+
+                    to
+                    (match-entity conn entity order-by (to-pred to))
+
+                    :else
+                    (match-entity conn entity order-by))
                   (match-entity conn entity))]
     (with-meta
       (cond->> (map (partial d/entity conn) matches)
@@ -492,6 +534,7 @@
   (parse-date excel-dtf "03.10.1899")
   (parse-date excel-dtf "03-10-1899")
   (parse-date tei-dtf "1899-10-03")
+  (parse-date utc-dtf "2022-03-25")
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")
@@ -502,7 +545,12 @@
   (d/entity conn "acc-1992_0005_124_Cenematics_0100_098.tif.jpg")
 
   ;; Test entity search
-  (match-entity conn {:document/mention #{"#npl837" "#npl1957" "#npub86"}})
+  (count (match-entity conn {'_ #{"#np56"}}
+                       [:document/date-mention :asc]
+                       (between-pred #inst"1948-08-30T23:00:00.000-00:00"
+                                     #inst"1950-08-30T23:00:00.000-00:00")))
+
+  (entity->search-query {:document/mention #{"#np56"}} :document/date-mention)
   (search conn {:document/mention #{"#np58"}})
   (count (search conn {:document/mention #{"#np58"}}))      ; 51 in total
   (count (search conn {:document/mention #{"#np58"}}
@@ -520,6 +568,11 @@
   ;; Print duplicates
   (doseq [[k v] (name-duplicates)]
     (println (str k ": " (str/join ", " v))))
+
+  ;; Test date predicates
+  ((between-pred #inst"1948-08-30T23:00:00.000-00:00"
+                 #inst"1950-08-30T23:00:00.000-00:00")
+   #inst"1949-08-30T23:00:00.000-00:00")
 
   (count (d/q '[:find ?name ?path
                 :where
