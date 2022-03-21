@@ -44,9 +44,13 @@
   []
   (.then (api/fetch "/search/metadata")
          #(do
-            (swap! state/search assoc
-                   :name->id (:name->id %)
-                   :id->name (set/map-invert (:name->id %)))
+            (let [name-kvs (:name-kvs %)
+                  name->id (into {} name-kvs)
+                  id->name (set/map-invert name->id)]
+              (swap! state/search assoc
+                     :name-kvs name-kvs
+                     :name->id name->id
+                     :id->name id->name))
             (?query-reset))))
 
 (defn items->query-params
@@ -88,10 +92,10 @@
     params))
 
 (defn multi-input-data
-  [name->id]
+  [name-kvs]
   (fn [_]
     [:datalist {:id "names"}
-     (for [[entity-name id] (sort name->id)]
+     (for [[entity-name id] name-kvs]
        [:option {:key   entity-name
                  :value entity-name}])]))
 
@@ -133,7 +137,7 @@
 
 (defn search-form
   []
-  (let [{:keys [name->id]} @state/search
+  (let [{:keys [name-kvs name->id]} @state/search
         update!  #(rfe/push-state ::page {} (state->params @state/query))
         set-in   (fn [e]
                    (let [in (e->v e)]
@@ -190,7 +194,7 @@
                                        :on-change set-in
                                        :value     in}]
           (when name->id
-            [multi-input-data name->id])
+            [multi-input-data name-kvs])
 
           [:label {:for "k"} " as "]
           [:select.search__input-attribute

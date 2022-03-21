@@ -9,7 +9,8 @@
             [tick.core :as t]
             [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.cuphic :as cup]
-            [dk.cst.cuphic.xml :as xml])
+            [dk.cst.cuphic.xml :as xml]
+            [dk.cst.glossematics.static :as static])
   (:import [java.io File]
            [java.sql Date]
            [java.time LocalDate]
@@ -110,7 +111,7 @@
                       (string? %)
                       (let [s (str/trim %)]
                         (when (not-empty s)
-                          (when-not (re-find #"\?|\-" s)
+                          (when-not (re-find #"\?" s)
                             s)))
 
                       (number? %)
@@ -163,13 +164,40 @@
              (set))
 
         (and (some? first-name) (some? last-name))
-        #{(str (first first-name) " " (first last-name))})
+        (let [first-name* (first first-name)
+              last-name*  (first last-name)]
+          (if (= first-name* last-name*)
+            #{last-name*}
+            #{(str first-name* " " last-name*)})))
       (if-not (or full-name (and last-name first-name))
         (or last-name first-name)
         full-name))))
 
-(defn name-lookup-kvs
-  "Return [name-str ident] for all names referenced in the TEI documents."
+;; Takes several minuts to execute; used to find static/top-30-name-kvs.
+;; TODO: remove again at some point?
+(defn top-names
+  []
+  (->> (d/q '[:find ?id (count ?f)
+              :where
+              [?p :entity/type :entity.type/person]
+              [?p :db/ident ?id]
+              [?f :entity/type :entity.type/file]
+              [?f _ ?id]]
+            conn)
+       (map #(assoc (d/entity conn (first %))
+               :db/ident (first %)
+               :frequency (second %)))
+       (mapcat (fn [{:keys [db/ident frequency] :as m}]
+                 (for [s (name-permutations m)]
+                   (with-meta [s ident] {:frequency frequency}))))
+       (sort-by (juxt (comp :frequency meta) first))
+       (reverse)))
+
+(defn name-kvs
+  "Return [name-str ident] for all names referenced in the TEI documents.
+
+  The 30 IDs with the highest document frequency are placed at the top,
+  while the rest of the results are sorted according to the name."
   []
   (->> (d/q '[:find [?id ...]
               :where
@@ -181,12 +209,18 @@
        (map #(assoc (d/entity conn %) :db/ident %))
        (mapcat (fn [{:keys [db/ident] :as m}]
                  (for [s (name-permutations m)]
-                   [s ident])))))
+                   [s ident])))
+       (remove (set static/top-30-name-kvs))
+       (sort-by first)
+       (concat static/top-30-name-kvs)))
 
+(alter-var-root #'name-kvs memoize)
+
+;; TODO: remove again?
 ;; For debugging source data
 (defn name-duplicates
   []
-  (->> (name-lookup-kvs)
+  (->> (name-kvs)
        (group-by first)
        (filter (comp multiple? second))
        (map (fn [[k v]]

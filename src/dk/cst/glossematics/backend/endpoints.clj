@@ -111,7 +111,7 @@
   [request]
   (-> (assoc request
         :status 200
-        :body (transito/write-str {:name->id (into {} (db/name-lookup-kvs))}))
+        :body (transito/write-str {:name-kvs (db/name-kvs)}))
       (update :headers assoc
               "Content-Type" "application/transit+json"
               "Cache-Control" one-day-cache)))
