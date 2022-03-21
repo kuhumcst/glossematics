@@ -11,15 +11,15 @@
   [query-params id->name]
   (->> (dissoc query-params :limit :offset :order-by)
        (mapcat (fn [[k v]]
-                 (mapv (fn [id]
-                         (with-meta [(if (= k :_) '_ k) id]
-                                    {:label (get id->name id)}))
-                       (str/split v #","))))))
+                 (map (fn [id]
+                        (with-meta [(if (= k :_) '_ k) id]
+                                   {:label (get id->name id)}))
+                      (str/split v #","))))))
 
 (defn parse-params
   [{:keys [order-by limit offset] :as query-params} id->name]
   (let [items (params->items query-params id->name)]
-    (cond-> {:items  items
+    (cond-> {:items  (vec items)
              :unique (set items)}
             order-by (assoc :order-by (->> (str/split order-by #",")
                                            (map (comp keyword str/trim))))
