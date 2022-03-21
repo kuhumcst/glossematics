@@ -1,3 +1,17 @@
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-2px, 0px) rotate(1deg); }
+  30% { transform: translate(2px, 1px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-2px, 0) rotate(0deg); }
+  70% { transform: translate(2px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(0px, -1px) rotate(-1deg); }
+}
+
 @font-face {
     font-family: PoiretOne;
     src: url(/fonts/PoiretOne-aD0x.ttf);
@@ -198,6 +212,23 @@ body {
     border: 2px solid rgba(255,255,255,0.2);
     border-radius: 4px;
     padding: 12px 24px 16px 24px;
+}
+
+.search input.not-allowed {
+    animation: shake 0.2s;
+}
+
+.search input.bad-input {
+    background-color: #DD6666;
+}
+
+.search input.good-input {
+    background-color: #99DD66;
+}
+
+/* yellow -- when e.g. input is technically valid, but already applied. */
+.search input.good-input.not-allowed {
+    background-color: #DDDD66;
 }
 
 .search legend {

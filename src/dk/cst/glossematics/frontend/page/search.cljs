@@ -133,22 +133,30 @@
 
 (defn search-form
   []
-  (let [{:keys [name->id id->name]} @state/search
-        {:keys [query-params]} @state/location
+  (let [{:keys [name->id]} @state/search
         update!  #(rfe/push-state ::page {} (state->params @state/query))
         set-in   (fn [e]
-                   (swap! state/query assoc :in (e->v e)))
+                   (let [in (e->v e)]
+                     (swap! state/query assoc
+                            :in in
+                            :good-input? (name->id in)
+                            :bad-input? false
+                            :not-allowed? false)))
         submit   #(let [{:keys [rel in unique]} @state/query]
-                    ;; TODO: shake animation when bad input?
-                    (when-let [id (name->id in)]
-                      (when-not (get unique [rel id])
-                        (swap! state/query add-kv (with-meta [rel id]
-                                                             {:label in}))
-                        (swap! state/query assoc
-                               :in ""
-                               :offset 0)
-                        (swap! state/search dissoc :results)
-                        (update!))))
+                    (if-let [id (name->id in)]
+                      (if-not (get unique [rel id])
+                        (do
+                          (swap! state/query add-kv (with-meta [rel id]
+                                                               {:label in}))
+                          (swap! state/query assoc
+                                 :in ""
+                                 :offset 0)
+                          (swap! state/search dissoc :results)
+                          (update!))
+                        (swap! state/query assoc :not-allowed? true))
+                      (swap! state/query assoc
+                             :bad-input? true
+                             :not-allowed? true)))
         set-rel  (fn [e]
                    (swap! state/query assoc :rel (s->rel (e->v e)))
                    (submit))
@@ -157,7 +165,8 @@
                     (update!))]
 
     (fn [_ _]
-      (let [{:keys [items in rel order-by]} @state/query
+      (let [{:keys [items in rel order-by
+                    bad-input? good-input? not-allowed?]} @state/query
             [order-rel order-dir] order-by
             no-input? (empty? in)
             no-items? (empty? items)]
@@ -165,11 +174,16 @@
          {:on-submit (fn [e]
                        (.preventDefault e)
                        (submit))}
-
          [:div.search__input
           [:label {:for "v"} "Look for "]
           [:input.search__input-value {:type      "list"
                                        :list      "names"
+                                       :class     [(when not-allowed?
+                                                     "not-allowed")
+                                                   (when bad-input?
+                                                     "bad-input")
+                                                   (when good-input?
+                                                     "good-input")]
                                        :name      "v"
                                        :id        "v"
                                        :disabled  (nil? name->id)
