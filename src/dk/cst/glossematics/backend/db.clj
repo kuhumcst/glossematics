@@ -153,6 +153,7 @@
     (set? v) v
     (some? v) #{v}))
 
+;; TODO: just use full name if we only have a single canonical name?
 (defn name-permutations
   "Get names sourced from the first, last, and full name of a `person-entity`."
   [person-entity]
@@ -196,11 +197,7 @@
        (sort-by (juxt (comp :frequency meta) first))
        (reverse)))
 
-(defn name-kvs
-  "Return [name-str ident] for all names referenced in the TEI documents.
-
-  The 30 IDs with the highest document frequency are placed at the top,
-  while the rest of the results are sorted according to the name."
+(defn person-name-kvs
   []
   (->> (d/q '[:find [?id ...]
               :where
@@ -212,7 +209,39 @@
        (map #(assoc (d/entity conn %) :db/ident %))
        (mapcat (fn [{:keys [db/ident] :as m}]
                  (for [s (name-permutations m)]
-                   [s ident])))
+                   [s ident])))))
+
+;; TODO: merge with person-name-kvs if/when we only have a single full-name
+(defn other-name-kvs
+  []
+  (->> (d/q '[:find [?id ...]
+              :where
+              (or
+                [?p :entity/type :entity.type/linguistic-organisation]
+                [?p :entity/type :entity.type/organisation]
+                [?p :entity/type :entity.type/publication]
+                [?p :entity/type :entity.type/language]
+                [?p :entity/type :entity.type/place]
+                [?p :entity/type :entity.type/term]
+                [?p :entity/type :entity.type/english-term])
+              [?p :db/ident ?id]
+              [?f :entity/type :entity.type/file]
+              [?f _ ?id]]
+            conn)
+       (map #(assoc (d/entity conn %) :db/ident %))
+       (mapcat (fn [{:keys [db/ident entity/full-name]}]
+                 (if (coll? full-name)
+                   (for [s full-name]
+                     [s ident])
+                   [[full-name ident]])))))
+
+(defn name-kvs
+  "Return [name-str ident] for all names referenced in the TEI documents.
+
+  The 30 IDs with the highest document frequency are placed at the top,
+  while the rest of the results are sorted according to the name."
+  []
+  (->> (concat (other-name-kvs) (person-name-kvs))
        (remove (set static/top-30-name-kvs))
        (sort-by first)
        (concat static/top-30-name-kvs)))
@@ -223,7 +252,7 @@
 ;; For debugging source data
 (defn name-duplicates
   []
-  (->> (name-kvs)
+  (->> (person-name-kvs)
        (group-by first)
        (filter (comp multiple? second))
        (map (fn [[k v]]

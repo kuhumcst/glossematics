@@ -1,5 +1,6 @@
 (ns dk.cst.glossematics.static)
 
+;; TODO: keep using only person names or include other entities?
 (def top-30-name-kvs
   "The IDs with the highest document name-kvs frequency."
   [["Louis Trolle Hjelmslev" "#np56"]
