@@ -1,0 +1,364 @@
+8	Corolla linguistica
+9	Bibliotheca Orientalis
+10	Traité de phonétique grecque
+11	Storia della lingua di Roma
+12	Danske Studier
+13	Acta Philologica Scandinavica
+14	Humanistisk Samfunds skrifter
+15	Actes du IVe Congres de ling. 142 infra
+15	Travaux IV
+15	Vol. I af Travaux
+15	Travaux du Cercle Linguistique de Copenhague
+16	A propos d ' une livre récent sur les noms verbaux en grec ancien
+16	Mélanges
+17	Mélanges linguistiques
+18	AL
+18	Acta
+18	Acta  Linguistica
+18	Acta Linguistica
+18	Acta Linguistica I-II
+18	ACTA LINGUISTICA 
+19	Acta Jutlandica
+19	ACTA JUTLANDICA
+20	Hafniensia
+21	Annual Report of the Institute of Phonetics
+22	ARIPUC
+23	Bulletin de Cercle Linguistique
+23	Bulletin du Cercle Linguistique de Copenhague
+23	Bulletin du Cercle linguistique de Copenhague
+23	Bulletin XIII
+24	Academia Sinica
+25	Bulletin of the Institute of History and Philology
+26	IJAL
+27	International Journal of American Linguistics
+28	Journal of the Optical Society of America
+29	Langages
+30	Language Sciences
+31	Language
+32	Le maître phonétique
+33	Nordisk Tidsskrift for Tale og Stemme
+34	Phonetica
+35	Scientific American
+36	Studies in Linguistics
+37	JASA
+38	The Journal of the Acoustical Society of America
+39	Word
+39	WORD
+40	Archiv für vergleichende Phonetik
+41	AJ
+42	ALH
+43	BCLC
+44	Breve fra og til Rasmus Rask
+45	Bulletinen
+46	Bulletin VI
+47	Cahiers  Ferdinand de Saussure
+47	Cahiers Saussure 
+48	Capitula XIII
+49	Caractères généraux des langues créoles
+50	Cas I
+51	Catégorie des cas
+51	Cas II
+51	Cas (vol. II)
+52	Charisteria
+52	Charisteria Mathesio
+53	Dansk biografisk  lexikon
+54	De nordiska språken
+55	De nordiska systerspraaken
+56	Die Sprache der Hethiter
+57	Essai d ' une théorie de morphèmes
+57	Essai d ' une théorie des morphèmes
+57	Essai d ' une théorie des morphèmes
+57	Essai d'une théorie des morphèmes
+58	Etudes balt. 76
+58	Etudes baltiques
+58	Études Baltiques
+58	Etudes baltiques 89
+59	Etudes d ' aspect
+59	Etudes d' aspect
+59	Études d’aspect
+59	Etudes d'aspect
+60	Fjoldemaalets lydsystem
+61	Fonetikken
+62	Omkr. sprogteoriens grundlægg.
+62	Omkr.sprt.grl.
+62	Omkring sprogteoriens grundlæggelse
+62	Omkring Sprogteoriens Grundlaeggelse 
+63	Formation des noms en grec anciens
+64	Haandbog i Dansk Sproglære
+65	Historien om en moder i femten sprog
+66	Hittite Dictionary
+67	IF
+67	IF.
+68	Isländsk - svensk ordbok
+69	Kbh. univ. festskrift
+70	Kejserens nye klæder paa femogtyve Sprog
+71	Kilder til Hittiternes historie
+72	Kleine litauische Sprachlehre
+73	Komedijos
+74	Latinen  efter Naturmetoden
+75	Latinsk Ordføjningslære
+76	Les hiéroglyphes hittities
+77	Les Noms d'action
+78	Lettische Gramm.
+79	Le verbe et la phrase nominale
+80	Lingua Latina
+81	Mélanges de philologie, de littérature et d’histoire anciennes offerts à J. Marouzeau
+81	Mélanges Marouzeau
+82	Mélanges Pedersen
+83	Nysvenska studier xxx bind XIX
+84	OSG
+86	An Outline of Cenology. A "Phoneme" Theory on Intra-Linguistic Principles
+86	Outline of Glossematics
+86	Outline of Glossematics I
+86	Outline of Glossematics Part I
+86	Outline I
+86	Outline of Glossematics II
+86	Outline of Glossematics Part II
+86	Outline II
+86	An Outline of Cenology
+87	Phil. Woch.
+88	Præpositioner
+89	Praktisk lærebog i islandsk nutidssprog
+90	Principes de grammaire générale
+91	Principes
+92	Rask-udgaven
+93	Rasmus Rask, his life and works
+94	Rationel semantik (pleremik)
+94	Rationel Semantik (Pleremik)
+95	Realitet som grammatisk Kategori
+96	Salmonsens Leksikon-Tidsskrift
+97	Sandfeld-mindeskrift
+98	Scando-Slavica
+99	Schmidt - Phiseldecks ABC
+100	Sproget
+101	Sprogteori
+102	Sprvsk. i 19. årh .
+103	Storia delle lingua di Roma
+104	Studia Varangica
+105	Translatøren
+106	Tysk fonetik
+108	Études d'aspect
+109	latinbogen
+110	realitet som grammatisk kategori
+111	sprogsystem og sprogforandring
+117	Brysselrapport
+118	IVe Congres intern. de ling., Résumés des 
+119	KZ
+120	Modersmålets fonetik
+121	Orph., Lith. 108
+122	serbo - kroatiske grammatik
+123	Vgl. kelt Gramm.
+124	- σις - bog
+125	A concise Comparative Celtic Grammar
+126	Acta Philologica Scandinavia
+127	Bulletin XIII
+128	Det lærde Selskabs Skrifters Humanistiske serie
+129	Diatesen i græsk, slavisk og baltisk
+130	Die sechs litauischen Intonationen
+131	Hittiterne og deres sprog
+132	Introduction to the Study of the Greek Dialects
+133	Les noms d’action en –sis
+134	Manuel de phonétique grecque
+135	Preliminary Reports
+136	Recherches structurales 1949
+137	Rencontre assyriologique
+138	Rationel Semantik
+139	Recent theories on the Nature of the Linguistic Sign
+140	Prolegomena
+140	Prolegomena to a Theory of Language
+140	Prolegomena to Glossematics 
+141	Linguistic Interludes
+142	Vox
+143	Sprog og tanke
+144	Proceedings of the Second International Congress of Phonetic Sciences
+145	On the Principles of Phonematics
+146	The Phonematics of Danish
+147	Synspunkter for dansk fonetik
+148	Nationaltidende
+149	The Cenematics of English
+150	Melanges Ginneken
+151	Das Wort
+152	The Burushaski Language
+153	TCLP
+154	La notation ekphonétique
+155	Leitfaden
+156	Synopsis
+157	Les Langues du monde
+158	English Studie
+159	Die Phonetik Und Ihre Beziehungen Zu Den Grenzwissenschaften
+160	En sprogmands levned
+161	m.f.
+162	Danish Reader
+163	Lehrbuch
+164	Linguistic Abstracts
+165	Maître Phonétique
+166	Principles of Romanization
+167	Sechuan Reader
+168	The Aims of Phonetics
+169	Comparative Study in Shona Phonetics
+170	Sketch of Achumawi Phonetics
+171	Anglia Beiblatt
+172	New Turkish-Inglish Dictionary
+173	Psyche
+173	Psyche: A journal of general and linguistic psychology
+174	Origin of a Suffix
+175	La notion de rection
+176	Bulletin de Cercle Linguistique de Paris
+177	Foundations of Language
+178	The Syllable as a Structural Unit
+179	On the structural interpretation of diphthongs
+180	Ann. Ac. Sc. Fennicæ
+181	Travaux du Cercle linguistique de Copenhague vol. VIII 1
+182	Ordbogen
+183	The Phoneme
+184	Meaning of Meaning
+185	General Semantics
+186	La Stratification du Langage
+187	Handbook of American Indian Languages III
+188	Lehrbuch der Phonetik
+189	Modersmålets fonetik
+190	Le Maître Phonétique
+191	Proceedings of the 8th International Congress of Linguists
+192	On Vowel Harmony in Some West African Languages.
+193	Det danske r
+194	A Sketch of Achumawi Phonetics
+195	A Danish Phonetic Reader
+196	Maidu, et kalifornisk sprog
+197	The Phonematics of Danish
+198	Speech and Writing
+199	Anm. af D.M.Beach: The Phonetics of the Hottentot Language
+200	On the Structural Interpretation of Diphtongs
+201	The General Rules of English
+202	Notes on the English Tenses
+203	On Equivalent Relations
+204	Maidu Phonetics
+205	Dansk-engelsk ordbog
+205	Dansk-Engelsk Ordbog I-II
+206	Maidu grammar
+207	Maidu folkloristic texts
+208	Phonematics
+209	Africa
+210	Proceedings of the Third International Congress of Phonetic Sciences
+211	On the Structural Interpretation of Diphthongs
+212	The General Rules of English
+213	English Language Teaching
+214	Notes on the English Tenses
+215	On Equivalent Relations
+15	Travaux du Cercle linguistique de Copenhague V
+216	Index to the Franz Boas Collection of Materials for American Linguistics
+217	The Classification of Afr. Lang.
+218	Maidu Macrophonemes
+219	Grundzüge der phonologie
+220	Phonologie. Een hoofdstuk uit de structurele taalwetenschap
+221	Mélanges M. Aleksandar Belic
+222	Mélanges de linguistique offerts à Charles Bally
+223	La langue et la société
+224	Kalispel
+224	The Kalispel Language
+224	The Kalispel Language: An Outline of the Grammar with Texts, Translations, and Dictionary
+225	An Analysis of Mind
+226	Ueber Akzent und Silbenbildung in den älteren semitischen Sprachen
+227	Language, Truth and Logic
+228	Communication A Philosophical Study of Language
+229	Foundations of the theory of signs
+230	Linguistic Aspects of Science
+232	Ordbog over det danske sprog
+233	Danske Folkemaal
+234	Herlovianeren
+83	Nysvenska Studier
+236	Nordisk Målstræv
+236	Årbog for Nordisk Målstræv
+60	Fjoldemålets lydsystem
+238	Nordisk tidskrift utgivet av Letterstedska Föreningen
+239	Meddelelser fra Dansklærerforeningen
+240	The Philosophy of Grammar
+241	Analytic Syntax
+242	Kindersprache, Aphasie und Allgemeine Lautgesetze
+243	Dansk begrebsordbog
+244	Språkanalys
+245	Das literarische Kunstwerk, Eine Untersuchung aus dem Grenzgebiet der Ontologie, Logik und Literaturwissenschaft 
+246	Le Symbolisme / Le Symbolisme: Etude sur le Style des Symbolistes Francais
+247	A propos  de la syntagmatique du professeur A. Belic
+248	Cahiers Ferdinand de Saussure
+249	Kilder til Hittitternes historie
+250	Mot et morphème
+251	Mazon serbokroatiske grammatik
+252	Lautbibliothek phonetische Platten und Umschriften hrsg. von der Lautabteilung der Preussischen Staatsbibliothek Heft 34
+253	A Further Note on Identity
+254	Interrelations of Relations and of Correlations
+255	Introduction
+256	Feuillets pour l'étude des systèmes de langues
+257	American-Spanish Syntax
+258	Rigveda
+258	Rig Veda
+259	Bases of Phonology
+260	Philosophie der symbolischen formen
+270	Introduction to Philosophy
+271	Essay towards a Real Character and a Philosophical Language
+272	English By the Nature Method
+273	B.S.L.
+274	Langue et parole
+275	A Psycology of Gesture
+276	Das literarische Kunstwerk, Eine  Untersuchung aus dem Grenzgebiet der Ontologie, Logik und Literaturwissenschaft
+277	Istoria sintaxei
+278	Language in Action
+279	Rapports
+280	Societatea română de linguistică
+281	The Loom of Language
+282	Hammerich-festskr.
+282	Hammerich-festskriftet
+282	Hammerich-festskrift
+13	Acta Philol. Scand.
+136	Recherches
+283	Kinsey Report
+284	The Limitations of Science
+285	Oxford Dictionary
+286	Scientific Method
+287	An Inquiry into Meaning and Truth
+288	Philosophy and the Physicists
+86	Part I
+86	Part II
+289	Structure générale des correlations linguistiques
+136	Recherches structurales
+289	Transactions
+290	Encyclopedia of United Science
+291	Phonetics
+292	Phonemics
+293	The Folklore of Capitalism
+294	Principles of Romanisation
+295	English Language Teaching
+296	Ciencias Culturales
+297	Introdución a la linguistica
+291	Phonetics 116
+291	Phonetics, a critical analysis of phonetic theory and a technic for the practical description of sounds
+298	Linguistic Survey
+299	Essays and Studies
+300	Modes of Meaning
+301	A Study of History
+302	The Folklore of Capitalism
+303	Reflexiones sobre la historia universal
+304	Primer of Phonemics
+305	PRELIMINARIES TO SPEECH ANALYSIS
+305	Preliminaries to Speech Analysis
+306	Oxford Slavonic Papers
+307	Prologue to the library of the Slavistic Circle
+308	Sur l’indépendance de l’épithète
+309	The New Doctrine of Language in Present-Day Russia
+310	The So-called Deictic Elements in Grammar
+311	Igor's Tale
+311	Igor Tale
+312	Sound and Meaning
+312	Sound and Meaning in Modern Linguistics
+313	La prononciation du français actuel
+314	Danish Scientific Activities During the Second World War
+314	Danish Scientific Activities
+315	Røros-lappisk grammatikk
+316	St. Constantine’s Prologue to the Gospels
+317	Bibliotheca Linguistica
+318	For Roman Jakobson
+319	Lidovés noviny
+320	Presser Prague
+320	Prager Presse
+321	Slovo a Slovesnost
+322	volume of ancient Russian Epic Studies
+323	Lykisch und Hittitisch

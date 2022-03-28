@@ -1,0 +1,612 @@
+1	accent
+2	accessory
+3	accessory glosseme
+4	accessory variety
+5	actualized
+6	adjective
+7	adjunct
+8	adverb
+9	affix
+10	after-semiotic alternation
+11	ambicentral
+12	ambicentral glosseme
+13	ambifundamental
+14	ambifundamental exponent
+15	ambimedian
+16	ambiprimary
+17	ambiprincipal
+18	analysis
+19	analysis complex
+20	analyzed into, be
+21	application
+22	apply
+23	area
+24	articulation
+25	autocenemateme
+26	autonomous
+27	autonomy
+28	autophthong
+29	autopleremateme
+30	bilateral connexion
+31	bilateral correlation
+32	bilateral function
+33	bilaterality
+34	biplane
+35	bound articulation
+36	catalysis
+37	catalyzed to, be
+38	category
+39	cell
+40	cell-cohesion
+41	cenemateme
+42	cenematic
+43	cenematic functive
+44	cenematy 
+45	ceneme
+46	cenia
+47	central
+48	central glosseme
+49	central variety
+50	centrifugal
+51	centrifugal glosseme
+52	centripetal
+53	centripetal glosseme
+54	chain
+55	character
+56	character glosseme
+57	characteristic
+58	circumscribe
+59	class
+60	cohesion
+61	cohesive
+62	combination
+63	combined
+64	commutation
+65	commutation test
+66	complementarity
+67	complementary
+68	complex
+69	complex sum
+70	components
+71	compositum
+72	concept
+73	configuration
+74	conformal
+75	conformity
+76	conformity test
+77	conglomerate
+78	congruence
+79	conjugation
+80	conjunction
+81	connective
+82	connective-signal
+83	connexion
+84	connotative
+85	connotative plane
+86	connotative semiotic
+87	connotator
+88	consolidation
+89	consonant
+90	constant
+91	constellation
+92	constellative
+93	constituent
+94	constitutive
+95	constitutive ceneme
+96	constitutive glosseme
+97	constitutive plereme
+98	contact
+99	contensive
+100	content
+101	content functive
+102	content line
+103	content plane
+104	content side
+105	continuation
+106	continue
+107	continued by, be
+108	contract
+109	contradictory correlation
+110	contrary correlation
+111	converse
+112	converted
+113	converted exponent
+114	converted variety
+115	correlat
+116	correlation
+117	declension
+118	deduction
+119	defectivate
+120	defectivated
+121	defectivation
+122	defective category
+123	definable
+124	definition
+125	definitive semiotic test
+126	degree
+127	denotation test
+128	denotative
+129	denotative plane
+130	denotative semiotic
+131	derivate
+132	derivate test
+133	derivatives
+134	descript
+135	description, principle of exhaustive
+136	descriptor
+137	designation
+138	determinant
+139	determinate
+140	determination
+141	determined
+142	determining
+143	diachrony
+144	difference-unit
+145	dimension
+146	diphthong
+147	directed
+148	directing
+149	direction
+150	direction variety
+151	directive
+152	directive glosseme
+153	directive morpheme
+154	directive prosodeme
+155	dissection
+156	dominance
+157	dominant
+158	dominate
+159	duplex sum
+160	economy, principle of
+161	election
+162	element
+163	empirical principle
+164	encatalyzed
+165	endocohesion
+166	enter into
+167	entity
+168	established
+169	establishing
+170	establishment
+171	exclusion
+172	exhaustive description, principle of
+173	exintensive
+174	exponent
+175	expression
+176	expression functive
+177	expression line
+178	expression plane
+179	expression side
+180	extense character
+181	extense characteristic
+182	extense morpheme
+183	extense prosodeme
+184	extense theme
+185	extensive
+186	extent
+187	external
+188	external content plane
+189	external expression plane
+190	external metasemiological
+191	external metasemiological plane
+192	external metasemiology
+193	external plane
+194	external semiological
+195	external semiological plane
+196	external semiology
+197	extreme participation
+198	extrinsic
+199	facultative
+200	facultativity
+201	field
+202	flexion variety
+203	flexive
+204	flexive glosseme
+205	flexive morpheme
+206	flexive prosodeme
+207	fore-semiotic
+208	form
+209	formant
+210	formative
+211	fragmentation
+212	free articulation
+213	function
+214	function to, have
+215	functional category
+216	functional field
+217	functival category
+218	functive
+219	fundamental
+220	fundamental exponent
+221	fundamental variety
+222	fusion
+223	general
+225	general-system
+224	generalization, principle of
+226	generic
+227	genetic relationship
+228	glossary
+229	glossematy
+231	glosseme-category
+232	glosseme-sum
+233	glosseme-unit
+230	glossemes
+234	glossia
+235	government
+236	greatest-sum
+237	group
+238	heterogeneous sum
+239	heteroplane function
+240	heterosubgeneous sum
+241	heterosubtagmatic sum
+242	heterosubtypical sum
+243	heterotagmatic sum
+244	heterotypical sum
+245	hierarchy
+246	hierarchy test
+247	homogeneous sum
+248	homologue
+249	homology
+250	homonym
+251	homonymous
+252	homonymy
+253	homoplane function
+254	homosubgeneous sum
+255	homosubtagmatic sum
+256	homosubtypical sum
+257	homotagmatic sum
+258	homotypical sum
+259	hypothesis
+260	ideal
+261	identity-unit
+262	implication
+263	implied by, be
+264	implying
+265	include
+266	indefinable
+267	indicators
+268	individual
+269	induction
+270	inextensive
+271	insist
+272	intense character
+273	intense characteristic
+274	intense morpheme
+275	intense prosodeme
+276	intense theme
+277	intensive
+278	interdependence
+279	interdependent
+280	interjection
+281	internal
+282	internal metasemiological
+283	internal metasemiological plane
+284	internal metasemiology
+285	internal plane
+286	internal semiological
+287	internal semiological plane
+288	internal semiology
+289	intracohesion
+290	intrinsic sum
+291	invariants
+292	junction
+293	juxtaposition
+294	language
+295	language test
+296	latency
+297	latent
+298	least-sum
+299	lexeme
+300	lexia
+301	lexicon
+302	line
+303	linguistic schema
+304	linguistic usage
+305	loan from
+306	loan-contact
+307	localized (variety)
+308	manifestant
+309	manifestation
+310	manifestation test
+311	manifestatum
+312	mapping
+313	marginal
+314	marginal glosseme
+315	marginal variety
+316	maximal sum
+317	median
+318	median glosseme
+319	median variety
+320	member
+321	meta-(scientific semiotic)
+323	metachrony
+324	metadescript
+325	metadescriptor
+326	metasemiological
+327	metasemiological plane
+328	metasemiology
+322	metasemiotic
+329	metasemiotic
+330	minimal sum
+331	modulation
+332	monophthong
+333	monoplane
+334	morpheme
+335	multiplex sum
+336	mutation
+337	mutation-test
+338	nexia
+339	nexus
+340	nominal character
+341	nominal characteristic
+342	nominal theme
+343	non-scientific semiotic
+344	noun
+345	numeral
+346	object semiotic
+347	obligatory (dominance)
+348	octuplex sum
+349	op-chain
+351	op-series
+350	operation
+352	optional (dominance)
+353	order
+354	overlapping
+355	paradigm
+356	paradigmatic
+357	part
+358	participant
+359	participation
+360	particular
+361	particularity
+362	partition
+363	partment
+364	peripheral
+365	peripheral glosseme
+366	peripheral variety
+367	permutation
+368	plane
+369	pleremateme
+370	plerematic
+371	plerematic functive
+372	plerematy
+373	plereme
+374	pleria
+375	pluriplane
+376	polar
+377	polarity
+378	polyphthong
+379	power
+381	pre-relate
+380	preposition
+382	primary
+383	primary glosseme
+384	primary variety
+385	prime glosseme
+386	principal
+387	principal glosseme
+388	principal variety
+389	procedure
+390	process
+391	pronoun
+392	propria
+393	prosodeme
+394	prosody
+395	pseudocharacteristic
+396	pseudoextensive
+397	pseudointensive
+398	pseudonexia
+399	pseudonexus
+400	pseudosyllable
+401	pseudotheme
+402	purport
+403	purport test
+404	quadruplex sum 
+405	quincuplex sum
+406	radical
+407	rank
+408	realization
+409	realized
+410	reciprocal
+411	reciprocity
+412	redistribution
+413	reduced to, be
+414	reduction
+415	principle of reduction
+416	refined principle of reduction
+417	relate
+418	relation
+419	relation-test
+420	relative
+421	resolution
+422	resolve
+423	role
+424	root
+425	schema
+426	science test
+427	scientific semiotic
+428	secondary glosseme
+429	secondary variety
+430	section
+431	sejunction
+432	selected
+433	selecting
+434	selection
+435	semicentral
+436	semicentral glosseme(-variety)
+437	semicentral variety
+438	semifundamental
+439	semifundamental exponent
+440	semifundamental variety
+441	semimedian
+442	semimedian glosseme
+443	semimedian variety
+444	semiological
+445	semiological plane
+446	semiology
+447	semiotic
+448	semiotic base
+449	semiotic change
+450	semiotic family
+451	semiotic schema
+452	semiotic test
+453	semiotic usage
+454	semiprimary
+455	semiprimary glosseme
+456	semiprimary variety
+457	semiprincipal
+458	semiprincipal glosseme
+459	semiprincipal variety
+460	septemplex sum
+461	sequence
+462	set
+463	sexiespartite sum
+464	side
+465	sign
+466	sign function
+469	sign-process
+470	sign-system
+467	signal
+468	signal for, be
+471	simple accessory
+472	simple accessory glosseme
+473	simple constitutive
+474	simple correlation
+475	simple flexive
+476	simple formative
+477	simple median
+478	simple median glosseme
+479	simple peripheral
+480	simple peripheral glosseme
+481	simple primary
+482	simple primary glosseme
+483	simple principal
+484	simple principal glosseme
+485	simple prosody
+486	simple secondary
+487	simple secondary glosseme
+488	simple species
+489	simple subspecies
+490	simple subtagma
+491	simple subtype
+492	simple tagma
+493	simple type
+494	simplex sum
+495	simplicity principle
+496	size
+497	solidarity
+498	solidary
+499	special
+500	special-schema
+501	species
+502	specific
+503	specification
+504	specified
+505	specifying
+506	stem
+507	subjunct
+508	subspecies
+509	substance
+510	substance-functive
+511	substantive
+512	substantive
+513	substitution
+514	subtagma
+515	subtype
+516	succession
+517	sum
+518	superjunct
+519	suppletivism
+520	suspended
+521	suspension
+522	syllabeme
+523	syllabia
+524	syllabic theme
+525	syllable
+526	symbolic systems
+527	symphthong
+528	sympleremateme
+529	syncenemateme
+530	syncretism
+531	syncretization
+532	syncretizing
+533	synonomy
+534	synonym
+535	synonymous
+536	syntagma
+537	syntagmateme
+538	syntagmatic
+539	syntagmaty
+540	synthesis
+541	system
+542	tagma
+543	taxematic
+544	taxeme
+545	taxeme-category
+546	taxia
+547	tempo
+548	tetraphthong
+549	text
+550	themate
+551	themate glosseme
+552	themative
+553	themative cenemateme
+554	themative glosseme
+555	themative pleremateme
+556	thematized themative
+557	theme
+558	theorem
+559	theory
+560	total-schema
+561	translation
+562	transposition
+563	triphthong
+564	triplex sum
+565	type
+566	unilateral connexion
+567	unit
+568	universal
+569	universality
+570	upper chain
+571	variable
+572	variants
+573	variations
+574	varieties
+575	verb
+576	verbal character
+577	verbal characteristic
+578	virtual
+579	virtuality
+580	vowel
+581	words
+582	cenology
+583	phonematics
+583	phonematic
+584	phonemateme
+584	sound-types
+585	types
+586	homonexual ceneme
+587	plane of expression
+588	plane of content
+589	heteroplane selection
+590	homoplane selection
+591	extrinsic selection
+414	Pr. of Reduction
+160	Pr. of Economy
+59	Classes
+592	Glossematics
+592	glossematics
+593	glossematic 
+594	Equipollent
+595	functival field
+596	coherence
+597	equivalence
+230	glosseme
+598	strata and stratum
+599	intrinsic
+600	resultant
+601	sematic
+602	grapheme
+42	cenematia
+603	equipollent
+604	engintrinsic

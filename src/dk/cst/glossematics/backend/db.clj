@@ -158,7 +158,7 @@
   [person-entity]
   (let [{:keys [person/first-name
                 person/last-name
-                person/full-name]} (update-vals person-entity as-set)]
+                entity/full-name]} (update-vals person-entity as-set)]
     (set/union
       (cond
         (or (multiple? first-name) (multiple? last-name))
@@ -238,13 +238,22 @@
        (xl/select-columns {:A :db/ident
                            :B :person/first-name
                            :C :person/last-name
-                           :D :person/full-name
+                           :D :entity/full-name
                            :E :person/birth
                            :F :person/death})
        (rest)                                               ; skip title
        (map normalize-name-data)
        (map remove-nil-vals)
        (remove #(= {:entity/type :entity.type/person} %)))) ; empty
+
+(defn other-entities
+  [filename id-prefix entity-type]
+  (->> (-> filename io/resource io/file io/reader line-seq dedupe)
+       (map #(str/split % #"\t"))
+       (map (fn [[id full-name]]
+              {:db/ident         (str id-prefix id)
+               :entity/type      (keyword "entity.type" entity-type)
+               :entity/full-name full-name}))))
 
 (defn- with-body?
   "Does the file with `filename` contain a body of content?"
@@ -456,6 +465,13 @@
   (d/transact conn {:tx-data (file-entities files-dir)})
   (d/transact conn {:tx-data (timeline-entities)})
   (d/transact conn {:tx-data (person-entities)})
+  (d/transact conn {:tx-data (other-entities "lingvistiskeOrganisationer-konferencer.txt" "#nlingorg" "linguistic-organisation")})
+  (d/transact conn {:tx-data (other-entities "Organisationer.txt" "#norg" "organisation")})
+  (d/transact conn {:tx-data (other-entities "publikationer.txt" "#npub" "publication")})
+  (d/transact conn {:tx-data (other-entities "sprog.txt" "#ns" "language")})
+  (d/transact conn {:tx-data (other-entities "stednavne.txt" "#npl" "place")})
+  (d/transact conn {:tx-data (other-entities "terms.txt" "#nt" "term")})
+  (d/transact conn {:tx-data (other-entities "terms-eng.txt" "#nteng" "english-term")})
   (d/transact conn {:tx-data (map as-entity (tei-files conn))}))
 
 (defn- entity->where-triples
