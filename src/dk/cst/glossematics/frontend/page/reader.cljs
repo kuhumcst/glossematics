@@ -60,13 +60,20 @@
                                          (subs ref 1)
                                          ref)}))
 
+;; TODO: eventually use :as-alias
+(defn- search-href
+  [ref]
+  (rfe/href :dk.cst.glossematics.frontend.page.search/page {} {'_      ref
+                                                               :limit  20
+                                                               :offset 0}))
+
 (def ref-as-anchor
   (cup/->transformer
     '[_ {:ref  ref
          :type ?type} ???]
 
     (fn [{:syms [ref ?type]}]
-      [:a {:href  (encyclopedia-href ref)
+      [:a {:href  (search-href ref)
            :title (da-type ?type)}
        [:slot]])))
 
