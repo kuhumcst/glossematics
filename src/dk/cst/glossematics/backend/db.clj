@@ -236,7 +236,8 @@
                    [[full-name ident]])))))
 
 (defn name-kvs
-  "Return [name-str ident] for all names referenced in the TEI documents.
+  "Return [name-str ident] for all names referenced in the TEI documents;
+  no unreferenced names are included in the returned collection!
 
   The 30 IDs with the highest document frequency are placed at the top,
   while the rest of the results are sorted according to the name."
@@ -367,6 +368,8 @@
 (def text-patterns
   {:body-refs  '[tag {:ref  ref
                       :type ?type} ???]
+   :lang-refs  '[:note {:type "language"
+                        :n    ref} ???]
    :body-dates '[:date {:when when} ???]})
 
 (defn scrape-document
@@ -425,8 +428,9 @@
 (defn document-triples
   [filename {:keys [objectDesc
                     correspDesc
-                    body-refs
                     facsimile
+                    body-refs
+                    lang-refs
                     body-dates]
              :as   result}]
   #_(clojure.pprint/pprint result)
@@ -471,6 +475,9 @@
          (for [{:syms [when]} body-dates]
            [filename :document/date-mention (parse-date tei-dtf when)])
          (for [{:syms [tag ref ?type]} body-refs]
+           (when (valid-id? ref)
+             [filename :document/mention ref]))
+         (for [{:syms [ref]} lang-refs]
            (when (valid-id? ref)
              [filename :document/mention ref]))])
       nil)))
