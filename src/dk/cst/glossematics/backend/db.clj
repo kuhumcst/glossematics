@@ -300,19 +300,28 @@
 ;; TODO: is ?optional switched with non-optional? see :document-type
 ;; TODO: the ... pattern not working correctly in Cuphic?
 (def header-patterns
-  {:language      '[:language {:ident language} ???]
-   :title         '[:title {} title]
-   :author        '[:author {:ref author} ???]
-   :settlement    '[:settlement {:ref settlement} ???]
-   :document-type '[:objectDesc {:form form}
-                    [:supportDesc {}
-                     [:support {} support]
-                     [:extent {}
-                      [:note {} page-count]]]]
-   :header-refs   '[tag {:ref  ref
-                         :type ?type} ???]                  ; TODO: not enough context
-   :changes       '[:change {:when when :who who} ???]
-   :header-dates  '[:date {:when when} ???]})
+  {:language    '[:language {:ident language} ???]
+   :title       '[:title {} title]
+   :author      '[:author {:ref author} ???]
+   :settlement  '[:settlement {:ref settlement} ???]
+   :repository  '[:repository {:ref repository} ???]
+   :collection  '[:collection {} collection]
+   :objectDesc  '[:objectDesc {:form form}
+                  [:supportDesc {}
+                   [:support {} support]
+                   [:extent {}
+                    [:note {} page-count]]]]
+   :correspDesc '[:correspDesc
+                  {}
+                  [:correspAction
+                   {:type "sent"}
+                   [:persName {:ref sender} ???]
+                   [:placeName {:ref sender-loc}]
+                   [:date {} sent-at]]
+                  [:correspAction {:type "received"}
+                   [:persName {:ref recipient} ???]
+                   [:placeName {:ref recipient-loc}]]]
+   :hand-desc   '[:handDesc {} [:p {} hand-desc]]})
 
 (def facsimile-patterns
   {:facsimile '[:graphic {:xml/id id}]})
@@ -333,28 +342,60 @@
       (cup/scrape facsimile facsimile-patterns)
       (cup/scrape text text-patterns))))
 
-(def blank-ref?
-  #{"xx" "#xx"})
+(def placeholder?
+  #{"xx" "#xx" "NA"})
+
+(defn valid?
+  [v]
+  (not (or (str/blank? v)
+           (placeholder? v))))
+
+(defn valid-int?
+  [v]
+  (and (valid? v)
+       (re-matches #"\d+" v)))
+
+(defn valid-id?
+  [v]
+  (and (valid? v)
+       ;; TODO: make Dorte streamline archive IDs in the TEI files
+       (or (str/starts-with? v "n")                         ; used for archives
+           (str/starts-with? v "#n"))
+       (re-find #"\d$" v)))
+
+(defn valid-date?
+  [v]
+  (re-matches #"\d\d\d\d-\d\d-\d\d" v))
+
+;; Since Dorte's IDs sometimes have a prefixed # and sometimes don't
+(defn fix-id
+  [id]
+  (if (str/starts-with? id "#")
+    id
+    (str "#" id)))
 
 (defn single-val
   [result k]
   (-> (get result k) first (get (symbol k))))
 
 (defn single-triple
-  [result filename rel k]
+  [result filename validation-fn rel k]
   (when-let [v (single-val result k)]
-    (when (not (or (blank-ref? v)
-                   (str/blank? v)))
+    (when (validation-fn v)
       [filename rel v])))
 
 (defn document-triples
-  [filename {:keys [header-refs
+  [filename {:keys [objectDesc
+                    correspDesc
                     body-refs
                     facsimile
-                    changes
                     body-dates]
              :as   result}]
-  (let [triple (partial single-triple result filename)]
+  #_(clojure.pprint/pprint result)
+  (let [triple    (partial single-triple result filename valid?)
+        id-triple (comp
+                    (fn [[e a v :as eav]] (when eav [e a (fix-id v)]))
+                    (partial single-triple result filename valid-id?))]
     (disj
       (reduce
         into
@@ -362,21 +403,37 @@
           conj
           #{}
           [(triple :document/title :title)
-           (triple :document/author :author)
-           (triple :document/editor :editor)
-           (triple :document/language :language)
-           (triple :document/settlement :settlement)])
-        [(for [{:syms [when who]} changes]
-           [filename :document/editor who])
-         (for [{:syms [id]} facsimile]
+           (triple :document/hand :hand-desc)
+           (id-triple :document/author :author)
+           (id-triple :document/language :language)
+           (id-triple :document/repository :repository)
+           (id-triple :document/settlement :settlement)
+           (let [collection (triple :document/collection :collection)]
+             (when (valid-int? (last collection))
+               (update collection 2 parse-long)))
+           (when-let [form (get-in objectDesc [0 'form])]
+             [filename :document/form form])
+           (when-let [sender (get-in correspDesc [0 'sender])]
+             (when (valid-id? sender)
+               [filename :document/sender sender]))
+           (when-let [sender-loc (get-in correspDesc [0 'sender-loc])]
+             (when (valid-id? sender-loc)
+               [filename :document/sender-location sender-loc]))
+           (when-let [sent-at (get-in correspDesc [0 'sent-at])]
+             (when (valid-date? sent-at)
+               [filename :document/sent-at (parse-date utc-dtf sent-at)]))
+           (when-let [recipient (get-in correspDesc [0 'recipient])]
+             (when (valid-id? recipient)
+               [filename :document/recipient recipient]))
+           (when-let [recipient-loc (get-in correspDesc [0 'recipient-loc])]
+             (when (valid-id? recipient-loc)
+               [filename :document/recipient-location recipient-loc]))])
+        [(for [{:syms [id]} facsimile]
            [filename :document/facsimile id])
          (for [{:syms [when]} body-dates]
            [filename :document/date-mention (parse-date tei-dtf when)])
-         #_(for [{:syms [tag ref ?type]} header-refs]
-             (when (str/starts-with? ref "#n")
-               [filename (keyword "header" (ref-str tag ?type)) ref]))
          (for [{:syms [tag ref ?type]} body-refs]
-           (when (str/starts-with? ref "#n")
+           (when (valid-id? ref)
              [filename :document/mention ref]))])
       nil)))
 
@@ -516,14 +573,11 @@
       {:total (count matches)})))
 
 (comment
-  (def example (nth (tei-files conn) 69))
-  (xml/parse example)
-  (nth (xml/parse example) 2)                               ; header
-  (nth (xml/parse example) 3)                               ; facsimile
-  (nth (xml/parse example) 4)                               ; text/body
-  (scrape-document example)
-  (document-triples "example.xml" (scrape-document example))
+  (def example (nth (tei-files conn) 99))
+  (xml/parse (slurp example))
+  (scrape-document (slurp example))
   (as-triples example)
+  (as-entity example)
 
   (file-entities "/Users/rqf595/Desktop/Glossematics-data")
   (count (file-entities "/Users/rqf595/Desktop/Glossematics-data"))

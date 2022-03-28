@@ -120,11 +120,19 @@
     :else (subs (str rel) 1)))
 
 (def id-rels
-  {:document/mention {:label "mentioned"}
-   :document/author  {:label "author"}})
+  {:document/mention            {:label "mentioned"}
+   :document/author             {:label "author"}
+   :document/sender             {:label "sender"}
+   :document/sender-location    {:label "sender location"}
+   :document/recipient          {:label "recipient"}
+   :document/recipient-location {:label "recipient location"}
+   :document/repository         {:label "repository"}
+   #_#_:document/collection {:label "collection"}})
 
+;; TODO: order by collection?
 (def date-rels
-  {:document/date-mention {:label "mentioned date"}})
+  {:document/date-mention {:label "mentioned date"}
+   :document/sent-at      {:label "send date"}})
 
 (defn- state->params
   [{:keys [items limit offset order-by from to]}]
