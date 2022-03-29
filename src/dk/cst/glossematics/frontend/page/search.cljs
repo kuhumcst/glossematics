@@ -191,8 +191,10 @@
                    (submit))
         order-fn #(fn [e]
                     (swap! state/query assoc-in [:order-by %] (s->rel (e->v e)))
+                    (swap! state/query assoc :offset 0)
                     (update!))
         date-fn  #(fn [e]
+                    (swap! state/query assoc :offset 0)
                     (if-let [v (not-empty (e->v e))]
                       (swap! state/query assoc % v)
                       (swap! state/query dissoc %))
