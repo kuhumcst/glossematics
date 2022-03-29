@@ -562,23 +562,27 @@
            :where [?e :db/ident ?id]]
          (entity->where-triples entity))))
 
-;; Fixes sorting when there is a mix of e.g. dates and :tg/nil
 (defn- ignore-tg-nil
+  "Fixes sorting when there is a mix of e.g. dates and :tg/nil"
   [x]
   (when-not (= :tg/nil x) x))
 
+(def sort-keyfn
+  "Helper function to order search results by the sort-val first & ID second."
+  (juxt (comp ignore-tg-nil second) first))
+
 (defn- sort-results
   "Sort 2-tuple `search-results` containing sort values in the second position.
-  A `sort-pred` may be supplied to filter the results prior to sorting."
+
+  A `sort-pred` may be supplied to filter the results prior to sorting, e.g.
+  only keeping results with a sort-val within some range."
   [search-results & [sort-pred]]
   (->> search-results
        (filter (comp (or sort-pred (constantly true)) second))
-       (sort-by (comp ignore-tg-nil second))
+       (sort-by sort-keyfn)
        (map first)
-       (apply sorted-set)))
+       (distinct)))
 
-;; TODO: seems to not order properly by :document/sent-at, fix
-;; See: http://localhost:8080/app/search?_=%23np145%2C%23np57&order-by=document%2Fsent-at%2Casc&limit=20&offset=0
 (defn match-entity
   "Look up entity IDs in `conn` matching partial `entity` description.
 
