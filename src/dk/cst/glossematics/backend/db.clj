@@ -577,6 +577,8 @@
        (map first)
        (apply sorted-set)))
 
+;; TODO: seems to not order properly by :document/sent-at, fix
+;; See: http://localhost:8080/app/search?_=%23np145%2C%23np57&order-by=document%2Fsent-at%2Casc&limit=20&offset=0
 (defn match-entity
   "Look up entity IDs in `conn` matching partial `entity` description.
 
