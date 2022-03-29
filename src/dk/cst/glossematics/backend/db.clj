@@ -521,29 +521,23 @@
        (set)))
 
 (defn- to-pred
-  "Return pred to check that date is on or before `to-date`."
-  [to-date]
-  (let [to-ms (inst-ms to-date)]
-    (fn [date]
-      (and (inst? date)
-           (<= (inst-ms date) to-ms)))))
+  "Return pred to check that the test value is on or before `to`."
+  [to]
+  (fn [v]
+    (and v (<= (compare v to) 0))))
 
 (defn- from-pred
-  "Return pred to check that date is on or after `from-date`."
-  [from-date]
-  (let [from-ms (inst-ms from-date)]
-    (fn [date]
-      (and (inst? date)
-           (<= from-ms (inst-ms date))))))
+  "Return pred to check that the test value is on or after `from`."
+  [from]
+  (fn [v]
+    (and v (>= (compare v from) 0))))
 
 (defn- between-pred
-  "Return pred to check that date is on or between `from-date` and `to-date`."
-  [from-date to-date]
-  (let [after-from-date? (from-pred from-date)
-        before-to-date?  (to-pred to-date)]
-    (fn [date]
-      (and (after-from-date? date)
-           (before-to-date? date)))))
+  "Return pred to check that the test value is on or between `from` and `to`."
+  [from to]
+  (fn [v]
+    (and ((from-pred from) v)
+         ((to-pred to) v))))
 
 (defn- entity->search-query
   "Build an entity search query from a partial `entity` description.
@@ -578,7 +572,10 @@
   only keeping results with a sort-val within some range."
   [search-results & [sort-pred]]
   (->> search-results
-       (filter (comp (or sort-pred (constantly true)) second))
+       (filter (comp (or sort-pred
+                         (constantly true))
+                     ignore-tg-nil
+                     second))
        (sort-by sort-keyfn)
        (map first)
        (distinct)))

@@ -183,13 +183,15 @@ body {
 
 .search__input input[type=list],
 .search__order #sort-key,
-.search__between input[type=date]
+.search__between input[type=date],
+.search__between input[type=number]
 {
     flex-grow: 1;
 }
 
 .search input[type=list],
 .search input[type=date],
+.search__between input[type=number],
 .search input[type=checkbox],
 .search select {
     appearance: none;

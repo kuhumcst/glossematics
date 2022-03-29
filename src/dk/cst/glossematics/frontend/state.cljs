@@ -18,12 +18,14 @@
 (def ^:dynamic *modal-dialog*)
 
 (def query-defaults
-  {:unique   #{} :items []         ; = ordered set
+  {:unique   #{} :items []                                  ; = ordered set
    :in       ""
    :rel      '_
    :limit    20
    :offset   0
-   :order-by [nil :asc]})
+   :order-by [nil :asc]
+   :from     nil
+   :to       nil})
 
 ;; Local page data should all be cursors into this central data structure.
 (defonce db

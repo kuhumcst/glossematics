@@ -119,6 +119,7 @@
     (= rel '_) "_"
     :else (subs (str rel) 1)))
 
+;; TODO: allow integer input, e.g. collection
 (def id-rels
   {:document/mention            {:label "mentioned"}
    :document/author             {:label "author"}
@@ -129,10 +130,13 @@
    :document/repository         {:label "repository"}
    #_#_:document/collection {:label "collection"}})
 
-;; TODO: order by collection?
-(def date-rels
-  {:document/date-mention {:label "mentioned date"}
-   :document/sent-at      {:label "send date"}})
+(def order-rels
+  {:document/date-mention {:label "mentioned date"
+                           :type  "date"}
+   :document/sent-at      {:label "send date"
+                           :type  "date"}
+   :document/collection   {:label "collection"
+                           :type  "number"}})
 
 (defn- state->params
   [{:keys [items limit offset order-by from to]}]
@@ -163,6 +167,7 @@
 (defn search-form
   []
   (let [{:keys [name-kvs name->id]} @state/search
+        no-op    (fn [e] (.preventDefault e))
         update!  #(rfe/push-state ::page {} (state->params @state/query))
         set-in   (fn [e]
                    (let [in (e->v e)]
@@ -189,11 +194,11 @@
         set-rel  (fn [e]
                    (swap! state/query assoc :rel (s->rel (e->v e)))
                    (submit))
-        order-fn #(fn [e]
+        ->order  #(fn [e]
                     (swap! state/query assoc-in [:order-by %] (s->rel (e->v e)))
-                    (swap! state/query assoc :offset 0)
+                    (swap! state/query assoc :offset 0 :from nil :to nil)
                     (update!))
-        date-fn  #(fn [e]
+        ->tofrom #(fn [e]
                     (swap! state/query assoc :offset 0)
                     (if-let [v (not-empty (e->v e))]
                       (swap! state/query assoc % v)
@@ -204,12 +209,11 @@
       (let [{:keys [items in rel order-by from to
                     bad-input? good-input? not-allowed?]} @state/query
             [order-rel order-dir] order-by
-            no-items? (empty? items)
-            no-order? (nil? order-rel)]
+            no-items?  (empty? items)
+            no-order?  (nil? order-rel)
+            order-type (get-in order-rels [order-rel :type] "date")]
         [:form.search
-         {:on-submit (fn [e]
-                       (.preventDefault e)
-                       (submit))}
+         {:on-submit no-op}                                 ; no page reloads
          [:div.search__input
           [:label {:for "v"} "Look for "]
           [:input.search__input-value {:type      "list"
@@ -223,6 +227,10 @@
                                        :id        "v"
                                        :disabled  (nil? name->id)
                                        :on-change set-in
+                                       :on-key-up (fn [e]
+                                                    (.preventDefault e)
+                                                    (when (= 13 (.-keyCode e))
+                                                      (submit)))
                                        :value     in}]
           (when name->id
             [multi-input-data name-kvs])
@@ -233,38 +241,38 @@
             :value     (rel->s rel)
             :on-change set-rel
             :disabled  (not (get name->id in))}
-           [select-opts id-rels [:option {:value (rel->s '_)} "anything"]]]]
+           [select-opts id-rels [:option {:value (rel->s '_)} "-"]]]]
 
          [:div.search__order
           [:label {:for "sort-key"} "Order by "]
           [:select {:id        "sort-key"
                     :disabled  no-items?
                     :value     (rel->s order-rel)
-                    :on-change (order-fn 0)}
-           [select-opts date-rels [:option {:value ""} ""]]]
+                    :on-change (->order 0)}
+           [select-opts order-rels [:option {:value ""} "-"]]]
 
           [:label {:for "sort-dir"} " in direction "]
           [:select {:id        "sort-dir"
                     :disabled  (or (nil? order-rel) no-items?)
                     :value     (rel->s order-dir)
-                    :on-change (order-fn 1)}
+                    :on-change (->order 1)}
            [:option {:value "asc"} "ascending"]
            [:option {:value "desc"} "descending"]]]
 
          [:div.search__between
           [:label {:for "from"} "From "]
           [:input {:id        "from"
-                   :type      "date"
+                   :type      order-type
                    :value     from
                    :max       to
                    :class     (when from
                                 "good-input")
-                   :on-change (date-fn :from)
+                   :on-change (->tofrom :from)
                    :disabled  (or no-order? no-items?)}]
 
           [:label {:for "to"} " to "]
           [:input {:id        "to"
-                   :type      "date"
+                   :type      order-type
                    :value     to
                    :min       from
                    :class     (if (and from to
@@ -274,7 +282,7 @@
                                  "not-allowed"]
                                 (when to
                                   "good-input"))
-                   :on-change (date-fn :to)
+                   :on-change (->tofrom :to)
                    :disabled  (or no-order? no-items?)}]]
 
          (when (not-empty items)
