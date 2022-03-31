@@ -330,13 +330,14 @@
      [:button {:disabled (= offset 0)
                :on-click #(set-offset - 20)}
       "←"]
-     " "
-     (if offset
-       (str offset " to " (+ offset num-results))
-       num-results)
-     " out of "
-     total
-     " "
+     [:span.search-results__paging-description
+      " "
+      (if offset
+        (str offset " to " (+ offset num-results))
+        num-results)
+      " out of "
+      total
+      " "]
      [:button {:disabled (or (= num-results total)
                              (< total (+ offset limit)))
                :on-click #(set-offset + 20)}

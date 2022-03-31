@@ -265,3 +265,17 @@ body {
     padding: 0 8px;
     text-transform: uppercase;
 }
+
+.search-results__paging {
+    display: flex;
+}
+
+.search-results__paging > button {
+    flex-grow: 1;
+}
+
+.search-results__paging-description {
+    padding: 8px;
+    min-width: 20ch;
+    text-align: center;
+}
