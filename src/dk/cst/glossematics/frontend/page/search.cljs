@@ -206,38 +206,39 @@
             no-items?  (empty? items)
             no-order?  (nil? order-rel)
             order-type (get-in order-rels [order-rel :type] "date")]
-        [:form.search
+        [:form.search-form
          {:on-submit no-op}                                 ; no page reloads
-         [:div.search__input
+         [:div.search-form__input
           [:label {:for "v"} "Look for "]
-          [:input.search__input-value {:type      "list"
-                                       :list      "names"
-                                       :class     [(when not-allowed?
-                                                     "not-allowed")
-                                                   (when bad-input?
-                                                     "bad-input")
-                                                   (when good-input?
-                                                     "good-input")]
-                                       :id        "v"
-                                       :disabled  (nil? name->id)
-                                       :on-change set-in
-                                       :on-key-up (fn [e]
-                                                    (.preventDefault e)
-                                                    (when (= 13 (.-keyCode e))
-                                                      (submit)))
-                                       :value     in}]
+          [:input {:type      "list"
+                   :list      "names"
+                   :class     ["search-form__input-value"
+                               (when not-allowed?
+                                 "not-allowed")
+                               (when bad-input?
+                                 "bad-input")
+                               (when good-input?
+                                 "good-input")]
+                   :id        "v"
+                   :disabled  (nil? name->id)
+                   :on-change set-in
+                   :on-key-up (fn [e]
+                                (.preventDefault e)
+                                (when (= 13 (.-keyCode e))
+                                  (submit)))
+                   :value     in}]
           (when name->id
             [multi-input-data name-kvs])
 
           [:label {:for "k"} " as "]
-          [:select.search__input-attribute
+          [:select.search-form__input-attribute
            {:id        "k"
             :value     (rel->s rel)
             :on-change set-rel
             :disabled  (not (get name->id in))}
            [select-opts id-rels [:option {:value (rel->s '_)} "-"]]]]
 
-         [:div.search__order
+         [:div.search-form__order
           [:label {:for "sort-key"} "Order by "]
           [:select {:id        "sort-key"
                     :disabled  no-items?
@@ -253,7 +254,7 @@
            [:option {:value "asc"} "ascending"]
            [:option {:value "desc"} "descending"]]]
 
-         [:div.search__between
+         [:div.search-form__between
           [:label {:for "from"} "From "]
           [:input {:id        "from"
                    :type      order-type
@@ -295,10 +296,10 @@
             (for [[k v :as kv] items
                   :let [label (:label (meta kv))]]
               [:<> {:key kv}
-               [:span.search__item
+               [:span.search-form__item
                 (when (not= k '_)
-                  [:span.search__item-key (:label (id-rels k)) " "])
-                [:span.search__item-label label]
+                  [:span.search-form__item-key (:label (id-rels k)) " "])
+                [:span.search-form__item-label label]
                 [:button {:type     "button"                ; prevent submit
                           :title    "Remove criterion"
                           :on-click (fn [e]
@@ -311,7 +312,7 @@
 (defn- set-offset
   [f n]
   (let [new-offset (fn [offset & args] (apply f offset args))
-        top-elem   (js/document.querySelector ".search-results__paging")]
+        top-elem   (js/document.querySelector ".search-result__paging")]
     (->> (swap! state/query update :offset new-offset n)
          (state->params)
          (rfe/replace-state ::page {}))
@@ -326,11 +327,11 @@
   (let [{:keys [offset limit]} @state/query
         num-results (count results)
         total       (:total (meta results))]
-    [:div.search-results__paging
+    [:div.search-result__paging
      [:button {:disabled (= offset 0)
                :on-click #(set-offset - 20)}
       "←"]
-     [:span.search-results__paging-description
+     [:span.search-result__paging-description
       " "
       (if offset
         (str offset " to " (+ offset num-results))
@@ -343,29 +344,32 @@
                :on-click #(set-offset + 20)}
       "→"]]))
 
-(defn search-results
+(defn search-result-items
   "View of search `results`."
   [results]
-  [:ul
-   (for [{:keys [file/name] :as entity} results]
-     [:li {:key name}
-      [:a {:href (rfe/href ::reader/page {:document name})}
-       name]
-      [:br]
-      ;; This is only present while figuring things out...
-      [:pre (with-out-str (cljs.pprint/pprint entity))]])])
+  [:div.search-result__items
+   [:dl
+    (for [{:keys [file/name document/title] :as entity} results]
+      [:<> {:key name}
+       [:dt
+        [:a {:href (rfe/href ::reader/page {:document name})}
+         title]]
+       [:dd
+        ;; This is only present while figuring things out...
+        [:pre (with-out-str (cljs.pprint/pprint entity))]]])]])
 
 (defn page
   []
   (let [{:keys [results name->id]} @state/search]
-    [:<>
+    [:div.search-page
      ;; React key needed for input to update after name->id has been fetched!
      ^{:key name->id} [search-form]
      (when results
-       (if (empty? results)
-         [:div.search-results
-          [:p "No matches found for query."]]
-         [:div.search-results
-          [search-paging results]
-          [search-results results]
-          [search-paging results]]))]))
+       [:div.search-result
+        (if (empty? results)
+          [:div.search-result__items
+           [:p "No matches found for query."]]
+          [:<>
+           [search-paging results]
+           [search-result-items results]
+           [search-paging results]])])]))

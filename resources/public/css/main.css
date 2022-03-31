@@ -12,6 +12,16 @@
   100% { transform: translate(0px, -1px) rotate(-1deg); }
 }
 
+@keyframes search-fade-in {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes item-fade-in {
+  from {opacity: 0;}
+  to {opacity: 0.5;}
+}
+
 @font-face {
     font-family: PoiretOne;
     src: url(/fonts/PoiretOne-aD0x.ttf);
@@ -55,11 +65,16 @@ body {
     margin: 0 auto;
 }
 
-.search {
+.search-page {
+    max-width: 120ch;
+    margin: auto;
+}
+
+.search-form {
     padding: 16px;
     background-color: #662211;
     border: 1px solid #333;
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     flex-direction: column;
     font-family: Georgia, serif;
@@ -67,11 +82,11 @@ body {
     font-size: 16px;
 }
 
-.search > * + * {
+.search-form > * + * {
     margin-top: 16px;
 }
 
-.search label {
+.search-form label {
     color: white;
     opacity: 0.7;
     letter-spacing: 1.5;
@@ -79,16 +94,11 @@ body {
     padding: 4px;
 }
 
-.search label:hover {
+.search-form label:hover {
     opacity: 0.8;
 }
 
-@keyframes item-fade-in {
-  from {opacity: 0;}
-  to {opacity: 0.5;}
-}
-
-.search__item {
+.search-form__item {
     animation: item-fade-in 1s;
     transition: all 0.2s;
     border: 1px solid rgba(255,255,255,0.2);
@@ -103,15 +113,15 @@ body {
     color: white;
 }
 
-.search__item:last-child {
+.search-form__item:last-child {
     margin-right: 0;
 }
 
-.search__item:hover {
+.search-form__item:hover {
     opacity: 0.8;
 }
 
-.search__item > button {
+.search-form__item > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
     outline: revert;
@@ -127,13 +137,13 @@ body {
 }
 
 
-.search__item > button:hover {
+.search-form__item > button:hover {
     transform: rotate(90deg);
     background-size: 20px;
 }
 
-.search legend > button,
-.search__between > button {
+.search-form legend > button,
+.search-form__between > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
     outline: revert;
@@ -148,17 +158,17 @@ body {
 }
 
 
-.search legend:hover {
+.search-form legend:hover {
     opacity: 0.8;
 }
 
-.search legend > button:hover {
+.search-form legend > button:hover {
     transform: rotate(90deg);
     background-size: 24px;
     opacity: 1;
 }
 
-.search__item-key {
+.search-form__item-key {
     font-weight: bold;
     font-variant: small-caps;
     opacity: 0.5;
@@ -166,34 +176,34 @@ body {
     margin-right: 8px;
 }
 
-.search__input,
-.search__order,
-.search__between
+.search-form__input,
+.search-form__order,
+.search-form__between
 {
     display: flex;
     align-items: center;
 }
 
-.search__input > * + *,
-.search__order > * + *,
-.search__between > * + *
+.search-form__input > * + *,
+.search-form__order > * + *,
+.search-form__between > * + *
 {
     margin-left: 8px;
 }
 
-.search__input input[type=list],
-.search__order #sort-key,
-.search__between input[type=date],
-.search__between input[type=number]
+.search-form__input input[type=list],
+.search-form__order #sort-key,
+.search-form__between input[type=date],
+.search-form__between input[type=number]
 {
     flex-grow: 1;
 }
 
-.search input[type=list],
-.search input[type=date],
-.search__between input[type=number],
-.search input[type=checkbox],
-.search select {
+.search-form input[type=list],
+.search-form input[type=date],
+.search-form__between input[type=number],
+.search-form input[type=checkbox],
+.search-form select {
     appearance: none;
 
 
@@ -206,76 +216,94 @@ body {
     background-color: rgba(255,255,255,0.6);
 }
 
-.search input[type=list],
-.search input[type=checkbox],
-.search select {
+.search-form input[type=list],
+.search-form input[type=checkbox],
+.search-form select {
     padding: 4px 8px;
 }
 
-.search input[type=date]::placeholder {
+.search-form input[type=date]::placeholder {
     color: red;
     opacity: 1;
 }
 
-.search input[type=date] {
+.search-form input[type=date] {
     padding: 0 8px; /* TODO: something off about input[type=date] top-padding */
 
     /* Safari weirdness: https://stackoverflow.com/questions/69888903/text-color-is-not-working-on-safari-iphone*/
     -webkit-text-fill-color: rgba(0,0,0,0.9);
 }
 
-.search select:active {
+.search-form select:active {
     color: black;
 }
 
-.search select:not(:disabled) {
+.search-form select:not(:disabled) {
     cursor: pointer;
 }
 
-.search input:disabled, select:disabled {
+.search-form input:disabled, select:disabled {
     opacity: 0.2;
 }
 
-.search fieldset {
+.search-form fieldset {
     border: 2px solid rgba(255,255,255,0.2);
     border-radius: 4px;
     padding: 12px 24px 16px 24px;
 }
 
-.search input.not-allowed {
+.search-form input.not-allowed {
     animation: shake 0.2s;
 }
 
-.search input.bad-input {
+.search-form input.bad-input {
     background-color: #d64646;
 }
 
-.search input.good-input {
+.search-form input.good-input {
     background-color: #59ba4a;
 }
 
 /* yellow -- when e.g. input is technically valid, but already applied. */
-.search input.good-input.not-allowed {
+.search-form input.good-input.not-allowed {
     background-color: #f6d348;
 }
 
-.search legend {
+.search-form legend {
     color: white;
     opacity: 0.7;
     padding: 0 8px;
     text-transform: uppercase;
 }
 
-.search-results__paging {
+.search-result {
+    animation: search-fade-in 0.5s;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background-color: #DDD;
+}
+
+.search-result__paging {
     display: flex;
 }
 
-.search-results__paging > button {
+.search-result__paging > button {
     flex-grow: 1;
+    cursor: pointer;
 }
 
-.search-results__paging-description {
+.search-result__paging > button[disabled] {
+    cursor: not-allowed;
+}
+
+.search-result__paging-description {
     padding: 8px;
-    min-width: 20ch;
     text-align: center;
+    font-size: 24px;
+    min-width: 24ch;
+}
+
+.search-result__items {
+    padding: 16px;
+    font-size: 16px;
 }
