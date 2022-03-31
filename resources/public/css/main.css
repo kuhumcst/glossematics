@@ -12,42 +12,188 @@
   100% { transform: translate(0px, -1px) rotate(-1deg); }
 }
 
+@keyframes fade-in-x {
+  from {
+    opacity: 1;
+    transform: scaleX(0.33);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes fade-in-y {
+  from {
+    opacity: 1;
+    transform: scaleY(0.33);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes fade-in-xy {
+  from {
+    opacity: 0;
+    transform: scale(0.33);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pop-up {
+  from {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in-result {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  from {
+    text-shadow:
+    0 0 1px #ff4da6;
+  }
+  to {
+    text-shadow:
+    0 0 4px  #ff4da6,
+    0 0 8px  #ff4da6,
+    0 0 12px #ff4da6,
+    0 0 16px #ff4da6,
+    0 0 20px #ff4da6,
+    0 0 24px #ff4da6,
+    0 0 28px #ff4da6;
+  }
+}
+
 @font-face {
     font-family: PoiretOne;
     src: url(/fonts/PoiretOne-aD0x.ttf);
 }
 
+::placeholder {
+    color: rgba(0,0,0,0.3);
+}
+
 body {
     margin: 0;
-    background: #EDEDED;
+    background: var(--background-darker);
 }
 
-.shell__logo {
-    background: #111;
-}
-
-.shell__logo a {
+a {
+    color: #1060d7;
     text-decoration: none;
 }
 
-.shell__logo h1 {
-    color: #DDD;
-    letter-spacing: 4px;
-    font-family: PoiretOne;
-    font-size: 48px;
-    text-align: left;
-    text-transform: uppercase;
-    padding: 24px 24px 4px 24px;
-    border-bottom: 24px solid #662211;
+a:hover {
+    text-decoration: underline;
 }
 
-.shell__logo span {
-    color: #EEAAAA;
-    font-size: 24px;
+/* Reset for special links. */
+nav a:hover {
+    text-decoration: none;
+}
+
+nav {
+    background: black url(/images/texture/fabric-of-squares.png);
+    box-shadow: var(--box-shadow-elevated);
+    border-bottom: 8px solid #bd3929;
+    position: sticky;
+    top: 0;
+    z-index: 998;
+    display: flex;
+    align-items: flex-end;
+    padding:
+        var(--padding-l)
+        var(--padding-l)
+        var(--padding-m)
+        var(--padding-l);
+}
+
+nav h1, nav a {
+    transition: all 0.33s;
+    color: #EFEFEF;
+    letter-spacing: 6px;
+    font-family: PoiretOne;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+
+}
+
+nav h1 {
+    margin-right: auto;
+    font-size: 32px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #EFEFEF;
+    padding: 0;
+    transform: skew(-12deg);
+}
+
+nav a:hover {
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+nav a:first-child {
+    margin-right: auto;
+}
+
+nav a:not(:first-child) {
+    margin: 0;
+    font-size: 16px;
+    color: #ffc92e;
+}
+
+nav a:not(:first-child) + a {
+     margin-left: var(--margin-l);
+}
+
+nav a:not(:first-child)::first-letter {
+    font-size: 32px;
+}
+
+nav span {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+@media only screen and (max-width: 650px) {
+  nav h1,
+  nav a:not(:first-child),
+  nav a:not(:first-child)::first-letter {
+    font-size: 16px;
+  }
+  nav h1 span {
+    font-size: 0;
+  }
+  nav {
+    padding:
+            var(--padding-m);
+  }
 }
 
 .shell__content {
-    padding: 0 24px;
+    padding: var(--padding-xl);
 }
 
 .reader {
@@ -55,70 +201,82 @@ body {
     margin: 0 auto;
 }
 
-.search {
-    padding: 16px;
-    background-color: #662211;
-    border: 1px solid #333;
-    border-radius: 8px;
+.search-page {
+    max-width: 110ch;
+    margin: auto;
+}
+
+.text-content {
+    animation: fade-in-result 0.33s ease-out;
+    padding: var(--padding-l);
+    border: var(--border-subtle);
+    background: rgba(0,0,0,0.08);
+    border-radius: var(--border-radius);
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: var(--color);
+    line-height: 1.5;
+    letter-spacing: 1.25;
+}
+
+.text-content ul {
+    margin: var(--margin-xl) 0 var(--margin-xl) var(--margin-l);
+}
+
+.text-content ul > li + li {
+    margin-top: var(--margin);
+}
+
+.search-form {
     display: flex;
     flex-direction: column;
     font-family: Georgia, serif;
     letter-spacing: 1.25;
     font-size: 16px;
+    margin-bottom: var(--margin-xl);
 }
 
-.search > * + * {
+.search-form > * + * {
     margin-top: 16px;
 }
 
-.search label {
-    color: white;
-    opacity: 0.7;
+label {
+    color: #333;
     letter-spacing: 1.5;
     text-transform: uppercase;
     padding: 4px;
 }
 
-.search label:hover {
-    opacity: 0.8;
-}
-
-@keyframes item-fade-in {
-  from {opacity: 0;}
-  to {opacity: 0.5;}
-}
-
-.search__item {
-    animation: item-fade-in 1s;
+.search-form__item {
+    display: inline-block; /* to allow CSS transform */
+    animation: fade-in-xy 0.33s;
     transition: all 0.2s;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 4px;
-    opacity: 0.5;
-    background-color: rgba(255,255,255,0.2);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    background-color: white;
     padding: 4px 4px 4px 12px;
-    margin-right: 4px;
+    margin: 12px 6px 0 0;
     white-space: nowrap;
-    font-style: italic;
-    line-height: calc(28px + 1ch);
-    color: white;
+    color: var(--color);
 }
 
-.search__item:last-child {
+.search-form__item:last-child {
     margin-right: 0;
 }
 
-.search__item:hover {
-    opacity: 0.8;
+.search-form__item:hover {
+    transform: var(--transform-elevated);
+    box-shadow: var(--box-shadow-elevated);
 }
 
-.search__item > button {
+.search-form__item > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
     outline: revert;
     color: transparent;
 
     transition: all 0.33s;
-    background: url(/images/x-white.svg) no-repeat center;
+    background: url(/images/x-black.svg) no-repeat center;
     background-size: 12px;
     line-height: 16px;
     width: 20px;
@@ -126,156 +284,191 @@ body {
     margin-left: 4px;
 }
 
-
-.search__item > button:hover {
+.search-form__item > button:hover {
     transform: rotate(90deg);
     background-size: 20px;
 }
 
-.search legend > button,
-.search__between > button {
+.search-form legend > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
     outline: revert;
     color: transparent;
 
     transition: all 0.33s;
-    background: url(/images/x-white.svg) no-repeat center;
+    background: url(/images/x-black.svg) no-repeat center;
     background-size: 16px;
     width: 20px;
     vertical-align: text-bottom;
     margin-left: 4px;
 }
 
-
-.search legend:hover {
-    opacity: 0.8;
-}
-
-.search legend > button:hover {
+.search-form legend > button:hover {
     transform: rotate(90deg);
     background-size: 24px;
-    opacity: 1;
+    opacity: 1;v
 }
 
-.search__item-key {
-    font-weight: bold;
+.search-form__item-key {
+    color: var(--color);
     font-variant: small-caps;
-    opacity: 0.5;
-    border-right: 1px solid white;
-    margin-right: 8px;
 }
 
-.search__input,
-.search__order,
-.search__between
+details summary {
+    font-size: 12px;
+    margin: var(--margin-l) var(--margin) var(--margin) var(--margin);
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.input-row
 {
     display: flex;
     align-items: center;
 }
 
-.search__input > * + *,
-.search__order > * + *,
-.search__between > * + *
+.input-row > * + *
 {
-    margin-left: 8px;
+    margin-left: var(--margin);
 }
 
-.search__input input[type=list],
-.search__order #sort-key,
-.search__between input[type=date],
-.search__between input[type=number]
+.input-row + .input-row {
+    margin-top: var(--margin);
+}
+
+.input-row input[type=list],
+.input-row #sort-key,
+.input-row input[type=date],
+.input-row input[type=number]
 {
     flex-grow: 1;
 }
 
-.search input[type=list],
-.search input[type=date],
-.search__between input[type=number],
-.search input[type=checkbox],
-.search select {
+.input-row input[type=list],
+.input-row input[type=date],
+.input-row input[type=number],
+.input-row input[type=checkbox],
+.input-row input[type=submit],
+.input-row button,
+.input-row select
+{
     appearance: none;
 
-
+    transition: all 0.33s;
     min-height: 28px;
     min-width: 28px;
     font-size: 16px;
-    color: rgba(0,0,0,0.9);
-    border: 1px solid white;
-    border-radius: 4px;
-    background-color: rgba(255,255,255,0.6);
+    color: var(--color);
+    border: var(--border);
+    border-radius: var(--border-radius);
+    background: var(--background);
 }
 
-.search input[type=list],
-.search input[type=checkbox],
-.search select {
+.input-row input[type=list],
+.input-row input[type=checkbox],
+.input-row select
+{
     padding: 4px 8px;
 }
 
-.search input[type=date]::placeholder {
+.input-row input[type=date]::placeholder {
     color: red;
     opacity: 1;
 }
 
-.search input[type=date] {
+.input-row input[type=date] {
     padding: 0 8px; /* TODO: something off about input[type=date] top-padding */
 
     /* Safari weirdness: https://stackoverflow.com/questions/69888903/text-color-is-not-working-on-safari-iphone*/
     -webkit-text-fill-color: rgba(0,0,0,0.9);
 }
 
-.search select:active {
-    color: black;
-}
-
-.search select:not(:disabled) {
+.input-row input[type=submit] {
     cursor: pointer;
 }
 
-.search input:disabled, select:disabled {
-    opacity: 0.2;
+.input-row select:active {
+    color: black;
 }
 
-.search fieldset {
-    border: 2px solid rgba(255,255,255,0.2);
+.input-row select:not(:disabled) {
+    cursor: pointer;
+}
+
+*:disabled
+{
+    opacity: 0.33;
+}
+
+.search-form fieldset {
+    animation: fade-in-y 0.33s;
+    border: var(--border-subtle);
     border-radius: 4px;
-    padding: 12px 24px 16px 24px;
+    padding: 8px 24px 24px 24px;
 }
 
-.search input.not-allowed {
+.input-row input.not-allowed {
     animation: shake 0.2s;
 }
 
-.search input.bad-input {
-    background-color: #d64646;
+.input-row input.bad-input {
+    box-shadow: 0 0 8px 4px #d64646;
 }
 
-.search input.good-input {
-    background-color: #59ba4a;
+.input-row input.good-input {
+    box-shadow: 0 0 8px 4px #70e400;
 }
 
 /* yellow -- when e.g. input is technically valid, but already applied. */
-.search input.good-input.not-allowed {
-    background-color: #f6d348;
+.input-row input.good-input.not-allowed {
+    box-shadow: 0 0 8px 4px #EE9c00;
 }
 
-.search legend {
-    color: white;
-    opacity: 0.7;
+.search-form fieldset legend {
+    font-size: 20px;
+    color: #333;
     padding: 0 8px;
     text-transform: uppercase;
 }
 
-.search-results__paging {
-    display: flex;
+.search-result__paging,
+.search-result__options {
+    border: var(--border-subtle);
+    border-radius: var(--border-radius);
+    padding: var(--padding) var(--padding-l);
+    background: rgba(0,0,0,0.08);
+    backdrop-filter: blur(4px);
 }
 
-.search-results__paging > button {
-    flex-grow: 1;
+.search-result__paging {
+    position: sticky;
+    top: 80px;
 }
 
-.search-results__paging-description {
-    padding: 8px;
-    min-width: 20ch;
+.search-result__paging .input-row {
+    justify-content: space-between;
+}
+
+.search-result__paging button {
+    width: 120px;
+    cursor: pointer;
+}
+
+.search-result__paging select {
+    min-width: 120px;
     text-align: center;
+}
+
+.search-result__paging > button[disabled] {
+    cursor: not-allowed;
+}
+
+.search-result__items {
+    padding: 16px;
+    font-size: 16px;
+}
+
+.search-result__items dd + dt {
+    margin-top: 24px;
 }

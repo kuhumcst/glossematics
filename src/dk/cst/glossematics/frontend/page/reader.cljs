@@ -63,9 +63,9 @@
 ;; TODO: eventually use :as-alias
 (defn- search-href
   [ref]
-  (rfe/href :dk.cst.glossematics.frontend.page.search/page {} {'_      ref
-                                                               :limit  20
-                                                               :offset 0}))
+  (rfe/href :dk.cst.glossematics.frontend.page.search/page {}
+            (merge (select-keys state/query-defaults [:limit :offset])
+                   {'_ ref})))
 
 (def ref-as-anchor
   (cup/->transformer
@@ -282,7 +282,7 @@
            :document document
            :tei tei
            :hiccup rewritten-hiccup
-           :facs-kvs (pattern/heterostyled facs shuffle)
+           :facs-kvs facs
 
            ;; Perhaps a bit confusingly, the value of the :tei-kvs key is set as
            ;; a side-effect of the cup/rewrite call above. Below, the count of
@@ -307,22 +307,18 @@
     (when (and document-selected? new-document?)
       (set-content! current-document))
 
-    [:<>
-     [:h2 current-document]
-
-     ;; TODO: support metadata-only documents
-     (when (and document-selected? hiccup)
-       [:div.reader
-        [group/combination {:weights [1 1]}
-         [pattern/carousel state/facs-carousel]
-         [pattern/tabs
-          {:i   0
-           :kvs (pattern/heterostyled
-                  [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
-                   ["TEI" [:pre {:style {:white-space "pre-wrap"
-                                         :margin      "1ch"
-                                         :padding     "1ch"
-                                         :background  "white"}}
-                           [:code
-                            tei]]]])}
-          {:id "tei-tabs"}]]])]))
+    (when (and document-selected? hiccup)
+      [:div.reader
+       [group/combination {:weights [1 1]}
+        [pattern/carousel state/facs-carousel]
+        [pattern/tabs
+         {:i   0
+          :kvs (pattern/heterostyled
+                 [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
+                  ["TEI" [:pre {:style {:white-space "pre-wrap"
+                                        :margin      "1ch"
+                                        :padding     "1ch"
+                                        :background  "white"}}
+                          [:code
+                           tei]]]])}
+         {:id "tei-tabs"}]]])))

@@ -28,6 +28,7 @@
     [:link {:rel "icon" :href "/images/favicon.svg"}]
     [:link {:rel "mask-icon" :href "/images/favicon.svg" :color "#a02c2c"}]
     [:link {:rel "stylesheet" :href "/css/main.css"}]
+    [:link {:rel "stylesheet" :href "/css/theme.css"}]
 
     ;; These styles are used by the Simile Timeline API
     [:link {:rel "stylesheet" :href "/timeline/css/ethers.css"}]

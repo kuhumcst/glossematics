@@ -1,9 +1,10 @@
 :root {
     /* Defaults. */
-    --background: #FFF;
-    --border: 1px solid #888;
-    --border-color: #888;
-    --border-radius: 2px;
+    --background: #FFF url(/images/texture/groovepaper.png);
+    --border: 1px solid #666;
+    --border-subtle: 1px solid #AAA;
+    --border-color: #666;
+    --border-radius: 4px;
     --border-width: 1px;
     --box-shadow: 0 0 8px 0 rgba(0,0,0,0.75);
     --color: #222;
@@ -30,7 +31,9 @@
     --grid-64: 64px;
 
     /* Variations. */
+    --background-darker: #EDEAE8 url(/images/texture/asfalt-dark.png);
     --box-shadow-hidden: 0 0 0 0 rgba(0,0,0,0);
+    --box-shadow-elevated: 0 4px 4px rgba(0,0,0,0.3);
     --color-subtle: #AAA;
     --color-very-subtle: #DDD;
     --font-family-heading: Futura, sans-serif;
@@ -40,18 +43,20 @@
     --inactive-filter-focus: brightness(1);
     --inactive-border: 1px solid #DDD;
     --margin-s: 4px;
+    --margin-m: 8px;
     --margin-l: 16px;
     --margin-xl: 32px;
     --padding-s: 4px;
+    --padding-m: 8px;
     --padding-l: 16px;
     --padding-xl: 32px;
     --transparent-border: 1px solid transparent;
 
+    /* Transformations. */
+    --transform-elevated: scale(1.04);
+
     /* Custom. */
-    --tab-background-1: #EECCEE;
-    --tab-background-2: #CCDDEE;
-    --tab-background-3: #CCFFCC;
-    --tab-background-4: #FFFFBB;
-    --tab-background-5: #FFBBBB;
-    --tab-background-6: #FFDDBB;
+    --tab-background-1: #ffc92e url(/images/texture/natural-paper.png); /* yellow */
+    --tab-background-2: #ff663c url(/images/texture/natural-paper.png); /* red */
+    --tab-background-3: #779eff url(/images/texture/natural-paper.png); /* blue */
 }

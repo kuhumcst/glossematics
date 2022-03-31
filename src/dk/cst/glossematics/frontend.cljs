@@ -53,14 +53,12 @@
   "A container component that wraps the various pages of the app."
   []
   [:div.shell
-   [:div.shell__logo
+   [:nav
     [:a {:href (href ::main)}
-     [:h1 "Glossematics" [:span ".org"]]]]
+     [:h1 "Glossematics" [:span ".org"]]]
+    [:a {:href (href ::search/page)} "Search"]
+    [:a {:href (href ::timeline/page)} "Timeline"]]
    [:div.shell__content
-    [:div {:style {:margin-bottom "20px"}}
-     [:a {:href (href ::search/page)} "Search"] ", "
-     [:a {:href (href ::timeline/page)} "Timeline"]]
-
     (if-let [page (get-in @state/location [:data :page])]
       [page]
       [:p "unknown page"])]])
@@ -78,14 +76,14 @@
     (rf/router routes)
     (fn [{:keys [path query-params] :as m}]
       (let [old-location @state/location]
-        (reset! state/location m)
-
         ;; Don't re-fetch prep data on soft reloads, e.g. by shadow-cljs.
         (when (or (not= path (:path old-location))
                   (not= query-params (:query-params old-location)))
           (universal-prep!)
           (when-let [prep (get-in m [:data :prep])]
-            (prep m)))))
+            (prep m)))
+
+        (reset! state/location m)))
     {:use-fragment false}))
 
 (defn ^:dev/after-load render

@@ -29,23 +29,25 @@
 (def background-colours
   ["var(--tab-background-1)"
    "var(--tab-background-2)"
-   "var(--tab-background-3)"
-   "var(--tab-background-4)"
-   "var(--tab-background-5)"
-   "var(--tab-background-6)"])
+   "var(--tab-background-3)"])
+
+(defn add-background
+  "Annotate background `n` of `backgrounds` in the metadata of `kv`."
+  [backgrounds n kv]
+  (vary-meta kv assoc-in [:style :background] (nth backgrounds n)))
 
 (defn heterostyled
   "Apply heterogeneous styling to tab `kvs`."
   ([kvs]
    (heterostyled kvs identity))
   ([kvs order-fn]
-   (let [backgrounds (cycle (order-fn background-colours))
-         mk-style    (fn [m n]
-                       (assoc m :style {:background (nth backgrounds n)}))]
-     (into (empty kvs)
-           (map-indexed (fn [n kv]
-                          (vary-meta kv mk-style n))
-                        kvs)))))
+   (let [backgrounds     (cycle (order-fn background-colours))
+         add-background' (partial add-background backgrounds)]
+     (into (empty kvs) (map-indexed add-background' kvs))))
+  ([kvs order-fn backgrounds]
+   (let [backgrounds     (cycle (order-fn backgrounds))
+         add-background' (partial add-background backgrounds)]
+     (into (empty kvs) (map-indexed add-background' kvs)))))
 
 ;; TODO: what to do when drag-and-dropping from tabs using same state?
 ;; Currently, the two tabs components have their tabs reordered, but should
