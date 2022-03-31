@@ -3,6 +3,7 @@
   (:require [clojure.string :as str]
             [clojure.set :as set]
             [reitit.frontend.easy :as rfe]
+            [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.api :as api]))
@@ -148,13 +149,6 @@
               offset (assoc :offset offset)
               from (assoc :from from)
               to (assoc :to to)))))
-
-(defn- set-offset
-  [f n]
-  (let [new-offset (fn [offset & args] (apply f offset args))]
-    (->> (swap! state/query update :offset new-offset n)
-         (state->params)
-         (rfe/replace-state ::page {}))))
 
 (defn- select-opts
   [rels & [default-option]]
@@ -314,39 +308,63 @@
                  "x"]]
                " "])])]))))
 
-(defn page
-  []
-  (let [{:keys [results name->id]} @state/search
-        {:keys [offset limit]} @state/query
+(defn- set-offset
+  [f n]
+  (let [new-offset (fn [offset & args] (apply f offset args))
+        top-elem   (js/document.querySelector ".search-results__paging")]
+    (->> (swap! state/query update :offset new-offset n)
+         (state->params)
+         (rfe/replace-state ::page {}))
+
+    ;; Scroll to the top paging element when switching pages.
+    (when-not (shared/visible? top-elem)
+      (.scrollIntoView top-elem))))
+
+(defn search-paging
+  "Paging widget for search `results`"
+  [results]
+  (let [{:keys [offset limit]} @state/query
         num-results (count results)
         total       (:total (meta results))]
+    [:div.search-results__paging
+     [:button {:disabled (= offset 0)
+               :on-click #(set-offset - 20)}
+      "←"]
+     " "
+     (if offset
+       (str offset " to " (+ offset num-results))
+       num-results)
+     " out of "
+     total
+     " "
+     [:button {:disabled (or (= num-results total)
+                             (< total (+ offset limit)))
+               :on-click #(set-offset + 20)}
+      "→"]]))
+
+(defn search-results
+  "View of search `results`."
+  [results]
+  [:ul
+   (for [{:keys [file/name] :as entity} results]
+     [:li {:key name}
+      [:a {:href (rfe/href ::reader/page {:document name})}
+       name]
+      [:br]
+      ;; This is only present while figuring things out...
+      [:pre (with-out-str (cljs.pprint/pprint entity))]])])
+
+(defn page
+  []
+  (let [{:keys [results name->id]} @state/search]
     [:<>
      ;; React key needed for input to update after name->id has been fetched!
      ^{:key name->id} [search-form]
      (when results
        (if (empty? results)
-         [:p "No matches found for query."]
-         [:<>
-          [:p
-           [:button {:disabled (= offset 0)
-                     :on-click #(set-offset - 20)}
-            "←"]
-           " "
-           (if offset
-             (str offset " to " (+ offset num-results))
-             num-results)
-           " out of "
-           total
-           " "
-           [:button {:disabled (or (= num-results total)
-                                   (< total (+ offset limit)))
-                     :on-click #(set-offset + 20)}
-            "→"]]
-          [:ul
-           (for [{:keys [file/name] :as entity} results]
-             [:li {:key name}
-              [:a {:href (rfe/href ::reader/page {:document name})}
-               name]
-              [:br]
-              ;; This is only present while figuring things out...
-              [:pre (with-out-str (cljs.pprint/pprint entity))]])]]))]))
+         [:div.search-results
+          [:p "No matches found for query."]]
+         [:div.search-results
+          [search-paging results]
+          [search-results results]
+          [search-paging results]]))]))
