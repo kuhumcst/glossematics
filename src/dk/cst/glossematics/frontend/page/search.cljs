@@ -139,6 +139,11 @@
    :document/collection   {:label "collection"
                            :type  "number"}})
 
+(def rel->label
+  (->> (merge id-rels order-rels)
+       (map (juxt key (comp :label val)))
+       (into {})))
+
 (defn- state->params
   [{:keys [items limit offset order-by from to]}]
   (when-let [params (items->query-params items)]            ; clear other params
@@ -342,23 +347,46 @@
                :on-click #(set-offset + limit)}
       "→"]]))
 
+(defn- search-result-val
+  [id->name v]
+  (cond
+    (and (string? v) (str/starts-with? v "#"))
+    (get id->name v v)
+
+    (inst? v)
+    (first (str/split (.toISOString v) #"T"))
+
+    :else
+    (str v)))
+
 (defn search-result-items
   "View of search `results`."
-  [results]
+  [results id->name]
   [:div.search-result__items
    [:dl
-    (for [{:keys [file/name document/title] :as entity} results]
-      [:<> {:key name}
+    (for [{:keys [document/title] :as entity} results
+          :let [filename (:file/name entity)]]
+      [:<> {:key filename}
        [:dt
-        [:a {:href (rfe/href ::reader/page {:document name})}
+        [:a {:href (rfe/href ::reader/page {:document filename})}
          title]]
        [:dd
-        ;; This is only present while figuring things out...
-        [:pre (with-out-str (cljs.pprint/pprint entity))]]])]])
+        [:table
+         [:tbody
+          (for [[k v] (->> (select-keys entity (keys rel->label))
+                           (sort-by (comp name key)))]
+            [:tr {:key k}
+             [:td (rel->label k)]
+             [:td (if (set? v)
+                    (->> (map (partial search-result-val id->name) v)
+                         (sort)
+                         (str/join ", "))
+                    (search-result-val id->name v))]])]]]])]])
+
 
 (defn page
   []
-  (let [{:keys [results name->id]} @state/search]
+  (let [{:keys [results name->id id->name]} @state/search]
     [:div.search-page
      ;; React key needed for input to update after name->id has been fetched!
      ^{:key name->id} [search-form]
@@ -369,5 +397,6 @@
            [:p "No matches found for query."]]
           [:<>
            [search-paging results]
-           [search-result-items results]
+           (when id->name
+             [search-result-items results id->name])
            [search-paging results]])])]))

@@ -307,3 +307,7 @@ body {
     padding: 16px;
     font-size: 16px;
 }
+
+.search-result__items dd + dt {
+    margin-top: 24px;
+}
