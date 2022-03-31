@@ -329,19 +329,17 @@
         total       (:total (meta results))]
     [:div.search-result__paging
      [:button {:disabled (= offset 0)
-               :on-click #(set-offset - 20)}
+               :on-click #(set-offset - limit)}
       "←"]
      [:span.search-result__paging-description
-      " "
       (if offset
-        (str offset " to " (+ offset num-results))
+        (str offset " ··· " (+ offset num-results))
         num-results)
-      " out of "
-      total
-      " "]
+      (when (> total limit)
+        [:<> " ⊂ " total])]
      [:button {:disabled (or (= num-results total)
                              (< total (+ offset limit)))
-               :on-click #(set-offset + 20)}
+               :on-click #(set-offset + limit)}
       "→"]]))
 
 (defn search-result-items

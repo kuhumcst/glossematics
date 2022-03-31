@@ -63,9 +63,9 @@
 ;; TODO: eventually use :as-alias
 (defn- search-href
   [ref]
-  (rfe/href :dk.cst.glossematics.frontend.page.search/page {} {'_      ref
-                                                               :limit  20
-                                                               :offset 0}))
+  (rfe/href :dk.cst.glossematics.frontend.page.search/page {}
+            (merge (select-keys state/query-defaults [:limit :offset])
+                   {'_ ref})))
 
 (def ref-as-anchor
   (cup/->transformer

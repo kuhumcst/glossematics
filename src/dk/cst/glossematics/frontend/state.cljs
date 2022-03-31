@@ -21,7 +21,7 @@
   {:unique   #{} :items []                                  ; = ordered set
    :in       ""
    :rel      '_
-   :limit    20
+   :limit    10
    :offset   0
    :order-by [nil :asc]
    :from     nil
