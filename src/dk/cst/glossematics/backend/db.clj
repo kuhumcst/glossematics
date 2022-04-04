@@ -350,6 +350,8 @@
                    [:support {} support]
                    [:extent {}
                     [:note {} page-count]]]]
+
+   ;; TODO: adjust - doesn't match in https://glossematics.org/app/reader/20.9.1945-Holt-LH-tei-final.xml
    :correspDesc '[:correspDesc
                   {}
                   [:correspAction
@@ -360,6 +362,7 @@
                   [:correspAction {:type "received"}
                    [:persName {:ref recipient} ???]
                    [:placeName {:ref recipient-loc}]]]
+
    :hand-desc   '[:handDesc {} [:p {} hand-desc]]})
 
 (def facsimile-patterns
