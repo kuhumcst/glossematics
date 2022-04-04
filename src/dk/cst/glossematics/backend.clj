@@ -4,7 +4,6 @@
             [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
             [io.pedestal.log :as log]
-            [io.pedestal.test :as test]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
             [dk.cst.pedestal.sp.routes :as sp.routes]
@@ -13,7 +12,7 @@
             [dk.cst.pedestal.sp.example :as example]
             [dk.cst.glossematics.backend.index :as index]
             [dk.cst.glossematics.backend.endpoints :as endpoints]
-            [dk.cst.glossematics.backend.db :refer [bootstrap!]]))
+            [dk.cst.glossematics.backend.db :as db]))
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
@@ -62,6 +61,7 @@
 (defn ->service-map
   [sp-conf]
   (when-let [conf-error (s/explain-data ::sp.conf/config sp-conf)]
+    (log/error :bootstrap.conf/invalid conf-error)
     (throw (ex-info "invalid configuration" conf-error)))
   (let [csp (if index/development?
               {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* 0.0.0.0:* ws://localhost:* ws://0.0.0.0:*"}
@@ -85,58 +85,70 @@
       index/development? (assoc ::http/allowed-origins (constantly true)))))
 
 (defn load-sp-conf!
-  ([path] (reset! sp-conf (cond-> (sp.conf/init (sp.conf/read-file! path))
-                            ;; Comment out this line to use auth during dev.
-                            ;; Make sure to reload the sp-conf and restart!
-                            index/development? (assoc :auth-override :all))))
-  ([] (load-sp-conf! (example/in-home "/.glossematics/repl-conf.edn"))))
+  "Load the config file (superset of a Pedestal SP config) at `conf-path`."
+  [conf-path]
+  (log/info :bootstrap.conf/load conf-path)
+  (reset! sp-conf (cond-> (sp.conf/init (sp.conf/read-file! conf-path))
+                    ;; Comment out this line to use auth during dev.
+                    ;; Make sure to reload the sp-conf and restart!
+                    index/development? (assoc :auth-override :all))))
 
-(defn start []
-  (when (not @sp-conf)
-    (load-sp-conf!)
-    (bootstrap! @sp-conf))
-  (let [service-map (->service-map @sp-conf)]
+(defn start-prod
+  "Start a production environment using the config file at `conf-path`."
+  [conf-path]
+  (log/info :bootstrap/start {:dev? false})
+  (let [conf        (load-sp-conf! conf-path)
+        service-map (->service-map conf)]
+    (db/bootstrap! conf)
+    (log/info :bootstrap.asami/begin-cache-names true)
+    (db/name-kvs)                                           ; memoize names
+    (log/info :bootstrap.asami/names-cache (count (db/name-kvs)))
+    (log/info :bootstrap.server/service-map service-map)
     (http/start (http/create-server service-map))))
 
 (defn start-dev []
-  (when (not @sp-conf)
-    (load-sp-conf!)
-    (bootstrap! @sp-conf))
-  (reset! server (http/start (http/create-server (assoc (->service-map @sp-conf)
-                                                   ::http/join? false)))))
+  "Start a development environment using the config file at `conf-path`."
+  (log/info :bootstrap/start {:dev? true})
+
+  ;; NOTE: only bootstraps once in dev mode!
+  ;; This facilitates quick server restarts when developing at the REPL.
+  (if (not @sp-conf)
+    (-> (example/in-home "/.glossematics/repl-conf.edn")
+        (load-sp-conf!)
+        (db/bootstrap!))
+    (log/info :bootstrap.conf/skip true))
+
+  (let [service-map (assoc (->service-map @sp-conf) ::http/join? false)]
+    (log/info :bootstrap.server/service-map service-map)
+    (reset! server (http/start (http/create-server service-map)))))
 
 (defn stop-dev []
+  (log/info :bootstrap.server/stop true)
   (http/stop @server))
 
-(defn restart []
+(defn restart-dev []
   (when @server
     (stop-dev))
   (start-dev))
 
 (defn -main
-  [& [conf-source]]
+  [& [conf-path]]
+  (log/info :bootstrap/main conf-path)
   (cond
-    (.exists (io/file conf-source))
+    (.exists (io/file conf-path))
     (do
-      (log/info :conf/exists {:source conf-source})
-      (load-sp-conf! conf-source)
-      (start))
+      (log/info :bootstrap.conf/exists conf-path)
+      (start-prod conf-path))
 
-    conf-source
-    (log/error :conf/unreadable {:source conf-source})
+    conf-path
+    (log/error :bootstrap.conf/unreadable conf-path)
 
     :else
-    (log/error :conf/missing {:source conf-source})))
+    (log/error :bootstrap.conf/missing conf-path)))
 
 (comment
   @sp-conf
-  (:state-manager @sp-conf)
-
-  (load-sp-conf!)
-  (clojure.pprint/pprint (->service-map @sp-conf))
-
-  (test/response-for (:io.pedestal.http/service-fn @server) :get "/no-such-route")
-
-  (restart)
+  (restart-dev)
   (start-dev)
-  (stop-dev))
+  (stop-dev)
+  #_.)

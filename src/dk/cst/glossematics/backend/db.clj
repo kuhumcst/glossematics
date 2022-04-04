@@ -2,11 +2,11 @@
   "Functions for populating & querying the Glossematics Asami database."
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as log]
             [clojure.set :as set]
             [clojure.math.combinatorics :as combo]
             [asami.core :as d]
             [tick.core :as t]
+            [io.pedestal.log :as log]
             [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml]
@@ -488,6 +488,7 @@
     (document-triples (.getName file) (scrape-document file))))
 
 (defn as-entity
+  "Render a TEI file at the given `filepath` as an Asami entity."
   [filepath]
   (let [triples (as-triples filepath)
         ident   (ffirst triples)]
@@ -495,20 +496,55 @@
            {k #{v}})
          (apply merge-with set/union {:db/ident ident}))))
 
+(defn- log-transaction!
+  "Transact `tx-data`, logging its count using the supplied `description`."
+  [description tx-data]
+  (log/info (keyword "bootstrap.asami" (str (name description) "-tx"))
+            (count tx-data))
+  (d/transact conn {:tx-data tx-data}))
+
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
   [{:keys [files-dir] :as conf}]
-  (d/transact conn {:tx-data (file-entities files-dir)})
-  (d/transact conn {:tx-data (timeline-entities)})
-  (d/transact conn {:tx-data (person-entities)})
-  (d/transact conn {:tx-data (other-entities "lingvistiskeOrganisationer-konferencer.txt" "#nlingorg" "linguistic-organisation")})
-  (d/transact conn {:tx-data (other-entities "Organisationer.txt" "#norg" "organisation")})
-  (d/transact conn {:tx-data (other-entities "publikationer.txt" "#npub" "publication")})
-  (d/transact conn {:tx-data (other-entities "sprog.txt" "#ns" "language")})
-  (d/transact conn {:tx-data (other-entities "stednavne.txt" "#npl" "place")})
-  (d/transact conn {:tx-data (other-entities "terms.txt" "#nt" "term")})
-  (d/transact conn {:tx-data (other-entities "terms-eng.txt" "#nteng" "english-term")})
-  (d/transact conn {:tx-data (map as-entity (tei-files conn))}))
+
+  ;; Add all core entities from the static files included in the source repo.
+  (log/info :bootstrap.asami/begin-static-files true)
+  (log-transaction! :timeline (timeline-entities))
+  (log-transaction! :person (person-entities))
+  (log-transaction! :linguistic-organisation (other-entities "lingvistiskeOrganisationer-konferencer.txt" "#nlingorg" "linguistic-organisation"))
+  (log-transaction! :organisation (other-entities "Organisationer.txt" "#norg" "organisation"))
+  (log-transaction! :publication (other-entities "publikationer.txt" "#npub" "publication"))
+  (log-transaction! :language (other-entities "sprog.txt" "#ns" "language"))
+  (log-transaction! :place (other-entities "stednavne.txt" "#npl" "place"))
+  (log-transaction! :terms (other-entities "terms.txt" "#nt" "term"))
+  (log-transaction! :english-terms (other-entities "terms-eng.txt" "#nteng" "english-term"))
+
+  ;; Add the file entities found in the files-dir.
+  ;; Then parse each TEI file and link the document data to the file entities.
+  (log/info :bootstrap.asami/begin-files-dir files-dir)
+  (log-transaction! :files (file-entities files-dir))
+  (log-transaction! :tei-data (map as-entity (tei-files conn))))
+
+#_(defn bootstrap!
+    "Asynchronously bootstrap an in-memory Asami database from a `conf`."
+    [{:keys [files-dir] :as conf}]
+    (log/info :bootstrap.asami/dir {:dir files-dir})
+
+    ;; Add all core entities based on the input files.
+    (log-transaction! :files (file-entities files-dir))
+    (log-transaction! :timeline (timeline-entities))
+    (log-transaction! :person (person-entities))
+    (log-transaction! :linguistic-organisation (other-entities "lingvistiskeOrganisationer-konferencer.txt" "#nlingorg" "linguistic-organisation"))
+    (log-transaction! :organisation (other-entities "Organisationer.txt" "#norg" "organisation"))
+    (log-transaction! :publication (other-entities "publikationer.txt" "#npub" "publication"))
+    (log-transaction! :language (other-entities "sprog.txt" "#ns" "language"))
+    (log-transaction! :place (other-entities "stednavne.txt" "#npl" "place"))
+    (log-transaction! :terms (other-entities "terms.txt" "#nt" "term"))
+    (log-transaction! :english-terms (other-entities "terms-eng.txt" "#nteng" "english-term"))
+
+    ;; Parse each TEI file and link the document data to the file entities.
+    ;; This is by far the slowest part of the Asami bootstrap process.
+    (log-transaction! :tei-data (map as-entity (tei-files conn))))
 
 (defn- entity->where-triples
   "Deconstruct partial `entity` description into triples for a search query."
@@ -606,7 +642,9 @@
   Also accepts :limit and :offset to return results gradually, as well as
   :order-by which should be a vector of [k dir]. The :total amount of matches
   regardless of :limit/:offset is always included as metadata."
-  [conn entity & {:keys [limit offset order-by from to]}]
+  [conn entity & {:keys [limit offset order-by from to] :as opts}]
+  (log/info :asami/search {:entity entity
+                           :opts   opts})
   (let [matches (if order-by
                   (cond
                     (and from to)
@@ -689,4 +727,7 @@
                 [?e :file/name ?name]
                 [?e :file/path ?path]]
               (d/db conn)))
+
+  (:db-after @(log-transaction! :terms (other-entities "terms.txt" "#nt" "term")))
+  (tei-files (:db-after @(log-transaction! :terms (file))))
   #_.)

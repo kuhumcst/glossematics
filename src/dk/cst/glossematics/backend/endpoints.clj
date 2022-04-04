@@ -2,6 +2,7 @@
   "The various handlers/interceptors provided by the backend web service."
   (:require [clojure.string :as str]
             [io.pedestal.http.route :refer [path-params-decoder]]
+            [io.pedestal.log :as log]
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
             [asami.core :as d]
@@ -93,39 +94,43 @@
                 to
                 _]
          :as   params} (split-params query-params)
-        entity   (cond-> (dissoc (merge {:file/extension "xml"} params)
-                                 :_ :limit :offset :order-by :from :to)
-                   _ (assoc '_ _))
-        entities (db/search conn entity
-                            :limit (when limit (parse-long (first limit)))
-                            :offset (when offset (parse-long (first offset)))
-                            :order-by (when order-by (map keyword order-by))
-                            :from (when-let [from (first from)]
-                                    (if (re-matches #"\d+" from)
-                                      (parse-long from)
-                                      (db/parse-date db/utc-dtf from)))
-                            :to (when-let [to (first to)]
-                                  (if (re-matches #"\d+" to)
-                                    (parse-long to)
-                                    (db/parse-date db/utc-dtf to))))]
-
+        entity (cond-> (dissoc (merge {:file/extension "xml"} params)
+                               :_ :limit :offset :order-by :from :to)
+                 _ (assoc '_ _))
+        raw    (db/search conn entity
+                          :limit (when limit (parse-long (first limit)))
+                          :offset (when offset (parse-long (first offset)))
+                          :order-by (when order-by (map keyword order-by))
+                          :from (when-let [from (first from)]
+                                  (if (re-matches #"\d+" from)
+                                    (parse-long from)
+                                    (db/parse-date db/utc-dtf from)))
+                          :to (when-let [to (first to)]
+                                (if (re-matches #"\d+" to)
+                                  (parse-long to)
+                                  (db/parse-date db/utc-dtf to))))
+        final  (with-meta
+                 (map clean-entity raw)
+                 (meta raw))]
+    (log/info :endpoints/search-result {:raw-count   (count raw)
+                                        :final-count (count final)})
     (-> (assoc request
           :status 200
-          :body (transito/write-str (with-meta
-                                      (map clean-entity entities)
-                                      (meta entities))))
+          :body (transito/write-str final))
         (update :headers assoc
                 "Content-Type" "application/transit+json"
                 "Cache-Control" one-day-cache))))
 
 (defn search-metadata-handler
   [request]
-  (-> (assoc request
-        :status 200
-        :body (transito/write-str {:name-kvs (db/name-kvs)}))
-      (update :headers assoc
-              "Content-Type" "application/transit+json"
-              "Cache-Control" one-day-cache)))
+  (let [kvs (db/name-kvs)]
+    (log/info :endpoints/search-metadata {:name-kvs-count (count kvs)})
+    (-> (assoc request
+          :status 200
+          :body (transito/write-str {:name-kvs kvs}))
+        (update :headers assoc
+                "Content-Type" "application/transit+json"
+                "Cache-Control" one-day-cache))))
 
 (def timeline-chain
   [timeline-handler])
