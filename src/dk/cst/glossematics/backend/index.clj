@@ -24,6 +24,8 @@
   [:html {:lang "da"}
    [:head
     [:meta {:charset "utf-8"}]
+    [:meta {:name    "viewport"
+            :content "width=device-width, initial-scale=1.0"}]
     [:title (str (when development? "(dev) ") "Glossematics")]
     [:link {:rel "icon" :href "/images/favicon.svg"}]
     [:link {:rel "mask-icon" :href "/images/favicon.svg" :color "#a02c2c"}]

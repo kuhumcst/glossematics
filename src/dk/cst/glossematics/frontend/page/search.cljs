@@ -9,6 +9,7 @@
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.api :as api]))
 
+;; TODO: bad ref for LOUIS HJELMSLEV (missing "np") http://localhost:9000/app/reader/acc-1992_0005_035_Uldall_0110-tei-final.xml
 ;; TODO: missing name http://localhost:8080/app/search?limit=10&offset=0&_=%23npl737
 
 (defn params->items
@@ -139,27 +140,45 @@
     (= rel '_) "_"
     :else (subs (str rel) 1)))
 
-;; TODO: allow integer input, e.g. collection
-(def id-rels
+;; TODO: denote compatible input types, e.g. location, individual, etc.
+;; TODO: make collection, repository searchable too (add to datalist)
+(def search-rels
   {:document/mention            {:label "mentioned"}
    :document/author             {:label "author"}
    :document/sender             {:label "sender"}
    :document/sender-location    {:label "sender location"}
    :document/recipient          {:label "recipient"}
    :document/recipient-location {:label "recipient location"}
-   :document/repository         {:label "repository"}
+   #_#_:document/repository {:label "repository"}
    #_#_:document/collection {:label "collection"}})
 
 (def order-rels
   {:document/date-mention {:label "mentioned date"
                            :type  "date"}
-   :document/sent-at      {:label "send date"
-                           :type  "date"}
-   #_#_:document/collection {:label "collection"
-                             :type  "number"}})
+   :document/sent-at      {:label "date"
+                           :type  "date"}})
+
+(def other-rels
+  "Relations that are not available as search/order params."
+  {:document/title     {:label "title"}
+   :document/form      {:label "form"}
+   :document/hand      {:label "representation"}
+   :document/facsimile {:label "facsimile"}
+   :file/name          {:label "file name"}
+   :file/extension     {:label "file extension"}
+   :file/body?         {:label "transcribed"}})
+
+
+;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
+(def search-result-rels
+  [:document/sent-at
+   :document/form
+   :document/author
+   :document/recipient
+   :file/body?])
 
 (def rel->label
-  (->> (merge id-rels order-rels)
+  (->> (merge search-rels order-rels other-rels)
        (map (juxt key (comp :label val)))
        (into {})))
 
@@ -290,7 +309,7 @@
      [:<> {:key kv}
       [:span.search-form__item {:style style}
        (when (not= k '_)
-         [:span.search-form__item-key (:label (id-rels k)) " → "])
+         [:span.search-form__item-key (:label (search-rels k)) " → "])
        [:span.search-form__item-label label]
        [:button {:type     "button"                         ; prevent submit
                  :title    "Remove criterion"
@@ -345,7 +364,7 @@
             :value     (rel->s rel)
             :on-change set-rel
             :disabled  (not (get name->id in))}
-           [select-opts id-rels [:option {:value (rel->s '_)} "anything"]]]
+           [select-opts search-rels [:option {:value (rel->s '_)} "anything"]]]
 
           [:input {:type     "submit"
                    :value    "Search"
@@ -372,7 +391,7 @@
 (defn generate-paging
   [limit total]
   (->> (iterate (partial + limit) 1)
-       (map (fn [n] [n (min total (+ n limit))]))
+       (map (fn [n] [n (min total (dec (+ n limit)))]))
        (take-while (comp (partial > total) first))))
 
 (defn search-paging
@@ -401,6 +420,12 @@
 (defn- search-result-val
   [id->name v]
   (cond
+    (boolean? v)
+    [:input {:type      "checkbox"
+             :checked   v
+             :tab-index "-1"
+             :read-only true}]
+
     (and (string? v) (str/starts-with? v "#"))
     (get id->name v v)
 
@@ -419,15 +444,15 @@
           :let [filename (:file/name entity)]]
       [:<> {:key filename}
        [:dt
-        [:a {:href (rfe/href ::reader/page {:document filename})}
+        [:a {:title "View this document"
+             :href  (rfe/href ::reader/page {:document filename})}
          title]]
        [:dd
         [:table
          [:tbody
-          (for [[k v] (->> (select-keys entity (keys rel->label))
-                           (sort-by (comp name key)))]
+          (for [[k v] (->> (select-keys entity search-result-rels))]
             [:tr {:key k}
-             [:td [:strong (rel->label k)]]
+             [:td [:strong (str (get rel->label k k))]]
              [:td (if (set? v)
                     (->> (map (partial search-result-val id->name) v)
                          (sort)
@@ -454,7 +479,7 @@
       [:li
        "By default, a search criterion will be compared to anything. "
        "However, a particular field may be selected for any criterion, "
-       "e.g. the field \"" [:strong [:em (get-field id-rels)]] "\"."]
+       "e.g. the field \"" [:strong [:em (get-field search-rels)]] "\"."]
       [:li
        "The search results may also be sorted according to a specific field, "
        "e.g. the field \"" [:strong [:em (get-field order-rels)]] "\". "
@@ -490,5 +515,13 @@
             [search-result-postprocessing]]
            (when id->name
              [search-result-items results id->name])]])
-       (when (empty? query-params)
-         [explanation name->id]))]))
+       (if (empty? query-params)
+         [explanation name->id]
+         ;; TODO: put this in main.css
+         [:div {:style {:text-align      "center"
+                        :opacity         "0"
+                        :animation       "fade-in-xy 1s ease-out forwards"
+                        :animation-delay "0.5s"}}
+          [:img {:style {:width  150
+                         :height 150}
+                 :src   "/images/loading.svg"}]]))]))

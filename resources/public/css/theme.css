@@ -33,7 +33,7 @@
     /* Variations. */
     --background-darker: #EDEAE8 url(/images/texture/asfalt-dark.png);
     --box-shadow-hidden: 0 0 0 0 rgba(0,0,0,0);
-    --box-shadow-elevated: 0 4px 4px rgba(0,0,0,0.3);
+    --box-shadow-elevated: 0 8px 8px rgba(0,0,0,0.3);
     --color-subtle: #AAA;
     --color-very-subtle: #DDD;
     --font-family-heading: Futura, sans-serif;

@@ -112,25 +112,27 @@ nav a:hover {
 }
 
 nav {
-    background: black url(/images/texture/fabric-of-squares.png);
+    background-image: linear-gradient(180deg, #000 66%, #222 100%);
     box-shadow: var(--box-shadow-elevated);
-    border-bottom: 8px solid #bd3929;
     position: sticky;
     top: 0;
     z-index: 998;
     display: flex;
     align-items: flex-end;
     padding:
-        var(--padding-l)
-        var(--padding-l)
+        var(--padding-xl)
         var(--padding-m)
-        var(--padding-l);
+        var(--padding-m)
+        var(--padding-m);
+}
+
+nav, nav h1, nav a {
+    transition: all 0.33s;
 }
 
 nav h1, nav a {
-    transition: all 0.33s;
     color: #EFEFEF;
-    letter-spacing: 6px;
+    letter-spacing: 4px;
     font-family: PoiretOne;
     text-transform: uppercase;
     padding: 0;
@@ -140,14 +142,13 @@ nav h1, nav a {
 
 nav h1 {
     margin-right: auto;
-    font-size: 32px;
+    font-size: 40px;
 }
 
 nav a {
     text-decoration: none;
     color: #EFEFEF;
     padding: 0;
-    transform: skew(-12deg);
 }
 
 nav a:hover {
@@ -160,8 +161,7 @@ nav a:first-child {
 
 nav a:not(:first-child) {
     margin: 0;
-    font-size: 16px;
-    color: #ffc92e;
+    font-size: 20px;
 }
 
 nav a:not(:first-child) + a {
@@ -169,7 +169,8 @@ nav a:not(:first-child) + a {
 }
 
 nav a:not(:first-child)::first-letter {
-    font-size: 32px;
+    font-size: 40px;
+    color: #ffc92e;
 }
 
 nav span {
@@ -190,6 +191,19 @@ nav span {
     padding:
             var(--padding-m);
   }
+}
+
+nav.reader-mode h1,
+nav.reader-mode a:not(:first-child),
+nav.reader-mode a:not(:first-child)::first-letter {
+  font-size: 16px;
+}
+nav.reader-mode h1 span {
+  font-size: 0;
+}
+nav.reader-mode {
+  padding:
+          var(--padding-m);
 }
 
 .shell__content {
@@ -241,7 +255,7 @@ nav span {
 }
 
 label {
-    color: #333;
+    color: var(--color);
     letter-spacing: 1.5;
     text-transform: uppercase;
     padding: 4px;
@@ -439,11 +453,12 @@ details summary {
     padding: var(--padding) var(--padding-l);
     background: rgba(0,0,0,0.08);
     backdrop-filter: blur(4px);
+    z-index: 998;
 }
 
 .search-result__paging {
     position: sticky;
-    top: 80px;
+    top: 100px;
 }
 
 .search-result__paging .input-row {
@@ -465,10 +480,86 @@ details summary {
 }
 
 .search-result__items {
-    padding: 16px;
-    font-size: 16px;
+    margin-top: var(--padding-xl);
+}
+
+.search-result__items * {
+    font-size: 14px;
+}
+
+.search-result__items dl {
+    margin: 0;
+}
+
+.search-result__items dt > a {
+    display: block;
+    padding: var(--padding);
+
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border: var(--border);
+    background: var(--background);
+
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--color);
+}
+
+/* TODO: fix background blinking on hover! */
+.search-result__items dt:nth-child(3n+1) a {
+    background: var(--tab-background-2);
+}
+
+.search-result__items dt:nth-child(3n+2) a {
+    background: var(--tab-background-1);
+}
+
+.search-result__items dt:nth-child(3n+3) a {
+    background: var(--tab-background-3);
+}
+
+.search-result__items dd {
+    margin: 0;
+}
+
+.search-result__items dd > table {
+    background: var(--background);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-bottom: var(--border);
+    border-left: var(--border);
+    border-right: var(--border);
+    width: 100%;
+}
+
+.search-result__items dd > table td {
+    padding: var(--padding);
+    vertical-align: top;
+}
+
+.search-result__items dd > table td:first-child {
+    width: 1px;
+    padding-left: var(--padding-l);
+    text-align: right;
+    text-transform: uppercase;
+}
+
+.search-result__items dd > table td:last-child {
+     padding-right: var(--padding-l);
+}
+
+.search-result__items dd > table tr:first-child td {
+    padding-top: var(--padding-l);
+}
+
+.search-result__items dd > table tr:last-child td {
+    padding-bottom: var(--padding-l);
 }
 
 .search-result__items dd + dt {
-    margin-top: 24px;
+    margin-top: var(--margin-xl);
+}
+
+/* Removes visual click state change. */
+.search-result__items input[type='checkbox'][readonly]{
+    pointer-events: none;
 }

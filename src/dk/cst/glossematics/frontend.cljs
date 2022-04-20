@@ -52,16 +52,18 @@
 (defn shell
   "A container component that wraps the various pages of the app."
   []
-  [:div.shell
-   [:nav
-    [:a {:href (href ::main)}
-     [:h1 "Glossematics" [:span ".org"]]]
-    [:a {:href (href ::search/page)} "Search"]
-    [:a {:href (href ::timeline/page)} "Timeline"]]
-   [:div.shell__content
-    (if-let [page (get-in @state/location [:data :page])]
-      [page]
-      [:p "unknown page"])]])
+  (let [{:keys [page name]} (:data @state/location)]
+    [:div.shell
+     [:nav {:class (when (= name ::reader/page)
+                     "reader-mode")}
+      [:a {:href (href ::main)}
+       [:h1 "Glossematics" [:span ".org"]]]
+      [:a {:href (href ::search/page)} "Search"]
+      [:a {:href (href ::timeline/page)} "Timeline"]]
+     [:div.shell__content
+      (if page
+        [page]
+        [:p "unknown page"])]]))
 
 (defn universal-prep!
   "Prepare widely needed state."
