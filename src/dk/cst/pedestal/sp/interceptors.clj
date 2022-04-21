@@ -210,6 +210,10 @@
      :headers {"Content-Type" "text/html"}
      :body    (hiccup/html
                 [:html
+                 [:head
+                  [:meta {:charset "utf-8"}]
+                  [:meta {:name    "viewport"
+                          :content "width=device-width, initial-scale=1.0"}]]
                  [:body
                   [:h1 "Login required"]
                   [:p "You must "
@@ -222,6 +226,10 @@
    :headers {"Content-Type" "text/html"}
    :body    (hiccup/html
               [:html
+               [:head
+                [:meta {:charset "utf-8"}]
+                [:meta {:name    "viewport"
+                        :content "width=device-width, initial-scale=1.0"}]]
                [:body
                 [:h1 "Forbidden"]
                 [:p "You do not have permission to access this resource."]]])})
@@ -251,6 +259,10 @@
    RelayState]
   (hiccup/html
     [:html
+     [:head
+      [:meta {:charset "utf-8"}]
+      [:meta {:name    "viewport"
+              :content "width=device-width, initial-scale=1.0"}]]
      [:body {:style (str css-centred "height: 100vh;")}
       [:form {:action consent-url
               :method "get"}

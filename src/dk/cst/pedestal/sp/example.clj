@@ -50,7 +50,9 @@
                              :body    (hiccup/html
                                         [:html
                                          [:head
-                                          [:meta {:charset "utf-8"}]]
+                                          [:meta {:charset "utf-8"}]
+                                          [:meta {:name    "viewport"
+                                                  :content "width=device-width, initial-scale=1.0"}]]
                                          [:body
                                           [:h1 app-name]
                                           [:p "Example login form for logging in through an IdP."]
