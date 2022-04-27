@@ -60,19 +60,39 @@
                (reset! state/query)))))))
 
 (defn fetch-metadata!
+  "Fetches and post-processes metadata used to populate the search form."
   []
   (.then (api/fetch "/search/metadata")
          (fn [{:keys [search-metadata top-30-kvs]}]
-           (let [name->id (apply merge (vals search-metadata))
-                 id->name (set/map-invert name->id)]
+           (let [name->id   (apply merge (vals search-metadata))
+                 id->name   (set/map-invert name->id)
+                 name->type (fn [entity-name]
+                              (loop [groups (seq search-metadata)]
+                                (let [[[type name->id]] groups]
+                                  (when type
+                                    (if (name->id entity-name)
+                                      type
+                                      (recur (rest groups)))))))]
              (swap! state/search assoc
-                    ;; The entities with the highest document frequency are
-                    ;; placed at the top, the rest sorted according to the name.
-                    :name-kvs (->> (apply dissoc name->id top-30-kvs)
-                                   (sort-by first)
-                                   (concat top-30-kvs))
+
+                    ;; Core metadata. TODO: keep or remove?
+                    :metadata search-metadata
+
+                    ;; Name resolution for entities.
                     :name->id name->id
-                    :id->name id->name))
+                    :id->name id->name
+
+                    ;; Type resolution for entities.
+                    :name->type name->type
+                    :id->type (comp name->type id->name)
+
+                    ;; Sorted entity list for the form input's <datalist>.
+                    ;; The entities with the highest document frequency are put
+                    ;; at the top; the rest are sorted according to the name.
+                    :name-kvs (->> (map first top-30-kvs)
+                                   (apply dissoc name->id)
+                                   (sort-by first)
+                                   (concat top-30-kvs))))
            (?query-reset!))))
 
 (defn items->query-params
@@ -325,7 +345,7 @@
 
 (defn search-form
   []
-  (let [{:keys [name-kvs name->id]} @state/search
+  (let [{:keys [name-kvs name->id name->type]} @state/search
         set-in  (fn [e]
                   (let [in (e->v e)]
                     (swap! state/query assoc
@@ -337,8 +357,7 @@
                   (submit))]
 
     (fn [_ _]
-      (let [{:keys [order-by items in rel bad-input? not-allowed?]} @state/query
-            [order-rel] order-by
+      (let [{:keys [items in rel bad-input? not-allowed?]} @state/query
             good-input? (and (not-empty in) (name->id in))]
         [:form.search-form
          {:on-submit (fn [e] (.preventDefault e) (submit))}
