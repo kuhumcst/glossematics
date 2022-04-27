@@ -62,15 +62,18 @@
 (defn fetch-metadata!
   []
   (.then (api/fetch "/search/metadata")
-         #(do
-            (let [name-kvs (:name-kvs %)
-                  name->id (into {} name-kvs)
-                  id->name (set/map-invert name->id)]
-              (swap! state/search assoc
-                     :name-kvs name-kvs
-                     :name->id name->id
-                     :id->name id->name))
-            (?query-reset!))))
+         (fn [{:keys [search-metadata top-30-kvs]}]
+           (let [name->id (apply merge (vals search-metadata))
+                 id->name (set/map-invert name->id)]
+             (swap! state/search assoc
+                    ;; The entities with the highest document frequency are
+                    ;; placed at the top, the rest sorted according to the name.
+                    :name-kvs (->> (apply dissoc name->id top-30-kvs)
+                                   (sort-by first)
+                                   (concat top-30-kvs))
+                    :name->id name->id
+                    :id->name id->name))
+           (?query-reset!))))
 
 (defn items->query-params
   [items]

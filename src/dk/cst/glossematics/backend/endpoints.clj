@@ -6,7 +6,8 @@
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
             [asami.core :as d]
-            [dk.cst.glossematics.backend.db :as db :refer [conn]])) ; TODO: attach this in an interceptor instead, reducing decoupling?)
+            [dk.cst.glossematics.backend.db :as db :refer [conn]] ; TODO: attach this in an interceptor instead, reducing decoupling?
+            [dk.cst.glossematics.static :as static]))
 
 (def one-month-cache
   "private, max-age=2592000")
@@ -123,11 +124,12 @@
 
 (defn search-metadata-handler
   [request]
-  (let [kvs (db/name-kvs)]
-    (log/info :endpoints/search-metadata {:name-kvs-count (count kvs)})
+  (let [search-metadata (db/search-metadata)]
+    (log/info :endpoints/search-metadata (update-vals search-metadata count))
     (-> (assoc request
           :status 200
-          :body (transito/write-str {:name-kvs kvs}))
+          :body (transito/write-str {:search-metadata search-metadata
+                                     :top-30-kvs      static/top-30-name-kvs}))
         (update :headers assoc
                 "Content-Type" "application/transit+json"
                 "Cache-Control" one-day-cache))))

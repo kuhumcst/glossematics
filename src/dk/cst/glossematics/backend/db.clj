@@ -9,8 +9,7 @@
             [io.pedestal.log :as log]
             [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.cuphic :as cup]
-            [dk.cst.cuphic.xml :as xml]
-            [dk.cst.glossematics.static :as static])
+            [dk.cst.cuphic.xml :as xml])
   (:import [java.io File]
            [java.sql Date]
            [java.time LocalDate]
@@ -197,26 +196,13 @@
        (sort-by (juxt (comp :frequency meta) first))
        (reverse)))
 
-(defn person-name-kvs
-  []
-  (->> (d/q '[:find [?id ...]
-              :where
-              [?p :entity/type :entity.type/person]
-              [?p :db/ident ?id]
-              [?f :entity/type :entity.type/file]
-              [?f _ ?id]]
-            conn)
-       (map #(assoc (d/entity conn %) :db/ident %))
-       (mapcat (fn [{:keys [db/ident] :as m}]
-                 (for [s (name-permutations m)]
-                   [s ident])))))
-
-;; TODO: merge with person-name-kvs if/when we only have a single full-name
-(defn other-name-kvs
+(defn search-metadata
+  "Return a mapping from entity type->name->id to be used by the frontend."
   []
   (->> (d/q '[:find [?id ...]
               :where
               (or
+                [?p :entity/type :entity.type/person]
                 [?p :entity/type :entity.type/linguistic-organisation]
                 [?p :entity/type :entity.type/organisation]
                 [?p :entity/type :entity.type/publication]
@@ -225,40 +211,21 @@
                 [?p :entity/type :entity.type/term]
                 [?p :entity/type :entity.type/english-term])
               [?p :db/ident ?id]
+
+              ;; Only include refs currently found in the TEI files.
+              [?f _ ?id]
               [?f :entity/type :entity.type/file]
-              [?f _ ?id]]
+              [?f :file/extension "xml"]]
             conn)
-       (map #(assoc (d/entity conn %) :db/ident %))
-       (mapcat (fn [{:keys [db/ident entity/full-name]}]
-                 (if (coll? full-name)
-                   (for [s full-name]
-                     [s ident])
-                   [[full-name ident]])))))
+       (map (fn [id]
+              (let [{:keys [entity/full-name entity/type]} (d/entity conn id)]
+                (if (coll? full-name)
+                  {type (into {} (for [variant full-name]
+                                   [variant id]))}
+                  {type {full-name id}}))))
+       (apply merge-with merge)))
 
-(defn name-kvs
-  "Return [name-str ident] for all names referenced in the TEI documents;
-  no unreferenced names are included in the returned collection!
-
-  The 30 IDs with the highest document frequency are placed at the top,
-  while the rest of the results are sorted according to the name."
-  []
-  (->> (concat (other-name-kvs) (person-name-kvs))
-       (remove (set static/top-30-name-kvs))
-       (sort-by first)
-       (concat static/top-30-name-kvs)))
-
-(alter-var-root #'name-kvs memoize)
-
-;; TODO: remove again?
-;; For debugging source data
-(defn name-duplicates
-  []
-  (->> (person-name-kvs)
-       (group-by first)
-       (filter (comp multiple? second))
-       (map (fn [[k v]]
-              [k (map second v)]))
-       (sort)))
+(alter-var-root #'search-metadata memoize)
 
 (defn person-entities
   []
