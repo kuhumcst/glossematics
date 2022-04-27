@@ -162,6 +162,7 @@ nav a:first-child {
 nav a:not(:first-child) {
     margin: 0;
     font-size: 20px;
+    flex-grow: 0; /* Fix Firefox width issue */
 }
 
 nav a:not(:first-child) + a {
