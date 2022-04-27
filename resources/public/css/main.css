@@ -121,9 +121,9 @@ nav {
     align-items: flex-end;
     padding:
         var(--padding-xl)
+        var(--padding-l)
         var(--padding-m)
-        var(--padding-m)
-        var(--padding-m);
+        var(--padding-l);
 }
 
 nav, nav h1, nav a {
