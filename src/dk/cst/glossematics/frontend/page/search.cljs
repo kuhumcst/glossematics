@@ -313,8 +313,41 @@
        (when order-rel
          [search-result-between order-by from to])])))
 
+(def entity-types
+  {:entity.type/person
+   {:entity-label "Person"
+    :img-src      "/images/person-sharp-svgrepo-com.svg"}
+
+   :entity.type/publication
+   {:entity-label "Publication"
+    :img-src      "/images/book-fill.svg"}
+
+   :entity.type/term
+   {:entity-label "Term (Danish)"
+    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
+
+   :entity.type/english-term
+   {:entity-label "Term (English)"
+    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
+
+   :entity.type/language
+   {:entity-label "Language"
+    :img-src      "/images/speech-bubble-svgrepo-com.svg"}
+
+   :entity.type/place
+   {:entity-label "Language"
+    :img-src      "/images/earth-fill.svg"}
+
+   :entity.type/organisation
+   {:entity-label "Organisation"
+    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}
+
+   :entity.type/linguistic-organisation
+   {:entity-label "Linguistic organisation"
+    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}})
+
 (defn search-criteria
-  [items]
+  [id->type items]
   [:fieldset
    [:legend "Search criteria"
     [:button {:type     "button"                            ; prevent submit
@@ -331,9 +364,15 @@
          :let [{:keys [label style]} (meta kv)]]
      [:<> {:key kv}
       [:span.search-form__item {:style style}
+       (when id->type
+         (when-let [{:keys [img-src
+                            entity-label]} (get entity-types (id->type v))]
+           [:img.search-form__item-icon {:src img-src
+                                         :alt entity-label}]))
        (when (not= k '_)
          [:span.search-form__item-key (:label (search-rels k)) " → "])
-       [:span.search-form__item-label label]
+       [:span.search-form__item-label
+        label]
        [:button {:type     "button"                         ; prevent submit
                  :title    "Remove criterion"
                  :on-click (fn [e]
@@ -345,7 +384,7 @@
 
 (defn search-form
   []
-  (let [{:keys [name-kvs name->id name->type]} @state/search
+  (let [{:keys [name-kvs name->id id->type name->type]} @state/search
         set-in  (fn [e]
                   (let [in (e->v e)]
                     (swap! state/query assoc
@@ -393,7 +432,7 @@
                    :disabled (empty? in)}]]
 
          (when (not-empty items)
-           [search-criteria items])]))))
+           [search-criteria id->type items])]))))
 
 (defn- set-offset
   [f n]

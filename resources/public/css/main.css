@@ -263,7 +263,9 @@ label {
 }
 
 .search-form__item {
-    display: inline-block; /* to allow CSS transform */
+    display: inline-flex;
+    align-items: center;
+
     animation: fade-in-xy 0.33s;
     transition: all 0.2s;
     border: var(--border);
@@ -304,6 +306,12 @@ label {
     background-size: 20px;
 }
 
+img.search-form__item-icon {
+    height: var(--font-size);
+    width: var(--font-size);
+    margin-right: var(--margin);
+}
+
 .search-form legend > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
@@ -327,6 +335,8 @@ label {
 .search-form__item-key {
     color: var(--color);
     font-variant: small-caps;
+    font-weight: bold;
+    margin-right: var(--margin-s);
 }
 
 details summary {
