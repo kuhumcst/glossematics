@@ -45,11 +45,11 @@
 
    :entity.type/term
    {:entity-label "Term (Danish)"
-    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
+    :img-src      "/images/label-svgrepo-com.svg"}
 
    :entity.type/english-term
    {:entity-label "Term (English)"
-    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
+    :img-src      "/images/label-svgrepo-com.svg"}
 
    :entity.type/language
    {:entity-label "Language"
@@ -61,9 +61,9 @@
 
    :entity.type/organisation
    {:entity-label "Organisation"
-    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}
+    :img-src      "/images/people-group-svgrepo-com.svg"}
 
    :entity.type/linguistic-organisation
    {:entity-label "Linguistic organisation"
-    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}})
+    :img-src      "/images/people-group-svgrepo-com.svg"}})
 

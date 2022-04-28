@@ -336,18 +336,19 @@
      "x"]]
 
    (for [[k v :as kv] items
-         :let [{:keys [label style]} (meta kv)]]
+         :let [{:keys [label style]} (meta kv)
+               {:keys [img-src
+                       entity-label]} (when id->type
+                                        (-> v id->type sd/entity-types))]]
      [:<> {:key kv}
-      [:span.search-form__item {:style style}
-       (when id->type
-         (when-let [{:keys [img-src
-                            entity-label]} (get sd/entity-types (id->type v))]
-           [:img.search-form__item-icon {:src img-src
-                                         :alt entity-label}]))
+      [:span.search-form__item {:style style
+                                :title entity-label}
+       (when img-src
+         [:img.search-form__item-icon {:src img-src
+                                       :alt entity-label}])
        (when (not= k '_)
          [:span.search-form__item-key (:label (search-rels k)) " → "])
-       [:span.search-form__item-label
-        label]
+       [:span.search-form__item-label label]
        [:button {:type     "button"                         ; prevent submit
                  :title    "Remove criterion"
                  :on-click (fn [e]
