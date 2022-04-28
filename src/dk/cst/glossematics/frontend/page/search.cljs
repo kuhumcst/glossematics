@@ -410,6 +410,7 @@
 
           [:input {:type     "submit"
                    :value    "Search"
+                   ;; TODO: disable when entity-type is incompatible with rel
                    :disabled (empty? in)}]]
 
          (when (not-empty items)
