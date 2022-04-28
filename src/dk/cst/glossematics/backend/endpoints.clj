@@ -7,7 +7,7 @@
             [com.wsscode.transito :as transito]
             [asami.core :as d]
             [dk.cst.glossematics.backend.db :as db :refer [conn]] ; TODO: attach this in an interceptor instead, reducing decoupling?
-            [dk.cst.glossematics.static :as static]))
+            [dk.cst.glossematics.static-data :as sd]))
 
 (def one-month-cache
   "private, max-age=2592000")
@@ -129,7 +129,7 @@
     (-> (assoc request
           :status 200
           :body (transito/write-str {:search-metadata search-metadata
-                                     :top-30-kvs      static/top-30-name-kvs}))
+                                     :top-30-kvs      sd/top-30}))
         (update :headers assoc
                 "Content-Type" "application/transit+json"
                 "Cache-Control" one-day-cache))))

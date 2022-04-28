@@ -4,6 +4,7 @@
             [clojure.set :as set]
             [reitit.frontend.easy :as rfe]
             [dk.cst.stucco.pattern :as stp]
+            [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.page.reader :as reader]
@@ -163,15 +164,20 @@
     (= rel '_) "_"
     :else (subs (str rel) 1)))
 
-;; TODO: denote compatible input types, e.g. location, individual, etc.
 ;; TODO: make collection, repository searchable too (add to datalist)
 (def search-rels
-  {:document/mention            {:label "mentioned"}
-   :document/author             {:label "author"}
-   :document/sender             {:label "sender"}
-   :document/sender-location    {:label "sender location"}
-   :document/recipient          {:label "recipient"}
-   :document/recipient-location {:label "recipient location"}
+  {:document/mention            {:label      "mentioned"
+                                 :compatible (set (keys sd/entity-types))}
+   :document/author             {:label      "author"
+                                 :compatible #{:entity.type/person}}
+   :document/sender             {:label      "sender"
+                                 :compatible #{:entity.type/person}}
+   :document/sender-location    {:label      "sender location"
+                                 :compatible #{:entity.type/place}}
+   :document/recipient          {:label      "recipient"
+                                 :compatible #{:entity.type/person}}
+   :document/recipient-location {:label      "recipient location"
+                                 :compatible #{:entity.type/place}}
    #_#_:document/repository {:label "repository"}
    #_#_:document/collection {:label "collection"}})
 
@@ -190,7 +196,6 @@
    :file/name          {:label "file name"}
    :file/extension     {:label "file extension"}
    :file/body?         {:label "transcribed"}})
-
 
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels
@@ -221,8 +226,11 @@
   [:<>
    default-option
    (->> (sort-by (comp :label second) rels)
-        (map (fn [[rel {:keys [label]}]]
-               [:option {:key rel :value (rel->s rel)} label])))])
+        (map (fn [[rel {:keys [label]} :as kv]]
+               [:option {:key      rel
+                         :disabled (:disabled (meta kv))
+                         :value    (rel->s rel)}
+                label])))])
 
 (defn- update!
   []
@@ -313,39 +321,6 @@
        (when order-rel
          [search-result-between order-by from to])])))
 
-(def entity-types
-  {:entity.type/person
-   {:entity-label "Person"
-    :img-src      "/images/person-sharp-svgrepo-com.svg"}
-
-   :entity.type/publication
-   {:entity-label "Publication"
-    :img-src      "/images/book-fill.svg"}
-
-   :entity.type/term
-   {:entity-label "Term (Danish)"
-    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
-
-   :entity.type/english-term
-   {:entity-label "Term (English)"
-    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
-
-   :entity.type/language
-   {:entity-label "Language"
-    :img-src      "/images/speech-bubble-svgrepo-com.svg"}
-
-   :entity.type/place
-   {:entity-label "Language"
-    :img-src      "/images/earth-fill.svg"}
-
-   :entity.type/organisation
-   {:entity-label "Organisation"
-    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}
-
-   :entity.type/linguistic-organisation
-   {:entity-label "Linguistic organisation"
-    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}})
-
 (defn search-criteria
   [id->type items]
   [:fieldset
@@ -366,7 +341,7 @@
       [:span.search-form__item {:style style}
        (when id->type
          (when-let [{:keys [img-src
-                            entity-label]} (get entity-types (id->type v))]
+                            entity-label]} (get sd/entity-types (id->type v))]
            [:img.search-form__item-icon {:src img-src
                                          :alt entity-label}]))
        (when (not= k '_)
@@ -385,15 +360,16 @@
 (defn search-form
   []
   (let [{:keys [name-kvs name->id id->type name->type]} @state/search
-        set-in  (fn [e]
-                  (let [in (e->v e)]
-                    (swap! state/query assoc
-                           :in in
-                           :bad-input? false
-                           :not-allowed? false)))
-        set-rel (fn [e]
-                  (swap! state/query assoc :rel (s->rel (e->v e)))
-                  (submit))]
+        set-in       (fn [e]
+                       (let [in (e->v e)]
+                         (swap! state/query assoc
+                                :in in
+                                :bad-input? false
+                                :not-allowed? false)))
+        set-rel      (fn [e]
+                       (swap! state/query assoc :rel (s->rel (e->v e)))
+                       (submit))
+        anything-opt [:option {:value (rel->s '_)} "anything"]]
 
     (fn [_ _]
       (let [{:keys [items in rel bad-input? not-allowed?]} @state/query
@@ -425,7 +401,11 @@
             :value     (rel->s rel)
             :on-change set-rel
             :disabled  (not (get name->id in))}
-           [select-opts search-rels [:option {:value (rel->s '_)} "anything"]]]
+           (if-let [entity-type (and name->type (name->type in))]
+             (let [compatible? (comp boolean entity-type :compatible second)
+                   ?disable    #(with-meta % {:disabled (not (compatible? %))})]
+               [select-opts (map ?disable search-rels) anything-opt])
+             [select-opts search-rels anything-opt])]
 
           [:input {:type     "submit"
                    :value    "Search"

@@ -1,7 +1,7 @@
-(ns dk.cst.glossematics.static)
+(ns dk.cst.glossematics.static-data)
 
 ;; TODO: keep using only person names or include other entities?
-(def top-30-name-kvs
+(def top-30
   "The IDs with the highest document name-kvs frequency."
   [["Louis Trolle Hjelmslev" "#np56"]
    ["Hans Jørgen Uldall" "#np145"]
@@ -33,3 +33,37 @@
    ["Andreas Peter Damsgaard Blinkenberg" "#np549"]
    ["Eberhard Zwirner" "#np166"]
    ["Svend Ranulf" "#np115"]])
+
+(def entity-types
+  {:entity.type/person
+   {:entity-label "Person"
+    :img-src      "/images/person-sharp-svgrepo-com.svg"}
+
+   :entity.type/publication
+   {:entity-label "Publication"
+    :img-src      "/images/book-fill.svg"}
+
+   :entity.type/term
+   {:entity-label "Term (Danish)"
+    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
+
+   :entity.type/english-term
+   {:entity-label "Term (English)"
+    :img-src      "/images/speech-bubble-svgrepo-com.svg"} ;TODO
+
+   :entity.type/language
+   {:entity-label "Language"
+    :img-src      "/images/speech-bubble-svgrepo-com.svg"}
+
+   :entity.type/place
+   {:entity-label "Language"
+    :img-src      "/images/earth-fill.svg"}
+
+   :entity.type/organisation
+   {:entity-label "Organisation"
+    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}
+
+   :entity.type/linguistic-organisation
+   {:entity-label "Linguistic organisation"
+    :img-src      "/images/three-persons-silhouettes-svgrepo-com.svg"}})
+
