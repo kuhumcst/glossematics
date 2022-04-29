@@ -179,21 +179,6 @@ nav span {
     opacity: 0.8;
 }
 
-@media only screen and (max-width: 650px) {
-  nav h1,
-  nav a:not(:first-child),
-  nav a:not(:first-child)::first-letter {
-    font-size: 16px;
-  }
-  nav h1 span {
-    font-size: 0;
-  }
-  nav {
-    padding:
-            var(--padding-m);
-  }
-}
-
 nav.reader-mode h1,
 nav.reader-mode a:not(:first-child),
 nav.reader-mode a:not(:first-child)::first-letter {
@@ -468,6 +453,7 @@ details summary {
 }
 
 .search-result__paging {
+    transition: all 0.33s;
     position: sticky;
     top: 100px;
 }
@@ -573,4 +559,77 @@ details summary {
 /* Removes visual click state change. */
 .search-result__items input[type='checkbox'][readonly]{
     pointer-events: none;
+}
+
+.index-page h1 {
+    text-align: center;
+}
+
+.index-page dl, .index-page ul {
+    margin: 0;
+}
+
+.index-page h1 > img {
+    width: 32px;
+    height: 32px;
+    vertical-align: text-top;
+}
+
+.index-page__skip-links {
+    text-align: center;
+    font-size: 24px;
+    font-style: italic;
+    word-spacing: 4px;
+    line-height: 1.5;
+    margin: 0 0 var(--margin-xl) 0;
+}
+
+dl.index-list dt {
+    transition: all 0.33s;
+    animation: fade-in-result 0.33s ease-out;
+
+    position: sticky;
+    top: 100px;
+    scroll-margin: 100px; /* Fix scrollIntoView for sticky elem. */
+
+    font-size: 32px;
+    text-align: center;
+    background: var(--background);
+    border-radius: var(--border-radius);
+    border: var(--border);
+    padding: var(--padding-s);
+    margin: var(--margin-xl) 0 var(--margin) 0;
+}
+
+dl.index-list dd {
+    margin: 0;
+}
+
+.index-page ul {
+    list-style-type: square;
+}
+
+/* Responsive media query changes for small screens. */
+@media only screen and (max-width: 650px) {
+  nav h1,
+  nav a:not(:first-child),
+  nav a:not(:first-child)::first-letter {
+    font-size: 16px;
+  }
+  nav h1 span {
+    font-size: 0;
+  }
+  nav {
+    padding:
+            var(--padding-m);
+  }
+
+  dl.index-list dt {
+      top: 48px;
+      scroll-margin: 48px;
+  }
+
+  .search-result__paging {
+    top: 48px;
+  }
 }

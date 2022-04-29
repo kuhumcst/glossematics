@@ -56,7 +56,7 @@
     :img-src      "/images/speech-bubble-svgrepo-com.svg"}
 
    :entity.type/place
-   {:entity-label "Language"
+   {:entity-label "Place"
     :img-src      "/images/earth-fill.svg"}
 
    :entity.type/organisation
@@ -67,3 +67,10 @@
    {:entity-label "Linguistic organisation"
     :img-src      "/images/people-group-svgrepo-com.svg"}})
 
+(def danish-letter->ascii
+  {"æ" "ae"
+   "Æ" "Ae"
+   "å" "aa"
+   "Å" "Aa"
+   "ø" "oe"
+   "Ø" "Oe"})

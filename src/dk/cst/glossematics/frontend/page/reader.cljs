@@ -13,9 +13,9 @@
             [dk.cst.stucco.group :as group]
             [dk.cst.stucco.document :as document]
             [dk.cst.stucco.util.css :as css]
-            [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
-            [dk.cst.glossematics.frontend.api :as api]))
+            [dk.cst.glossematics.frontend.api :as api]
+            [dk.cst.glossematics.frontend.shared :as shared]))
 
 ;; TODO: missing facs http://localhost:8080/app/reader/acc-1992_0005_025_Jakobson_0160-tei-final.xml
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
@@ -54,26 +54,13 @@
       (into [:ul] (for [[tag attr & content] list-items]
                     (into [:li] content))))))
 
-(defn- encyclopedia-href
-  [ref]
-  (rfe/href ::encyclopedia/entry {:ref (if (str/starts-with? ref "#")
-                                         (subs ref 1)
-                                         ref)}))
-
-;; TODO: eventually use :as-alias
-(defn- search-href
-  [ref]
-  (rfe/href :dk.cst.glossematics.frontend.page.search/page {}
-            (merge (select-keys state/query-defaults [:limit :offset])
-                   {'_ ref})))
-
 (def ref-as-anchor
   (cup/->transformer
     '[_ {:ref  ref
          :type ?type} ???]
 
     (fn [{:syms [ref ?type]}]
-      [:a {:href  (search-href ref)
+      [:a {:href  (shared/search-href ref)
            :title (da-type ?type)}
        [:slot]])))
 

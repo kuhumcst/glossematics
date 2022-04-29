@@ -12,6 +12,7 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
             [dk.cst.glossematics.frontend.page.search :as search]
+            [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
@@ -28,6 +29,9 @@
     {:name ::search/page
      :page search/page
      :prep #(search/fetch-results! %)}]
+   ["/app/index/:kind"
+    {:name ::index/page
+     :page index/page}]
    ["/app/reader/:document"
     {:name ::reader/page
      :page reader/page}]

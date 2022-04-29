@@ -1,5 +1,5 @@
 (ns dk.cst.glossematics.frontend.page.search
-  "Page containing a synchronized facsimile & TEI transcription reader."
+  "Page containing a search form for finding content to read."
   (:require [clojure.string :as str]
             [clojure.set :as set]
             [reitit.frontend.easy :as rfe]
