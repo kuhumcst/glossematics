@@ -101,7 +101,7 @@
         service-map (->service-map conf)]
     (db/bootstrap! conf)
     (log/info :bootstrap.asami/begin-cache-names true)
-    (->> (update-vals db/search-metadata count)             ; memoize
+    (->> (update-vals (db/search-metadata) count)           ; memoize
          (log/info :bootstrap.asami/names-cache))
     (log/info :bootstrap.server/service-map service-map)
     (http/start (http/create-server service-map))))
