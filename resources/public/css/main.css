@@ -457,7 +457,7 @@ details summary {
 .search-result__paging {
     transition: all 0.33s;
     position: sticky;
-    top: 100px;
+    top: 87px;
 }
 
 .search-result__paging .input-row {
@@ -613,20 +613,26 @@ dl.index-list dt {
     animation: fade-in-result 0.33s ease-out;
 
     position: sticky;
-    top: 100px;
-    scroll-margin: 100px; /* Fix scrollIntoView for sticky elem. */
+    top: 87px;
+    scroll-margin: 87px; /* Fix scrollIntoView for sticky elem. */
 
     font-size: 32px;
     text-align: center;
     background: var(--background);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
     border: var(--border);
+    border-bottom: var(--border-subtle);
     padding: var(--padding-s);
-    margin: var(--margin-xl) 0 var(--margin) 0;
+    margin: var(--margin-xl) 0 0 0;
 }
 
 dl.index-list dd {
     margin: 0;
+}
+
+dl.index-list dd .text-content {
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-top: none;
 }
 
 .index-page ul {
@@ -649,11 +655,11 @@ dl.index-list dd {
   }
 
   dl.index-list dt {
-      top: 48px;
-      scroll-margin: 48px;
+      top: 35px;
+      scroll-margin: 35px;
   }
 
   .search-result__paging {
-    top: 48px;
+    top: 35px;
   }
 }
