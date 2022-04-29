@@ -512,7 +512,7 @@
                  [:a {:href (shared/index-href entity-type)}
                   [:img.entity-icon {:src img-src}]
                   entity-label]))
-          (interpose ", ")
+          (interpose " / ")
           (into [:p.search-page__index-links]))
      [:hr]
      [:p "Use this page to search for relevant documents in our archive."]
