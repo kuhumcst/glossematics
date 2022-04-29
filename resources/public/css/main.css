@@ -201,7 +201,9 @@ nav.reader-mode {
     margin: 0 auto;
 }
 
-.search-page {
+.search-page,
+.index-page
+{
     max-width: 110ch;
     margin: auto;
 }
@@ -291,7 +293,7 @@ label {
     background-size: 20px;
 }
 
-img.search-form__item-icon {
+img.entity-icon {
     height: var(--font-size);
     width: var(--font-size);
     margin-right: var(--margin);
@@ -582,6 +584,24 @@ details summary {
     word-spacing: 4px;
     line-height: 1.5;
     margin: 0 0 var(--margin-xl) 0;
+}
+
+.search-page__index-links {
+    text-align: center;
+    word-spacing: 4px;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 16px;
+}
+
+.search-page__index-links a {
+    white-space: nowrap;
+}
+
+.search-page hr {
+    border: none;
+    border-top: var(--border-subtle);
+    margin: var(--margin-l) 0;
 }
 
 dl.index-list dt {
