@@ -221,11 +221,11 @@ nav.reader-mode {
     letter-spacing: 1.25;
 }
 
-.text-content ul {
+.index-page ul {
     margin: var(--margin-xl) 0 var(--margin-xl) var(--margin-l);
 }
 
-.text-content ul > li + li {
+.index-page ul > li + li {
     margin-top: var(--margin);
 }
 
@@ -569,9 +569,11 @@ details summary {
     font-family: PoiretOne, sans-serif;
     text-transform: uppercase;
     letter-spacing: 4px;
+    margin-bottom: var(--margin-xl);
 }
 
-.index-page dl, .index-page ul {
+.index-page dl,
+.index-page ul {
     margin: 0;
 }
 
@@ -583,18 +585,18 @@ details summary {
 
 .index-page__skip-links {
     text-align: center;
-    font-size: 24px;
+    font-size: 18px;
     font-style: italic;
-    word-spacing: 4px;
+    word-spacing: 6px;
     line-height: 1.5;
-    margin: 0 0 var(--margin-xl) 0;
+    margin: 0;
 }
 
 .search-page__index-links {
     text-align: center;
     line-height: 1.5;
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-family: PoiretOne, sans-serif;
 }
 
@@ -608,6 +610,10 @@ details summary {
     margin: var(--margin-l) 0;
 }
 
+dl.index-list {
+    margin-top: var(--margin-xl);
+}
+
 dl.index-list dt {
     transition: all 0.33s;
     animation: fade-in-result 0.33s ease-out;
@@ -616,27 +622,62 @@ dl.index-list dt {
     top: 87px;
     scroll-margin: 87px; /* Fix scrollIntoView for sticky elem. */
 
-    font-size: 32px;
-    text-align: center;
+    font-size: 24px;
+    text-shadow: 0 0 1px white;
     background: var(--background);
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
     border: var(--border);
+    border-top: var(--border);
     border-bottom: var(--border-subtle);
-    padding: var(--padding-s);
-    margin: var(--margin-xl) 0 0 0;
+    padding: var(--padding) var(--padding-l);
+}
+
+dl.index-list dt:first-child {
+    border-top: var(--border);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 dl.index-list dd {
     margin: 0;
 }
 
-dl.index-list dd .text-content {
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+dl.index-list dd {
+    border: var(--border);
     border-top: none;
+    border-bottom: none;
+    background: var(--background);
+    padding: var(--padding-l);
+    animation: fade-in-result 0.33s ease-out;
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: var(--color);
+    line-height: 1.5;
+    letter-spacing: 1.25;
+}
+
+dl.index-list dd:last-child {
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-bottom: var(--border);
 }
 
 .index-page ul {
-    list-style-type: square;
+    list-style-type: '➤';
+    padding-left: var(--padding-xl);
+}
+
+.index-page ul li {
+    padding-left: var(--padding-l);
+}
+
+.index-page ul li::first-letter {
+    font-size: 20px;
+}
+
+.index-page ul li + li {
+    margin-top: var(--margin-l);
+}
+
+.index-page ul li::marker {
+    color: #999;
 }
 
 /* Responsive media query changes for small screens. */

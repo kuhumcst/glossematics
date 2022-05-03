@@ -48,15 +48,16 @@
      (when metadata
        (let [groups (index-groups metadata entity-type)]
          [:<>
-          (into [:p.index-page__skip-links]
-                (->> groups
-                     (map (fn [[letter]]
-                            (let [fragment (str "#" (shared/legal-id letter))]
-                              [:a {:href     fragment
-                                   :on-click #(shared/find-fragment fragment)}
-                               letter])))
-                     (interpose ", ")
-                     (vec)))
+          [:div.text-content
+           (into [:p.index-page__skip-links]
+                 (->> groups
+                      (map (fn [[letter]]
+                             (let [fragment (str "#" (shared/legal-id letter))]
+                               [:a {:href     fragment
+                                    :on-click #(shared/find-fragment fragment)}
+                                letter])))
+                      (interpose ", ")
+                      (vec)))]
           [:dl.index-list {:ref #(shared/find-fragment)}
            (for [[letter kvs :as kv] groups]
              [:<> {:key letter}
@@ -64,9 +65,8 @@
                     :style (:style (meta kv))}
                letter]
               [:dd
-               [:div.text-content
-                [:ul
-                 (for [[k v] (sort-by (comp str-sort-val first) kvs)]
-                   [:li {:key k}
-                    [:a {:href (shared/search-href v)}
-                     (str k)]])]]]])]]))]))
+               [:ul
+                (for [[k v] (sort-by (comp str-sort-val first) kvs)]
+                  [:li {:key k}
+                   [:a {:href (shared/search-href v)}
+                    (str k)]])]]])]]))]))
