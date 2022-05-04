@@ -8,6 +8,7 @@
             [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.page.reader :as reader]
+            [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.api :as api]))
 
 ;; TODO: bad ref for LOUIS HJELMSLEV (missing "np") http://localhost:9000/app/reader/acc-1992_0005_035_Uldall_0110-tei-final.xml
@@ -507,13 +508,7 @@
   (let [n         (count name->id)
         get-field (fn [m] (:label (second (nth (seq m) (rand-int (count m))))))]
     [:div.text-content
-     (->> (sort-by (comp :entity-label second) sd/entity-types)
-          (map (fn [[entity-type {:keys [entity-label img-src]}]]
-                 [:a {:href (shared/index-href entity-type)}
-                  [:img.entity-icon {:src img-src}]
-                  entity-label]))
-          (interpose " / ")
-          (into [:p.search-page__index-links]))
+     [index/index-links]
      [:hr]
      [:p "Use this page to search for relevant documents in our archive."]
      [:ul

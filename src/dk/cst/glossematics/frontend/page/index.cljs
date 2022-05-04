@@ -35,38 +35,61 @@
        (into [])
        (add-backgrounds)))
 
+(defn index-links
+  [& [current-type]]
+  (->> (sort-by (comp :entity-label second) sd/entity-types)
+       (map (fn [[entity-type {:keys [entity-label img-src]}]]
+              (if (= current-type entity-type)
+                [:span [:img.entity-icon {:src img-src}]
+                 entity-label]
+                [:a {:href     (shared/index-href entity-type)
+                     :disabled (= current-type entity-type)}
+                 [:img.entity-icon {:src img-src}]
+                 entity-label])))
+       (interpose " / ")
+       (into [:p.index-links])))
+
+(defn skip-links
+  [groups]
+  (into [:p.index-page__skip-links]
+        (->> groups
+             (map (fn [[letter]]
+                    (let [fragment (str "#" (shared/legal-id letter))]
+                      [:a {:href     fragment
+                           :on-click #(shared/find-fragment fragment)}
+                       letter])))
+             (interpose ", ")
+             (vec))))
+
+(defn index-list
+  [groups]
+  [:dl.index-list {:ref #(shared/find-fragment)}
+   (for [[letter kvs :as kv] groups]
+     [:<> {:key letter}
+      [:dt {:id    (shared/legal-id letter)
+            :style (:style (meta kv))}
+       letter]
+      [:dd
+       [:ul
+        (for [[k v] (sort-by (comp str-sort-val first) kvs)]
+          [:li {:key k}
+           [:a {:href (shared/search-href v)}
+            (str k)]])]]])])
+
 (defn page
   []
   (let [{:keys [metadata]} @state/search
         entity-type (->> (get-in @state/location [:path-params :kind])
                          (keyword "entity.type"))
         {:keys [entity-label
-                img-src]
-         :as   entity-info} (get sd/entity-types entity-type)]
+                img-src]} (get sd/entity-types entity-type)]
     [:div.index-page
      [:h1 [:img {:src img-src}] " " entity-label]
      (when metadata
        (let [groups (index-groups metadata entity-type)]
          [:<>
           [:div.text-content
-           (into [:p.index-page__skip-links]
-                 (->> groups
-                      (map (fn [[letter]]
-                             (let [fragment (str "#" (shared/legal-id letter))]
-                               [:a {:href     fragment
-                                    :on-click #(shared/find-fragment fragment)}
-                                letter])))
-                      (interpose ", ")
-                      (vec)))]
-          [:dl.index-list {:ref #(shared/find-fragment)}
-           (for [[letter kvs :as kv] groups]
-             [:<> {:key letter}
-              [:dt {:id    (shared/legal-id letter)
-                    :style (:style (meta kv))}
-               letter]
-              [:dd
-               [:ul
-                (for [[k v] (sort-by (comp str-sort-val first) kvs)]
-                  [:li {:key k}
-                   [:a {:href (shared/search-href v)}
-                    (str k)]])]]])]]))]))
+           [index-links entity-type]
+           [:hr]
+           [skip-links groups]]
+          ^{:key groups} [index-list groups]]))]))

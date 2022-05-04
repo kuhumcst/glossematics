@@ -221,10 +221,16 @@ nav.reader-mode {
     letter-spacing: 1.25;
 }
 
+.text-content p {
+    margin-bottom: 0;
+}
+
+.text-content ul,
 .index-page ul {
     margin: var(--margin-xl) 0 var(--margin-xl) var(--margin-l);
 }
 
+.text-content ul > li + li,
 .index-page ul > li + li {
     margin-top: var(--margin);
 }
@@ -589,10 +595,9 @@ details summary {
     font-style: italic;
     word-spacing: 6px;
     line-height: 1.5;
-    margin: 0;
-}
+    margin: 0;}
 
-.search-page__index-links {
+.index-links {
     text-align: center;
     line-height: 1.5;
     margin: 0;
@@ -600,11 +605,11 @@ details summary {
     font-family: PoiretOne, sans-serif;
 }
 
-.search-page__index-links a {
+.index-links a, span {
     white-space: nowrap;
 }
 
-.search-page hr {
+hr {
     border: none;
     border-top: var(--border-subtle);
     margin: var(--margin-l) 0;
