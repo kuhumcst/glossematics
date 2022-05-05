@@ -19,21 +19,13 @@
   (when s
     (first (str/upper-case (str-sort-val s)))))
 
-(def backgrounds
-  (cycle stp/background-colours))
-
-(defn- add-backgrounds
-  [kvs]
-  (stp/heterostyled kvs identity backgrounds))
-
 (defn- index-groups
   [search-metadata entity-type]
   (->> (get search-metadata entity-type)
        (group-by (comp str->index-group first))
        (remove (comp nil? first))
        (sort-by first)
-       (into [])
-       (add-backgrounds)))
+       (into [])))
 
 (defn index-links
   [& [current-type]]
@@ -61,20 +53,13 @@
              (interpose ", ")
              (vec))))
 
-(defn index-list
-  [groups]
-  [:dl.index-list {:ref #(shared/find-fragment)}
-   (for [[letter kvs :as kv] groups]
-     [:<> {:key letter}
-      [:dt {:id    (shared/legal-id letter)
-            :style (:style (meta kv))}
-       letter]
-      [:dd
-       [:ul
-        (for [[k v] (sort-by (comp str-sort-val first) kvs)]
-          [:li {:key k}
-           [:a {:href (shared/search-href v)}
-            (str k)]])]]])])
+(defn index-content
+  [kv]
+  [:ul
+   (for [[k v] (sort-by (comp str-sort-val first) kv)]
+     [:li {:key k}
+      [:a {:href (shared/search-href v)}
+       (str k)]])])
 
 (defn page
   []
@@ -92,4 +77,4 @@
            [index-links entity-type]
            [:hr]
            [skip-links groups]]
-          ^{:key groups} [index-list groups]]))]))
+          ^{:key groups} [shared/kvs-list groups index-content]]))]))

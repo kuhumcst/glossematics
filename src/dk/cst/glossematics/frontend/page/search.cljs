@@ -196,14 +196,14 @@
    :document/facsimile {:label "facsimile"}
    :file/name          {:label "file name"}
    :file/extension     {:label "file extension"}
-   :file/body?         {:label "transcribed"}})
+   :file/body?         {:label "transcription"}})
 
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels
-  [:document/sent-at
+  [:document/author
    :document/form
-   :document/author
    :document/recipient
+   :document/sent-at
    :file/body?])
 
 (def rel->label
@@ -314,13 +314,11 @@
   "Widgets for ordering results and limiting the result set to a certain range."
   []
   (let [{:keys [order-by from to]} @state/query
-        {:keys [results]} @state/search
         [order-rel] order-by]
-    (when-not (and (empty? results) (nil? order-rel))
-      [:div.search-result__options
-       [search-result-order order-by]
-       (when order-rel
-         [search-result-between order-by from to])])))
+    [:<>
+     [search-result-order order-by]
+     (when order-rel
+       [search-result-between order-by from to])]))
 
 (defn search-criteria
   [id->type items]
@@ -374,7 +372,9 @@
         anything-opt [:option {:value (rel->s '_)} "anything"]]
 
     (fn [_ _]
-      (let [{:keys [items in rel bad-input? not-allowed?]} @state/query
+      (let [{:keys [items in rel order-by bad-input? not-allowed?]} @state/query
+            {:keys [results]} @state/search
+            [order-rel] order-by
             good-input? (and (not-empty in) (name->id in))]
         [:form.search-form
          {:on-submit (fn [e] (.preventDefault e) (submit))}
@@ -415,7 +415,16 @@
                    :disabled (empty? in)}]]
 
          (when (not-empty items)
-           [search-criteria id->type items])]))))
+           [:<>
+            [search-criteria id->type items]
+
+            ;; Remove when:
+            ;;   1) There are no results.
+            ;;   2) We can be sure it is not due to filtering by date.
+            (when-not (and (empty? results) (nil? order-rel))
+              [:details {:open (boolean order-rel)}
+               [:summary "Sorting"]
+               [search-result-postprocessing]])])]))))
 
 (defn- set-offset
   [f n]
@@ -443,8 +452,9 @@
   [results]
   (let [{:keys [offset limit]} @state/query
         num-results (count results)
-        total       (:total (meta results))]
-    (when-let [pp (not-empty (generate-paging limit total))]
+        total       (:total (meta results))
+        pp          (generate-paging limit total)]
+    (when (> (count pp) 1)
       [:div.search-result__paging
        [:div.input-row
         [:button {:disabled (= offset 0)
@@ -465,10 +475,7 @@
   [id->name v]
   (cond
     (boolean? v)
-    [:input {:type      "checkbox"
-             :checked   v
-             :tab-index "-1"
-             :read-only true}]
+    (if v "✔ available" "n/a")
 
     (and (string? v) (str/starts-with? v "#"))
     (get id->name v v)
@@ -479,30 +486,23 @@
     :else
     (str v)))
 
-(defn search-result-items
-  "View of search `results`."
-  [results id->name]
-  [:div.search-result__items
-   [:dl
-    (for [{:keys [document/title] :as entity} results
-          :let [filename (:file/name entity)]]
-      [:<> {:key filename}
-       [:dt
-        [:a {:title "View this document"
-             :href  (rfe/href ::reader/page {:document filename})}
-         title]]
-       [:dd
-        [:table
-         [:tbody
-          (for [[k v] (->> (select-keys entity search-result-rels))]
-            [:tr {:key k}
-             [:td [:strong (str (get rel->label k k))]]
-             [:td (if (set? v)
-                    (->> (map (partial search-result-val id->name) v)
-                         (sort)
-                         (str/join ", "))
-                    (search-result-val id->name v))]])]]]])]])
-
+(defn search-result
+  [id->name {:keys [document/title file/name] :as entity}]
+  [:table
+   [:tbody
+    [:tr
+     [:td [:strong (str (get rel->label :document/title))]]
+     [:td [:a {:title "View in the reader"
+               :href  (rfe/href ::reader/page {:document name})}
+           title]]]
+    (for [[k v] (select-keys entity search-result-rels)]
+      [:tr {:key k}
+       [:td [:strong (str (get rel->label k k))]]
+       [:td (if (set? v)
+              (->> (map (partial search-result-val id->name) v)
+                   (sort)
+                   (str/join ", "))
+              (search-result-val id->name v))]])]])
 (defn explanation
   [name->id]
   (let [n         (count name->id)
@@ -549,18 +549,16 @@
      (if results
        (if (empty? results)
          [:div.text-content
-          [search-result-postprocessing]
           [:p
            "No documents match the search criteria. "
            " Perhaps try removing a criterion?"]]
-         [:div.text-content
+         [:<>
           [:div.search-result
            [search-paging results]
-           [:details {:open (boolean order-rel)}
-            [:summary "Sort & limit"]
-            [search-result-postprocessing]]
            (when id->name
-             [search-result-items results id->name])]])
+             (let [results' (map (juxt :file/name identity) results)]
+               [shared/kvs-list results' (partial search-result id->name)])
+             #_[search-result-items results id->name])]])
        (if (empty? query-params)
          [explanation name->id]
          ;; TODO: put this in main.css

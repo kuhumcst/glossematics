@@ -58,8 +58,8 @@
 
 @keyframes fade-in-result {
   from {
-    opacity: 0;
-    transform: translateY(32px);
+    opacity: 0.33;
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -222,7 +222,7 @@ nav.reader-mode {
 }
 
 .text-content p {
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .text-content ul,
@@ -334,10 +334,15 @@ img.entity-icon {
 
 details summary {
     font-size: 12px;
-    margin: var(--margin-l) var(--margin) var(--margin) var(--margin);
-    text-align: center;
+    color: var(--color);
+    margin: 0;
+    text-align: right;
     text-transform: uppercase;
     cursor: pointer;
+}
+
+details[open] summary {
+    margin-bottom: var(--margin);
 }
 
 .input-row
@@ -450,13 +455,21 @@ details summary {
     text-transform: uppercase;
 }
 
-.search-result__paging,
-.search-result__options {
-    border: var(--border-subtle);
-    border-radius: var(--border-radius);
-    padding: var(--padding) var(--padding-l);
-    background: rgba(0,0,0,0.08);
-    backdrop-filter: blur(4px);
+.search-result__paging {
+    animation: fade-in-result 0.33s ease-out;
+    border: var(--border);
+    border-radius:
+        var(--border-radius)
+        var(--border-radius)
+        0
+        0;
+    padding:
+        var(--padding)
+        var(--padding-l);
+    background:rgba(0,0,0,0.2);
+    box-shadow:
+        inset 0 -16px 16px rgba(0,0,0,0.1),
+        var(--box-shadow-elevated);
     z-index: 998;
 }
 
@@ -484,89 +497,30 @@ details summary {
     cursor: not-allowed;
 }
 
-.search-result__items {
-    margin-top: var(--padding-xl);
-}
-
-.search-result__items * {
-    font-size: 14px;
-}
-
-.search-result__items dl {
-    margin: 0;
-}
-
-.search-result__items dt > a {
-    display: block;
-    padding: var(--padding);
-
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    border: var(--border);
-    background: var(--background);
-
-    text-align: center;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: var(--color);
-}
-
-/* TODO: fix background blinking on hover! */
-.search-result__items dt:nth-child(3n+1) a {
-    background: var(--tab-background-2);
-}
-
-.search-result__items dt:nth-child(3n+2) a {
-    background: var(--tab-background-1);
-}
-
-.search-result__items dt:nth-child(3n+3) a {
-    background: var(--tab-background-3);
-}
-
-.search-result__items dd {
-    margin: 0;
-}
-
-.search-result__items dd > table {
-    background: var(--background);
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-    border-bottom: var(--border);
-    border-left: var(--border);
-    border-right: var(--border);
+dl.kvs-list dd > table {
+    border-collapse: collapse;
     width: 100%;
 }
 
-.search-result__items dd > table td {
+dl.kvs-list dd > table td {
     padding: var(--padding);
     vertical-align: top;
 }
 
-.search-result__items dd > table td:first-child {
+dl.kvs-list dd > table td:first-child {
     width: 1px;
     padding-left: var(--padding-l);
     text-align: right;
     text-transform: uppercase;
 }
 
-.search-result__items dd > table td:last-child {
-     padding-right: var(--padding-l);
+/* Creates an index card like appearance. */
+dl.kvs-list dd > table tr {
+    border-bottom: 1px solid #ddd;
 }
 
-.search-result__items dd > table tr:first-child td {
-    padding-top: var(--padding-l);
-}
-
-.search-result__items dd > table tr:last-child td {
-    padding-bottom: var(--padding-l);
-}
-
-.search-result__items dd + dt {
-    margin-top: var(--margin-xl);
-}
-
-/* Removes visual click state change. */
-.search-result__items input[type='checkbox'][readonly]{
-    pointer-events: none;
+dl.kvs-list dd > table tr:last-child {
+    border-bottom: none;
 }
 
 .index-page h1 {
@@ -615,11 +569,12 @@ hr {
     margin: var(--margin-l) 0;
 }
 
-dl.index-list {
-    margin-top: var(--margin-xl);
+dl.kvs-list {
+    margin: 0; /* reset */
 }
 
-dl.index-list dt {
+
+dl.kvs-list dt {
     transition: all 0.33s;
     animation: fade-in-result 0.33s ease-out;
 
@@ -627,30 +582,28 @@ dl.index-list dt {
     top: 87px;
     scroll-margin: 87px; /* Fix scrollIntoView for sticky elem. */
 
-    font-size: 24px;
-    text-shadow: 0 0 1px white;
+    font-size: 16px;
+    font-weight: bold;
+    color: rgba(0,0,0,0.6);
+    letter-spacing: 2px;
     background: var(--background);
     border: var(--border);
     border-top: var(--border);
-    border-bottom: var(--border-subtle);
-    padding: var(--padding) var(--padding-l);
+    border-bottom:none;
+    padding: var(--padding-l);
 }
 
-dl.index-list dt:first-child {
+dl.kvs-list dt:first-child {
     border-top: var(--border);
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
-dl.index-list dd {
+dl.kvs-list dd {
     margin: 0;
-}
-
-dl.index-list dd {
     border: var(--border);
     border-top: none;
     border-bottom: none;
     background: var(--background);
-    padding: var(--padding-l);
     animation: fade-in-result 0.33s ease-out;
     font-family: Georgia, serif;
     font-size: 16px;
@@ -659,9 +612,40 @@ dl.index-list dd {
     letter-spacing: 1.25;
 }
 
-dl.index-list dd:last-child {
+dl.kvs-list dd:last-child {
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     border-bottom: var(--border);
+    padding: var(--padding-l);
+}
+
+/* Pseudo-3D separation. */
+dl.kvs-list dd:not(:last-child) {
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.2);
+    padding:
+        var(--padding-l)
+        var(--padding-l)
+        var(--padding-xl)
+        var(--padding-l);
+}
+
+.search-page dl.kvs-list dt {
+    position: static;
+    text-align: center;
+}
+
+/* The :not(:first-child) part deals with lack of paging. */
+.search-page dl.kvs-list:not(:first-child) dt:first-child {
+    border-radius: 0;
+    border-top: none;
+}
+
+.index-page dl.kvs-list {
+    margin-top: var(--margin-xl);
+}
+
+.index-page dl.kvs-list dt {
+    font-size: 24px;
+    padding: var(--padding) var(--padding-l);
 }
 
 .index-page ul {
@@ -700,7 +684,7 @@ dl.index-list dd:last-child {
             var(--padding-m);
   }
 
-  dl.index-list dt {
+  dl.kvs-list dt {
       top: 35px;
       scroll-margin: 35px;
   }

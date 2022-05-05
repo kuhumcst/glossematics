@@ -3,7 +3,8 @@
   (:require [clojure.string :as str]
             [reitit.frontend.easy :as rfe]
             [dk.cst.glossematics.frontend.state :as state]
-            [dk.cst.glossematics.static-data :as sd]))
+            [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.stucco.pattern :as stp]))
 
 ;; https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
 (defn- visible?
@@ -19,8 +20,8 @@
 (defn find-fragment
   "Scroll to the `fragment`; if none specified, read from window.location.hash."
   ([fragment]
-   (.scrollIntoView (js/document.querySelector fragment)
-                    #js{:behavior "smooth"}))
+   (when-let [elem (js/document.querySelector fragment)]
+     (.scrollIntoView elem #js{:behavior "smooth"})))
   ([]
    (when-let [fragment (not-empty js/window.location.hash)]
      (find-fragment fragment))))
@@ -58,3 +59,22 @@
       (str "No" s')
 
       :else s')))
+
+(def backgrounds
+  (cycle stp/background-colours))
+
+(defn- add-backgrounds
+  [kvs]
+  (stp/heterostyled kvs identity backgrounds))
+
+(defn kvs-list
+  "Generic display of title+content `kvs`; `val-com` renders the content."
+  [kvs val-com]
+  [:dl.kvs-list {:ref #(find-fragment)}
+   (for [[k v :as kv] (add-backgrounds kvs)]
+     [:<> {:key k}
+      [:dt {:id    (legal-id k)
+            :style (:style (meta kv))}
+       k]
+      [:dd
+       [val-com v]]])])
