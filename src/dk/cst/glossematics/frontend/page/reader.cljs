@@ -257,6 +257,11 @@
 (defn set-content!
   "Change the `document` currently displayed in the reader."
   [document]
+  ;; Should not display old state while waiting for the network request.
+  (when (not= document (:document @state/reader))
+    (swap! state/reader assoc :i 0 :document nil))
+
+  ;; TODO: fix :tei-kvs side-effect, makes it hard to implement history/cache
   (p/let [url              (api/normalize-url (str "/file/" document))
           tei              (api/fetch url)
           raw-hiccup       (parse tei)
@@ -266,7 +271,7 @@
           missing-count    (- (count facs) (count tei-kvs))
           placeholder      ["N/A" "[content missing]"]]
     (swap! state/reader assoc
-           :i 0
+
            :document document
            :tei tei
            :hiccup rewritten-hiccup
