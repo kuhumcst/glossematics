@@ -504,10 +504,12 @@ details[open] summary {
     width: 120px;
     height: 100%; /* Safari vertical stretch fix. */
     cursor: pointer;
-    background: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.7);
     padding: var(--padding);
     font-size: var(--font-size-l);
     font-variant: small-caps;
+    text-shadow: 1px 1px #FFFFFF;
+    color: var(--color);
     border: none;
     border-right: var(--border);
     border-left: var(--border);
@@ -516,7 +518,7 @@ details[open] summary {
 
 .search-result__paging button:not([disabled]):hover,
 .search-result__paging select:not([disabled]):hover {
-    background: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.95);
 }
 
 .search-result__paging button:first-child {
