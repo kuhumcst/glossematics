@@ -39,6 +39,7 @@
     --font-family-heading: Futura, sans-serif;
     --font-family-metadata: "Lucida Console", Monaco, monospace;
     --font-size-s: 12px;
+    --font-size-l: 18px;
     --inactive-filter: brightness(0.9);
     --inactive-filter-focus: brightness(1);
     --inactive-border: 1px solid #DDD;

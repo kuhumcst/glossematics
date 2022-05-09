@@ -305,6 +305,24 @@ img.entity-icon {
     margin-right: var(--margin);
 }
 
+a.action {
+    font-size: var(--font-size-l);
+}
+
+img.action__icon {
+    transition: all 0.2s;
+    height: var(--font-size-l);
+        width: var(--font-size-l);
+    opacity: 0.33;
+    margin-left: var(--margin);
+    vertical-align: text-top;
+}
+
+a:hover img.action__icon {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
 .search-form legend > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
@@ -504,7 +522,7 @@ dl.kvs-list dd > table {
 
 dl.kvs-list dd > table td {
     padding: var(--padding);
-    vertical-align: top;
+    vertical-align: text-top;
 }
 
 dl.kvs-list dd > table td:first-child {

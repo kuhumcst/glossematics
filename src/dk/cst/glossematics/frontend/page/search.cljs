@@ -492,9 +492,10 @@
    [:tbody
     [:tr
      [:td [:strong (str (get rel->label :document/title))]]
-     [:td [:a {:title "View in the reader"
-               :href  (rfe/href ::reader/page {:document name})}
-           title]]]
+     [:td [:a.action {:title "View in the reader"
+                      :href  (rfe/href ::reader/page {:document name})}
+           title
+           [:img.action__icon {:src "/images/external-link-svgrepo-com.svg"}]]]]
     (for [[k v] (select-keys entity search-result-rels)]
       [:tr {:key k}
        [:td [:strong (str (get rel->label k k))]]
