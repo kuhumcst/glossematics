@@ -63,6 +63,7 @@
 (def backgrounds
   (cycle stp/background-colours))
 
+;; TODO: missing proper cycle http://localhost:9000/app/search?_=%23np57%2C%23np388&limit=10&offset=10
 (defn- add-backgrounds
   [kvs offset]
   (stp/heterostyled kvs identity (if (number? offset)
