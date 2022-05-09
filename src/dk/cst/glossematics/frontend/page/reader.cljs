@@ -1,8 +1,6 @@
 (ns dk.cst.glossematics.frontend.page.reader
   "Page containing a synchronized facsimile & TEI transcription reader."
-  (:require [clojure.string :as str]
-            [shadow.resource :as resource]
-            [reitit.frontend.easy :as rfe]
+  (:require [shadow.resource :as resource]
             [kitchen-async.promise :as p]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml]
@@ -15,7 +13,8 @@
             [dk.cst.stucco.util.css :as css]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
-            [dk.cst.glossematics.frontend.shared :as shared]))
+            [dk.cst.glossematics.frontend.shared :as shared]
+            [dk.cst.glossematics.static-data :as sd]))
 
 ;; TODO: yuki not linked http://localhost:9000/app/reader/HJUtilDJ-1932-09-28-tei-final.xml
 ;; TODO: missing facs http://localhost:8080/app/reader/acc-1992_0005_025_Jakobson_0160-tei-final.xml
@@ -262,8 +261,8 @@
     (swap! state/reader assoc :i 0 :document nil))
 
   ;; TODO: fix :tei-kvs side-effect, makes it hard to implement history/cache
-  (p/let [url              (api/normalize-url (str "/file/" document))
-          tei              (api/fetch url)
+  (p/let [tei              (api/fetch (str "/file/" document))
+          entity           (api/fetch (str "/entity/" document))
           raw-hiccup       (parse tei)
           facs             (get-facs raw-hiccup)
           rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)
@@ -273,6 +272,7 @@
     (swap! state/reader assoc
 
            :document document
+           :entity entity
            :tei tei
            :hiccup rewritten-hiccup
            :facs-kvs facs
@@ -287,13 +287,24 @@
                       (concat tei-kvs (repeat missing-count placeholder))
                       tei-kvs))))
 
+(defn entity-meta
+  [search-state entity]
+  (let [entity' (dissoc entity :file/extension :file/body?) ; not interesting
+        kvs     (concat (remove nil? (for [k sd/reader-rels]
+                                       (when-let [v (get entity' k)]
+                                         [k v])))
+                        (sort-by first (apply dissoc entity' sd/reader-rels)))]
+    [shared/metadata-table search-state kvs]))
+
 (defn page
   []
-  (let [{:keys [hiccup tei document]} @state/reader
+  (let [{:keys [hiccup tei document entity]} @state/reader
+        {:keys [id->name] :as search-state} @state/search
         location*          @state/location
         current-document   (get-in location* [:path-params :document])
         document-selected? (= ::page (get-in location* [:data :name]))
-        new-document?      (not= document current-document)]
+        new-document?      (not= document current-document)
+        {:keys [file/body?]} entity]
 
     ;; Uses a side-effect of the rendering function to load new documents.
     ;; Probably a bad way to do this...
@@ -307,11 +318,18 @@
         [pattern/tabs
          {:i   0
           :kvs (pattern/heterostyled
-                 [["Content" ^{:key tei} [rescope/scope hiccup tei-css]]
-                  ["TEI" [:pre {:style {:white-space "pre-wrap"
-                                        :margin      "1ch"
-                                        :padding     "1ch"
-                                        :background  "white"}}
-                          [:code
-                           tei]]]])}
+                 (cond->> [["Metadata"
+                            (when id->name
+                              [:div.reader-content
+                               [entity-meta search-state entity]])]
+
+                           ["TEI"
+                            [:pre.reader-content
+                             [:code {:style {:white-space "pre-wrap"}}
+                              tei]]]]
+
+                          body?
+                          (into
+                            [["Transcription"
+                              ^{:key tei} [rescope/scope hiccup tei-css]]])))}
          {:id "tei-tabs"}]]])))

@@ -52,6 +52,11 @@
     (assoc-in (ring/file-response path)
               [:headers "Cache-Control"] one-day-cache)))
 
+(defn- clean-entity
+  "Remove private/unnecessary data from `entity`."
+  [entity]
+  (dissoc entity :file/path :entity/type))
+
 (defn entity-handler
   "A handler to serve database entities, e.g. document or event metadata."
   [{:keys [path-params] :as request}]
@@ -61,7 +66,7 @@
       (-> request
           (assoc
             :status 200
-            :body (transito/write-str entity))
+            :body (transito/write-str (clean-entity entity)))
           (update :headers assoc
                   "Content-Type" "application/transit+json"
                   "Cache-Control" one-day-cache))
@@ -73,11 +78,6 @@
   "Split comma-separated strings in `query-params`."
   [query-params]
   (update-vals query-params #(str/split % #"\s*,\s*")))
-
-(defn- clean-entity
-  "Remove private/unnecessary data from `entity`."
-  [entity]
-  (dissoc entity :file/path :entity/type))
 
 (defn search-handler
   "A handler to search for database entities, e.g. document or event metadata.

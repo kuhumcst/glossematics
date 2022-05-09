@@ -74,3 +74,61 @@
    "Å" "Aa"
    "ø" "oe"
    "Ø" "Oe"})
+
+
+;; TODO: make collection, repository searchable too (add to datalist)
+(def search-rels
+  {:document/mention            {:label      "mentioned"
+                                 :compatible (set (keys entity-types))}
+   :document/author             {:label      "author"
+                                 :compatible #{:entity.type/person}}
+   :document/sender             {:label      "sender"
+                                 :compatible #{:entity.type/person}}
+   :document/sender-location    {:label      "sender location"
+                                 :compatible #{:entity.type/place}}
+   :document/recipient          {:label      "recipient"
+                                 :compatible #{:entity.type/person}}
+   :document/recipient-location {:label      "recipient location"
+                                 :compatible #{:entity.type/place}}
+   #_#_:document/repository {:label "repository"}
+   #_#_:document/collection {:label "collection"}})
+
+(def order-rels
+  {:document/date-mention {:label "mentioned date"
+                           :type  "date"}
+   :document/sent-at      {:label "date"
+                           :type  "date"}})
+
+(def other-rels
+  "Relations that are not available as search/order params."
+  {:document/title      {:label "title"}
+   :document/collection {:label "collection"}
+   :document/form       {:label "form"}
+   :document/hand       {:label "representation"}
+   :document/facsimile  {:label "facsimile"}
+   :document/repository {:label "repository"}
+   :file/name           {:label "file name"}
+   :file/extension      {:label "file extension"}
+   :file/body?          {:label "transcription"}})
+
+;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
+(def search-result-rels
+  [:document/sent-at
+   :document/form
+   :document/author
+   :document/recipient
+   :document/sent-at
+   :file/body?])
+
+(def reader-rels
+  [:document/title
+   :document/sent-at
+   :document/form
+   :document/author
+   :document/recipient
+   :file/body?])
+
+(def rel->label
+  (->> (merge search-rels order-rels other-rels)
+       (map (juxt key (comp :label val)))
+       (into {})))

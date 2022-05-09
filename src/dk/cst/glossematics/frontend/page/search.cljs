@@ -471,39 +471,17 @@
                   :on-click #(set-offset + limit)}
          "next →"]]])))
 
-(defn- search-result-val
-  [id->name v]
-  (cond
-    (boolean? v)
-    (if v "✔ available" "n/a")
+(defn search-result-table
+  [search-state {:keys [document/title file/name] :as entity}]
+  (let [hyperlink [:a.action {:title "View in the reader"
+                              :href  (shared/reader-href name)}
+                   title
+                   [:img.action__icon
+                    {:src "/images/external-link-svgrepo-com.svg"}]]
+        kvs       (concat [[:document/title hyperlink]]
+                          (select-keys entity sd/search-result-rels))]
+    [shared/metadata-table search-state kvs]))
 
-    (and (string? v) (str/starts-with? v "#"))
-    (get id->name v v)
-
-    (inst? v)
-    (first (str/split (.toISOString v) #"T"))
-
-    :else
-    (str v)))
-
-(defn search-result
-  [id->name {:keys [document/title file/name] :as entity}]
-  [:table
-   [:tbody
-    [:tr
-     [:td [:strong (str (get rel->label :document/title))]]
-     [:td [:a.action {:title "View in the reader"
-                      :href  (rfe/href ::reader/page {:document name})}
-           title
-           [:img.action__icon {:src "/images/external-link-svgrepo-com.svg"}]]]]
-    (for [[k v] (select-keys entity search-result-rels)]
-      [:tr {:key k}
-       [:td [:strong (str (get rel->label k k))]]
-       [:td (if (set? v)
-              (->> (map (partial search-result-val id->name) v)
-                   (sort)
-                   (str/join ", "))
-              (search-result-val id->name v))]])]])
 (defn explanation
   [name->id]
   (let [n         (count name->id)
@@ -540,7 +518,7 @@
 
 (defn page
   []
-  (let [{:keys [results name->id id->name]} @state/search
+  (let [{:keys [results name->id id->name] :as search-state} @state/search
         {:keys [offset]} @state/query
         {:keys [query-params]} @state/location]
     [:div.search-page
@@ -556,9 +534,9 @@
           [:div.search-result
            [search-paging results]
            (when id->name
-             (let [results'       (map (juxt :file/name identity) results)
-                   search-result' (partial search-result id->name)]
-               [shared/kvs-list results' search-result' offset]))]])
+             (let [kvs          (map (juxt :file/name identity) results)
+                   entity-table (partial search-result-table search-state)]
+               [shared/kvs-list kvs entity-table offset]))]])
        (if (empty? query-params)
          [explanation name->id]
          ;; TODO: put this in main.css

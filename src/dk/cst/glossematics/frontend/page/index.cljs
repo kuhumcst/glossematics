@@ -1,23 +1,15 @@
 (ns dk.cst.glossematics.frontend.page.index
   "Page containing a range of indices of important entities."
   (:require [clojure.string :as str]
-            [dk.cst.stucco.pattern :as stp]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]))
-
-(defn str-sort-val
-  "Remove prepended parentheses from `s`."
-  [s]
-  (-> s
-      (str/replace #"^\(.+\)\s*" "")
-      (str/replace #"^\-\s*" "")))
 
 (defn str->index-group
   "The canonical index group for a given `s`; used for group-by."
   [s]
   (when s
-    (first (str/upper-case (str-sort-val s)))))
+    (first (str/upper-case (shared/str-sort-val s)))))
 
 (defn- index-groups
   [search-metadata entity-type]
@@ -56,7 +48,7 @@
 (defn index-content
   [kv]
   [:ul
-   (for [[k v] (sort-by (comp str-sort-val first) kv)]
+   (for [[k v] (sort-by (comp shared/str-sort-val first) kv)]
      [:li {:key k}
       [:a {:href (shared/search-href v)}
        (str k)]])])

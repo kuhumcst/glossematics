@@ -88,6 +88,10 @@
     src: url(/fonts/PoiretOne-aD0x.ttf);
 }
 
+* {
+    font-family: Georgia, serif;
+}
+
 ::placeholder {
     color: rgba(0,0,0,0.3);
 }
@@ -133,7 +137,7 @@ nav, nav h1, nav a {
 nav h1, nav a {
     color: #EFEFEF;
     letter-spacing: 4px;
-    font-family: PoiretOne;
+    font-family: PoiretOne, sans-serif;
     text-transform: uppercase;
     padding: 0;
     margin: 0;
@@ -174,7 +178,8 @@ nav a:not(:first-child)::first-letter {
     color: #ffc92e;
 }
 
-nav span {
+nav h1 span {
+    font-family: PoiretOne, sans-serif;
     font-size: 12px;
     opacity: 0.8;
 }
@@ -204,7 +209,7 @@ nav.reader-mode {
 .search-page,
 .index-page
 {
-    max-width: 110ch;
+    max-width: 90ch;
     margin: auto;
 }
 
@@ -319,7 +324,7 @@ img.action__icon {
 }
 
 a:hover img.action__icon {
-    transform: scale(1.2);
+    transform: scale(1.1);
     opacity: 1;
 }
 
@@ -540,17 +545,17 @@ details[open] summary {
     cursor: not-allowed;
 }
 
-dl.kvs-list dd > table {
+table.entity-metadata {
     border-collapse: collapse;
     width: 100%;
 }
 
-dl.kvs-list dd > table td {
+table.entity-metadata td {
     padding: var(--padding);
     vertical-align: text-top;
 }
 
-dl.kvs-list dd > table td:first-child {
+table.entity-metadata td:first-child {
     width: 1px;
     padding-left: var(--padding-l);
     text-align: right;
@@ -558,12 +563,35 @@ dl.kvs-list dd > table td:first-child {
 }
 
 /* Creates an index card like appearance. */
-dl.kvs-list dd > table tr {
+table.entity-metadata tr {
     border-bottom: 1px solid #ddd;
 }
 
-dl.kvs-list dd > table tr:last-child {
+table.entity-metadata tr:last-child {
     border-bottom: none;
+}
+
+table.entity-metadata dl dt {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: var(--font-size-s);
+    border-bottom: var(--border-subtle);
+    padding-bottom: var(--padding-s);
+    margin-bottom: var(--margin);
+}
+
+table.entity-metadata dl dd {
+    margin: 0;
+}
+
+table.entity-metadata dl ul {
+    margin: 0 0 var(--margin-l) 0;
+    padding-left: var(--padding-l);
+    list-style-type: none;
+}
+
+table.entity-metadata dl ul li {
+    padding: 0;
 }
 
 .index-page h1 {
@@ -602,8 +630,9 @@ dl.kvs-list dd > table tr:last-child {
     font-family: PoiretOne, sans-serif;
 }
 
-.index-links a, span {
+.index-links a, .index-links span {
     white-space: nowrap;
+    font-family: PoiretOne, sans-serif;
 }
 
 hr {
@@ -734,4 +763,18 @@ dl.kvs-list dd:not(:last-child) {
   .search-result__paging {
     top: 35px;
   }
+}
+
+.reader-content {
+    transition: var(--transition);
+    padding: var(--padding-l);
+    margin: 0;
+    background: var(--background);
+    border: var(--border);
+    border-radius: var(--border-radius);
+}
+
+/* Opposite of <strong> or <em> */
+.weak {
+    color: var(--color-subtle);
 }

@@ -2,9 +2,17 @@
   "Frontend code that can be freely shared between frontend namespaces."
   (:require [clojure.string :as str]
             [reitit.frontend.easy :as rfe]
+            [tick.core :as t]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.stucco.pattern :as stp]))
+
+(defn str-sort-val
+  "Remove prepended parentheses from `s`."
+  [s]
+  (-> s
+      (str/replace #"^\(.+\)\s*" "")
+      (str/replace #"^\-\s*" "")))
 
 ;; https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
 (defn- visible?
@@ -47,10 +55,16 @@
   (rfe/href :dk.cst.glossematics.frontend.page.index/page
             {:kind (name entity-type)}))
 
+;; TODO: eventually use :as-alias
+(defn reader-href
+  [document]
+  (rfe/href :dk.cst.glossematics.frontend.page.reader/page
+            {:document document}))
+
 (defn legal-id
   "Make sure `s` is a legal HTML id/fragment, e.g. doesn't start with a number."
   [s]
-  (let [s' (clojure.string/replace s #"[æøåÆØÅ]" sd/danish-letter->ascii)]
+  (let [s' (str/replace s #"[æøåÆØÅ]" sd/danish-letter->ascii)]
     (cond
       (not (re-matches #"[a-zA-Z0-9]+" s'))
       (str "X" (js/Math.abs (hash s')))
@@ -69,6 +83,82 @@
   (stp/heterostyled kvs identity (if (number? offset)
                                    (drop offset backgrounds)
                                    backgrounds)))
+
+(defn- sort-coll
+  [id->name coll]
+  (sort-by (if (inst? (first coll))
+             identity
+             (comp str-sort-val #(get id->name % %)))
+           coll))
+
+(defn- group-coll
+  [id->type coll]
+  (group-by (if (inst? (first coll))
+              (comp str t/year)
+              (comp :entity-label sd/entity-types id->type))
+            coll))
+
+(defn- metadata-table-val
+  [{:keys [id->name id->type] :as search-state} k v]
+  (let [into-ul (fn [coll]
+                  (into [:ul]
+                        (->> (sort-coll id->name coll)
+                             (map #(metadata-table-val search-state k %))
+                             (map #(vector :li %)))))]
+    (cond
+      ;; Hiccup passes unchanged
+      (vector? v)
+      v
+
+      ;; Special behaviour.
+      (= k :document/facsimile)
+      (if (set? v)
+        (str (count v) " pages")
+        (str "1 page"))
+
+      ;; Individual entities caught here.
+      (and (string? v) (str/starts-with? v "#"))
+      [:a {:href  (search-href v)
+           :title "View in the reader"
+           :key   v}
+       (when-let [img-src (some-> v id->type sd/entity-types :img-src)]
+         [:img.entity-icon {:src img-src :alt ""}])
+       (get id->name v v)]
+
+      ;; Collections caught here.
+      (set? v)
+      (into [:dl]
+            (->> (group-coll id->type v)
+                 (sort-by key)
+                 (map (fn [[k coll]]
+                        [:<>
+                         [:dt k]
+                         [:dd (into-ul coll)]]))))
+
+      ;; :file/body?
+      (boolean? v)
+      (if v
+        [:em "available"]
+        [:span.weak "n/a"])
+
+      (inst? v)
+      (let [d   (.toISOString v)
+            ret (str/split d #"T")]
+        (if (coll? ret)
+          (first ret)
+          d))
+
+      :else
+      (str v))))
+
+(defn metadata-table
+  [search-state kvs]
+  [:table.entity-metadata
+   [:tbody
+    (for [[k v] kvs]
+      [:tr {:key k}
+       [:td [:strong (str (get sd/rel->label k k))]]
+       [:td (metadata-table-val search-state k v)]])]])
 
 (defn kvs-list
   "Generic display of title+content `kvs`; `val-com` renders the content."
