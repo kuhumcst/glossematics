@@ -423,7 +423,7 @@
             ;;   2) We can be sure it is not due to filtering by date.
             (when-not (and (empty? results) (nil? order-rel))
               [:details {:open (boolean order-rel)}
-               [:summary "Sorting"]
+               [:summary "More options"]
                [search-result-postprocessing]])])]))))
 
 (defn- set-offset
@@ -540,9 +540,8 @@
 (defn page
   []
   (let [{:keys [results name->id id->name]} @state/search
-        {:keys [order-by]} @state/query
-        {:keys [query-params]} @state/location
-        [order-rel] order-by]
+        {:keys [offset]} @state/query
+        {:keys [query-params]} @state/location]
     [:div.search-page
      ;; React key needed for input to update after name->id has been fetched!
      ^{:key name->id} [search-form]
@@ -556,9 +555,9 @@
           [:div.search-result
            [search-paging results]
            (when id->name
-             (let [results' (map (juxt :file/name identity) results)]
-               [shared/kvs-list results' (partial search-result id->name)])
-             #_[search-result-items results id->name])]])
+             (let [results'       (map (juxt :file/name identity) results)
+                   search-result' (partial search-result id->name)]
+               [shared/kvs-list results' search-result' offset]))]])
        (if (empty? query-params)
          [explanation name->id]
          ;; TODO: put this in main.css

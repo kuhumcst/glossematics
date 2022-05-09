@@ -64,14 +64,16 @@
   (cycle stp/background-colours))
 
 (defn- add-backgrounds
-  [kvs]
-  (stp/heterostyled kvs identity backgrounds))
+  [kvs offset]
+  (stp/heterostyled kvs identity (if (number? offset)
+                                   (drop offset backgrounds)
+                                   backgrounds)))
 
 (defn kvs-list
   "Generic display of title+content `kvs`; `val-com` renders the content."
-  [kvs val-com]
+  [kvs val-com & [offset]]
   [:dl.kvs-list {:ref #(find-fragment)}
-   (for [[k v :as kv] (add-backgrounds kvs)]
+   (for [[k v :as kv] (add-backgrounds kvs offset)]
      [:<> {:key k}
       [:dt {:id    (legal-id k)
             :style (:style (meta kv))}

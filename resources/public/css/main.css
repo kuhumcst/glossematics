@@ -571,12 +571,12 @@ hr {
 
 dl.kvs-list {
     margin: 0; /* reset */
+    animation: fade-in-result 0.33s ease-out;
 }
 
 
 dl.kvs-list dt {
     transition: all 0.33s;
-    animation: fade-in-result 0.33s ease-out;
 
     position: sticky;
     top: 87px;
@@ -604,7 +604,6 @@ dl.kvs-list dd {
     border-top: none;
     border-bottom: none;
     background: var(--background);
-    animation: fade-in-result 0.33s ease-out;
     font-family: Georgia, serif;
     font-size: 16px;
     color: var(--color);
