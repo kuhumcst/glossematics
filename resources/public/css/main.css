@@ -502,6 +502,7 @@ details[open] summary {
 .search-result__paging button,
 .search-result__paging select {
     width: 120px;
+    height: 100%; /* Safari vertical stretch fix. */
     cursor: pointer;
     background: rgba(255,255,255,0.5);
     padding: var(--padding);
