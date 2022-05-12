@@ -101,15 +101,19 @@
 
 (def other-rels
   "Relations that are not available as search/order params."
-  {:document/title      {:label "title"}
-   :document/collection {:label "collection"}
-   :document/form       {:label "form"}
-   :document/hand       {:label "representation"}
-   :document/facsimile  {:label "facsimile"}
-   :document/repository {:label "repository"}
-   :file/name           {:label "file name"}
-   :file/extension      {:label "file extension"}
-   :file/body?          {:label "transcription"}})
+  {:document/title       {:label "title"}
+   :document/collection  {:label "collection"}
+   :document/form        {:label "form"}
+   :document/hand        {:label "representation"}
+   :document/facsimile   {:label "facsimile"}
+   :document/repository  {:label "repository"}
+   :document/language    {:label "language"}
+   :document/settlement  {:label "place"}
+   :document/year        {:label "year"}
+   :document/publication {:label "publication"}
+   :file/name            {:label "file name"}
+   :file/extension       {:label "file extension"}
+   :file/body?           {:label "transcription"}})
 
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels

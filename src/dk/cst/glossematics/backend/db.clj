@@ -142,6 +142,42 @@
        (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
 
+(def bibliography-columns
+  {:B :file/name
+   #_#_:C :temp/author                                      ; TODO: should be ID
+   :D :document/settlement
+   :F :document/title
+   :G :document/year
+   :L :document/language
+   :M :document/facsimile
+   :P :document/repository
+   :Q :document/collection})
+
+(defn normalize-bibliography-data
+  [{:keys [file/name document/repository] :as bibliographic-entry}]
+  (-> bibliographic-entry
+      (update-vals #(if (string? %) (str/trim %) %))
+      (update :document/settlement {"København" "#npl283"
+                                    "Aarhus"    "#npl1"})
+      (update :document/repository {"Acta Jutlandica"                              "#narch10"
+                                    "Travaux du Cercle de Linguistique Copenhague" "#narch11"})
+      (update :document/year int)
+      (assoc :entity/type :entity.type/bibliographic-entry
+             :document/publication ({"Acta Jutlandica"                              "#npub19"
+                                     "Travaux du Cercle de Linguistique Copenhague" "#npub15"}
+                                    repository)
+             :db/ident name)))
+
+(defn bibliographic-entities
+  []
+  (->> (io/file (io/resource "NEW_metadata-udgivelser-10122021_LC.xlsx"))
+       (xl/load-workbook)
+       (xl/select-sheet "Sheet1")
+       (xl/select-columns bibliography-columns)
+       (rest)
+       (map normalize-bibliography-data)
+       (map remove-nil-vals)))
+
 (defn- multiple?
   [x]
   (and (coll? x) (> (count x) 1)))
@@ -480,6 +516,7 @@
   ;; Add all core entities from the static files included in the source repo.
   (log/info :bootstrap.asami/begin-static-files true)
   (log-transaction! :timeline (timeline-entities))
+  (log-transaction! :bibliography (bibliographic-entities))
   (log-transaction! :person (person-entities))
   (log-transaction! :linguistic-organisation (other-entities "lingvistiskeOrganisationer-konferencer.txt" "#nlingorg" "linguistic-organisation"))
   (log-transaction! :organisation (other-entities "Organisationer.txt" "#norg" "organisation"))
@@ -494,27 +531,6 @@
   (log/info :bootstrap.asami/begin-files-dir files-dir)
   (log-transaction! :files (file-entities files-dir))
   (log-transaction! :tei-data (map as-entity (tei-files conn))))
-
-#_(defn bootstrap!
-    "Asynchronously bootstrap an in-memory Asami database from a `conf`."
-    [{:keys [files-dir] :as conf}]
-    (log/info :bootstrap.asami/dir {:dir files-dir})
-
-    ;; Add all core entities based on the input files.
-    (log-transaction! :files (file-entities files-dir))
-    (log-transaction! :timeline (timeline-entities))
-    (log-transaction! :person (person-entities))
-    (log-transaction! :linguistic-organisation (other-entities "lingvistiskeOrganisationer-konferencer.txt" "#nlingorg" "linguistic-organisation"))
-    (log-transaction! :organisation (other-entities "Organisationer.txt" "#norg" "organisation"))
-    (log-transaction! :publication (other-entities "publikationer.txt" "#npub" "publication"))
-    (log-transaction! :language (other-entities "sprog.txt" "#ns" "language"))
-    (log-transaction! :place (other-entities "stednavne.txt" "#npl" "place"))
-    (log-transaction! :terms (other-entities "terms.txt" "#nt" "term"))
-    (log-transaction! :english-terms (other-entities "terms-eng.txt" "#nteng" "english-term"))
-
-    ;; Parse each TEI file and link the document data to the file entities.
-    ;; This is by far the slowest part of the Asami bootstrap process.
-    (log-transaction! :tei-data (map as-entity (tei-files conn))))
 
 (defn- entity->where-triples
   "Deconstruct partial `entity` description into triples for a search query."
@@ -647,6 +663,7 @@
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
   (timeline-entities)
+  (bibliographic-entities)
   (person-entities)
   (parse-date excel-dtf "03.10.1899")
   (parse-date excel-dtf "03-10-1899")
