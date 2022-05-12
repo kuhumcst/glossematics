@@ -346,8 +346,11 @@
          [:img.entity-icon {:src img-src
                             :alt entity-label}])
        (when (not= k '_)
-         [:span.search-form__item-key (:label (search-rels k)) " → "])
-       [:span.search-form__item-label label]
+         [:span.search-form__item-key
+          (or (:label (search-rels k))
+              (str k))
+          " → "])
+       [:span.search-form__item-label (or label (str v))]
        [:button {:type     "button"                         ; prevent submit
                  :title    "Remove criterion"
                  :on-click (fn [e]
