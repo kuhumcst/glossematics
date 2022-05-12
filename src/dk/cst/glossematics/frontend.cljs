@@ -12,6 +12,7 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
             [dk.cst.glossematics.frontend.page.search :as search]
+            [dk.cst.glossematics.frontend.page.bibliography :as bibliography]
             [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
@@ -29,6 +30,10 @@
     {:name ::search/page
      :page search/page
      :prep #(search/fetch-results! %)}]
+   ["/app/bibliography"
+    {:name ::bibliography/page
+     :page bibliography/page
+     :prep #(bibliography/fetch-results!)}]
    ["/app/index/:kind"
     {:name ::index/page
      :page index/page}]
@@ -63,7 +68,8 @@
       [:a {:href (href ::main)}
        [:h1 "Glossematics" [:span ".org"]]]
       [:a {:href (href ::search/page)} "Search"]
-      [:a {:href (href ::timeline/page)} "Timeline"]]
+      [:a {:href (href ::timeline/page)} "Timeline"]
+      [:a {:href (href ::bibliography/page)} "Bibliography"]]
      [:div.shell__content
       (if page
         [page]

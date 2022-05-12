@@ -7,6 +7,12 @@
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.stucco.pattern :as stp]))
 
+(defn surname-listing
+  "Put the surname of `s` at the front, followed by a comma and the rest."
+  [s]
+  (let [parts (str/split s #" ")]
+    (apply str (last parts) ", " (str/join " " (butlast parts)))))
+
 (defn str-sort-val
   "Remove prepended parentheses from `s`."
   [s]

@@ -741,7 +741,7 @@ dl.kvs-list dd:not(:last-child) {
 }
 
 /* Responsive media query changes for small screens. */
-@media only screen and (max-width: 650px) {
+@media only screen and (max-width: 850px) {
   nav h1,
   nav a:not(:first-child),
   nav a:not(:first-child)::first-letter {
@@ -751,8 +751,7 @@ dl.kvs-list dd:not(:last-child) {
     font-size: 0;
   }
   nav {
-    padding:
-            var(--padding-m);
+    padding: var(--padding-m);
   }
 
   dl.kvs-list dt {
@@ -763,6 +762,23 @@ dl.kvs-list dd:not(:last-child) {
   .search-result__paging {
     top: 35px;
   }
+}
+
+@media only screen and (max-width: 600px) {
+    nav h1,
+    nav a:not(:first-child),
+    nav a:not(:first-child)::first-letter {
+      font-size: 12px;
+    }
+
+    dl.kvs-list dt {
+        top: 30px;
+        scroll-margin: 30px;
+    }
+
+    .search-result__paging {
+      top: 30px;
+    }
 }
 
 .reader-content {

@@ -55,6 +55,9 @@
 (defonce query
   (r/cursor db [:search :query]))
 
+(defonce bibliography
+  (r/cursor db [:bibliography]))
+
 (defonce reader
   (r/cursor db [:reader]))
 
