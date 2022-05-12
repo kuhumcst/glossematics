@@ -79,6 +79,17 @@
   [query-params]
   (update-vals query-params #(str/split % #"\s*,\s*")))
 
+(defn- ?keywordize
+  "Conditionally keywordize `s`."
+  [s]
+  (if (str/starts-with? s ":")
+    (keyword (subs s 1))
+    s))
+
+(defn ?keywordize-coll
+  [coll]
+  (into (empty coll) (map ?keywordize coll)))
+
 (defn search-handler
   "A handler to search for database entities, e.g. document or event metadata.
 
@@ -94,7 +105,8 @@
                 from
                 to
                 _]
-         :as   params} (split-params query-params)
+         :as   params} (-> (split-params query-params)
+                           (update-vals ?keywordize-coll))
         entity (cond-> (dissoc (merge {:file/extension "xml"} params)
                                :_ :limit :offset :order-by :from :to)
                  _ (assoc '_ _))
