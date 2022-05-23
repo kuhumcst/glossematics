@@ -11,16 +11,16 @@
          403 "The resource is restricted — you may have been logged out!\n\n"
          404 "The resource does not exist — the page may need to refresh!\n\n"
          nil)
-       "Do you want to refresh the page?\n\n"))
+       "Do you want to log in again and refresh the page?\n\n"))
 
 (defn refresh-dialog
   "Display a dialog based on the HTTP `status` asking to refresh the page."
   [status]
-  (when-not state/*modal-dialog*
-    (set! state/*modal-dialog* true)
-    (if (js/confirm (refresh-dialog-msg status))
-      (js/location.reload)
-      (set! state/*modal-dialog* false))))
+  (when-not state/*block-modal-dialogs*
+    (set! state/*block-modal-dialogs* true)
+    (when (js/confirm (refresh-dialog-msg status))
+      (js/location.replace (str (:saml-login state/paths)
+                                "?RelayState=" js/location.href)))))
 
 (defn normalize-url
   [url]
@@ -30,7 +30,7 @@
 
 (defn fetch
   "Do a GET request for the resource at `url`, returning the response body.
-  Bad response codes result in a dialog asking the user to refresh the page.
+  Bad response codes result in a dialog asking the user to log in again.
 
   Usually, bad responses (e.g. 403) are caused by frontend-server mismatch
   which can be resolved by loading the latest version of the frontend app."

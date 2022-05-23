@@ -253,9 +253,13 @@
   (->> (:graphic (cup/scrape hiccup {:graphic '[:graphic {:xml/id id}]}))
        (mapv (comp facs-id->facs-page #(get % 'id)))))
 
+;; Keep track of document fetches
+(def ^:dynamic *current-fetch* nil)
+
 (defn set-content!
   "Change the `document` currently displayed in the reader."
   [document]
+  (set! *current-fetch* document)
   ;; Should not display old state while waiting for the network request.
   (when (not= document (:document @state/reader))
     (swap! state/reader assoc :i 0 :document nil))
@@ -308,7 +312,9 @@
 
     ;; Uses a side-effect of the rendering function to load new documents.
     ;; Probably a bad way to do this...
-    (when (and document-selected? new-document?)
+    (when (and document-selected?
+               new-document?
+               (not= current-document *current-fetch*))
       (set-content! current-document))
 
     (when (and document-selected? hiccup)

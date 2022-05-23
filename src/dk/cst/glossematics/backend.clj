@@ -6,6 +6,7 @@
             [io.pedestal.log :as log]
             [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
+            [io.pedestal.interceptor :as ic]
             [dk.cst.pedestal.sp.routes :as sp.routes]
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
@@ -17,39 +18,53 @@
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
 
+(defn ->conf-ic
+  "Return an interceptor that assocs the `conf` to the request."
+  [conf]
+  (ic/interceptor
+    {:name  ::saml-paths
+     :enter (fn [ctx]
+              (update ctx :request assoc :conf conf))}))
+
 (defn glossematics-routes
   "Most of the routing happens on the frontend inside the SPA. The API routes
    are an exception (as well as the SAML routes required for Pedestal SP)."
   [conf]
   (let [redirect-to-spa [(fn [_] {:status  301
                                   :headers {"Location" "/app"}})]
-        single-page-app (conj (sp.ic/auth-chain conf :authenticated)
-                              index/handler)]
+        conf-ic         (->conf-ic conf)
+        all             (conj (sp.ic/auth-chain conf :all) conf-ic)
+        authenticated   (conj (sp.ic/auth-chain conf :authenticated) conf-ic)
+        spa-chain       (conj all index/handler)]
+
     ;; These first few routes all lead to the SPA
     #{["/" :get redirect-to-spa :route-name ::root]
-      ["/app" :get single-page-app :route-name ::spa]
-      ["/app/*" :get single-page-app :route-name ::spa-path]
+      ["/app" :get spa-chain :route-name ::spa]
+      ["/app/*" :get spa-chain :route-name ::spa-path]
 
       ;; API routes
       ["/timeline"
-       :get (into (sp.ic/auth-chain conf :authenticated)
-                  endpoints/timeline-chain)
+       :get (into all endpoints/timeline-chain)
        :route-name ::endpoints/timeline]
       ["/file/:filename"
-       :get (into (sp.ic/auth-chain conf :authenticated)
-                  endpoints/file-chain)
+       :get (into authenticated endpoints/file-chain)
        :route-name ::endpoints/file]
       ["/entity/:id"
-       :get (into (sp.ic/auth-chain conf :authenticated)
-                  endpoints/entity-chain)
+       :get (into authenticated endpoints/entity-chain)
        :route-name ::endpoints/entity]
+
+      ;; Unrestricted at the route level, but performs local authorization.
+      ;; Refer to the source code of the 'search-handler' for details.
       ["/search"
-       :get (into (sp.ic/auth-chain conf :authenticated)
-                  endpoints/search-chain)
+       :get (into all endpoints/search-chain)
        :route-name ::endpoints/search]
+
+      ;; The metadata contains names and internal IDs, but it doesn't contain
+      ;; information about these names. It is needed to construct unrestricted
+      ;; pages such as the bibliography page. Otherwise, that page would have to
+      ;; be hidden. Under GDPR this will likely constitute legitimate interest.
       ["/search/metadata"
-       :get (into (sp.ic/auth-chain conf :authenticated)
-                  endpoints/search-metadata-chain)
+       :get (into all endpoints/search-metadata-chain)
        :route-name ::endpoints/search-metadata]}))
 
 (defn routes

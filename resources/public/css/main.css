@@ -110,6 +110,12 @@ a:hover {
     text-decoration: underline;
 }
 
+a[disabled] {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.25;
+}
+
 /* Reset for special links. */
 nav a:hover {
     text-decoration: none;

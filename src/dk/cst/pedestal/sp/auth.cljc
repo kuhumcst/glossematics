@@ -57,3 +57,9 @@
             (condition->auth-test ~condition)) ~assertions)
      (do ~@body)
      (throw (ex-info "Unsatisfied condition" {::condition ~condition}))))
+
+#?(:clj
+   (defn enforce-condition
+     "Fail fast if the `request` assertions do not meet a `condition`."
+     [request condition]
+     (only-permit [(request->assertions request) condition])))

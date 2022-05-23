@@ -7,7 +7,8 @@
             [com.wsscode.transito :as transito]
             [asami.core :as d]
             [dk.cst.glossematics.backend.db :as db :refer [conn]] ; TODO: attach this in an interceptor instead, reducing decoupling?
-            [dk.cst.glossematics.static-data :as sd]))
+            [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.pedestal.sp.auth :as sp.auth]))
 
 (def one-month-cache
   "private, max-age=2592000")
@@ -49,8 +50,10 @@
                     [?e :file/name ?name]
                     [?e :file/path ?path]]
                   conn filename)]
-    (assoc-in (ring/file-response path)
-              [:headers "Cache-Control"] one-day-cache)))
+    (if path
+      (assoc-in (ring/file-response path)
+                [:headers "Cache-Control"] one-day-cache)
+      {:status 404})))
 
 (defn- clean-entity
   "Remove private/unnecessary data from `entity`."
@@ -70,9 +73,7 @@
           (update :headers assoc
                   "Content-Type" "application/transit+json"
                   "Cache-Control" one-day-cache))
-      {:status  404
-       :body    nil
-       :headers {}})))
+      {:status 404})))
 
 (defn- split-params
   "Split comma-separated strings in `query-params`."
@@ -89,6 +90,10 @@
 (defn ?keywordize-coll
   [coll]
   (into (empty coll) (map ?keywordize coll)))
+
+(def whitelisted
+  "Whitelist certain searches for unauthenticated access based on entity type."
+  #{[:entity.type/bibliographic-entry]})
 
 (defn search-handler
   "A handler to search for database entities, e.g. document or event metadata.
@@ -107,6 +112,8 @@
                 _]
          :as   params} (-> (split-params query-params)
                            (update-vals ?keywordize-coll))
+        _      (when-not (whitelisted (:entity/type params))
+                 (sp.auth/enforce-condition request :authenticated))
         entity (cond-> (dissoc (merge {:file/extension "xml"} params)
                                :_ :limit :offset :order-by :from :to)
                  _ (assoc '_ _))

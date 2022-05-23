@@ -85,7 +85,7 @@
 (defn api-ic
   "Example API endpoint."
   [request]
-  (let [assertions (-> request :session :saml :assertions)]
+  (let [assertions (sp.auth/request->assertions request)]
     {:status  200
      :headers {"Content-Type" "application/json"}
      :body    (sp.auth/only-permit [assertions {:attrs {"lastName" #{"Jackson"}}}]

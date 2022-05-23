@@ -30,7 +30,7 @@
   (= main-js "main.js"))
 
 (defn index-hiccup
-  [assertions]
+  [assertions saml-paths]
   [:html {:lang "da"}
    [:head
     [:meta {:charset "utf-8"}]
@@ -66,19 +66,21 @@
    [:body
     [:div#app]
     [:script
-     (str "var SAMLAssertions = '" (pr-str assertions) "';"
-          "var inDevelopmentEnvironment = " development? ";")]
+     (str "var SAMLAssertions = '" (pr-str assertions) "';\n"
+          "var SAMLPaths = '" (pr-str saml-paths) "';\n"
+          "var inDevelopmentEnvironment = " development? ";\n")]
     [:script {:src (cb (str "/js/compiled/" main-js))}]]])
 
 (defn index-html
-  [assertions]
-  (hiccup/html (index-hiccup assertions)))
+  [assertions saml-paths]
+  (hiccup/html (index-hiccup assertions saml-paths)))
 
 (defn handler
   [request]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    (index-html (sp.auth/request->assertions request))})
+   :body    (index-html (sp.auth/request->assertions request)
+                        (-> request :conf :paths))})
 
 (defn shadow-handler
   "Handler used by the shadow-cljs watch process which overrides auth."

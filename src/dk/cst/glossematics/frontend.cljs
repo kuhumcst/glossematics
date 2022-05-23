@@ -67,9 +67,17 @@
                      "reader-mode")}
       [:a {:href (href ::main)}
        [:h1 "Glossematics" [:span ".org"]]]
-      [:a {:href (href ::search/page)} "Search"]
-      [:a {:href (href ::timeline/page)} "Timeline"]
-      [:a {:href (href ::bibliography/page)} "Bibliography"]]
+      [:a {:href      (href ::search/page)
+           :title     "Find documents to read"
+           :tab-index (if state/authenticated? "0" "-1")    ; for accessibility
+           :disabled  (not state/authenticated?)}
+       "Search"]
+      [:a {:href  (href ::timeline/page)
+           :title "The life Louis Hjelmslev"}
+       "Timeline"]
+      [:a {:href  (href ::bibliography/page)
+           :title "Relevant works"}
+       "Bibliography"]]
      [:div.shell__content
       (if page
         [page]
@@ -82,25 +90,22 @@
     (when-not name->id
       (search/fetch-metadata!))))
 
-(defn set-up-navigation!
-  []
-  (rfe/start!
-    (rf/router routes)
-    (fn [{:keys [path query-params] :as m}]
-      (let [old-location @state/location]
-        ;; Don't re-fetch prep data on soft reloads, e.g. by shadow-cljs.
-        (when (or (not= path (:path old-location))
-                  (not= query-params (:query-params old-location)))
-          (universal-prep!)
-          (when-let [prep (get-in m [:data :prep])]
-            (prep m)))
+(defn on-navigate
+  [{:keys [path query-params] :as m}]
+  (let [old-location @state/location]
+    ;; Avoid re-fetching/resetting on soft reloads, e.g. by shadow-cljs.
+    (when (or (not= path (:path old-location))
+              (not= query-params (:query-params old-location)))
+      (set! state/*block-modal-dialogs* false)
+      (universal-prep!)
+      (when-let [prep (get-in m [:data :prep])]
+        (prep m)))
 
-        (reset! state/location m)))
-    {:use-fragment false}))
+    (reset! state/location m)))
 
 (defn ^:dev/after-load render
   []
-  (set-up-navigation!)                                      ; keep up-to-date
+  (rfe/start! (rf/router routes) on-navigate {:use-fragment false})
   (rdom/render [shell] (js/document.getElementById "app")))
 
 (defn init!

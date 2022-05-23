@@ -7,7 +7,6 @@
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]
-            [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.api :as api]))
 

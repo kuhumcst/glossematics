@@ -2,20 +2,32 @@
   "Contains both static and dynamic frontend state."
   (:require [reagent.core :as r]
             [clojure.edn :as edn]
-            [dk.cst.stucco.util.state :as su]))
+            [dk.cst.stucco.util.state :as su]
+            [dk.cst.pedestal.sp.auth :as sp.auth]))
 
 (defonce development?
   (when (exists? js/inDevelopmentEnvironment)
     js/inDevelopmentEnvironment))
 
-;; Loading assertions by passing an EDN string in index.html
+;; Loading assertions and saml-paths by passing an EDN string in index.html
 (defonce assertions
   (if (exists? js/SAMLAssertions)
     (edn/read-string js/SAMLAssertions)
     {}))
 
-;; Some state to keep track of modals to avoid concurrent instances.
-(def ^:dynamic *modal-dialog*)
+(defonce paths
+  (if (exists? js/SAMLPaths)
+    (edn/read-string js/SAMLPaths)
+    {}))
+
+(def authenticated?
+  (sp.auth/if-permit [assertions :authenticated]
+    true
+    false))
+
+;; To avoid having multiple modals in succession after multiple bad API fetches,
+;; additional modals will be blocked until the route changes.
+(def ^:dynamic *block-modal-dialogs*)
 
 (def local-query-keys
   "Keys used locally by the search page; not transferable via query-params."
