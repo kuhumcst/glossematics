@@ -83,4 +83,4 @@
 (defn shadow-handler
   "Handler used by the shadow-cljs watch process which overrides auth."
   [request]
-  (handler (assoc-in request [:session :saml :assertions :restriction] :all)))
+  (handler (assoc-in request [:session :saml :assertions :condition] :all)))

@@ -104,22 +104,35 @@
   {:pre  [(s/valid? ::config base-conf)]
    :post [(s/valid? ::config %)]}
   (let [{:keys [saml-login] :as paths*} (merge default-paths paths)
-        {:keys [cookie-attrs]} session
-        max-age*       (or (:max-age cookie-attrs) (* 60 60 8))
+        {:keys [cookie-attrs store]} session
+        max-age        (or (:max-age cookie-attrs)
+                           (* 60 60 36))                    ; 36 hours
         acs-url        (str sp-url saml-login)
         app-name*      (or app-name sp-url)
         state-manager* (or state-manager (saml/in-memory-state-manager 60))
         validation*    (merge {:acs-url       acs-url
                                :state-manager state-manager}
                               validation)
-        cookie-attrs*  (merge {:http-only true
+
+        ;; Defaults to secure cookie settings. If you need to test on a dev
+        ;; machine you will probably need to, at the very least, init a config
+        ;; that has [:session :cookie-attrs :secure] set to false and not true!
+        cookie-attrs*  (merge {:http-only true              ; disable JS access
                                :expires   never
                                :path      "/"
-                               #_#_:secure true             ;TODO: re-enable to enforce https
-                               :max-age   max-age*}
+                               :secure    true              ; only over HTTPS
+                               :max-age   max-age}
                               cookie-attrs)
+
+        ;; A TTL session store is used by default if no alternative is defined.
+        ;; This store derives its time-to-live from the client-side :max-age
+        ;; (defaults to 36 hours). Whenever the session data is accessed,
+        ;; e.g. when accessing a route with an auth-chain, the server-side TTL
+        ;; is reset. Combined with no cookie expiration, this minimizes the need
+        ;; to re-authenticate while regularly accessing a site.
         session*       (merge {:cookie-name  "pedestal-sp"
-                               :store        (ttl/ttl-memory-store max-age*)
+                               :store        (or store
+                                                 (ttl/ttl-memory-store max-age))
                                :cookie-attrs cookie-attrs*}
                               (dissoc session :cookie-attrs))]
     (assoc base-conf

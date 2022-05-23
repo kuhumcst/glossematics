@@ -16,45 +16,44 @@
   [request]
   (get-in request [:session :saml :assertions]))
 
-(defn- assertions->auth-test
-  "Return a function taking a request that compares an `assertions` map to the
-  stored SAML assertions for the user making the request."
-  [assertions]
-  #(submap? assertions %))
+(defn condition->auth-test
+  "Return a function to test an assertions map based on a given `condition`:
 
-(defn restriction->auth-test
-  "Return a function to test an assertions map based on a given `restriction`.
-  The restriction can be :authenticated, :all, :none, a submap, or a function."
-  [restriction]
+    :authenticated - requires authentication to access.
+              :all - can be accessed by anyone, no restrictions apply.
+             :none - no access by anyone under any circumstances.
+               map - allow access when the assertions contain this submap.
+                fn - takes assertions as input and returns true if accessible."
+  [condition]
   (cond
-    (keyword? restriction) (case restriction
-                             :authenticated some?
-                             :all (constantly true)
-                             :none (constantly false))
-    (map? restriction) (assertions->auth-test restriction)
-    (fn? restriction) restriction))
+    (keyword? condition) (case condition
+                           :authenticated some?
+                           :all (constantly true)
+                           :none (constantly false))
+    (map? condition) #(submap? condition %)
+    (fn? condition) condition))
 
 (defn auth-override
   "Create an auth test override from the `assertions` map.
 
-  During development the assertions map may contain a :restriction key defining
-  an alternative test used to override the restrictions of a production system."
+  During development, the assertions map may contain a :condition key defining
+  an alternative test used to override the conditions of a production system."
   [assertions]
-  (restriction->auth-test (:restriction assertions)))
+  (condition->auth-test (:condition assertions)))
 
 (defmacro if-permit
-  "Checks that `assertions` satisfies `restriction`. When true, returns the
+  "Checks that `assertions` satisfies `condition`. When true, returns the
   first clause of `body`; else returns the second clause."
-  [[assertions restriction] & body]
+  [[assertions condition] & body]
   `(if ((or (auth-override ~assertions)
-            (restriction->auth-test ~restriction)) ~assertions)
+            (condition->auth-test ~condition)) ~assertions)
      ~@body))
 
 (defmacro only-permit
-  "Checks that `assertions` satisfies `restriction`. If true, returns `body`;
+  "Checks that `assertions` satisfies `condition`. If true, returns `body`;
   else throws an exception."
-  [[assertions restriction] & body]
+  [[assertions condition] & body]
   `(if ((or (auth-override ~assertions)
-            (restriction->auth-test ~restriction)) ~assertions)
+            (condition->auth-test ~condition)) ~assertions)
      (do ~@body)
-     (throw (ex-info "Unsatisfied restriction" {::restriction ~restriction}))))
+     (throw (ex-info "Unsatisfied condition" {::condition ~condition}))))

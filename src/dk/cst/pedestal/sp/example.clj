@@ -121,8 +121,11 @@
                  :checked false}]})
 
 (defn load-sp-conf!
-  ([path] (reset! sp-conf (assoc (sp.conf/init (sp.conf/read-file! path))
-                            :consent consent)))
+  ([path] (reset! sp-conf (-> (sp.conf/read-file! path)
+                              (assoc-in [:session :cookie-attrs :secure] false)
+                              (assoc :consent consent)
+                              (sp.conf/init))))
+  ;;TODO: remove this default value
   ([] (load-sp-conf! (in-home "/.glossematics/repl-conf.edn"))))
 
 (defn start []

@@ -6,7 +6,7 @@
   the output of the `chain` function.
 
   Route-level authorisation checks can be made using the `permit-request?` fn
-  from within an interceptor. For inline restriction definitions and checks
+  from within an interceptor. For inline condition definitions and checks
   (available in both Clojure/ClojureScript) refer to `dk.cst.pedestal.sp.auth`."
   (:require [clojure.pprint :refer [pprint]]
             [clojure.walk :as walk]
@@ -172,23 +172,23 @@
   (middlewares/session session))
 
 (defn override-ic
-  "Interceptor that adds a `restriction` override to the SAML assertions map."
-  [restriction]
+  "Interceptor that adds a `condition` override to the SAML assertions map."
+  [condition]
   {:name  ::override
    :enter (fn [ctx]
-            (assoc-in ctx [:request :session :saml :assertions :restriction]
-                      restriction))})
+            (assoc-in ctx [:request :session :saml :assertions :condition]
+                      condition))})
 
 (defn guard-ic
-  "Interceptor that will throw exceptions based on the given `restriction`.
+  "Interceptor that will throw exceptions based on the given `condition`.
 
-  By also including the restriction as metadata other interceptors can look up
-  restrictions for different routes ahead of time (see permit? fn)."
-  [restriction]
-  (let [authorized? (sp.auth/restriction->auth-test restriction)
-        auth-meta   {::restriction restriction
+  By also including the condition as metadata, other interceptors can look up
+  conditions for different routes ahead of time (see: 'permit-request?' fn)."
+  [condition]
+  (let [authorized? (sp.auth/condition->auth-test condition)
+        auth-meta   {::condition condition
                      ::auth-test   authorized?}]
-    (assert authorized? (str "Invalid restriction: " restriction))
+    (assert authorized? (str "Invalid condition: " condition))
     (with-meta
       (ic/interceptor
         {:name  ::guard
@@ -239,7 +239,7 @@
   [conf]
   (error/error-dispatch [{:keys [request] :as ctx} ex]
     [{:exception-type :clojure.lang.ExceptionInfo}]
-    (if (::restriction (ex-data ex))
+    (if (::condition (ex-data ex))
       (if (authenticated? request)
         (assoc ctx :response no-authorization-response)
         (assoc ctx :response ((->no-authentication-handler conf) request)))
@@ -352,7 +352,9 @@
                     {"consent" (assoc cookie-attrs
                                  :value query-params*)}
 
-                    ;; Control the expiration of the session cookie.
+                    ;; Controls the client-side expiration of session cookies;
+                    ;; server-side expiration is a property of the session store
+                    ;; defined in the Pedestal SP config map.
                     (-> (select-keys cookies ["pedestal-sp"])
                         (update "pedestal-sp"
                                 merge (if (= pedestal-sp "on")
@@ -403,7 +405,7 @@
 
 (defn permit-request?
   "Is a `route` or `query-string` allowed within the current interceptor `ctx`?
-  Checks restrictions set by interceptor chain constructed with the chain fn.
+  Checks conditions set by interceptor chain constructed with the chain fn.
 
   Note that unresolved routes will result in a truthy response, but the return
   value will be :not-found in that case!"
@@ -422,17 +424,22 @@
 
 (defn auth-chain
   "Create an interceptor chain to make sure that a user is authorized to access
-  a resource based on the expanded `conf` and a `restriction`.
+  a resource based on the expanded `conf` and a `condition`.
+
+  Even if a route is not restricted, it might make sense to prepend it with an
+  'auth-chain' anyway, as this will (by default) reset the TTL of the session
+  whenever a user accesses the route in question. Use :all as the `condition`
+  to allow universal access to a route.
 
   During development, the required authorisation can be modified by setting
-  the :auth-override key of the conf to a different restriction, e.g. :all."
-  [{:keys [auth-override] :as conf} restriction]
+  the :auth-override key of the conf to a different condition, e.g. :all."
+  [{:keys [auth-override] :as conf} condition]
   (if auth-override
     [(failure-ic conf)
      (session-ic conf)
      (override-ic auth-override)
-     (guard-ic restriction)]
+     (guard-ic condition)]
 
     [(failure-ic conf)
      (session-ic conf)
-     (guard-ic restriction)]))
+     (guard-ic condition)]))
