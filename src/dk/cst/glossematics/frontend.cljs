@@ -15,6 +15,7 @@
             [dk.cst.glossematics.frontend.page.bibliography :as bibliography]
             [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.page.reader :as reader]
+            [dk.cst.glossematics.frontend.page.user :as user]
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
@@ -26,6 +27,9 @@
     {:name ::encyclopedia/entry
      :page encyclopedia/page
      :prep #(prn 'encyclopedia @state/location)}]
+   ["/app/user"
+    {:name ::user/page
+     :page user/page}]
    ["/app/search"
     {:name ::search/page
      :page search/page
@@ -61,7 +65,8 @@
 (defn shell
   "A container component that wraps the various pages of the app."
   []
-  (let [{:keys [page name]} (:data @state/location)]
+  (let [{:keys [page name]} (:data @state/location)
+        authenticated? @state/authenticated?]
     [:div.shell
      [:nav {:class (when (= name ::reader/page)
                      "reader-mode")}
@@ -69,15 +74,19 @@
        [:h1 "Glossematics" [:span ".org"]]]
       [:a {:href      (href ::search/page)
            :title     "Find documents to read"
-           :tab-index (if state/authenticated? "0" "-1")    ; for accessibility
-           :disabled  (not state/authenticated?)}
+           :tab-index (if authenticated? "0" "-1")    ; for accessibility
+           :disabled  (not authenticated?)}
        "Search"]
       [:a {:href  (href ::timeline/page)
            :title "The life Louis Hjelmslev"}
        "Timeline"]
       [:a {:href  (href ::bibliography/page)
            :title "Relevant works"}
-       "Bibliography"]]
+       "Bibliography"]
+      [:a {:href  (href ::user/page)
+           :title "Settings"}
+       [:img.nav-icon {:src "/images/person-sharp-yellow-svgrepo-com.svg"
+                       :alt ""}]]]
      [:div.shell__content
       (if page
         [page]

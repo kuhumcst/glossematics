@@ -66,6 +66,8 @@
    [:body
     [:div#app]
     [:script
+     ;; Rather than having an extra endpoint that the SPA needs to access, these
+     ;; values are passed on to the SPA along with the compiled main.js code.
      (str "var SAMLAssertions = '" (pr-str assertions) "';\n"
           "var SAMLPaths = '" (pr-str saml-paths) "';\n"
           "var inDevelopmentEnvironment = " development? ";\n")]

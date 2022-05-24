@@ -236,6 +236,10 @@ nav.reader-mode {
     margin: 0;
 }
 
+.text-content * + p {
+    margin-top: var(--margin-l);
+}
+
 .text-content ul,
 .index-page ul {
     margin: var(--margin-xl) 0 var(--margin-xl) var(--margin-l);
@@ -314,6 +318,18 @@ img.entity-icon {
     height: var(--font-size);
     width: var(--font-size);
     margin-right: var(--margin);
+}
+
+img.nav-icon {
+    transition: all 0.2s;
+    height: 48px;
+    vertical-align: bottom;
+    margin-bottom: -11px;
+    opacity: 0.66;
+}
+
+img.nav-icon:hover {
+    opacity: 1;
 }
 
 a.action {
@@ -600,6 +616,7 @@ table.entity-metadata dl ul li {
     padding: 0;
 }
 
+.user-page h1,
 .index-page h1 {
     text-align: center;
     font-weight: normal;
@@ -759,6 +776,10 @@ dl.kvs-list dd:not(:last-child) {
   nav {
     padding: var(--padding-m);
   }
+  img.nav-icon {
+      height: 32px;
+      margin-bottom: -10px;
+  }
 
   dl.kvs-list dt {
       top: 35px;
@@ -776,6 +797,10 @@ dl.kvs-list dd:not(:last-child) {
     nav a:not(:first-child)::first-letter {
       font-size: 12px;
     }
+    img.nav-icon {
+          height: 24px;
+          margin-bottom: -9.5px;
+      }
 
     dl.kvs-list dt {
         top: 30px;
@@ -799,4 +824,73 @@ dl.kvs-list dd:not(:last-child) {
 /* Opposite of <strong> or <em> */
 .weak {
     color: var(--color-subtle);
+}
+
+.auth-message {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+button.logout-button,
+button.login-button {
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.33s;
+    color: rgba(0,0,0,0.66);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 20px;
+    word-spacing: 2;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    padding: var(--padding);
+}
+
+button.logout-button:hover,
+button.login-button:hover {
+    transform: var(--transform-elevated);
+    box-shadow: var(--box-shadow-elevated);
+}
+
+button.logout-button:active,
+button.login-button:active {
+    transform: scale(97.5%);
+    filter: none;
+}
+
+button.logout-button {
+    background: var(--tab-background-2);
+}
+
+button.login-button {
+    background: rgba(102,184,64,1) url(/images/texture/natural-paper.png);
+}
+
+button.logout-button img,
+button.login-button img {
+    transition: all 0.33s;
+    height: 20px;
+    width: 20px;
+    margin-right: var(--margin);
+    opacity: 0.66;
+}
+
+.user-page em {
+    font-weight: bold;
+    font-style: italic;
+    font-size: 20;
+}
+
+.user-page thead {
+    font-weight: bold;
+}
+
+.user-page td {
+    padding: var(--padding-s) var(--padding);
+}
+
+.user-page td:first-child {
+    text-align: right;
+    font-weight: bold;
 }

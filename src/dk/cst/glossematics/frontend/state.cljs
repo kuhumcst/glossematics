@@ -20,10 +20,11 @@
     (edn/read-string js/SAMLPaths)
     {}))
 
-(def authenticated?
-  (sp.auth/if-permit [assertions :authenticated]
-    true
-    false))
+(defonce authenticated?
+  (r/atom
+    (sp.auth/if-permit [assertions :authenticated]
+      true
+      false)))
 
 ;; To avoid having multiple modals in succession after multiple bad API fetches,
 ;; additional modals will be blocked until the route changes.
