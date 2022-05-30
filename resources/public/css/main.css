@@ -184,20 +184,12 @@ nav a:not(:first-child)::first-letter {
     color: #ffc92e;
 }
 
-nav h1 span {
-    font-family: PoiretOne, sans-serif;
-    font-size: 12px;
-    opacity: 0.8;
-}
-
 nav.reader-mode h1,
 nav.reader-mode a:not(:first-child),
 nav.reader-mode a:not(:first-child)::first-letter {
   font-size: 16px;
 }
-nav.reader-mode h1 span {
-  font-size: 0;
-}
+
 nav.reader-mode {
   padding:
           var(--padding-m);
@@ -213,7 +205,8 @@ nav.reader-mode {
 }
 
 .search-page,
-.index-page
+.index-page,
+.user-page
 {
     max-width: 90ch;
     margin: auto;
@@ -236,7 +229,7 @@ nav.reader-mode {
     margin: 0;
 }
 
-.text-content * + p {
+.text-content p + * {
     margin-top: var(--margin-l);
 }
 
@@ -248,6 +241,13 @@ nav.reader-mode {
 .text-content ul > li + li,
 .index-page ul > li + li {
     margin-top: var(--margin);
+}
+
+.text-content aside {
+    width: fit-content;
+    background: rgba(255,255,255,0.33);
+    margin: var(--margin-xl) auto;
+    border: var(--border-subtle);
 }
 
 .search-form {
@@ -534,8 +534,6 @@ details[open] summary {
     background: rgba(255,255,255,0.7);
     padding: var(--padding);
     font-size: var(--font-size-l);
-    font-variant: small-caps;
-    text-shadow: 1px 1px #FFFFFF;
     color: var(--color);
     border: none;
     border-right: var(--border);
@@ -581,12 +579,16 @@ table.entity-metadata td:first-child {
     width: 1px;
     padding-left: var(--padding-l);
     text-align: right;
-    text-transform: uppercase;
+    font-variant: small-caps;
 }
 
 /* Creates an index card like appearance. */
 table.entity-metadata tr {
     border-bottom: 1px solid #ddd;
+}
+
+.text-content table.entity-metadata tr {
+    border-bottom: var(--border-subtle);
 }
 
 table.entity-metadata tr:last-child {
@@ -770,9 +772,6 @@ dl.kvs-list dd:not(:last-child) {
   nav a:not(:first-child)::first-letter {
     font-size: 16px;
   }
-  nav h1 span {
-    font-size: 0;
-  }
   nav {
     padding: var(--padding-m);
   }
@@ -826,17 +825,12 @@ dl.kvs-list dd:not(:last-child) {
     color: var(--color-subtle);
 }
 
-.auth-message {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
 button.logout-button,
 button.login-button {
     display: inline-flex;
+    width: 100%;
     align-items: center;
-    transition: all 0.33s;
+    transition: all 0.2s;
     color: rgba(0,0,0,0.66);
     cursor: pointer;
     font-weight: bold;
@@ -849,14 +843,18 @@ button.login-button {
 
 button.logout-button:hover,
 button.login-button:hover {
-    transform: var(--transform-elevated);
-    box-shadow: var(--box-shadow-elevated);
+    border-color: black;
 }
 
 button.logout-button:active,
 button.login-button:active {
-    transform: scale(97.5%);
+    transform: scale(99%);
     filter: none;
+}
+
+button.logout-button *,
+button.login-button * {
+    margin: auto;
 }
 
 button.logout-button {
@@ -882,15 +880,6 @@ button.login-button img {
     font-size: 20;
 }
 
-.user-page thead {
-    font-weight: bold;
-}
-
-.user-page td {
-    padding: var(--padding-s) var(--padding);
-}
-
-.user-page td:first-child {
-    text-align: right;
+.user-page table.entity-metadata td:first-child {
     font-weight: bold;
 }

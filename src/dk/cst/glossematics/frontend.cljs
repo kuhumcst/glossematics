@@ -71,18 +71,18 @@
      [:nav {:class (when (= name ::reader/page)
                      "reader-mode")}
       [:a {:href (href ::main)}
-       [:h1 "Glossematics" [:span ".org"]]]
+       [:h1 "Glossematics"]]
       [:a {:href      (href ::search/page)
            :title     "Find documents to read"
            :tab-index (if authenticated? "0" "-1")    ; for accessibility
            :disabled  (not authenticated?)}
-       "Search"]
+       "Find"]
       [:a {:href  (href ::timeline/page)
            :title "The life Louis Hjelmslev"}
        "Timeline"]
       [:a {:href  (href ::bibliography/page)
            :title "Relevant works"}
-       "Bibliography"]
+       "Bibl."]
       [:a {:href  (href ::user/page)
            :title "Settings"}
        [:img.nav-icon {:src "/images/person-sharp-yellow-svgrepo-com.svg"
