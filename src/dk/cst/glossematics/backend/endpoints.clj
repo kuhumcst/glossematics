@@ -112,26 +112,27 @@
                 _]
          :as   params} (-> (split-params query-params)
                            (update-vals ?keywordize-coll))
-        _      (when-not (whitelisted (:entity/type params))
-                 (sp.auth/enforce-condition request :authenticated))
-        entity (cond-> (dissoc (merge {:file/extension "xml"} params)
-                               :_ :limit :offset :order-by :from :to)
-                 _ (assoc '_ _))
-        raw    (db/search conn entity
-                          :limit (when limit (parse-long (first limit)))
-                          :offset (when offset (parse-long (first offset)))
-                          :order-by (when order-by (map keyword order-by))
-                          :from (when-let [from (first from)]
-                                  (if (re-matches #"\d+" from)
-                                    (parse-long from)
-                                    (db/parse-date db/utc-dtf from)))
-                          :to (when-let [to (first to)]
-                                (if (re-matches #"\d+" to)
-                                  (parse-long to)
-                                  (db/parse-date db/utc-dtf to))))
-        final  (with-meta
-                 (map clean-entity raw)
-                 (meta raw))]
+        wildcard _                                          ; _ is used for noop
+        _        (when-not (whitelisted (:entity/type params))
+                   (sp.auth/enforce-condition request :authenticated))
+        entity   (cond-> (dissoc (merge {:file/extension "xml"} params)
+                                 :_ :limit :offset :order-by :from :to)
+                   wildcard (assoc '_ wildcard))
+        raw      (db/search conn entity
+                            :limit (when limit (parse-long (first limit)))
+                            :offset (when offset (parse-long (first offset)))
+                            :order-by (when order-by (map keyword order-by))
+                            :from (when-let [from (first from)]
+                                    (if (re-matches #"\d+" from)
+                                      (parse-long from)
+                                      (db/parse-date db/utc-dtf from)))
+                            :to (when-let [to (first to)]
+                                  (if (re-matches #"\d+" to)
+                                    (parse-long to)
+                                    (db/parse-date db/utc-dtf to))))
+        final    (with-meta
+                   (map clean-entity raw)
+                   (meta raw))]
     (log/info :endpoints/search-result {:raw-count   (count raw)
                                         :final-count (count final)})
     (-> (assoc request
