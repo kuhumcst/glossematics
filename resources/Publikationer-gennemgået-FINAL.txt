@@ -4,11 +4,13 @@
 11	Storia della lingua di Roma
 12	Danske Studier
 13	Acta Philologica Scandinavica
+13	Acta Philol. Scand.
 14	Humanistisk Samfunds skrifter
 15	Actes du IVe Congres de ling. 142 infra
 15	Travaux IV
 15	Vol. I af Travaux
 15	Travaux du Cercle Linguistique de Copenhague
+15	Travaux du Cercle linguistique de Copenhague V
 16	A propos d ' une livre récent sur les noms verbaux en grec ancien
 16	Mélanges
 17	Mélanges linguistiques
@@ -17,7 +19,6 @@
 18	Acta  Linguistica
 18	Acta Linguistica
 18	Acta Linguistica I-II
-18	ACTA LINGUISTICA 
 19	Acta Jutlandica
 19	ACTA JUTLANDICA
 20	Hafniensia
@@ -43,7 +44,6 @@
 37	JASA
 38	The Journal of the Acoustical Society of America
 39	Word
-39	WORD
 40	Archiv für vergleichende Phonetik
 41	AJ
 42	ALH
@@ -52,13 +52,11 @@
 45	Bulletinen
 46	Bulletin VI
 47	Cahiers  Ferdinand de Saussure
-47	Cahiers Saussure 
 48	Capitula XIII
 49	Caractères généraux des langues créoles
 50	Cas I
 51	Catégorie des cas
 51	Cas II
-51	Cas (vol. II)
 52	Charisteria
 52	Charisteria Mathesio
 53	Dansk biografisk  lexikon
@@ -78,11 +76,11 @@
 59	Études d’aspect
 59	Etudes d'aspect
 60	Fjoldemaalets lydsystem
+60	Fjoldemålets lydsystem
 61	Fonetikken
 62	Omkr. sprogteoriens grundlægg.
 62	Omkr.sprt.grl.
 62	Omkring sprogteoriens grundlæggelse
-62	Omkring Sprogteoriens Grundlaeggelse 
 63	Formation des noms en grec anciens
 64	Haandbog i Dansk Sproglære
 65	Historien om en moder i femten sprog
@@ -106,6 +104,7 @@
 81	Mélanges Marouzeau
 82	Mélanges Pedersen
 83	Nysvenska studier xxx bind XIX
+83	Nysvenska Studier
 84	OSG
 86	An Outline of Cenology. A "Phoneme" Theory on Intra-Linguistic Principles
 86	Outline of Glossematics
@@ -116,6 +115,8 @@
 86	Outline of Glossematics Part II
 86	Outline II
 86	An Outline of Cenology
+86	Part I
+86	Part II
 87	Phil. Woch.
 88	Præpositioner
 89	Praktisk lærebog i islandsk nutidssprog
@@ -148,9 +149,8 @@
 121	Orph., Lith. 108
 122	serbo - kroatiske grammatik
 123	Vgl. kelt Gramm.
-124	- σις - bog
+124	σις-bog
 125	A concise Comparative Celtic Grammar
-126	Acta Philologica Scandinavia
 127	Bulletin XIII
 128	Det lærde Selskabs Skrifters Humanistiske serie
 129	Diatesen i græsk, slavisk og baltisk
@@ -161,12 +161,13 @@
 134	Manuel de phonétique grecque
 135	Preliminary Reports
 136	Recherches structurales 1949
+136	Recherches
+136	Recherches structurales
 137	Rencontre assyriologique
 138	Rationel Semantik
 139	Recent theories on the Nature of the Linguistic Sign
 140	Prolegomena
 140	Prolegomena to a Theory of Language
-140	Prolegomena to Glossematics 
 141	Linguistic Interludes
 142	Vox
 143	Sprog og tanke
@@ -244,7 +245,6 @@
 213	English Language Teaching
 214	Notes on the English Tenses
 215	On Equivalent Relations
-15	Travaux du Cercle linguistique de Copenhague V
 216	Index to the Franz Boas Collection of Materials for American Linguistics
 217	The Classification of Afr. Lang.
 218	Maidu Macrophonemes
@@ -265,10 +265,8 @@
 232	Ordbog over det danske sprog
 233	Danske Folkemaal
 234	Herlovianeren
-83	Nysvenska Studier
 236	Nordisk Målstræv
 236	Årbog for Nordisk Målstræv
-60	Fjoldemålets lydsystem
 238	Nordisk tidskrift utgivet av Letterstedska Föreningen
 239	Meddelelser fra Dansklærerforeningen
 240	The Philosophy of Grammar
@@ -279,7 +277,6 @@
 245	Das literarische Kunstwerk, Eine Untersuchung aus dem Grenzgebiet der Ontologie, Logik und Literaturwissenschaft 
 246	Le Symbolisme / Le Symbolisme: Etude sur le Style des Symbolistes Francais
 247	A propos  de la syntagmatique du professeur A. Belic
-248	Cahiers Ferdinand de Saussure
 249	Kilder til Hittitternes historie
 250	Mot et morphème
 251	Mazon serbokroatiske grammatik
@@ -308,57 +305,28 @@
 282	Hammerich-festskr.
 282	Hammerich-festskriftet
 282	Hammerich-festskrift
-13	Acta Philol. Scand.
-136	Recherches
 283	Kinsey Report
 284	The Limitations of Science
 285	Oxford Dictionary
 286	Scientific Method
 287	An Inquiry into Meaning and Truth
 288	Philosophy and the Physicists
-86	Part I
-86	Part II
 289	Structure générale des correlations linguistiques
-136	Recherches structurales
-289	Transactions
 290	Encyclopedia of United Science
 291	Phonetics
+291	Phonetics 116
+291	Phonetics, a critical analysis of phonetic theory and a technic for the practical description of sounds
 292	Phonemics
 293	The Folklore of Capitalism
 294	Principles of Romanisation
 295	English Language Teaching
 296	Ciencias Culturales
 297	Introdución a la linguistica
-291	Phonetics 116
-291	Phonetics, a critical analysis of phonetic theory and a technic for the practical description of sounds
 298	Linguistic Survey
 299	Essays and Studies
 300	Modes of Meaning
 301	A Study of History
 302	The Folklore of Capitalism
 303	Reflexiones sobre la historia universal
-304	Primer of Phonemics
-305	PRELIMINARIES TO SPEECH ANALYSIS
-305	Preliminaries to Speech Analysis
-306	Oxford Slavonic Papers
-307	Prologue to the library of the Slavistic Circle
-308	Sur l’indépendance de l’épithète
-309	The New Doctrine of Language in Present-Day Russia
-310	The So-called Deictic Elements in Grammar
-311	Igor's Tale
-311	Igor Tale
-312	Sound and Meaning
-312	Sound and Meaning in Modern Linguistics
-313	La prononciation du français actuel
-314	Danish Scientific Activities During the Second World War
-314	Danish Scientific Activities
-315	Røros-lappisk grammatikk
-316	St. Constantine’s Prologue to the Gospels
-317	Bibliotheca Linguistica
-318	For Roman Jakobson
-319	Lidovés noviny
-320	Presser Prague
-320	Prager Presse
-321	Slovo a Slovesnost
-322	volume of ancient Russian Epic Studies
-323	Lykisch und Hittitisch
+304	Transactions
+305	Reconstruction typologique

@@ -1,4 +1,3 @@
-1	AARHUS
 1	Aarhus
 3	Agedrup
 4	Agerbæk
@@ -68,7 +67,6 @@
 68	Charlottenlund
 69	Christiansfeld
 70	Christianshavn
-283	Copenhagen
 72	Dalby
 73	Dalmose
 74	Dannemare
@@ -94,14 +92,13 @@
 94	Espergærde
 95	Esrum
 96	Fakse
-97	Fakse=Ladeplads
+97	Fakse Ladeplads
 98	Farsø
 99	Farum
 100	Ferritslev
 101	Fjenneslev
 102	Fjerritslev
 103	Fraugde
-104	FredensborgSt.by
 105	Fredericia
 106	Frederiksberg
 107	Frederikshavn
@@ -113,7 +110,6 @@
 113	Føllenslev
 114	Føvling
 115	Fåborg
-116	Faaborg
 117	Fårevejle
 118	Fårup
 119	Gadbjerg
@@ -126,7 +122,6 @@
 126	Gedved
 127	Gelsted
 128	Gentofte
-129	Gentofte,
 130	Gilleleje
 131	Gislev
 132	Gislinge
@@ -144,7 +139,6 @@
 144	Grauballe
 145	Gredstedbro
 146	Grenå
-147	Grenaa
 148	Greve
 149	Greve Strand
 150	Grevinge
@@ -185,7 +179,6 @@
 185	Hejls
 186	Hellebæk
 187	Hellerup
-187	Helrup
 188	Helsinge
 189	Helsingør
 190	Henne
@@ -224,13 +217,12 @@
 223	Hundslund
 224	Hurup
 225	Hvalsø
-226	Hvide=Sande
+226	Hvide Sande
 227	Hvidovre
 228	Højbjerg
 229	Højby
 230	Højer
-231	Høje-Tåstrup
-232	Høje-Taastrup
+231	Høje-Taastrup
 233	Højslev
 234	Høng
 235	Hørning
@@ -262,7 +254,6 @@
 261	Kerteminde
 262	Kettinge
 263	Kibæk
-264	Kirke
 265	Kirke-Eskilstrup
 266	Kirke-Hyllinge
 267	Kirke-Såby
@@ -334,10 +325,9 @@
 333	Nyborg
 334	Nyhavn
 335	Nykøbing
-336	Nykøbing-F.
-337	Nykøbing-Mors
-338	Nykøbing-S.
-339	Nykøbing-Sjælland
+336	Nykøbing Falster
+337	Nykøbing Mors
+339	Nykøbing Sjælland
 340	Nyrup
 341	Ny-Solbjerg
 342	Nysted
@@ -366,7 +356,7 @@
 365	Randbøl
 366	Randers
 367	Ranum
-368	Rask=Mølle
+368	Rask Mølle
 369	Redsted
 370	Regstrup
 371	Ribe
@@ -379,7 +369,7 @@
 378	Rude
 379	Rudkøbing
 380	Ruds-Vedby
-381	Rungsted=Kyst
+381	Rungsted Kyst
 382	Ry
 383	Rynkeby
 384	Ryomgård
@@ -400,7 +390,7 @@
 399	Sandvig
 400	Silkeborg
 401	Sindal
-402	Sjællands=Odde
+402	Sjællands Odde
 403	Sjølund
 404	Skagen
 405	Skals
@@ -426,7 +416,7 @@
 425	Snedsted
 426	Snekkersten
 427	Snertinge
-428	Solrød=Strand
+428	Solrød Strand
 429	Solrød
 430	Sommersted
 431	Sorø
@@ -476,7 +466,7 @@
 475	Terndrup
 476	Thisted
 477	Thyborøn
-478	Thyborøn=Havn
+478	Thyborøn Havn
 479	Thyholm
 480	Tikøb
 481	Tim
@@ -511,7 +501,7 @@
 510	Vadum
 511	Valby
 512	Vallensbæk
-513	Vallensbæk=Strand
+513	Vallensbæk Strand
 514	Vamdrup
 515	Vanløse
 516	Varde
@@ -520,9 +510,9 @@
 519	Vedde
 520	Vejby
 521	Vejen
-522	Vejers=Strand
+522	Vejers Strand
 523	Vejle
-524	Vejle=Øst
+524	Vejle Øst
 525	Vejstrup
 526	Veksø
 527	Vemb
@@ -532,7 +522,7 @@
 531	Vesterbro
 532	Vester-Skerninge
 533	Vestervig
-534	Vesterø=Havn
+534	Vesterø Havn
 535	Viborg
 536	Viby
 537	Videbæk
@@ -551,7 +541,6 @@
 550	Vridsløselille
 551	Vrå
 552	Væggerløse
-553	Værløse
 554	Værløse
 555	Ærøskøbing
 556	Ølgod
@@ -564,24 +553,20 @@
 563	Østbirk
 564	Øster-Assels
 565	Østerbro
-566	Østerby=Havn
+566	Østerby Havn
 567	Øster-Højst
 568	Øster-Marie
 569	Øster-Ulslev
 570	Øster-Vrå
 571	Åbenrå
 572	Aabenraa
-573	Åbybro
 574	Aabybro
 575	Åbyhøj
-576	Åkirkeby
 577	Aakirkeby
-578	Ålborg
 579	Aalborg
 580	Ålbæk
 581	Ålestrup
 582	Ålsgårde
-1	Århus
 584	Årre
 585	Års
 586	Aars
@@ -594,7 +579,6 @@
 593	Accra
 594	Adak
 595	Addis Ababa
-596	Addis Abeba
 597	Adliswil
 598	Affoltern am Albis
 599	Ahmadaba
@@ -622,7 +606,6 @@
 621	Amsterdam
 622	Anaktuvuk Pass
 623	Anchorage
-624	Anderson
 625	Andorra la Vella
 626	Angissoæ
 627	Angmagssalik
@@ -644,12 +627,9 @@
 643	Asjkhabad
 644	Asmara
 645	Astana
-646	Asuncion
 647	Asunción
 648	Aså
 649	Athen
-650	Athens
-651	ATHENS
 652	Atka
 653	Atlanta
 654	Atqasuk
@@ -658,9 +638,7 @@
 657	Auning
 658	Austin
 659	Baden
-660	Bagdad
-661	Baghda
-662	Baghdad
+662	Bagdad
 663	Baku
 664	Bamako
 665	Bandar Seri Begawan
@@ -681,13 +659,11 @@
 680	Beijing
 681	Beirut
 682	Belfast
-683	Belgrade
-683	Belgrad
+683	Beograd
 684	Bellinge
 685	Bellinzona
 686	Belmopan
 687	Belo Horizont
-688	Beograd
 689	Bergisch Gladbach
 690	Berlin
 691	Bern
@@ -705,7 +681,6 @@
 703	Bissau
 704	Bloemfontein
 705	Bochum
-706	Bogota
 707	Bogotá
 708	Boise
 709	Bonn
@@ -714,7 +689,6 @@
 712	Bottrop
 713	Bradford
 714	Branderup
-715	Brasilia
 716	Brasília
 717	Bratislava
 718	Braunschweig
@@ -725,15 +699,12 @@
 723	Bridgetown
 724	Brighton anove
 725	Bristol
-726	Brussels
-727	Bryssel
+727	Brussels
 728	Bucharest
 729	Buchs
 730	Buckland
 731	Budapest
 732	Buenos Aires
-732	BUENOS AIRES
-732	Buenos Ayres
 733	Bujumbura
 734	Bukarest
 735	Bulle
@@ -754,7 +725,6 @@
 751	Casablanca
 752	Castries
 753	Cayenne
-754	Central
 755	Cham
 756	Changchun
 757	Charleston
@@ -776,7 +746,6 @@
 773	Chur
 774	Circlity
 775	Circlot Springs
-776	City of London
 777	Clark's Point
 778	Codrington
 779	Coffman Cove
@@ -798,10 +767,8 @@
 795	Dalian
 796	Dallas-Fort Worth
 797	Dalur
-798	Damascus
 799	Damaskus
 800	Danmarkshavn
-801	Dar es Salaam
 802	Dar es-Salaam
 803	Darmstadt
 804	Davos
@@ -830,7 +797,6 @@
 827	Duisburgn
 828	Dundee
 829	Durham
-830	Dushanbe
 831	Dusjanbe
 832	Dübendorf
 833	Düsseldorf
@@ -924,15 +890,13 @@
 921	Hartford
 922	Hattarvik
 923	Havana
-924	Havanna
 925	Havndal
 926	Heidelberg
 927	Heilbronn
 928	Hejnsvig
 929	Hellur
 930	Helsingborg
-931	Helsingfors
-932	Helsinki
+931	Helsinki
 933	Hemmet
 934	Hereford
 935	Herisau
@@ -989,7 +953,6 @@
 986	Juneau
 987	Kabul
 988	Kachemak
-989	Kairo
 990	Kake
 991	Kaktovik
 992	Kaldbak
@@ -997,13 +960,11 @@
 994	Kaltag
 995	Kampala
 996	Kangatsiaæ
-997	Kapstaden
 998	Karachi
 999	Karlsruhe
 1000	Kassel
 1001	Kasaan
 1002	Kathmandu
-1003	Katmandu
 1004	Kenai
 1005	Ketchikan
 1006	Khartoum
@@ -1013,7 +974,7 @@
 1010	Kigali
 1011	Kilkenny
 1012	Kingston
-1013	Kingston pon Hull
+1013	Kingston upon Hull
 1014	Kingstown
 1015	Kinove
 1016	Kinshasa
@@ -1082,7 +1043,6 @@
 1079	Limerick
 1080	Lincoln
 1081	Lintrup
-1082	Lisbon
 1083	Lisburn
 1084	Lissabon
 1085	Littau
@@ -1095,7 +1055,6 @@
 1092	Lome
 1093	Lomé
 1094	Lomma
-1095	LONDON
 1095	London
 1096	Londonderry
 1097	Lopra
@@ -1152,7 +1111,6 @@
 1148	Montevideo
 1149	Montgomery
 1150	Monthey
-1151	Montpelier
 1152	Montpellie
 1153	Montreal
 1154	Montreux
@@ -1160,7 +1118,7 @@
 1156	Moroni
 1157	Morskranes
 1158	Morud
-1159	Moscow
+1160	Moscow
 1160	Moskva
 1161	Mountain Village
 1162	Mukines
@@ -1168,7 +1126,6 @@
 1164	Mumba
 1165	Muri
 1166	Muscat
-1167	Muskat
 1168	Muttenz
 1169	Mülheim an der Ruhr
 1170	München
@@ -1182,7 +1139,6 @@
 1178	Nanortalik
 1179	Nantes
 1180	Napakiak
-1181	Napaskiak
 1182	Narssarssuaæ
 1183	Narssaæ
 1184	Nashville
@@ -1284,13 +1240,11 @@
 1280	Port Moresby
 1281	Porto Alegr
 1282	Port of Spain
-1283	Port-of-Spain
 1284	Porto-Novo
 1285	Portsmouth
 1286	Port Vila
 1287	Potsdam
-1288	Prag
-1289	Prague
+1289	Prag
 1290	Praia
 1291	Pratteln
 1292	Preston
@@ -1301,7 +1255,6 @@
 1297	Pully
 1298	Pun
 1299	Pusan
-1300	Pyongyan
 1301	Pyongyang
 1302	Quinhagak
 1303	Quito
@@ -1347,7 +1300,6 @@
 1343	Saltnes
 1344	Salvado
 1345	Salzgitterund
-1346	Sana
 1347	Sanaá
 1348	Sandavagur
 1349	Sandoy
@@ -1355,7 +1307,6 @@
 1351	Sandved
 1352	Sandvik
 1353	San Francisco
-1354	San Jose
 1355	San José
 1356	Sankt Petersborg
 1357	Sanoint
@@ -1365,7 +1316,6 @@
 1361	Santiago de Chile
 1362	Santo Domingo
 1363	São Paulo
-1364	Sao Tome
 1365	São Tomé
 1366	Sarajevo
 1367	Savoonga
@@ -1462,11 +1412,9 @@
 1458	Tallinn
 1459	Tanana
 1460	Tarawa
-1461	Tashkent
 1462	Tasjkent
 1463	Tbilisi
 1464	Tegucigalpa
-1465	Teheran
 1466	Tehran
 1467	Tel Aviv
 1468	Teller
@@ -1496,12 +1444,10 @@
 1492	Toronto
 1493	Torrig
 1494	Torshavn
-1495	Tórshavn
-1496	ToulonP
+1496	Toulon
 1497	Toulouse
 1498	Tours
 1499	Trenton
-1500	Triege
 1501	Trige
 1502	Tripoli
 1503	Trongisvagur
@@ -1546,11 +1492,8 @@
 1542	Wakefield
 1543	Wales
 1544	Wallisellen
-1545	Warsaw
 1546	Warszawa
 1547	Washington DC
-1548	Washington D.C.
-1549	Washington, DC
 1550	Wasilla
 1551	Wellington
 1552	Wells
@@ -1580,7 +1523,6 @@
 1576	Yakutat
 1577	Yamoussoukro
 1578	Yangon
-1579	Yaounde
 1580	Yaoundé
 1581	Yaren
 1582	Yerevan
@@ -1595,7 +1537,6 @@
 1591	ØRavik
 1592	Aachen
 1593	Aarau
-1594	Afganistan
 1595	Afghanistan
 1596	Albanien
 1597	Algeriet
@@ -1629,7 +1570,6 @@
 1625	Brunei
 1626	Bulgarien
 1627	Burkina Faso
-1628	Burkina
 1629	Burundi
 1630	Caicosøerne
 1631	Cambodja
@@ -1638,7 +1578,6 @@
 1634	Caymanøerne
 1635	Ceylon
 1636	Centralafrikanske Republik
-1637	Republik
 1638	Chile
 1639	Christmas Island
 1640	Colombia
@@ -1649,7 +1588,6 @@
 1645	Cuba
 1646	Cypern
 1647	Danmark
-1647	Denmark
 1648	De Sydlige Sandwichøer
 1649	Sandwichøer
 1650	Djibouti
@@ -1668,7 +1606,6 @@
 1663	Filippinerne
 1664	Finland
 1665	Forenede Arabiske Emirater
-1666	Emirater
 1667	Frankrig
 1668	Fransk Guyana
 1669	Guyana
@@ -1707,17 +1644,15 @@
 1702	Israel
 1703	Italien
 1704	Jamaica
-1705	Jan
 1706	Japan
 1707	Jomfruøerne
 1708	Jordan
 1709	Jugoslavien
-1710	Kap
-1711	Verde
+1710	Kap Verde
 1712	Kasakhstan
 1713	Kenya
 1714	Kina
-1715	Kingdom
+1715	Kingdon
 1716	Kirgisistan
 1717	Kiribati
 1718	Kokosøerne
@@ -1738,7 +1673,6 @@
 1733	Makedonien
 1734	Malawi
 1735	Malaysia
-1736	Malaja
 1737	Malaya
 1738	Maldiverne
 1739	Mali
@@ -1756,7 +1690,6 @@
 1751	Monaco
 1752	Mongoliet
 1753	Montserrat
-1754	Mocambique
 1755	Mozambique
 1756	Myanmar
 1757	Namibia
@@ -1788,7 +1721,6 @@
 1783	Portugal
 1784	Principe
 1785	Puerto Rico
-1786	Puerto
 1787	Qatar
 1788	Réunion
 1789	Rumænien
@@ -1799,7 +1731,6 @@
 1794	Saint Christopher
 1795	Salomonøerne
 1796	Samoa
-1797	Samoa
 1798	San Marino
 1799	Sankt Helena
 1800	Sao Tomé
@@ -1814,23 +1745,18 @@
 1809	South Georgia
 1810	Spanien
 1811	Sri Lanka
-1812	Sri
-1813	Lanka
 1814	St. Christopher
 1815	St. Lucia
-1816	St. Vincent
 1817	Saint Lucia
 1818	Saint Vincent
 1819	Storbritannien
 1820	Sudan
 1821	Surinam
 1822	Svaldbard
-1823	Svejts
+1823	Schweiz
 1824	Sverige
 1825	Swaziland
 1826	Sydafrika
-1827	Sydafrikanske Republik
-1828	Sydafrika
 1829	Sydkorea
 1830	Sydlige Franske Territorier
 1831	Syrien
@@ -1853,13 +1779,10 @@
 1848	Tyskland
 1849	Tjekkoslovakiet
 1850	Uganda
-1851	Uk
 1852	United Kingdom
-1853	United
 1854	Ukraine
 1855	Ungarn
 1856	Uruguay
-1857	USA
 1858	Usbekistan
 1859	Vanuatu
 1860	Vatikanstaten
@@ -1953,7 +1876,6 @@
 1948	Acorerne
 1949	Adriaterhavet
 1950	Afrika
-1950	Africa
 1951	Alaska
 1952	Allinge-Gudhjem
 1953	Alper
@@ -1962,13 +1884,13 @@
 1956	Als Sund
 1957	Amerika
 1958	Anatolien
+1958	Vestanatolien
 1959	Andalusien
 1960	Antigua
 1961	Antiller
 1962	Antillerne
 1963	Appalacher
 1964	Appalacherne
-1965	Appenniner
 1966	Appenninerne
 1967	Arabien
 1968	Aragonien
@@ -1979,9 +1901,7 @@
 1973	Assisi
 1974	Assyrien
 1975	Atlanten
-1976	Atlanterhav
 1977	Atlanterhavet
-1978	Azorer
 1979	Azorerne
 1980	Babel
 1981	Babylon
@@ -1989,17 +1909,12 @@
 1983	Bahrain
 1984	Balkan
 1985	Baltikum
-1985	Balticum
 1986	Barbuda
-1987	Baskerland
 1988	Baskerlandet
-1989	Baskien
 1990	Bayern
 1991	Bengalen
 1992	Bergen
 1993	Betlehem
-1994	Biscayabugt
-1995	Biscayabugten
 1996	Biscayen
 1997	Bloksbjerg
 1998	Bosnien
@@ -2012,21 +1927,16 @@
 2005	Bøhmen
 2006	Bøjden
 2007	Californien
-2007	Kalifornien
-2008	Caraibien
 2009	Caribien
 2010	Castilien
 2011	Catalonien
 2012	Christiania
-2013	Dannebrogorden
-2014	Dannebrogordenen
 2015	Dannevang
 2016	Dannevirke
 2017	DDR
 2018	Ditmarsken
 2019	Djursland
 2020	Dogger
-2021	Dolomitter
 2022	Dolomitterne
 2023	Efesos
 2024	Ejderen
@@ -2044,31 +1954,23 @@
 2036	Frisland
 2037	Furesø
 2038	Furesøen
-2039	Færøer
 2040	Fønikien
 2041	Gallien
 2042	Gellerup
 2043	Gladsakse
-2044	Golfstrøm
-2045	Golfstrømmen
 2046	Gotland
 2047	Gottorp
 2048	Grenen
-2049	Gudenå
 2050	Gudenåen
 2051	Guldborg Sund
-2052	Guldborgsundbro
 2053	Guldborgsundbroen
 2054	Hanherrederne
 2055	Harzen
 2056	Hawaii
-2057	Himmelbjerg
 2058	Himmelbjerget
 2059	Himmerland
-2060	Hirtsholme
 2061	Hirtsholmene
-2062	Horns Herred
-2063	Hvidehav
+2062	Hornsherred
 2064	Hvidehavet
 2065	Hymen
 2066	Ildlandet
@@ -2077,14 +1979,10 @@
 2069	Isefjord
 2070	Isefjorden
 2071	Jammerbugt
-2072	Jammerbugten
 2073	Jomfruøer
 2074	Judæa
-2075	Juleø
 2076	Juleøen
 2077	Julsø
-2078	Jupiter
-2079	Jurabjerge
 2080	Jurabjergene
 2081	Juvre Dyb
 2082	Jylland
@@ -2100,9 +1998,7 @@
 2092	Korsika
 2093	Kreta
 2094	Krim
-2095	Kuriler
 2096	Kurilerne
-2097	Kyklader
 2098	Kykladerne
 2099	Langelandsbælt
 2100	Lapland
@@ -2110,11 +2006,7 @@
 2102	Levanten
 2103	Lilleasien
 2104	Lillebælt
-2105	Lillebæltsbro
-2106	Lillebæltsbroen
-2107	Limfjord
 2108	Limfjorden
-2109	Lisboa
 2110	Lombardiet
 2111	Luxemburg
 2112	Lybæk
@@ -2127,87 +2019,60 @@
 2119	Mellemøsten
 2120	Merkur
 2121	Mesopotamien
-2122	Middelhav
 2123	Middelhavet
 2124	Milano
 2125	Mols
-2126	Molukker
 2127	Molukkerne
-2128	Mosebog
-2129	Mosebogen
 2130	Mossø
-2131	Mælkevej
-2132	Mælkevejen
 2133	Maastricht
 2134	Napoli
 2135	Neapel
-2136	Nederland
 2137	Nederlandene
-2138	Neptun
-2139	Nil
 2140	Nilen
 2141	Nissum Bredning
 2142	Nissum Fjord
 2143	Nordamerika
 2144	Norden
-2145	Nordhav
 2146	Nordhavet
 2147	Nordkalotten
 2148	Nordkap
 2149	Nordpolen
 2150	Nordslesvig
-2151	Nordstjernen
-2152	Nordsø
 2153	Nordsøen
 2154	Nordyemen
 2155	Nubien
 2156	Nørrejylland
 2157	Oceanien
 2158	Oddesund
-2159	Ods Herred
-2160	Orkneyøer
+2159	Odsherred
 2161	Orkneyøerne
-2162	Orknøer
 2163	Orknøerne
 2164	Ostindien
 2165	Palæstina
-2166	PapuaNy Guinea
+2166	Papua Ny Guinea
 2167	Pedersker
 2168	Peloponnes
 2169	Persien
-2170	Pluto
-2171	Polarstjernen
 2172	Polynesien
 2173	Pommern
 2174	Pompeji
-2175	Praha
 2176	Preussen
 2177	Provence
-2178	Prøjsen
-2179	Pyrenæer
 2180	Pyrenæerne
-2181	Påskeø
 2182	Påskeøen
-2183	Rhin
 2184	Rhinen
 2185	Romerriget
 2186	Rytterknægten
-2187	Røde Hav
-2188	Rødehav
 2189	Rødehavet
 2190	Salling
 2191	Salling Sund
-2192	Sallingsundbro
 2193	Sallingsundbroen
 2194	Salomonøer
 2195	Sardinien
 2196	Saturn
-2197	Schweiz
-2198	Sein
 2199	Seinen
 2200	Serbien
 2201	Seycheller
-2202	Shetlandsøer
 2203	Shetlandsøerne
 2204	Sibirien
 2205	Sicilien
@@ -2221,32 +2086,23 @@
 2213	Skåne
 2214	Slesvig-Holsten
 2215	Slien
-2216	Smålandshav
 2217	Smålandshavet
-2218	Sortehav
 2219	Sortehavet
-2220	Sovjet
-2221	Sovjetunionen
+2220	Sovjetunionen
 2222	Sprogø
 2223	Stevns
-2224	Stillehav
 2225	Stillehavet
 2226	Storebælt
 2227	Storkøbenhavn
 2228	Storstrøms Amt
-2229	Storstrømsbro
 2230	Storstrømsbroen
-2231	Storå
 2232	Storåen
 2233	Sundeved
-2234	Suså
 2235	Susåen
 2236	Sydamerika
-2237	Sydkorset
 2238	Sydpolen
 2239	Sydslesvig
 2240	Sydyemen
-2241	Syvstjernen
 2242	Sønderjylland
 2243	Texas
 2244	Themsen
@@ -2255,63 +2111,42 @@
 2247	Tibet
 2248	Tissø
 2249	Tyrol
-2250	Uranus
 2251	Vatikanet
 2252	Vatikanstat
 2253	Vendsyssel
 2254	Venedig
-2255	Venezia
-2256	Venus
-2257	Vesterhav
 2258	Vesterhavet
 2259	Vestindien
 2260	Vesttyskland
 2261	Vogeser
 2262	Vogeserne
-2263	Vorherre
 2264	Wandsbek
 2265	Yding
 2266	Yding Skovhøj
 2267	Zodiakus
-2268	Ægæerhav
 2269	Ægæerhavet
 2270	Øresund
-2271	Østersø
 2272	Østersøen
 2273	Østeuropa
 2274	Østtyskland
 2275	Åland
-2276	Ålandsøer
 2277	Ålandsøerne
 2278	Ålbæk Bugt
 2279	Årøsund
 2280	Thessalonika
-2281	U.S.A
-2281	U.S.A.
-2281	USA
-283	Kbh
 2283	Mosel
 2284	Snaptun
 2285	Horsens Fjord
 2286	Rhodos
 2287	Thassos
-2288	Thasos
-69	Christiansfeldt
-337	Nykøbing Mors
-1698	Iraq
-1824	Sverrig
-2289	Ardennes
+2289	Ardennerne
 2290	Bordighera
 2291	Chartres
 2292	Frøslev
-2292	Frøslevlejren
 2293	Fuglsølejren
-2294	Ghent
 2294	Gent
-2295	Gøteborg
 2295	Göteborg
 2296	Hald Præstegård
-2296	Hald præstegård
 2297	Haute Savoie
 2298	Horserødlejren
 2299	Juodpetriai
@@ -2320,23 +2155,16 @@
 2302	Kurschat
 2303	Mashonaland
 2304	Neuengamme
-2304	Neuengamme koncentrationslejr
 2305	Olympos
 2306	Ossa
 2307	Pouru Saint-Rémy
-2307	Pouru-Saint-Remy
-2307	Pouru-Saint-Rémy
 2308	Ras Shamra
 2309	Reméhan
 2310	Røde Bøge
-2310	Røde Bøger
 2311	Rågeleje
-2311	Raageleje
-2312	Silute
 2312	Šilutė
 2313	Southern Rhodesia
 2314	Thurebylund
-2314	Thurebylynd
 2315	Tilsit
 2316	Tirstrup
 2317	Vestre Fængsel
@@ -2364,14 +2192,12 @@
 2348	Fakkegrav
 2349	Enrum
 2350	Fausing
-2351	Böllemosen
 2351	Bøllemosen
 2352	Kollund
 2353	Rougsø
 2354	Bisserup
 2355	Ohio
 2356	Tucumán
-2356	Tucuman
 2357	British Columbia
 2358	Sodoma
 2359	New Haven
@@ -2380,45 +2206,34 @@
 2362	Nebraska
 2363	Menorca
 2364	Jaca
-2365	Højlandene
 2365	Highlands
 2366	Albuquerque
 2367	New Mexico
 2368	British West Africa
 2369	Vestafrika
-2369	West Africa
 2370	Smestad
-1958	Vestanatolien
-1958	Vest-anatolia
 2371	Gretna Green
 2372	Kearney
 2373	Wallingford
 2374	Al Mansura
 2375	Aube
 2376	Buckinghamshire
-2377	Mehalla
 2377	El Mahalla El Kubra
 2378	Fontette
 2379	Gerrards Cross
-2379	Gerrard's Cross
-2379	GERRARD ' S CROSS
 2380	Golders Green
-2380	GOLDERS GREEN
 2381	Jaffa
 2382	Liéfra
 2383	Nymege
 2384	Sotavalta
 2385	Tanta
-2386	Western Europe
 2386	Vesteuropa
 2387	Zagazig
 2388	Wonston
 2389	Auschwitz
 2390	Buchenwald
 2391	Calcutta
-2392	USSR
 2393	Hampstead
-2393	Hampstead Heath
 2394	Bloomsburg
 2395	Cordoba
 2396	Lwów
@@ -2427,56 +2242,22 @@
 2399	Besserud
 2400	Oisemont
 2401	Somme
-1849	Čechoslovakiet
 2402	Turčiansky Sväty Martin
 2403	Norman
 2404	Oklahoma
-2404	Okla.
 2405	Fife
 2406	Kullen
 2407	Aberdeenshire
 2408	Barra 
-1819	Britain
-1819	Britannien
-732	Bs Aires	
 2409	Prestwick
 2410	Kent
 2411	Hebriderne
 2412	Virginia
 2413	Aabo
-734	Bucarest
-2289	Ardennerne
 2414	British Isles
-2341	Ind.
 2415	Åbo
 2416	Liège
-2416	Liége
-2416	Liege
 2417	Strømø
 2418	Bloomsbury
-1200	NewYork
 2419	Nordeuropa
 2420	Leith
-2421	Minneapolis
-2422	Firenze
-2422	Florence
-2423	Massachusetts
-2423	MASSACHUSETTS
-2211	Scotland
-1849	Tchécoslovaquie
-1849	Czechoslovakia
-1771	Norway
-1283	Copenhague
-1659	Esthonia
-1667	France
-2197	Switzerland
-2210	Scandinavia
-1615	Belgium
-2281	United States
-2030	Europe
-1667	France
-1842	Sweden
-1848	Germany
-1647	Dänemark
-2007	California
-1647	Danemark
