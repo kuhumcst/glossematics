@@ -35,7 +35,11 @@
    ["Svend Ranulf" "#np115"]])
 
 (def entity-types
-  {:entity.type/person
+  {:entity.type/repository
+   {:entity-label "Repository"
+    :img-src      "/images/archive-svgrepo-com.svg"}
+
+   :entity.type/person
    {:entity-label "Person"
     :img-src      "/images/person-sharp-svgrepo-com.svg"}
 
@@ -75,8 +79,6 @@
    "ø" "oe"
    "Ø" "Oe"})
 
-
-;; TODO: make collection, repository searchable too (add to datalist)
 (def search-rels
   {:document/mention            {:label      "mentioned"
                                  :compatible (set (keys entity-types))}
@@ -90,8 +92,12 @@
                                  :compatible #{:entity.type/person}}
    :document/recipient-location {:label      "recipient location"
                                  :compatible #{:entity.type/place}}
-   #_#_:document/repository {:label "repository"}
-   #_#_:document/collection {:label "collection"}})
+   :document/repository         {:label      "repository"
+                                 :compatible #{:entity.type/repository}}
+   :document/language           {:label      "language"
+                                 :compatible #{:entity.type/language}}
+   :document/publication        {:label      "publication"
+                                 :compatible #{:entity.type/publication}}})
 
 (def order-rels
   {:document/date-mention {:label "mentioned date"
@@ -99,21 +105,19 @@
    :document/sent-at      {:label "date"
                            :type  "date"}})
 
+;; TODO: make collection searchable too (add to search-rels)
 (def other-rels
   "Relations that are not available as search/order params."
-  {:document/title       {:label "title"}
-   :document/collection  {:label "collection"}
-   :document/form        {:label "form"}
-   :document/hand        {:label "representation"}
-   :document/facsimile   {:label "facsimile"}
-   :document/repository  {:label "repository"}
-   :document/language    {:label "language"}
-   :document/settlement  {:label "place"}
-   :document/year        {:label "year"}
-   :document/publication {:label "publication"}
-   :file/name            {:label "file name"}
-   :file/extension       {:label "file extension"}
-   :file/body?           {:label "transcription"}})
+  {:document/title      {:label "title"}
+   :document/collection {:label "collection"}
+   :document/form       {:label "form"}
+   :document/hand       {:label "representation"}
+   :document/facsimile  {:label "facsimile"}
+   :document/settlement {:label "place"}
+   :document/year       {:label "year"}
+   :file/name           {:label "file name"}
+   :file/extension      {:label "file extension"}
+   :file/body?          {:label "transcription"}})
 
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels

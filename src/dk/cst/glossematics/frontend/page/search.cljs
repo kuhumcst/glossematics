@@ -164,52 +164,6 @@
     (= rel '_) "_"
     :else (subs (str rel) 1)))
 
-;; TODO: make collection, repository searchable too (add to datalist)
-(def search-rels
-  {:document/mention            {:label      "mentioned"
-                                 :compatible (set (keys sd/entity-types))}
-   :document/author             {:label      "author"
-                                 :compatible #{:entity.type/person}}
-   :document/sender             {:label      "sender"
-                                 :compatible #{:entity.type/person}}
-   :document/sender-location    {:label      "sender location"
-                                 :compatible #{:entity.type/place}}
-   :document/recipient          {:label      "recipient"
-                                 :compatible #{:entity.type/person}}
-   :document/recipient-location {:label      "recipient location"
-                                 :compatible #{:entity.type/place}}
-   #_#_:document/repository {:label "repository"}
-   #_#_:document/collection {:label "collection"}})
-
-(def order-rels
-  {:document/date-mention {:label "mentioned date"
-                           :type  "date"}
-   :document/sent-at      {:label "date"
-                           :type  "date"}})
-
-(def other-rels
-  "Relations that are not available as search/order params."
-  {:document/title     {:label "title"}
-   :document/form      {:label "form"}
-   :document/hand      {:label "representation"}
-   :document/facsimile {:label "facsimile"}
-   :file/name          {:label "file name"}
-   :file/extension     {:label "file extension"}
-   :file/body?         {:label "transcription"}})
-
-;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
-(def search-result-rels
-  [:document/author
-   :document/form
-   :document/recipient
-   :document/sent-at
-   :file/body?])
-
-(def rel->label
-  (->> (merge search-rels order-rels other-rels)
-       (map (juxt key (comp :label val)))
-       (into {})))
-
 (defn- state->params
   [{:keys [items limit offset order-by from to]}]
   (when-let [params (items->query-params items)]            ; clear other params
@@ -267,7 +221,7 @@
      [:select {:id        "sort-key"
                :value     (rel->s order-rel)
                :on-change (->order 0)}
-      [select-opts order-rels [:option {:value ""} "nothing"]]]
+      [select-opts sd/order-rels [:option {:value ""} "nothing"]]]
 
      [:select {:id        "sort-dir"
                :disabled  (nil? order-rel)
@@ -278,7 +232,7 @@
 
 (defn search-result-between
   [[order-rel _ :as order-by] from to]
-  (let [order-type (get-in order-rels [order-rel :type] "date")
+  (let [order-type (get-in sd/order-rels [order-rel :type] "date")
         ->tofrom   #(fn [e]
                       (swap! state/query assoc :offset 0)
                       (if-let [v (not-empty (e->v e))]
@@ -346,7 +300,7 @@
                             :alt entity-label}])
        (when (not= k '_)
          [:span.search-form__item-key
-          (or (:label (search-rels k))
+          (or (:label (sd/search-rels k))
               (str k))
           " → "])
        [:span.search-form__item-label (or label (str v))]
@@ -408,8 +362,8 @@
            (if-let [entity-type (and name->type (name->type in))]
              (let [compatible? (comp boolean entity-type :compatible second)
                    ?disable    #(with-meta % {:disabled (not (compatible? %))})]
-               [select-opts (map ?disable search-rels) anything-opt])
-             [select-opts search-rels anything-opt])]
+               [select-opts (map ?disable sd/search-rels) anything-opt])
+             [select-opts sd/search-rels anything-opt])]
 
           [:input {:type     "submit"
                    :value    "Search"
@@ -506,10 +460,10 @@
       [:li
        "By default, a search criterion will be compared to anything. "
        "However, a particular field may be selected for any criterion, "
-       "e.g. the field \"" [:strong [:em (get-field search-rels)]] "\"."]
+       "e.g. the field \"" [:strong [:em (get-field sd/search-rels)]] "\"."]
       [:li
        "The search results may also be sorted according to a specific field, "
-       "e.g. the field \"" [:strong [:em (get-field order-rels)]] "\". "
+       "e.g. the field \"" [:strong [:em (get-field sd/order-rels)]] "\". "
        "They can be further restricted to a certain range too."]]
      (when-let [[k v] (nth (seq name->id) (rand-int n))]
        [:p

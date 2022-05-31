@@ -238,6 +238,7 @@
   (->> (d/q '[:find [?id ...]
               :where
               (or
+                [?p :entity/type :entity.type/repository]
                 [?p :entity/type :entity.type/person]
                 [?p :entity/type :entity.type/linguistic-organisation]
                 [?p :entity/type :entity.type/organisation]
@@ -509,6 +510,37 @@
             (count tx-data))
   (d/transact conn {:tx-data tx-data}))
 
+(def repositories
+  [{:db/ident         "#narch1"
+    :entity/full-name "Louis Hjelmslev's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch2"
+    :entity/full-name "Det Universitetshistoriske Arkiv"
+    :entity/type      :entity.type/repository}
+   ;; TODO: is #narch3 missing? investigate
+   {:db/ident         "#narch4"
+    :entity/full-name "Eli Fischer-Jørgensen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch5"
+    :entity/full-name "Francis Whitfield's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch6"
+    :entity/full-name "Hans Jørgen Uldall's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch7"
+    :entity/full-name "Henning Spang-Hanssen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch8"
+    :entity/full-name "Harry Wett Frederiksen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch9"
+    :entity/full-name "Paul Diderichsen's archive"
+    :entity/type      :entity.type/repository}
+   ;; TODO: is #narch10 missing? investigate
+   {:db/ident         "#narch11"
+    :entity/full-name "Travaux du Cercle de Linguistique Copenhague"
+    :entity/type      :entity.type/repository}])
+
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
   [{:keys [files-dir] :as conf}]
@@ -516,6 +548,7 @@
   ;; Add all core entities from the static files included in the source repo.
   (log/info :bootstrap.asami/begin-static-files true)
   (log-transaction! :timeline (timeline-entities))
+  (log-transaction! :repositories repositories)
   (log-transaction! :bibliography (bibliographic-entities))
   (log-transaction! :person (person-entities))
   (log-transaction! :linguistic-organisation (other-entities "Lingvistiske_organisationer_og_konferencer-gennemgået-FINAL.txt" "#nlingorg" "linguistic-organisation"))
