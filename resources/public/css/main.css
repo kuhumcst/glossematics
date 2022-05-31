@@ -191,8 +191,7 @@ nav.reader-mode a:not(:first-child)::first-letter {
 }
 
 nav.reader-mode {
-  padding:
-          var(--padding-m);
+  padding: var(--padding-m);
 }
 
 .shell__content {
@@ -330,6 +329,11 @@ img.nav-icon {
 
 img.nav-icon:hover {
     opacity: 1;
+}
+
+.reader-mode img.nav-icon {
+    height: 32px;
+    margin-bottom: -10px;
 }
 
 a.action {
