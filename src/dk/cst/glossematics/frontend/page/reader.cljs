@@ -16,6 +16,8 @@
             [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.static-data :as sd]))
 
+;; TODO: missing transcription https://glossematics.org/app/reader/acc-1992_0005_125_MTG_0810-tei.xml
+;; TODO: wrong sender https://glossematics.org/app/reader/acc-1992_0005_022_Bierwisch_0010-tei.xml
 ;; TODO: yuki not linked http://localhost:9000/app/reader/HJUtilDJ-1932-09-28-tei-final.xml
 ;; TODO: missing facs http://localhost:8080/app/reader/acc-1992_0005_025_Jakobson_0160-tei-final.xml
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
