@@ -104,6 +104,22 @@
               (comp :entity-label sd/entity-types id->type))
             coll))
 
+(def break-str-xf
+  "Transducer for annotating long Hiccup strings with word break opportunities."
+  (let [sep? (partial re-matches #"_|\.")]
+    (comp
+      (partition-by sep?)
+      (map (fn [cs]
+             (if (and (= (count cs) 1)
+                      (sep? (first cs)))
+               [:<> [:wbr] (first cs)]
+               (str/join cs)))))))
+
+(defn break-str
+  "Annotate `s` with word break opportunities."
+  [s]
+  (into [:<>] break-str-xf s))
+
 (defn- metadata-table-val
   [{:keys [id->name id->type] :as search-state} k v]
   (let [into-ul (fn [coll]

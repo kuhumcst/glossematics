@@ -431,7 +431,7 @@
   [search-state {:keys [document/title file/name] :as entity}]
   (let [hyperlink [:a.action {:title "View in the reader"
                               :href  (shared/reader-href name)}
-                   title
+                   (shared/break-str title)
                    [:img.action__icon
                     {:src "/images/external-link-svgrepo-com.svg"}]]
         kvs       (concat [[:document/title hyperlink]]
