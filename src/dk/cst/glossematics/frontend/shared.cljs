@@ -67,6 +67,11 @@
   (rfe/href :dk.cst.glossematics.frontend.page.reader/page
             {:document document}))
 
+(defn bib-href
+  [author]
+  (rfe/href :dk.cst.glossematics.frontend.page.bibliography/page
+            {:author author}))
+
 (defn legal-id
   "Make sure `s` is a legal HTML id/fragment, e.g. doesn't start with a number."
   [s]
@@ -121,11 +126,13 @@
   (into [:<>] break-str-xf s))
 
 (defn- metadata-table-val
-  [{:keys [id->name id->type] :as search-state} k v]
+  "Create a Hiccup representation for `v` based on `k` and the source `m`;
+  names are sourced via the `search-state`."
+  [{:keys [id->name id->type] :as search-state} m k v]
   (let [into-ul (fn [coll]
                   (into [:ul]
                         (->> (sort-coll id->name coll)
-                             (map #(metadata-table-val search-state k %))
+                             (map #(metadata-table-val search-state m k %))
                              (map #(vector :li %)))))]
     (cond
       ;; Hiccup passes unchanged
@@ -135,8 +142,14 @@
       ;; Special behaviour.
       (= k :document/facsimile)
       (if (set? v)
-        (str (count v) " pages")
-        (str "1 page"))
+        (count v)
+        1)
+
+      (= k :document/bib-entry)
+      (let [href     (-> m :document/author sd/id->author bib-href)
+            fragment (-> m :document/year str legal-id)]
+        [:a {:href (str href "#" fragment)}
+         v])
 
       ;; Individual entities caught here.
       (and (string? v) (str/starts-with? v "#"))
@@ -174,13 +187,13 @@
       (str v))))
 
 (defn metadata-table
-  [search-state kvs]
+  [search-state m kvs]
   [:table.entity-metadata
    [:tbody
     (for [[k v] kvs]
       [:tr {:key k}
        [:td [:strong (str (get sd/rel->label k k))]]
-       [:td (metadata-table-val search-state k v)]])]])
+       [:td (metadata-table-val search-state m k v)]])]])
 
 (defn kvs-list
   "Generic display of title+content `kvs`; `val-com` renders the content."
@@ -193,3 +206,11 @@
        k]
       [:dd
        [val-com v]]])])
+
+(defn- single
+  "If `x` is a 'coll' return the first item; else return `x`."
+  [x]
+  (if (coll? x)
+    (first (sort x))
+    x))
+

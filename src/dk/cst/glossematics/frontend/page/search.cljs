@@ -436,7 +436,7 @@
                     {:src "/images/external-link-svgrepo-com.svg"}]]
         kvs       (concat [[:document/title hyperlink]]
                           (select-keys entity sd/search-result-rels))]
-    [shared/metadata-table search-state kvs]))
+    [shared/metadata-table search-state entity kvs]))
 
 (defn explanation
   [name->id]

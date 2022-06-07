@@ -81,19 +81,46 @@
   (update-vals query-params #(str/split % #"\s*,\s*")))
 
 (defn- ?keywordize
-  "Conditionally keywordize `s`."
+  "Conditionally keywordize value `s`; otherwise:
+
+     * turn _ into a symbol (wildcard value, but value must be present).
+     * turn :ANY into a keyword (marks key for removal)"
   [s]
-  (if (str/starts-with? s ":")
+  (cond
+    (= s ":ANY")
+    :ANY
+
+    (str/starts-with? s ":")
     (keyword (subs s 1))
+
+    (= s "_")
+    (symbol '_)
+
+    :else
     s))
 
 (defn ?keywordize-coll
   [coll]
-  (into (empty coll) (map ?keywordize coll)))
+  (into #{}
+        (comp
+          (map ?keywordize)
+          (remove nil?))
+        coll))
 
 (def whitelisted
   "Whitelist certain searches for unauthenticated access based on entity type."
-  #{[:entity.type/bibliographic-entry]})
+  #{#{:entity.type/bibliographic-entry}})
+
+(defn- handle-file-extension
+  "Behaviour when dealing with :file/extension in search `params`.
+
+  Defaults to searching for XML (= TEI) files. However, the special value :ANY
+  may be used to remove the :file/extension criteria completely."
+  [params]
+  (case (:file/extension params)
+    nil (assoc params :file/extension "xml")
+    #{:ANY} (dissoc params :file/extension)
+    params))
 
 (defn search-handler
   "A handler to search for database entities, e.g. document or event metadata.
@@ -115,9 +142,9 @@
         wildcard _                                          ; _ is used for noop
         _        (when-not (whitelisted (:entity/type params))
                    (sp.auth/enforce-condition request :authenticated))
-        entity   (cond-> (dissoc (merge {:file/extension "xml"} params)
-                                 :_ :limit :offset :order-by :from :to)
-                   wildcard (assoc '_ wildcard))
+        entity   (-> (handle-file-extension params)
+                     (dissoc :_ :limit :offset :order-by :from :to)
+                     (cond-> wildcard (assoc '_ wildcard)))
         raw      (db/search conn entity
                             :limit (when limit (parse-long (first limit)))
                             :offset (when offset (parse-long (first offset)))

@@ -757,10 +757,6 @@ dl.kvs-list dd:not(:last-child) {
     padding-left: var(--padding-l);
 }
 
-.index-page ul li::first-letter {
-    font-size: 20px;
-}
-
 .index-page ul li + li {
     margin-top: var(--margin-l);
 }

@@ -300,7 +300,7 @@
                                        (when-let [v (get entity' k)]
                                          [k v])))
                         (sort-by first (apply dissoc entity' sd/reader-rels)))]
-    [shared/metadata-table search-state kvs]))
+    [shared/metadata-table search-state entity kvs]))
 
 (defn page
   []

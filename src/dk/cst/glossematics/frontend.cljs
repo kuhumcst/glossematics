@@ -34,7 +34,7 @@
     {:name ::search/page
      :page search/page
      :prep #(search/fetch-results! %)}]
-   ["/app/bibliography"
+   ["/app/bibliography/:author"
     {:name ::bibliography/page
      :page bibliography/page
      :prep #(bibliography/fetch-results!)}]
@@ -80,7 +80,7 @@
       [:a {:href  (href ::timeline/page)
            :title "The life Louis Hjelmslev"}
        "Timeline"]
-      [:a {:href  (href ::bibliography/page)
+      [:a {:href  (href ::bibliography/page {:author "lh"})
            :title "Relevant works"}
        "Bibl."]
       [:a {:href  (href ::user/page)

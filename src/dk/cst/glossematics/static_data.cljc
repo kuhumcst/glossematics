@@ -1,4 +1,5 @@
-(ns dk.cst.glossematics.static-data)
+(ns dk.cst.glossematics.static-data
+  (:require [clojure.set :as set]))
 
 ;; TODO: keep using only person names or include other entities?
 (def top-30
@@ -109,12 +110,17 @@
 (def other-rels
   "Relations that are not available as search/order params."
   {:document/title      {:label "title"}
+   :document/bib-entry  {:label "bibliography entry"}
+   :document/notes      {:label "notes"}
+   :document/pp         {:label "pp."}
+   :document/publisher  {:label "publisher"}
    :document/collection {:label "collection"}
    :document/form       {:label "form"}
    :document/hand       {:label "representation"}
    :document/facsimile  {:label "facsimile"}
    :document/settlement {:label "place"}
    :document/year       {:label "year"}
+   :document/end-year   {:label "year (end)"}
    :file/name           {:label "file name"}
    :file/extension      {:label "file extension"}
    :file/body?          {:label "transcription"}})
@@ -140,3 +146,11 @@
   (->> (merge search-rels order-rels other-rels)
        (map (juxt key (comp :label val)))
        (into {})))
+
+(def author->id
+  {"lh"  "#np56"
+   "efj" "#np40"
+   "pd"  "#np33"})
+
+(def id->author
+  (set/map-invert author->id))

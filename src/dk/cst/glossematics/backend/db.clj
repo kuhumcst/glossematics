@@ -3,6 +3,7 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.set :as set]
+            [clojure.data.csv :as csv]
             [clojure.math.combinatorics :as combo]
             [asami.core :as d]
             [tick.core :as t]
@@ -142,41 +143,105 @@
        (map remove-nil-vals)
        (map #(select-keys % chronology-import))))
 
-(def bibliography-columns
-  {:B :file/name
-   #_#_:C :temp/author                                      ; TODO: should be ID
-   :D :document/settlement
-   :F :document/title
-   :G :document/year
-   :L :document/language
-   :M :document/facsimile
-   :P :document/repository
-   :Q :document/collection})
+(def bib-val->ref
+  "Incomplete mapping from the strings used in the bibliography files to IDs."
+  {"København"                                       "#npl283"
+   "København."                                      "#npl283"
+   "Copenhagen"                                      "#npl283"
+   "Aarhus"                                          "#npl1"
+   "København; Aarhus"                               #{"#npl283"
+                                                       "#npl1"}
+   "Oslo"                                            "#npl1242"
+   "Cambridge"                                       "#npl741"
+   "London"                                          "#npl1095"
+   "Paris"                                           "#npl1257"
+   "New York"                                        "#npl1200"
+   "Helsinki"                                        "#npl931"
+   "Beograd"                                         "#npl683"
+   "Madison"                                         "#norg72"
+   "Nice"                                            "#npl1203"
+   "Bruxelles-Tervuren"                              "#npl2000"
+   "EFJ"                                             "#np40"
+   "LH"                                              "#np56"
+   "PD"                                              "#np33"
+   "Acta Jutlandica"                                 "#npub19"
+   "Travaux du Cercle de Linguistique Copenhague"    "#npub15"
+   "Summer Institute of Linguistics. Oklahoma"       "#norg82"
+   "Selskab for nordisk Filologi"                    "#norg3"
+   "Société de linguistique de Paris"                "#nlingorg50"
+   "Indiana University Publications"                 "#norg53"
+   "Nordisk Sprog- og Kulturforlag"                  "#norg18"
+   "Det Kongelige Danske Videnskabernes Selskab. Historisk-filologiske Meddelelser, 16 (1); Bianco Lunos Bogtrykkeri"
+   #{"#norg28"
+     "Bianco Lunos Bogtrykkeri"}
+   "Levin & Munksgaard"                              "#norg68"
+   "Levin & Munksgaards"                             "#norg68"
+   "Levin & Munksgaard; Aarhus Universitetsforlaget" #{"#norg68"
+                                                       "Aarhus Universitetsforlaget"}
+   "Munksgaard"                                      "#np104"
+   "Oslo U.P."                                       "#norg21"})
 
-(defn normalize-bibliography-data
-  [{:keys [file/name document/repository] :as bibliographic-entry}]
-  (-> bibliographic-entry
-      (update-vals #(if (string? %) (str/trim %) %))
-      (update :document/settlement {"København" "#npl283"
-                                    "Aarhus"    "#npl1"})
-      (update :document/repository {"Acta Jutlandica"                              "#narch10"
-                                    "Travaux du Cercle de Linguistique Copenhague" "#narch11"})
-      (update :document/year int)
-      (assoc :entity/type :entity.type/bibliographic-entry
-             :document/publication ({"Acta Jutlandica"                              "#npub19"
-                                     "Travaux du Cercle de Linguistique Copenhague" "#npub15"}
-                                    repository)
-             :db/ident name)))
+(defn normalize-bib-data
+  [{:keys [file/name
+           document/author
+           document/bib-entry
+           document/year]
+    :as   entry}]
+  (let [[year' end-year] (when (string? year)
+                           (map parse-long (str/split year #"-")))
+        end-year'     (when end-year
+                        (+ end-year (* (quot year' 100) 100)))
+        bib-val->ref' #(get bib-val->ref % %)]
+    (when year'
+      ;; In cases where we already have a :file/name we also have some canonical
+      ;; data from the TEI file, which we prefer over the bibliographical entry.
+      (-> (if name
+            (dissoc entry :document/title :document/author)
+            (update entry :document/author bib-val->ref'))
+          (update-vals str/trim)
+          (update :document/settlement bib-val->ref')
+          (update :document/repository bib-val->ref')
+          (update :document/publisher bib-val->ref')
+          (dissoc :tei-id :short-title)                     ; remove unused vals
+          (assoc :entity/type :entity.type/bibliographic-entry
+                 :document/year year'
+                 :document/end-year end-year'
+                 :db/ident (if name
+                             name
+                             (str author "-" bib-entry)))))))
 
-(defn bibliographic-entities
-  []
-  (->> (io/file (io/resource "NEW_metadata-udgivelser-10122021_LC.xlsx"))
-       (xl/load-workbook)
-       (xl/select-sheet "Sheet1")
-       (xl/select-columns bibliography-columns)
-       (rest)
-       (map normalize-bibliography-data)
-       (map remove-nil-vals)))
+(def bib-columns
+  [:document/author
+   :document/year
+   :document/bib-entry
+   :document/title
+   :document/publication
+   :document/publisher
+   :document/settlement
+   :document/pp
+   :document/notes
+   :short-title                                             ; unused
+   :tei-id                                                  ; unused
+   :file/name])
+
+(defn- remove-empty-vals
+  [m]
+  (apply dissoc m (->> (filter (comp empty? second) m)
+                       (map first))))
+
+(def bib-entries-xf
+  (comp
+    (map (partial zipmap bib-columns))
+    (map #(dissoc % :tei-id))
+    (map remove-empty-vals)
+    (map normalize-bib-data)
+    (remove nil?)
+    (map remove-nil-vals)))
+
+(defn bib-entries
+  [filename]
+  (with-open [reader (io/reader (io/resource filename))]
+    (into [] bib-entries-xf (rest (csv/read-csv reader)))))
 
 (defn- multiple?
   [x]
@@ -544,12 +609,16 @@
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
   [{:keys [files-dir] :as conf}]
-
-  ;; Add all core entities from the static files included in the source repo.
-  (log/info :bootstrap.asami/begin-static-files true)
+  ;; Timeline events
   (log-transaction! :timeline (timeline-entities))
+
+  ;; Bibliography
+  (log-transaction! :bib-EFJ (bib-entries "EFJ bibliografi - Sheet1.csv"))
+  (log-transaction! :bib-LH (bib-entries "LH bibliografi - Sheet1.csv"))
+  (log-transaction! :bib-PD (bib-entries "PD bibliografi - Sheet1.csv"))
+
+  ;; Search entities
   (log-transaction! :repositories repositories)
-  (log-transaction! :bibliography (bibliographic-entities))
   (log-transaction! :person (person-entities))
   (log-transaction! :linguistic-organisation (other-entities "Lingvistiske_organisationer_og_konferencer-gennemgået-FINAL.txt" "#nlingorg" "linguistic-organisation"))
   (log-transaction! :organisation (other-entities "Organisationer-gennemgået-FINAL.txt" "#norg" "organisation"))
@@ -561,7 +630,6 @@
 
   ;; Add the file entities found in the files-dir.
   ;; Then parse each TEI file and link the document data to the file entities.
-  (log/info :bootstrap.asami/begin-files-dir files-dir)
   (log-transaction! :files (file-entities files-dir))
   (log-transaction! :tei-data (map as-entity (tei-files conn))))
 
@@ -696,7 +764,7 @@
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
   (timeline-entities)
-  (bibliographic-entities)
+  (bib-entries "LH bibliografi - Sheet1.csv")
   (person-entities)
   (parse-date excel-dtf "03.10.1899")
   (parse-date excel-dtf "03-10-1899")
