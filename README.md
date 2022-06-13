@@ -1,6 +1,6 @@
 Glossematics
 ============
-[Infrastrukturalisme](https://cst.ku.dk/projekter/infrastrukturalisme/) is a joint project between the University of Copenhagen and Aarhus University. The project has the goal of publishing a web app on [glossematics.org](https://glossematics.org) to allow researchers from around the world to explore the life of the Danish linguist [Louis Hjelmslev](https://en.wikipedia.org/wiki/Louis_Hjelmslev) by making material available from previously unpublished primary sources, e.g. letters sent and received by the linguist.
+[Infrastrukturalisme](https://cst.ku.dk/projekter/infrastrukturalisme/) is a joint project between the University of Copenhagen and Aarhus University. The project has the goal of publishing a web app on [glossematics.dk](https://glossematics.dk) to allow researchers from around the world to explore the life of the Danish linguist [Louis Hjelmslev](https://en.wikipedia.org/wiki/Louis_Hjelmslev) by making material available from previously unpublished primary sources, e.g. letters sent and received by the linguist.
 
 Architecture
 ------------

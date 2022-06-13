@@ -420,7 +420,7 @@
                    [:extent {}
                     [:note {} page-count]]]]
 
-   ;; TODO: adjust - doesn't match in https://glossematics.org/app/reader/20.9.1945-Holt-LH-tei-final.xml
+   ;; TODO: adjust - doesn't match in https://glossematics.dk/app/reader/20.9.1945-Holt-LH-tei-final.xml
    :correspDesc '[:correspDesc
                   {}
                   [:correspAction
