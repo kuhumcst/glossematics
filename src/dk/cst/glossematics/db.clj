@@ -1,4 +1,4 @@
-(ns dk.cst.glossematics.backend.db
+(ns dk.cst.glossematics.db
   "Functions for populating & querying the Glossematics Asami database."
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
@@ -6,18 +6,11 @@
             [clojure.data.csv :as csv]
             [clojure.math.combinatorics :as combo]
             [asami.core :as d]
-            [tick.core :as t]
             [io.pedestal.log :as log]
             [dk.ative.docjure.spreadsheet :as xl]
-            [dk.cst.cuphic :as cup]
-            [dk.cst.cuphic.xml :as xml])
-  (:import [java.io File]
-           [java.sql Date]
-           [java.time LocalDate]
-           [java.time.format DateTimeFormatter
-                             DateTimeFormatterBuilder
-                             DateTimeParseException]
-           [java.time.temporal ChronoField]))
+            [dk.cst.glossematics.db.tei :as db.tei]
+            [tick.core :as t])
+  (:import [java.io File]))
 
 ;; Syntax errors (fixed)
 ;; acc-1992_0005_025_Jakobson_0180-tei-final.xml:127:64
@@ -72,30 +65,6 @@
 (def excel-dtf
   (t/formatter "dd-MM-yyyy"))
 
-(def utc-dtf
-  (t/formatter "yyyy-MM-dd"))
-
-(def tei-dtf
-  "NOTE: Defaults to 1 january in case either is missing."
-  (-> (DateTimeFormatterBuilder.)
-      (.appendPattern "yyyy[-MM[-dd]]")
-      (.parseDefaulting ChronoField/MONTH_OF_YEAR 1)
-      (.parseDefaulting ChronoField/DAY_OF_MONTH 1)
-      (.toFormatter)))
-
-(defn parse-date
-  "Parse a `date-str` using the `formatter` of choice. Expects some noise in
-  the data (e.g. Viggo's Excel file) so all dots are converted into dashes."
-  [^DateTimeFormatter formatter date-str]
-  (if (string? date-str)
-    (try
-      ;; TODO: converting to oldschool Date/inst now since - switch?
-      (-> ^LocalDate (t/parse-date (str/replace date-str #"\." "-") formatter)
-          (Date/valueOf))
-      (catch DateTimeParseException e                       ; missing year?
-        (log/warn "Could not parse date: " date-str)))
-    date-str))
-
 (defn normalize-chronology-data
   [event]
   (-> event
@@ -103,8 +72,8 @@
       (update :event/type event-type-longform)
       (update :event/restored-start? (comp boolean not-empty))
       (update :event/restored-end? (comp boolean not-empty))
-      (update :event/start (partial parse-date excel-dtf))
-      (update :event/end (partial parse-date excel-dtf))
+      (update :event/start (partial db.tei/parse-date excel-dtf))
+      (update :event/end (partial db.tei/parse-date excel-dtf))
       (assoc :entity/type :entity.type/event)))
 
 (defn normalize-name-data
@@ -395,179 +364,6 @@
          [?e :file/path ?path]]
        conn))
 
-(def rename
-  {:placeName :place
-   :persName  :person})
-
-(defn ref-str
-  [tag ?type]
-  (if (= tag :rs)
-    (name (get rename ?type ?type))
-    (name (get rename tag tag))))
-
-;; TODO: is ?optional switched with non-optional? see :document-type
-;; TODO: the ... pattern not working correctly in Cuphic?
-(def header-patterns
-  {:language    '[:language {:ident language} ???]
-   :title       '[:title {} title]
-   :author      '[:author {:ref author} ???]
-   :settlement  '[:settlement {:ref settlement} ???]
-   :repository  '[:repository {:ref repository} ???]
-   :collection  '[:collection {} collection]
-   :objectDesc  '[:objectDesc {:form form}
-                  [:supportDesc {}
-                   [:support {} support]
-                   [:extent {}
-                    [:note {} page-count]]]]
-
-   ;; TODO: adjust - doesn't match in https://glossematics.dk/app/reader/20.9.1945-Holt-LH-tei-final.xml
-   :correspDesc '[:correspDesc
-                  {}
-                  [:correspAction
-                   {:type "sent"}
-                   [:persName {:ref sender} ???]
-                   [:placeName {:ref sender-loc}]
-                   [:date {} sent-at]]
-                  [:correspAction {:type "received"}
-                   [:persName {:ref recipient} ???]
-                   [:placeName {:ref recipient-loc}]]]
-
-   :hand-desc   '[:handDesc {} [:p {} hand-desc]]})
-
-(def facsimile-patterns
-  {:facsimile '[:graphic {:xml/id id}]})
-
-(def text-patterns
-  {:body-refs  '[tag {:ref  ref
-                      :type ?type} ???]
-   :lang-refs  '[:note {:type "language"
-                        :n    ref} ???]
-   :body-dates '[:date {:when when} ???]})
-
-(defn scrape-document
-  [xml]
-  (let [hiccup    (xml/parse xml)
-        header    (nth hiccup 2)
-        facsimile (nth hiccup 3)
-        text      (nth hiccup 4)]
-    (merge
-      (cup/scrape header header-patterns)
-      (cup/scrape facsimile facsimile-patterns)
-      (cup/scrape text text-patterns))))
-
-(def placeholder?
-  #{"xx" "#xx" "NA"})
-
-(defn valid?
-  [v]
-  (not (or (str/blank? v)
-           (placeholder? v))))
-
-(defn valid-int?
-  [v]
-  (and (valid? v)
-       (re-matches #"\d+" v)))
-
-(defn valid-id?
-  [v]
-  (and (valid? v)
-       ;; TODO: make Dorte streamline archive IDs in the TEI files
-       (or (str/starts-with? v "n")                         ; used for archives
-           (str/starts-with? v "#n"))
-       (re-find #"\d$" v)))
-
-(defn valid-date?
-  [v]
-  (re-matches #"\d\d\d\d-\d\d-\d\d" v))
-
-;; Since Dorte's IDs sometimes have a prefixed # and sometimes don't
-(defn fix-id
-  [id]
-  (if (str/starts-with? id "#")
-    id
-    (str "#" id)))
-
-(defn single-val
-  [result k]
-  (-> (get result k) first (get (symbol k))))
-
-(defn single-triple
-  [result filename validation-fn rel k]
-  (when-let [v (single-val result k)]
-    (when (validation-fn v)
-      [filename rel v])))
-
-(defn document-triples
-  [filename {:keys [objectDesc
-                    correspDesc
-                    facsimile
-                    body-refs
-                    lang-refs
-                    body-dates]
-             :as   result}]
-  #_(clojure.pprint/pprint result)
-  (let [triple    (partial single-triple result filename valid?)
-        id-triple (comp
-                    (fn [[e a v :as eav]] (when eav [e a (fix-id v)]))
-                    (partial single-triple result filename valid-id?))]
-    (disj
-      (reduce
-        into
-        (reduce
-          conj
-          #{}
-          [(triple :document/title :title)
-           (triple :document/hand :hand-desc)
-           (id-triple :document/author :author)
-           (id-triple :document/language :language)
-           (id-triple :document/repository :repository)
-           (id-triple :document/settlement :settlement)
-           (let [collection (triple :document/collection :collection)]
-             (when (valid-int? (last collection))
-               (update collection 2 parse-long)))
-           (when-let [form (get-in objectDesc [0 'form])]
-             [filename :document/form form])
-           (when-let [sender (get-in correspDesc [0 'sender])]
-             (when (valid-id? sender)
-               [filename :document/sender sender]))
-           (when-let [sender-loc (get-in correspDesc [0 'sender-loc])]
-             (when (valid-id? sender-loc)
-               [filename :document/sender-location sender-loc]))
-           (when-let [sent-at (get-in correspDesc [0 'sent-at])]
-             (when (valid-date? sent-at)
-               [filename :document/sent-at (parse-date utc-dtf sent-at)]))
-           (when-let [recipient (get-in correspDesc [0 'recipient])]
-             (when (valid-id? recipient)
-               [filename :document/recipient recipient]))
-           (when-let [recipient-loc (get-in correspDesc [0 'recipient-loc])]
-             (when (valid-id? recipient-loc)
-               [filename :document/recipient-location recipient-loc]))])
-        [(for [{:syms [id]} facsimile]
-           [filename :document/facsimile id])
-         (for [{:syms [when]} body-dates]
-           [filename :document/date-mention (parse-date tei-dtf when)])
-         (for [{:syms [tag ref ?type]} body-refs]
-           (when (valid-id? ref)
-             [filename :document/mention ref]))
-         (for [{:syms [ref]} lang-refs]
-           (when (valid-id? ref)
-             [filename :document/mention ref]))])
-      nil)))
-
-(defn as-triples
-  [filepath]
-  (let [file (io/file filepath)]
-    (document-triples (.getName file) (scrape-document file))))
-
-(defn as-entity
-  "Render a TEI file at the given `filepath` as an Asami entity."
-  [filepath]
-  (let [triples (as-triples filepath)
-        ident   (ffirst triples)]
-    (->> (for [[_ k v] triples]
-           {k #{v}})
-         (apply merge-with set/union {:db/ident ident}))))
-
 (defn- log-transaction!
   "Transact `tx-data`, logging its count using the supplied `description`."
   [description tx-data]
@@ -606,6 +402,9 @@
     :entity/full-name "Travaux du Cercle de Linguistique Copenhague"
     :entity/type      :entity.type/repository}])
 
+(def file->entity
+  (comp db.tei/triples->entity db.tei/->triples))
+
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
   [{:keys [files-dir] :as conf}]
@@ -631,7 +430,7 @@
   ;; Add the file entities found in the files-dir.
   ;; Then parse each TEI file and link the document data to the file entities.
   (log-transaction! :files (file-entities files-dir))
-  (log-transaction! :tei-data (map as-entity (tei-files conn))))
+  (log-transaction! :tei-data (map file->entity (tei-files conn))))
 
 (defn- entity->where-triples
   "Deconstruct partial `entity` description into triples for a search query."
@@ -753,12 +552,6 @@
       {:total (count matches)})))
 
 (comment
-  (def example (nth (tei-files conn) 99))
-  (xml/parse (slurp example))
-  (scrape-document (slurp example))
-  (as-triples example)
-  (as-entity example)
-
   (file-entities "/Users/rqf595/Desktop/Glossematics-data")
   (count (file-entities "/Users/rqf595/Desktop/Glossematics-data"))
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
@@ -766,10 +559,8 @@
   (timeline-entities)
   (bib-entries "LH bibliografi - Sheet1.csv")
   (person-entities)
-  (parse-date excel-dtf "03.10.1899")
-  (parse-date excel-dtf "03-10-1899")
-  (parse-date tei-dtf "1899-10-03")
-  (parse-date utc-dtf "2022-03-25")
+  (db.tei/parse-date excel-dtf "03.10.1899")
+  (db.tei/parse-date excel-dtf "03-10-1899")
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")

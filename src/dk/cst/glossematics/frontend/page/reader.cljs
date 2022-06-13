@@ -11,6 +11,7 @@
             [dk.cst.stucco.group :as group]
             [dk.cst.stucco.document :as document]
             [dk.cst.stucco.util.css :as css]
+            [dk.cst.glossematics.db.tei :as db.tei]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.shared :as shared]
@@ -272,7 +273,8 @@
   ;; TODO: fix :tei-kvs side-effect, makes it hard to implement history/cache
   (p/let [tei              (or xml (api/fetch (str "/file/" document)))
           entity           (if xml
-                             {}
+                             (-> (db.tei/->triples document xml)
+                                 (db.tei/triples->entity))
                              (api/fetch (str "/entity/" document)))
           raw-hiccup       (parse tei)
           facs             (get-facs raw-hiccup)

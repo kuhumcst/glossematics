@@ -16,7 +16,7 @@
 (defn str-sort-val
   "Remove prepended parentheses from `s`."
   [s]
-  (-> s
+  (-> (str s)
       (str/replace #"^\(.+\)\s*" "")
       (str/replace #"^\-\s*" "")))
 

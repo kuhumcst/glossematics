@@ -109,7 +109,8 @@
 ;; TODO: make collection searchable too (add to search-rels)
 (def other-rels
   "Relations that are not available as search/order params."
-  {:document/title      {:label "title"}
+  {:db/ident            {:label "id"}
+   :document/title      {:label "title"}
    :document/bib-entry  {:label "bibliography entry"}
    :document/notes      {:label "notes"}
    :document/pp         {:label "pp."}

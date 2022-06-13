@@ -13,7 +13,7 @@
             [dk.cst.pedestal.sp.example :as example]
             [dk.cst.glossematics.backend.index :as index]
             [dk.cst.glossematics.backend.endpoints :as endpoints]
-            [dk.cst.glossematics.backend.db :as db]))
+            [dk.cst.glossematics.db :as db]))
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
