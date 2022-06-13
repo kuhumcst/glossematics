@@ -41,6 +41,9 @@
    ["/app/index/:kind"
     {:name ::index/page
      :page index/page}]
+   ["/app/reader"
+    {:name ::reader/preview
+     :page reader/page}]
    ["/app/reader/:document"
     {:name ::reader/page
      :page reader/page}]

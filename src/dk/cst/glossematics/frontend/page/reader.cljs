@@ -259,16 +259,21 @@
 (def ^:dynamic *current-fetch* nil)
 
 (defn set-content!
-  "Change the `document` currently displayed in the reader."
-  [document]
+  "Change the `document` currently displayed in the reader.
+
+  Optionally, an `xml` string may be provided to parse as a TEI document.
+  This feature is used to preview local TEI documents in Glossematics."
+  [document & [xml]]
   (set! *current-fetch* document)
   ;; Should not display old state while waiting for the network request.
   (when (not= document (:document @state/reader))
     (swap! state/reader assoc :i 0 :document nil))
 
   ;; TODO: fix :tei-kvs side-effect, makes it hard to implement history/cache
-  (p/let [tei              (api/fetch (str "/file/" document))
-          entity           (api/fetch (str "/entity/" document))
+  (p/let [tei              (or xml (api/fetch (str "/file/" document)))
+          entity           (if xml
+                             {}
+                             (api/fetch (str "/entity/" document)))
           raw-hiccup       (parse tei)
           facs             (get-facs raw-hiccup)
           rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)
@@ -308,36 +313,70 @@
         {:keys [id->name] :as search-state} @state/search
         location*          @state/location
         current-document   (get-in location* [:path-params :document])
+        local-preview?     (empty? current-document)
         document-selected? (= ::page (get-in location* [:data :name]))
         new-document?      (not= document current-document)
         {:keys [file/body?]} entity]
 
     ;; Uses a side-effect of the rendering function to load new documents.
     ;; Probably a bad way to do this...
-    (when (and document-selected?
+    (when (and (not local-preview?)
+               document-selected?
                new-document?
                (not= current-document *current-fetch*))
       (set-content! current-document))
 
-    (when (and document-selected? hiccup)
-      [:div.reader
-       [group/combination {:weights [1 1]}
-        [pattern/carousel state/facs-carousel]
-        [pattern/tabs
-         {:i   0
-          :kvs (pattern/heterostyled
-                 (cond->> [["Metadata"
-                            (when id->name
-                              [:div.reader-content
-                               [entity-meta search-state entity]])]
+    [:div {:class (if local-preview?
+                    "reader-preview"
+                    "reader")}
+     (when local-preview?
+       [:input {:aria-label "Local TEI-file"
+                :type       "file"
+                :on-change  (fn [e]
+                              (when-let [file (.item e.target.files 0)]
+                                (.then (.text file)
+                                       (fn [s]
+                                         (set-content! (.-name file) s)))))}])
 
-                           ["TEI"
-                            [:pre.reader-content
-                             [:code {:style {:white-space "pre-wrap"}}
-                              tei]]]]
+     (when hiccup
+       (if local-preview?
+         ;; Only for previewing TEI parsing functionality.
+         [pattern/tabs
+          {:i   0
+           :kvs (pattern/heterostyled
+                  [["Transcription"
+                    ^{:key tei} [rescope/scope hiccup tei-css]]
 
-                          body?
-                          (into
-                            [["Transcription"
-                              ^{:key tei} [rescope/scope hiccup tei-css]]])))}
-         {:id "tei-tabs"}]]])))
+                   ["Metadata"
+                    (when id->name
+                      [:div.reader-content
+                       [entity-meta search-state entity]])]
+
+                   ["TEI"
+                    [:pre.reader-content
+                     [:code {:style {:white-space "pre-wrap"}}
+                      tei]]]])}
+
+          {:id "tei-tabs"}]
+
+         ;; The primary page, displaying data fetched from the server.
+         [group/combination {:weights [1 1]}
+          [pattern/carousel state/facs-carousel]
+          [pattern/tabs
+           {:i   0
+            :kvs (pattern/heterostyled
+                   (cond->> [["Metadata"
+                              (when id->name
+                                [:div.reader-content
+                                 [entity-meta search-state entity]])]
+
+                             ["TEI"
+                              [:pre.reader-content
+                               [:code {:style {:white-space "pre-wrap"}}
+                                tei]]]]
+
+                            body?
+                            (into
+                              [["Transcription"
+                                ^{:key tei} [rescope/scope hiccup tei-css]]])))}
+           {:id "tei-tabs"}]]))]))

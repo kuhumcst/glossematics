@@ -203,9 +203,14 @@ nav.reader-mode {
     margin: 0 auto;
 }
 
+.reader-preview input[type=file] {
+    margin-bottom: 10px;
+}
+
 .search-page,
 .index-page,
-.user-page
+.user-page,
+.reader-preview
 {
     max-width: 90ch;
     margin: auto;
