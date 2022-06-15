@@ -18,9 +18,6 @@
              (interpose ", ")
              (vec))))
 
-(def surname-listing
-  (memoize shared/surname-listing))
-
 ;; TODO: make IDs into clickable search links
 (defn handle-name
   "Ensures that `x` -- which can be either an ID, a name, or a set of either IDs
@@ -55,7 +52,7 @@
                          title')]]
      [:li {:key bib-entry}
       (when-let [author-name (handle-name id->name author)]
-        [:<> (surname-listing author-name) ". "])
+        [:<> (shared/surname-first author-name) ". "])
       (if publication
         [:<>
          "\"" title'' "\". "
@@ -87,7 +84,7 @@
         full-name (-> other-author
                       (sd/author->id)
                       (id->name)
-                      (surname-listing)
+                      (shared/surname-first)
                       (str/split #",")
                       (first))]
     (if (= current-author other-author)

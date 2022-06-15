@@ -13,11 +13,17 @@
 
 (defn- index-groups
   [search-metadata entity-type]
-  (->> (get search-metadata entity-type)
-       (group-by (comp str->index-group first))
-       (remove (comp nil? first))
-       (sort-by first)
-       (into [])))
+  (let [entities (get search-metadata entity-type)]
+    (->> (if (= entity-type :entity.type/person)
+           (map (fn [[k v]]
+                  (let [k' (shared/surname-first k)]
+                    [(if (str/ends-with? k' ", ") k k') v]))
+                entities)
+           entities)
+         (group-by (comp str->index-group first))
+         (remove (comp nil? first))
+         (sort-by first)
+         (into []))))
 
 (defn index-links
   [& [current-type]]
@@ -46,9 +52,9 @@
              (vec))))
 
 (defn index-content
-  [kv]
+  [kvs]
   [:ul
-   (for [[k v] (sort-by (comp shared/str-sort-val first) kv)]
+   (for [[k v] (sort-by (comp shared/str-sort-val first) kvs)]
      [:li {:key k}
       [:a {:href (shared/search-href v)}
        (str k)]])])
