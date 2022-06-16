@@ -397,7 +397,9 @@
    {:db/ident         "#narch9"
     :entity/full-name "Paul Diderichsen's archive"
     :entity/type      :entity.type/repository}
-   ;; TODO: is #narch10 missing? investigate
+   {:db/ident         "#narch10"
+    :entity/full-name "Acta Jutlandica"
+    :entity/type      :entity.type/repository}
    {:db/ident         "#narch11"
     :entity/full-name "Travaux du Cercle de Linguistique Copenhague"
     :entity/type      :entity.type/repository}])
