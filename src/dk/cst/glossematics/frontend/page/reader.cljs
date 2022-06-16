@@ -1,6 +1,7 @@
 (ns dk.cst.glossematics.frontend.page.reader
   "Page containing a synchronized facsimile & TEI transcription reader."
-  (:require [shadow.resource :as resource]
+  (:require [clojure.string :as str]
+            [shadow.resource :as resource]
             [kitchen-async.promise :as p]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml]
@@ -309,6 +310,15 @@
                         (sort-by first (apply dissoc entity' sd/reader-rels)))]
     [shared/metadata-table search-state entity kvs]))
 
+(defn pdf-object
+  [pdf-src]
+  [:object {:data  pdf-src
+            :type  "application/pdf"
+            :style {:width  "100%"
+                    :height "calc(100vh - 102px)"}}
+   [:a {:href pdf-src}
+    "Download facsimile"]])
+
 (defn page
   []
   (let [{:keys [hiccup tei document entity]} @state/reader
@@ -318,7 +328,11 @@
         local-preview?     (empty? current-document)
         document-selected? (= ::page (get-in location* [:data :name]))
         new-document?      (not= document current-document)
-        {:keys [file/body?]} entity]
+        {:keys [file/body? document/facsimile]} entity
+        pdf-src            (and (not body?)
+                                (string? facsimile)
+                                (str/ends-with? facsimile ".pdf")
+                                (api/normalize-url (str "/file/" facsimile)))]
 
     ;; Uses a side-effect of the rendering function to load new documents.
     ;; Probably a bad way to do this...
@@ -363,7 +377,9 @@
 
          ;; The primary page, displaying data fetched from the server.
          [group/combination {:weights [1 1]}
-          [pattern/carousel state/facs-carousel]
+          (if pdf-src
+            [pdf-object pdf-src]
+            [pattern/carousel state/facs-carousel])
           [pattern/tabs
            {:i   0
             :kvs (pattern/heterostyled

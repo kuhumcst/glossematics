@@ -6,7 +6,7 @@
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
             [asami.core :as d]
-            [dk.cst.glossematics.db :as db :refer [conn]] ; TODO: attach this in an interceptor instead, reducing decoupling?
+            [dk.cst.glossematics.db :as db :refer [conn]]   ; TODO: attach this in an interceptor instead, reducing decoupling?
             [dk.cst.glossematics.db.tei :as db.tei]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
@@ -52,8 +52,9 @@
                     [?e :file/path ?path]]
                   conn filename)]
     (if path
-      (assoc-in (ring/file-response path)
-                [:headers "Cache-Control"] one-day-cache)
+      (-> (ring/file-response path)
+          (assoc-in [:headers "Cache-Control"] one-day-cache)
+          (assoc-in [:headers "X-Frame-Options"] "SAMEORIGIN")) ; allow <object>
       {:status 404})))
 
 (defn- clean-entity
