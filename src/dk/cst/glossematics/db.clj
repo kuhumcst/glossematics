@@ -378,7 +378,9 @@
    {:db/ident         "#narch2"
     :entity/full-name "Det Universitetshistoriske Arkiv"
     :entity/type      :entity.type/repository}
-   ;; TODO: is #narch3 missing? investigate
+   {:db/ident         "#narch3"
+    :entity/full-name "Lingvistisk Bibliotek"
+    :entity/type      :entity.type/repository}
    {:db/ident         "#narch4"
     :entity/full-name "Eli Fischer-Jørgensen's archive"
     :entity/type      :entity.type/repository}
