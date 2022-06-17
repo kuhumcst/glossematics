@@ -110,7 +110,7 @@
    (ghost src nil kmap))
   ([src path kmap]
    (let [state      (if path (ratom/cursor src path) src)
-         small-kmap (remove (partial apply =) kmap)         ; optimization
+         small-kmap (into {} (remove (partial apply =) kmap)) ; optimization
          inv-kmap   (set/map-invert small-kmap)]
      (ratom/make-reaction
        #(-> (deref state)

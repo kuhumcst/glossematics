@@ -17,7 +17,6 @@
             [io.pedestal.http.ring-middlewares :as middlewares]
             [ring.util.codec :as codec]
             [hiccup.core :as hiccup]
-            [time-literals.data-readers]                    ; tagged literals
             [time-literals.read-write :as tl]
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as coerce]
@@ -187,7 +186,7 @@
   [condition]
   (let [authorized? (sp.auth/condition->auth-test condition)
         auth-meta   {::condition condition
-                     ::auth-test   authorized?}]
+                     ::auth-test authorized?}]
     (assert authorized? (str "Invalid condition: " condition))
     (with-meta
       (ic/interceptor

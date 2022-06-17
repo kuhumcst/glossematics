@@ -5,7 +5,6 @@
             [reagent.dom :as rdom]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe :refer [href]]
-            [time-literals.data-readers]                    ; tagged literals
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
@@ -77,7 +76,7 @@
        [:h1 "Glossematics"]]
       [:a {:href      (href ::search/page)
            :title     "Find documents to read"
-           :tab-index (if authenticated? "0" "-1")    ; for accessibility
+           :tab-index (if authenticated? "0" "-1")          ; for accessibility
            :disabled  (not authenticated?)}
        "Find"]
       [:a {:href  (href ::timeline/page)

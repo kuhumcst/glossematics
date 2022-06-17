@@ -1,11 +1,10 @@
 {:paths   ["src" "resources"]
  :deps    {org.clojure/clojure            {:mvn/version "1.11.1"}
            org.clojure/data.json          {:mvn/version "2.4.0"} ; Pedestal SP
-           org.clojure/data.csv           {:mvn/version "1.0.0"}
+           org.clojure/data.csv           {:mvn/version "1.0.1"}
            org.clojure/math.combinatorics {:mvn/version "0.1.6"}
-           time-literals/time-literals    {:mvn/version "0.1.5"}
            dk.ative/docjure               {:mvn/version "1.17.0"}
-           tick/tick                      {:mvn/version "0.5.0-RC5"}
+           tick/tick                      {:mvn/version "0.5.0-RC6"} ; bundles time-literals
 
            io.pedestal/pedestal.service   {:mvn/version "0.5.10"}
            io.pedestal/pedestal.route     {:mvn/version "0.5.10"}
@@ -15,7 +14,7 @@
            hiccup/hiccup                  {:mvn/version "1.0.5"}
            ring/ring-core                 {:mvn/version "1.9.5"}
            com.wsscode/transito           {:mvn/version "2021.07.04"}
-           org.clojars.quoll/asami        {:mvn/version "2.2.3"}
+           org.clojars.quoll/asami        {:mvn/version "2.3.0"}
 
            ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
@@ -27,15 +26,16 @@
  ;; For now, the backend alias only contains metabase/saml20-clj since it
  ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
  ;; Using a separate alias for backend-only deps solves this.
- :aliases {:backend  {:extra-deps {metabase/saml20-clj {:mvn/version "2.0.0"}}}
+ :aliases {:backend  {:extra-deps {metabase/saml20-clj {:mvn/version "2.0.1"}}}
            :frontend {:extra-paths ["dev"]
-                      :extra-deps  {org.clojure/clojurescript   {:mvn/version "1.11.4"}
-                                    thheller/shadow-cljs        {:mvn/version "2.17.8"}
+                      :extra-deps  {org.clojure/clojurescript                       {:mvn/version "1.11.57"}
+                                    com.google.javascript/closure-compiler-unshaded {:mvn/version "v20220601"}
+                                    thheller/shadow-cljs                            {:mvn/version "2.19.3"}
                                     ;; TODO: use oops?
                                     #_#_binaryage/oops {:mvn/version "0.7.1"}
-                                    com.lambdaisland/glogi      {:mvn/version "1.1.144"}
-                                    metosin/reitit              {:mvn/version "0.5.17"}
-                                    reagent/reagent             {:mvn/version "1.1.1"}
-                                    lambdaisland/fetch          {:mvn/version "1.0.41"}
-                                    kitchen-async/kitchen-async {:mvn/version "0.1.0-SNAPSHOT"}}}
+                                    com.lambdaisland/glogi                          {:mvn/version "1.1.144"}
+                                    metosin/reitit                                  {:mvn/version "0.5.18"}
+                                    reagent/reagent                                 {:mvn/version "1.1.1"}
+                                    lambdaisland/fetch                              {:mvn/version "1.0.41"}
+                                    kitchen-async/kitchen-async                     {:mvn/version "0.1.0-SNAPSHOT"}}}
            :test     {:extra-paths ["test"]}}}
