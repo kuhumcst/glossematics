@@ -80,13 +80,10 @@
     (throw (ex-info "invalid configuration" conf-error)))
   (let [csp (if index/development?
               {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* 0.0.0.0:* ws://localhost:* ws://0.0.0.0:*"}
-              {:default-src "'none'"
-               :script-src  "'self' 'unsafe-inline'"        ; unsafe-eval possibly only needed for dev main.js
-               :connect-src "'self'"
-               :img-src     "'self'"
-               :font-src    "'self'"
-               :style-src   "'self' 'unsafe-inline'"
-               :base-uri    "'self'"})]
+              {:default-src "'self'"
+               :base-uri    "'self'"
+               :script-src  "'self' 'unsafe-inline'"        ; TODO: unsafe-eval possibly only needed for dev main.js?
+               :style-src   "'self' 'unsafe-inline'"})]
     (cond-> {::http/routes         #((deref #'routes) sp-conf)
              ::http/type           :jetty
              ::http/host           "0.0.0.0"                ; "localhost" won't work on a KU-IT server
