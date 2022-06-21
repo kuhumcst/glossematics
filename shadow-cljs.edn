@@ -6,7 +6,8 @@
  :builds   {:app  {:target            :browser
                    :output-dir        "resources/public/js/compiled"
                    :asset-path        "/js/compiled"
-                   :compiler-options  {:data-readers true}
+                   :compiler-options  {:data-readers  true
+                                       :infer-externs :auto}
                    :module-hash-names true
                    :modules           {:main {:init-fn dk.cst.glossematics.frontend/init!}}
 

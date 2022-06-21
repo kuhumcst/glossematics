@@ -30,7 +30,7 @@
            :frontend {:extra-paths ["dev"]
                       :extra-deps  {org.clojure/clojurescript                       {:mvn/version "1.11.57"}
                                     com.google.javascript/closure-compiler-unshaded {:mvn/version "v20220601"}
-                                    thheller/shadow-cljs                            {:mvn/version "2.19.3"}
+                                    thheller/shadow-cljs                            {:mvn/version "2.19.4"}
                                     ;; TODO: use oops?
                                     #_#_binaryage/oops {:mvn/version "0.7.1"}
                                     com.lambdaisland/glogi                          {:mvn/version "1.1.144"}

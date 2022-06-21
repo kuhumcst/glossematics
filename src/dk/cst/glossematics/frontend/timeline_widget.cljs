@@ -69,8 +69,8 @@
   "Mapping the interval time units described in labeller.js."
   (into {} interval-kvs))
 
-(def ->Layout
-  "Mapping the layouts described in timeline.js."
+(def ->Orientation
+  "Mapping the orientatons described in timeline.js."
   {:horizontal js/Timeline.HORIZONTAL
    :vertical   js/Timeline.VERTICAL})
 
@@ -101,11 +101,11 @@
 ;; TODO: optimise redrawing (store JS objects as state and reuse)
 (defn draw-timeline!
   "Draw a Simile Timeline in the HTML `element` based on `opts`."
-  [{:keys [layout bands event-source element]
-    :or   {layout :horizontal}
+  [{:keys [orientation bands event-source element]
+    :or   {orientation :horizontal}
     :as   opts}]
   (let [band-infos (connect-bands event-source bands)]
-    (js/Timeline.create element band-infos (->Layout layout))))
+    (js/Timeline.create element band-infos (->Orientation orientation) nil)))
 
 (def ms-count
   "Millisecond counts for various time spans."
@@ -139,8 +139,8 @@
   "Find dates between :start and :end of `event` with tick of size `ms`."
   [ms {:keys [start end] :as event}]
   (when end
-    (let [end-ts (.getTime end)]
-      (loop [ts    (+ (.getTime start) ms)
+    (let [end-ts (.getTime ^js/Date end)]
+      (loop [ts    (+ (.getTime ^js/Date start) ms)
              ticks []]
         (if (< ts end-ts)
           (recur (+ ts ms) (conj ticks (js/Date. ts)))
@@ -155,8 +155,8 @@
 
 (defn hotzone
   "Define a hotzone of size `ms` based on a `busy-date-kv`."
-  [unit ms [^js/Date center-date dates :as busy-date-kv]]
-  (let [center-ms (.getTime center-date)
+  [unit ms [center-date dates :as busy-date-kv]]
+  (let [center-ms (.getTime ^js/Date center-date)
         extent-ms (quot ms 2)]
     {:start   (js/Date. ^long (- center-ms extent-ms))
      :end     (js/Date. ^long (+ center-ms extent-ms))
@@ -180,8 +180,8 @@
   (let [band-height (fn [^js/Timeline._Band band]
                       (let [ep (.getEventPainter band)]
                         (when (g/containsKey ep "getOrthogonalExtent")
-                          (.getOrthogonalExtent ep))))
-        band0       (.getBand ^js/Timeline tl 0)]
+                          (.getOrthogonalExtent ^js ep))))
+        band0       (.getBand ^js tl 0)]
     (* (band-height band0) 1.25)))
 
 (defn resize-tl!
@@ -194,7 +194,7 @@
       (let [current-extent (tl-extent tl*)]
         (when-not (= current-extent extent)
           (swap! state assoc :extent current-extent))
-        (.layout ^js/Timeline tl*)))))
+        (.layout ^js tl*)))))
 
 (defn autoscroll-fn
   [^js/Timeline._Band band state]
@@ -229,9 +229,9 @@
 
   The available state options are:
 
-    :events - events as Clojure maps (see the prepare-event fn).
-    :bands  - information about the bands (see the connect-bands fn).
-    :layout - either :horizontal or :vertical."
+    :events      - events as Clojure maps (see the prepare-event fn).
+    :bands       - information about the bands (see the connect-bands fn).
+    :orientation - :horizontal or :vertical."
   [attr state]
   (let [state (if (map? state)
                 (r/atom state)
@@ -243,9 +243,9 @@
          (let [{:keys [event-source events] :as init-state} @state
                element   (rdom/dom-node this)
                new-state (assoc init-state :element element)
-               tl        (draw-timeline! new-state)
-               band0     (.getBand ^js/Timeline tl 0)
-               band1     (.getBand ^js/Timeline tl 1)]
+               ^js tl    (draw-timeline! new-state)
+               ^js band0 (.getBand tl 0)
+               ^js band1 (.getBand tl 1)]
            ;; TODO: also react to _onKeyUp _onMouseOut?
            (g/set band0 "_autoScroll" (autoscroll-fn band0 state))
            (g/set band1 "_autoScroll" (autoscroll-fn band1 state))
@@ -264,7 +264,7 @@
                height (max extent (-> attr :style :height))]
            (when-let [tl* (and tl @tl)]
              ;; Preserve scroll state of timeline when redrawing.
-             (let [band0 (.getBand ^js/Timeline tl* 0)
-                   date  (.getCenterVisibleDate band0)]
+             (let [band0 (.getBand ^js tl* 0)
+                   date  (.getCenterVisibleDate ^js band0)]
                (swap! state assoc-in [:bands :common :date] date)))
            [:div (assoc-in attr [:style :height] height)]))})))
