@@ -184,18 +184,27 @@ nav a:not(:first-child)::first-letter {
     color: #ffc92e;
 }
 
-nav.reader-mode h1,
-nav.reader-mode a:not(:first-child),
-nav.reader-mode a:not(:first-child)::first-letter {
+.shell.reader-mode nav h1,
+.shell.reader-mode nav a:not(:first-child),
+.shell.reader-mode nav a:not(:first-child)::first-letter {
   font-size: 16px;
 }
 
-nav.reader-mode {
+.shell.reader-mode nav {
   padding: var(--padding-m);
 }
 
 .shell__content {
     padding: var(--padding-xl);
+}
+
+.shell__content.fill-mode {
+    padding: 0;
+}
+
+.shell__content.fill-mode > * {
+    height: calc(100vh - 58px); /* 38xp + 20px */
+    margin-top: 20px;
 }
 
 .reader {

@@ -69,9 +69,9 @@
   []
   (let [{:keys [page name]} (:data @state/location)
         authenticated? @state/authenticated?]
-    [:div.shell
-     [:nav {:class (when (= name ::reader/page)
-                     "reader-mode")}
+    [:div.shell {:class (when (get #{::reader/page ::timeline/page} name)
+                          "reader-mode")}
+     [:nav
       [:a {:href (href ::main)}
        [:h1 "Glossematics"]]
       [:a {:href      (href ::search/page)
@@ -89,7 +89,8 @@
            :title "Settings"}
        [:img.nav-icon {:src "/images/person-sharp-yellow-svgrepo-com.svg"
                        :alt ""}]]]
-     [:div.shell__content
+     [:div.shell__content {:class (when (= name ::timeline/page)
+                                    "fill-mode")}
       (if page
         [page]
         [:p "unknown page"])]]))

@@ -174,28 +174,6 @@
                      (map (partial hotzone unit ms)))]
     (into [] hotzone-xf date-bins)))
 
-;; TODO: make dynamic, currently just adds +25% as the overview is set to 20%
-(defn tl-extent
-  [tl]
-  (let [band-height (fn [^js/Timeline._Band band]
-                      (let [ep (.getEventPainter band)]
-                        (when (g/containsKey ep "getOrthogonalExtent")
-                          (.getOrthogonalExtent ^js ep))))
-        band0       (.getBand ^js tl 0)]
-    (* (band-height band0) 1.25)))
-
-(defn resize-tl!
-  "Updates the :extent of the :tl defined in `state` until the size of the
-  container matches the extent of its contents. WARNING: kind of a hack."
-  [state]
-  (let [{:keys [tl extent]} @state
-        tl* (and tl @tl)]
-    (when tl*
-      (let [current-extent (tl-extent tl*)]
-        (when-not (= current-extent extent)
-          (swap! state assoc :extent current-extent))
-        (.layout ^js tl*)))))
-
 (defn autoscroll-fn
   [^js/Timeline._Band band state]
   (fn [distance f]
@@ -204,15 +182,14 @@
             0
             distance
             1000
-            #(do (when f (f)) (resize-tl! state))))))
+            #(when f (f))))))
 
 ;; TODO: unfortunately, this interferes with _autoScroll, fix it somehow!
 (defn on-mouse-up-fn
   [^js/Timeline._Band band state]
   (let [finish-drag (fn []
                       (.focus (.-_keyboardInput band))
-                      (._bounceBack band)
-                      (resize-tl! state))]
+                      (._bounceBack band))]
     (fn []
       (cond
         (.-_dragging band)
@@ -232,7 +209,7 @@
     :events      - events as Clojure maps (see the prepare-event fn).
     :bands       - information about the bands (see the connect-bands fn).
     :orientation - :horizontal or :vertical."
-  [attr state]
+  [_attr state]
   (let [state (if (map? state)
                 (r/atom state)
                 state)]
@@ -253,10 +230,6 @@
            #_(g/set band1 "_onMouseUp" (on-mouse-up-fn band1 state))
            (add-events! event-source events)
            (reset! state (assoc new-state :tl (atom tl)))))
-
-       :component-did-update
-       (fn [this]
-         (resize-tl! state))
 
        :reagent-render
        (fn [attr _]
