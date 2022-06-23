@@ -238,8 +238,8 @@ temp/
 
 # End of https://www.gitignore.io/api/node,java,clojure,intellij
 
-/resources/public/js/compiled
-/resources/public/js/test
+/resources/dk/cst/glossematics/public/js/compiled
+/resources/dk/cst/glossematics/public/js/test
 .idea
 .shadow-cljs
 package-lock.json

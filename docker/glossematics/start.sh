@@ -1,6 +1,6 @@
 #!/bin/bash
 
-clojure -A:backend -M -m dk.cst.glossematics.backend "/etc/glossematics/conf.edn"
+java -jar glossematics.jar "/etc/glossematics/conf.edn"
 
 # Print error in case of failure
 cat /tmp/clojure-*.edn

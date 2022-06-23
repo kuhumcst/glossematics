@@ -13,7 +13,8 @@
             [dk.cst.pedestal.sp.example :as example]
             [dk.cst.glossematics.backend.index :as index]
             [dk.cst.glossematics.backend.endpoints :as endpoints]
-            [dk.cst.glossematics.db :as db]))
+            [dk.cst.glossematics.db :as db])
+  (:gen-class))
 
 (defonce server (atom nil))
 (defonce sp-conf (atom nil))
@@ -88,7 +89,7 @@
              ::http/type           :jetty
              ::http/host           "0.0.0.0"                ; "localhost" won't work on a KU-IT server
              ::http/port           8080
-             ::http/resource-path  "/public"
+             ::http/resource-path  "/dk/cst/glossematics/public"
 
              ;; Using the starter policy from https://content-security-policy.com/ as a basis
              ::http/secure-headers {:content-security-policy-settings csp}}

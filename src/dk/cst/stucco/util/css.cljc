@@ -4,13 +4,13 @@
             [clojure.string :as str]))
 
 (def resources
-  {:document (resource/inline "public/css/document.css")
-   :group    (resource/inline "public/css/group.css")
-   :pattern  (resource/inline "public/css/pattern.css")
-   :shared   (resource/inline "public/css/shared.css")})
+  {:document (resource/inline "dk/cst/glossematics/public/css/document.css")
+   :group    (resource/inline "dk/cst/glossematics/public/css/group.css")
+   :pattern  (resource/inline "dk/cst/glossematics/public/css/pattern.css")
+   :shared   (resource/inline "dk/cst/glossematics/public/css/shared.css")})
 
 (def default-theme
-  (resource/inline "public/css/theme.css"))
+  (resource/inline "dk/cst/glossematics/public/css/theme.css"))
 
 (def shadow-style
   "The combined CSS content - including the default theme - for all widgets."

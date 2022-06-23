@@ -4,7 +4,8 @@
   (:require [clojure.java.io :as io]
             [clojure.edn :as edn]
             [hiccup.core :as hiccup]
-            [dk.cst.pedestal.sp.auth :as sp.auth])
+            [dk.cst.pedestal.sp.auth :as sp.auth]
+            [dk.cst.glossematics.backend.shared :refer [resource]])
   (:import [java.util Date]))
 
 (def init-hash
@@ -21,7 +22,7 @@
   that is not the case when running the regular shadow-cljs watch process.
 
   This relies on the :module-hash-names being set to true in shadow-cljs.edn."
-  (if-let [url (io/resource "public/js/compiled/manifest.edn")]
+  (if-let [url (resource "public/js/compiled/manifest.edn")]
     (-> url slurp edn/read-string first :output-name)
     "main.js"))
 

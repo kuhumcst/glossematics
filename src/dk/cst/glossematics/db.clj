@@ -6,10 +6,11 @@
             [clojure.data.csv :as csv]
             [clojure.math.combinatorics :as combo]
             [asami.core :as d]
+            [tick.core :as t]
             [io.pedestal.log :as log]
             [dk.ative.docjure.spreadsheet :as xl]
-            [dk.cst.glossematics.db.tei :as db.tei]
-            [tick.core :as t])
+            [dk.cst.glossematics.backend.shared :refer [resource]]
+            [dk.cst.glossematics.db.tei :as db.tei])
   (:import [java.io File]))
 
 ;; Syntax errors (fixed)
@@ -103,7 +104,8 @@
 
 (defn timeline-entities
   []
-  (->> (io/file (io/resource "Reconstructed Hjelmslev kronologi 250122.xlsx"))
+  (->> (resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
+       (io/input-stream)
        (xl/load-workbook)
        (xl/select-sheet "Ark1")
        (xl/select-columns chronology-columns)
@@ -209,7 +211,7 @@
 
 (defn bib-entries
   [filename]
-  (with-open [reader (io/reader (io/resource filename))]
+  (with-open [reader (io/reader (resource filename))]
     (into [] bib-entries-xf (rest (csv/read-csv reader)))))
 
 (defn- multiple?
@@ -300,7 +302,8 @@
 
 (defn person-entities
   []
-  (->> (io/file (io/resource "Navneliste_gennemgået-FINAL.xlsx"))
+  (->> (resource "Navneliste_gennemgået-FINAL.xlsx")
+       (io/input-stream)
        (xl/load-workbook)
        (xl/select-sheet "Sheet1")
        (xl/select-columns {:A :db/ident
@@ -316,7 +319,7 @@
 
 (defn other-entities
   [filename id-prefix entity-type]
-  (->> (-> filename io/resource io/file io/reader line-seq dedupe)
+  (->> (-> filename resource io/input-stream io/reader line-seq dedupe)
        (map #(str/split % #"\t"))
        (map (fn [[id full-name]]
               {:db/ident         (str id-prefix id)

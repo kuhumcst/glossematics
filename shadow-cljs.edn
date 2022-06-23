@@ -1,10 +1,9 @@
 {:deps     {:aliases [:frontend :test]}
- :dev-http {9000 {:root    "resources/public"
+ :dev-http {9000 {:root    "resources/dk/cst/glossematics/public"
                   :handler dk.cst.glossematics.backend.index/shadow-handler}}
- :nrepl    {:port    9900
-            :init-ns dev}
+ :nrepl    {:port 9900}
  :builds   {:app  {:target            :browser
-                   :output-dir        "resources/public/js/compiled"
+                   :output-dir        "resources/dk/cst/glossematics/public/js/compiled"
                    :asset-path        "/js/compiled"
                    :compiler-options  {:data-readers  true
                                        :infer-externs :auto}
@@ -14,6 +13,6 @@
                    ;; https://shadow-cljs.github.io/docs/UsersGuide.html#build-report
                    :build-hooks       [(shadow.cljs.build-report/hook)]}
             :test {:target   :browser-test
-                   :test-dir "resources/public/js/test"
+                   :test-dir "resources/dk/cst/glossematics/public/js/test"
                    :devtools {:http-port 9100
-                              :http-root "resources/public/js/test"}}}}
+                              :http-root "resources/dk/cst/glossematics/public/js/test"}}}}

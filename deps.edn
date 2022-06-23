@@ -15,6 +15,7 @@
            ring/ring-core                 {:mvn/version "1.9.5"}
            com.wsscode/transito           {:mvn/version "2021.07.04"}
            org.clojars.quoll/asami        {:mvn/version "2.3.0"}
+           metabase/saml20-clj            {:mvn/version "2.0.1"}
 
            ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
            ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
@@ -23,19 +24,17 @@
            kuhumcst/rescope               {:git/url "https://github.com/kuhumcst/rescope.git"
                                            :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}}
 
- ;; For now, the backend alias only contains metabase/saml20-clj since it
- ;; brought in a Google Guava dependency that conflicted with shadow-cljs.
- ;; Using a separate alias for backend-only deps solves this.
- :aliases {:backend  {:extra-deps {metabase/saml20-clj {:mvn/version "2.0.1"}}}
-           :frontend {:extra-paths ["dev"]
-                      :extra-deps  {org.clojure/clojurescript                       {:mvn/version "1.11.57"}
-                                    com.google.javascript/closure-compiler-unshaded {:mvn/version "v20220601"}
-                                    thheller/shadow-cljs                            {:mvn/version "2.19.4"}
-                                    ;; TODO: use oops?
-                                    #_#_binaryage/oops {:mvn/version "0.7.1"}
-                                    com.lambdaisland/glogi                          {:mvn/version "1.1.144"}
-                                    metosin/reitit                                  {:mvn/version "0.5.18"}
-                                    reagent/reagent                                 {:mvn/version "1.1.1"}
-                                    lambdaisland/fetch                              {:mvn/version "1.0.41"}
-                                    kitchen-async/kitchen-async                     {:mvn/version "0.1.0-SNAPSHOT"}}}
+ :aliases {:frontend {:extra-deps {org.clojure/clojurescript                       {:mvn/version "1.11.57"}
+                                   com.google.javascript/closure-compiler-unshaded {:mvn/version "v20220601"}
+                                   thheller/shadow-cljs                            {:mvn/version "2.19.4"}
+                                   ;; TODO: use oops?
+                                   #_#_binaryage/oops {:mvn/version "0.7.1"}
+                                   com.lambdaisland/glogi                          {:mvn/version "1.1.144"}
+                                   metosin/reitit                                  {:mvn/version "0.5.18"}
+                                   reagent/reagent                                 {:mvn/version "1.1.1"}
+                                   lambdaisland/fetch                              {:mvn/version "1.0.41"}
+                                   kitchen-async/kitchen-async                     {:mvn/version "0.1.0-SNAPSHOT"}}}
+           :build    {:extra-paths ["dev/src"]
+                      :extra-deps  {io.github.seancorfield/build-clj
+                                    {:git/tag "v0.8.2" :git/sha "0ffdb4c"}}}
            :test     {:extra-paths ["test"]}}}

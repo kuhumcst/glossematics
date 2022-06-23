@@ -33,7 +33,7 @@
 (def tei-css
   "Styles used for TEI documents specifically. They are written in a regular CSS
   file and then processed to work on the generated HTML."
-  (style/prefix-css "tei" (resource/inline "public/css/tei.css")))
+  (style/prefix-css "tei" (resource/inline "dk/cst/glossematics/public/css/tei.css")))
 
 (def theme+tei-css
   "The complete set of styles (widgets and TEI documents)."

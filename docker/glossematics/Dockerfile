@@ -48,6 +48,9 @@ COPY ./src /etc/glossematics/src
 COPY ./resources /etc/glossematics/resources
 RUN shadow-cljs --aliases :frontend release app
 
+# Build an uberjar for the backend
+RUN clojure -T:build org.corfield.build/uber :lib dk.cst/glossematics :main dk.cst.glossematics.backend :uber-file \"glossematics.jar\"
+
 # Run the backend web service
 COPY ./docker/glossematics/start.sh /etc/glossematics/start.sh
 RUN chmod +x /etc/glossematics/start.sh
