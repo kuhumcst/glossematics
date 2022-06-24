@@ -156,8 +156,8 @@ The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](ht
 
 However, the JavaScript source is still quite huge and written in a fairly incoherent style. For this reason, the visual style of the timeline must be handled by editing primarily
 
-* [ethers.css](/dk/cst/glossematics/public/timeline/css/ethers.css)
-* [themes.js](/dk/cst/glossematics/public/timeline/js/themes.js)
-* [ether-painters.js](/dk/cst/glossematics/public/timeline/js/ether-painters.js)
+* [ethers.css](/resources/dk/cst/glossematics/public/timeline/css/ethers.css)
+* [themes.js](/resources/dk/cst/glossematics/public/timeline/js/themes.js)
+* [ether-painters.js](/resources/dk/cst/glossematics/public/timeline/js/ether-painters.js)
 
 but also various other JS/CSS files depending on what needs to be changed.
