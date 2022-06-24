@@ -147,7 +147,7 @@ nav h1, nav a {
     text-transform: uppercase;
     padding: 0;
     margin: 0;
-
+    max-width: fit-content; /* fixes #47 - inconsistent widths in Firefox */
 }
 
 nav h1 {

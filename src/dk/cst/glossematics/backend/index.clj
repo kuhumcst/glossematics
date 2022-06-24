@@ -1,8 +1,7 @@
 (ns dk.cst.glossematics.backend.index
   "Generate the index.html file using Clojure. This is mostly done to streamline
   fingerprinting of any included files in the release version."
-  (:require [clojure.java.io :as io]
-            [clojure.edn :as edn]
+  (:require [clojure.edn :as edn]
             [hiccup.core :as hiccup]
             [dk.cst.pedestal.sp.auth :as sp.auth]
             [dk.cst.glossematics.backend.shared :refer [resource]])
@@ -76,7 +75,9 @@
 
 (defn index-html
   [assertions saml-paths]
-  (hiccup/html (index-hiccup assertions saml-paths)))
+  (str
+    "<!DOCTYPE html>"
+    (hiccup/html (index-hiccup assertions saml-paths))))
 
 (defn handler
   [request]
