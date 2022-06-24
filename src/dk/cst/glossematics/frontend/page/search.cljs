@@ -186,7 +186,8 @@
                          :value    (rel->s rel)}
                 label])))])
 
-(defn- update!
+(defn- new-page!
+  "Add a new page to the HTML history stack based on the current query state."
   []
   (rfe/push-state ::page {} (state->params @state/query)))
 
@@ -203,7 +204,7 @@
                  :in ""
                  :offset 0)
           (swap! state/search dissoc :results)
-          (update!))
+          (new-page!))
         (swap! state/query assoc :not-allowed? true))
       (swap! state/query assoc
              :bad-input? true
@@ -215,7 +216,7 @@
   (let [->order #(fn [e]
                    (swap! state/query assoc-in [:order-by %] (s->rel (e->v e)))
                    (swap! state/query assoc :offset 0 :from nil :to nil)
-                   (update!))]
+                   (new-page!))]
     [:div.input-row
      [:label {:for "sort-key"} "Sort by "]
      [:select {:id        "sort-key"
@@ -238,7 +239,7 @@
                       (if-let [v (not-empty (e->v e))]
                         (swap! state/query assoc % v)
                         (swap! state/query dissoc %))
-                      (update!))]
+                      (new-page!))]
     [:div.input-row
      [:label {:for "from"} "Limit from "]
      [:input {:id        "from"
@@ -284,7 +285,7 @@
                           (swap! state/query assoc
                                  :items []
                                  :unique #{})
-                          (update!))}
+                          (new-page!))}
      "x"]]
 
    (for [[k v :as kv] items
@@ -309,7 +310,7 @@
                  :on-click (fn [e]
                              (.preventDefault e)
                              (swap! state/query remove-kv kv)
-                             (update!))}
+                             (new-page!))}
         "x"]]
       " "])])
 
@@ -384,18 +385,10 @@
 
 (defn- set-offset
   [f n]
-  (let [new-offset    (fn [offset & args] (apply f offset args))
-        top-elem      (js/document.querySelector ".search-form")
-        header-height 100]
+  (let [new-offset    (fn [offset & args] (apply f offset args))]
     (->> (swap! state/query update :offset new-offset n)
          (state->params)
-         (rfe/replace-state ::page {}))
-
-    ;; Scroll to the top paging element when switching pages.
-    ;; Must also account for the approximate height of the sticky header!
-    (when-not (shared/visible? top-elem)
-      (.scrollIntoView top-elem true)
-      (.scroll js/window 0 (+ js/window.scrollY header-height)))))
+         (rfe/replace-state ::page {}))))
 
 (defn generate-paging
   [limit total]

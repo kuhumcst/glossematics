@@ -43,6 +43,18 @@
    (when-let [fragment (not-empty js/window.location.hash)]
      (find-fragment fragment))))
 
+;; TODO: over-engineered? querySelector not really needed at the moment
+(defn scroll-reset!
+  "Scroll to the element defined by `query-selector`, e.g. when switching pages.
+
+   Optionally set `account-for-header?` when needed!"
+  [query-selector & [account-for-header?]]
+  (let [top-elem      (js/document.querySelector query-selector)
+        header-height (if account-for-header? 100 0)]
+    (when-not (visible? top-elem)
+      (.scrollIntoView top-elem true)
+      (.scroll js/window 0 (+ js/window.scrollY header-height)))))
+
 ;; TODO: eventually use :as-alias
 (defn encyclopedia-href
   [ref]

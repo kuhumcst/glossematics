@@ -8,6 +8,7 @@
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
+            [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
             [dk.cst.glossematics.frontend.page.search :as search]
@@ -113,7 +114,8 @@
       (when-let [prep (get-in m [:data :prep])]
         (prep m)))
 
-    (reset! state/location m)))
+    (reset! state/location m)
+    (shared/scroll-reset! "body")))
 
 (defn ^:dev/after-load render
   []
