@@ -18,6 +18,7 @@
             [dk.cst.glossematics.frontend.shared :as shared]
             [dk.cst.glossematics.static-data :as sd]))
 
+;; TODO: wrong author? https://glossematics.dk/app/search?limit=10&offset=0&_=%23norg113
 ;; TODO: missing transcription https://glossematics.dk/app/reader/acc-1992_0005_125_MTG_0810-tei.xml
 ;; TODO: wrong sender https://glossematics.dk/app/reader/acc-1992_0005_022_Bierwisch_0010-tei.xml
 ;; TODO: yuki not linked http://localhost:9000/app/reader/HJUtilDJ-1932-09-28-tei-final.xml
