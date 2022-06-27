@@ -7,7 +7,7 @@
             [asami.core :as d]
             [io.pedestal.log :as log]
             [dk.cst.glossematics.static-data :as sd]
-            [dk.cst.glossematics.shared :refer [resource]]
+            [dk.cst.glossematics.shared :as shared]
             [dk.cst.glossematics.db.file :as db.file]
             [dk.cst.glossematics.db.person :as db.person]
             [dk.cst.glossematics.db.timeline :as db.timeline]
@@ -80,7 +80,7 @@
 
 (defn other-entities
   [filename id-prefix entity-type]
-  (->> (-> filename resource io/input-stream io/reader line-seq dedupe)
+  (->> (-> filename shared/resource io/input-stream io/reader line-seq dedupe)
        (map #(str/split % #"\t"))
        (map (fn [[id full-name]]
               {:db/ident         (str id-prefix id)

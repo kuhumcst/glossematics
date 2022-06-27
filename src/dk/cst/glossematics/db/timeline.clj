@@ -3,7 +3,7 @@
             [clojure.java.io :as io]
             [tick.core :as t]
             [dk.ative.docjure.spreadsheet :as xl]
-            [dk.cst.glossematics.shared :refer [parse-date resource]]))
+            [dk.cst.glossematics.shared :as shared]))
 
 (def chronology-columns
   {:A :event/start
@@ -55,8 +55,8 @@
       (update :event/type event-type-longform)
       (update :event/restored-start? (comp boolean not-empty))
       (update :event/restored-end? (comp boolean not-empty))
-      (update :event/start (partial parse-date excel-dtf))
-      (update :event/end (partial parse-date excel-dtf))
+      (update :event/start (partial shared/parse-date excel-dtf))
+      (update :event/end (partial shared/parse-date excel-dtf))
       (assoc :entity/type :entity.type/event)))
 
 (defn- remove-nil-vals
@@ -69,7 +69,7 @@
 
 (defn timeline-entities
   []
-  (->> (resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
+  (->> (shared/resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
        (io/input-stream)
        (xl/load-workbook)
        (xl/select-sheet "Ark1")

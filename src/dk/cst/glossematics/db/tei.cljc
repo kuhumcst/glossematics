@@ -5,18 +5,18 @@
             [clojure.set :as set]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml]
-            [dk.cst.glossematics.shared :refer [parse-date utc-dtf]])
+            [dk.cst.glossematics.shared :as shared])
   #?(:clj (:import [java.time.temporal ChronoField]
                    [java.time.format DateTimeFormatterBuilder])))
 
-(def utc-fallback-dtf
+(def utc-dtf'
   "NOTE: Defaults to 1 january in case either is missing."
   #?(:clj  (-> (DateTimeFormatterBuilder.)
                (.appendPattern "yyyy[-MM[-dd]]")
                (.parseDefaulting ChronoField/MONTH_OF_YEAR 1)
                (.parseDefaulting ChronoField/DAY_OF_MONTH 1)
                (.toFormatter))
-     :cljs utc-dtf))
+     :cljs shared/utc-dtf))
 
 ;; TODO: is ?optional switched with non-optional? see :document-type
 ;; TODO: the ... pattern not working correctly in Cuphic?
@@ -151,7 +151,7 @@
                [filename :document/sender-location sender-loc]))
            (when-let [sent-at (get-in correspDesc [0 'sent-at])]
              (when (valid-date? sent-at)
-               [filename :document/sent-at (parse-date utc-dtf sent-at)]))
+               [filename :document/sent-at (shared/parse-date utc-dtf' sent-at)]))
            (when-let [recipient (get-in correspDesc [0 'recipient])]
              (when (valid-id? recipient)
                [filename :document/recipient recipient]))
@@ -161,7 +161,7 @@
         [(for [{:syms [id]} facsimile]
            [filename :document/facsimile id])
          (for [{:syms [when]} body-dates]
-           [filename :document/date-mention (parse-date utc-fallback-dtf when)])
+           [filename :document/date-mention (shared/parse-date utc-dtf' when)])
          (for [{:syms [tag ref ?type]} body-refs]
            (when (valid-id? ref)
              [filename :document/mention ref]))

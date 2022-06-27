@@ -6,7 +6,7 @@
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
             [asami.core :as d]
-            [dk.cst.glossematics.db :as db :refer [conn]]   ; TODO: attach this in an interceptor instead, reducing decoupling?
+            [dk.cst.glossematics.db :refer [conn]]   ; TODO: attach this in an interceptor instead, reducing decoupling?
             [dk.cst.glossematics.db.search :as db.search]
             [dk.cst.glossematics.shared :refer [parse-date utc-dtf]]
             [dk.cst.glossematics.static-data :as sd]
