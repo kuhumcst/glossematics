@@ -35,6 +35,14 @@
         (log/warn "Could not parse date: " date-str)))
     date-str))
 
+(defn remove-nil-vals
+  "Remove kvs from `m` where v is nil.
+
+  Asami treats a nil v different from an absent v in an input entity. The former
+  comes out as :tg/nil in queries while the latter comes out as a true nil."
+  [m]
+  (into {} (remove (comp nil? second) m)))
+
 (comment
   (parse-date utc-fallback-dtf "1899-10-03")
   (parse-date utc-dtf "2022-03-25")
