@@ -8,11 +8,11 @@
             [io.pedestal.log :as log]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.shared :refer [resource]]
+            [dk.cst.glossematics.db.file :as db.file]
             [dk.cst.glossematics.db.person :as db.person]
             [dk.cst.glossematics.db.timeline :as db.timeline]
             [dk.cst.glossematics.db.bibliography :as db.bibliography]
-            [dk.cst.glossematics.db.tei :as db.tei])
-  (:import [java.io File]))
+            [dk.cst.glossematics.db.tei :as db.tei]))
 
 ;; Syntax errors (fixed)
 ;; acc-1992_0005_025_Jakobson_0180-tei-final.xml:127:64
@@ -119,39 +119,6 @@
                :entity/type      (keyword "entity.type" entity-type)
                :entity/full-name full-name}))))
 
-(defn- with-body?
-  "Does the file with `filename` contain a body of content?"
-  [filename]
-  (str/ends-with? filename "-final.xml"))
-
-(def file-entities-xf
-  (comp
-    (remove #(.isDirectory ^File %))
-    (map (fn [file]
-           (let [filename  (.getName ^File file)
-                 extension (last (str/split filename #"\."))
-                 path      (.getPath ^File file)]
-             {:db/ident       filename
-              :entity/type    :entity.type/file
-              :file/body?     (with-body? filename)
-              :file/name      filename
-              :file/extension extension
-              :file/path      path})))))
-
-(def duplicates-xf
-  (comp
-    (map :file/name)
-    (filter with-body?)
-    (map (fn [s] (str (subs s 0 (- (count s) 10)) ".xml")))))
-
-(defn file-entities
-  "Recursively list all file entities found in `dir`, ignoring directories.
-  Duplicates of the transcribed TEI files with empty bodies are not included."
-  [dir]
-  (let [entities   (into [] file-entities-xf (file-seq (io/file dir)))
-        duplicates (into #{} duplicates-xf entities)]
-    (remove (comp duplicates :file/name) entities)))
-
 (defn tei-files
   [conn]
   (d/q '[:find [?path ...]
@@ -166,9 +133,6 @@
   (log/info (keyword "bootstrap.asami" (str (name description) "-tx"))
             (count tx-data))
   (d/transact conn {:tx-data tx-data}))
-
-(def file->entity
-  (comp db.tei/triples->entity db.tei/->triples))
 
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
@@ -193,8 +157,8 @@
 
   ;; Add the file entities found in the files-dir.
   ;; Then parse each TEI file and link the document data to the file entities.
-  (log-transaction! :files (file-entities files-dir))
-  (log-transaction! :tei-data (map file->entity (tei-files conn))))
+  (log-transaction! :files (db.file/file-entities files-dir))
+  (log-transaction! :tei-data (map db.tei/file->entity (tei-files conn))))
 
 (defn- entity->where-triples
   "Deconstruct partial `entity` description into triples for a search query."
@@ -316,8 +280,6 @@
       {:total (count matches)})))
 
 (comment
-  (file-entities "/Users/rqf595/Desktop/Glossematics-data")
-  (count (file-entities "/Users/rqf595/Desktop/Glossematics-data"))
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
 

@@ -186,6 +186,9 @@
            {k #{v}})
          (apply merge-with set/union {:db/ident ident}))))
 
+(def file->entity
+  (comp triples->entity ->triples))
+
 (comment
   (def example (io/file "/Users/rqf595/Desktop/Glossematics-data/N-drev/Data-FINAL/DanielJones/TEI/DJtilHJU-1931-02-14-tei-final.xml"))
   (xml/parse (slurp example))
