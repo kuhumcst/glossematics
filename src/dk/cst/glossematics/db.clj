@@ -6,10 +6,10 @@
             [clojure.data.csv :as csv]
             [clojure.math.combinatorics :as combo]
             [asami.core :as d]
-            [tick.core :as t]
             [io.pedestal.log :as log]
             [dk.ative.docjure.spreadsheet :as xl]
-            [dk.cst.glossematics.backend.shared :refer [resource]]
+            [dk.cst.glossematics.shared :refer [resource]]
+            [dk.cst.glossematics.db.timeline :as db.timeline]
             [dk.cst.glossematics.db.tei :as db.tei])
   (:import [java.io File]))
 
@@ -22,60 +22,6 @@
 
 (defonce conn
   (d/connect db-uri))
-
-(def chronology-columns
-  {:A :event/start
-   :B :event/restored-start?
-   :C :event/end
-   :D :event/restored-end?
-   :E :event/type
-   :F :event/title
-   :G :event/description
-   :H :event/title-more
-   :I :event/?1
-   :J :location/country
-   :K :location/city
-   :L :location/institution
-   :M :event/?2
-   #_#_:N :event/title                                      ; duplicate column
-   :O :event/?3
-   :P :event/description-more
-   :Q :event/people
-   :R :event/source})
-
-(def chronology-import
-  #{:event/start
-    :event/restored-start?
-    :event/end
-    :event/restored-end?
-    :event/type
-    :event/title
-    :event/description
-    :location/country
-    :location/city
-    :location/institution
-    :event/people})
-
-(def event-type-longform
-  {"L" :life
-   "U" :teaching
-   "F" :lecture
-   "R" :travel
-   "N" :networking})
-
-(def excel-dtf
-  (t/formatter "dd-MM-yyyy"))
-
-(defn normalize-chronology-data
-  [event]
-  (-> event
-      (update-vals #(if (string? %) (str/trim %) %))
-      (update :event/type event-type-longform)
-      (update :event/restored-start? (comp boolean not-empty))
-      (update :event/restored-end? (comp boolean not-empty))
-      (update :event/start (partial db.tei/parse-date excel-dtf))
-      (update :event/end (partial db.tei/parse-date excel-dtf))
-      (assoc :entity/type :entity.type/event)))
 
 (defn normalize-name-data
   [person]
@@ -102,17 +48,6 @@
   [m]
   (into {} (remove (comp nil? second) m)))
 
-(defn timeline-entities
-  []
-  (->> (resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
-       (io/input-stream)
-       (xl/load-workbook)
-       (xl/select-sheet "Ark1")
-       (xl/select-columns chronology-columns)
-       (rest)                                               ; skip title
-       (map normalize-chronology-data)
-       (map remove-nil-vals)
-       (map #(select-keys % chronology-import))))
 
 (def bib-val->ref
   "Incomplete mapping from the strings used in the bibliography files to IDs."
@@ -415,8 +350,7 @@
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
   [{:keys [files-dir] :as conf}]
-  ;; Timeline events
-  (log-transaction! :timeline (timeline-entities))
+  (log-transaction! :timeline (db.timeline/timeline-entities))
 
   ;; Bibliography
   (log-transaction! :bib-EFJ (bib-entries "EFJ bibliografi - Sheet1.csv"))
@@ -563,11 +497,8 @@
   (count (file-entities "/Users/rqf595/Desktop/Glossematics-data"))
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
-  (timeline-entities)
   (bib-entries "LH bibliografi - Sheet1.csv")
   (person-entities)
-  (db.tei/parse-date excel-dtf "03.10.1899")
-  (db.tei/parse-date excel-dtf "03-10-1899")
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")

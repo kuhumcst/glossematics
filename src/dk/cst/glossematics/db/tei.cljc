@@ -3,22 +3,11 @@
   (:require [clojure.string :as str]
             #?(:clj [clojure.java.io :as io])
             [clojure.set :as set]
-            [tick.core :as t]
-            [tick.locale-en-us]                             ; need it for some reason
-            #?(:clj  [io.pedestal.log :as log]
-               :cljs [lambdaisland.glogi :as log])
             [dk.cst.cuphic :as cup]
-            [dk.cst.cuphic.xml :as xml])
-  #?(:clj (:import [java.io File]
-                   [java.sql Date]
-                   [java.time LocalDate]
-                   [java.time.temporal ChronoField]
-                   [java.time.format DateTimeFormatter
-                                     DateTimeFormatterBuilder
-                                     DateTimeParseException])))
-
-(def utc-dtf
-  (t/formatter "yyyy-MM-dd"))
+            [dk.cst.cuphic.xml :as xml]
+            [dk.cst.glossematics.shared :refer [parse-date utc-dtf]])
+  #?(:clj (:import [java.time.temporal ChronoField]
+                   [java.time.format DateTimeFormatterBuilder])))
 
 (def utc-fallback-dtf
   "NOTE: Defaults to 1 january in case either is missing."
@@ -28,23 +17,6 @@
                (.parseDefaulting ChronoField/DAY_OF_MONTH 1)
                (.toFormatter))
      :cljs utc-dtf))
-
-;; TODO: is this right?
-(defn value-of
-  [d]
-  #?(:clj  (Date/valueOf ^LocalDate d)
-     :cljs (.valueOf d)))
-
-(defn parse-date
-  "Parse a `date-str` using the `formatter` of choice. Expects some noise in
-  the data (e.g. Viggo's Excel file) so all dots are converted into dashes."
-  [formatter date-str]
-  (if (string? date-str)
-    (try
-      (value-of (t/parse-date (str/replace date-str #"\." "-") formatter))
-      (catch #?(:clj DateTimeParseException :cljs js/Error) e ; missing year?
-        (log/warn "Could not parse date: " date-str)))
-    date-str))
 
 ;; TODO: is ?optional switched with non-optional? see :document-type
 ;; TODO: the ... pattern not working correctly in Cuphic?
@@ -220,7 +192,4 @@
   (scrape-document (slurp example))
   (->triples example)
   (triples->entity (->triples example))
-
-  (parse-date utc-fallback-dtf "1899-10-03")
-  (parse-date utc-dtf "2022-03-25")
   #_.)

@@ -4,7 +4,7 @@
   (:require [clojure.edn :as edn]
             [hiccup.core :as hiccup]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.glossematics.backend.shared :refer [resource]])
+            [dk.cst.glossematics.shared :refer [resource]])
   (:import [java.util Date]))
 
 (def init-hash

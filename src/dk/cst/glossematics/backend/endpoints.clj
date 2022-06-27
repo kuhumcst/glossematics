@@ -7,7 +7,7 @@
             [com.wsscode.transito :as transito]
             [asami.core :as d]
             [dk.cst.glossematics.db :as db :refer [conn]]   ; TODO: attach this in an interceptor instead, reducing decoupling?
-            [dk.cst.glossematics.db.tei :as db.tei]
+            [dk.cst.glossematics.shared :refer [parse-date utc-dtf]]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
 
@@ -154,11 +154,11 @@
                             :from (when-let [from (first from)]
                                     (if (re-matches #"\d+" from)
                                       (parse-long from)
-                                      (db.tei/parse-date db.tei/utc-dtf from)))
+                                      (parse-date utc-dtf from)))
                             :to (when-let [to (first to)]
                                   (if (re-matches #"\d+" to)
                                     (parse-long to)
-                                    (db.tei/parse-date db.tei/utc-dtf to))))
+                                    (parse-date utc-dtf to))))
         final    (with-meta
                    (map clean-entity raw)
                    (meta raw))]
