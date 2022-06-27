@@ -72,6 +72,41 @@
    {:entity-label "Linguistic organisation"
     :img-src      "/images/people-group-svgrepo-com.svg"}})
 
+(def repositories
+  [{:db/ident         "#narch1"
+    :entity/full-name "Louis Hjelmslev's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch2"
+    :entity/full-name "Det Universitetshistoriske Arkiv"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch3"
+    :entity/full-name "Lingvistisk Bibliotek"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch4"
+    :entity/full-name "Eli Fischer-Jørgensen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch5"
+    :entity/full-name "Francis Whitfield's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch6"
+    :entity/full-name "Hans Jørgen Uldall's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch7"
+    :entity/full-name "Henning Spang-Hanssen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch8"
+    :entity/full-name "Harry Wett Frederiksen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch9"
+    :entity/full-name "Paul Diderichsen's archive"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch10"
+    :entity/full-name "Acta Jutlandica"
+    :entity/type      :entity.type/repository}
+   {:db/ident         "#narch11"
+    :entity/full-name "Travaux du Cercle de Linguistique Copenhague"
+    :entity/type      :entity.type/repository}])
+
 (def danish-letter->ascii
   {"æ" "ae"
    "Æ" "Ae"

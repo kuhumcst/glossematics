@@ -8,6 +8,7 @@
             [asami.core :as d]
             [io.pedestal.log :as log]
             [dk.ative.docjure.spreadsheet :as xl]
+            [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.shared :refer [resource]]
             [dk.cst.glossematics.db.timeline :as db.timeline]
             [dk.cst.glossematics.db.tei :as db.tei])
@@ -47,7 +48,6 @@
   comes out as :tg/nil in queries while the latter comes out as a true nil."
   [m]
   (into {} (remove (comp nil? second) m)))
-
 
 (def bib-val->ref
   "Incomplete mapping from the strings used in the bibliography files to IDs."
@@ -309,41 +309,6 @@
             (count tx-data))
   (d/transact conn {:tx-data tx-data}))
 
-(def repositories
-  [{:db/ident         "#narch1"
-    :entity/full-name "Louis Hjelmslev's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch2"
-    :entity/full-name "Det Universitetshistoriske Arkiv"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch3"
-    :entity/full-name "Lingvistisk Bibliotek"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch4"
-    :entity/full-name "Eli Fischer-Jørgensen's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch5"
-    :entity/full-name "Francis Whitfield's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch6"
-    :entity/full-name "Hans Jørgen Uldall's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch7"
-    :entity/full-name "Henning Spang-Hanssen's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch8"
-    :entity/full-name "Harry Wett Frederiksen's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch9"
-    :entity/full-name "Paul Diderichsen's archive"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch10"
-    :entity/full-name "Acta Jutlandica"
-    :entity/type      :entity.type/repository}
-   {:db/ident         "#narch11"
-    :entity/full-name "Travaux du Cercle de Linguistique Copenhague"
-    :entity/type      :entity.type/repository}])
-
 (def file->entity
   (comp db.tei/triples->entity db.tei/->triples))
 
@@ -358,7 +323,7 @@
   (log-transaction! :bib-PD (bib-entries "PD bibliografi - Sheet1.csv"))
 
   ;; Search entities
-  (log-transaction! :repositories repositories)
+  (log-transaction! :repositories sd/repositories)
   (log-transaction! :person (person-entities))
   (log-transaction! :linguistic-organisation (other-entities "Lingvistiske_organisationer_og_konferencer-gennemgået-FINAL.txt" "#nlingorg" "linguistic-organisation"))
   (log-transaction! :organisation (other-entities "Organisationer-gennemgået-FINAL.txt" "#norg" "organisation"))
