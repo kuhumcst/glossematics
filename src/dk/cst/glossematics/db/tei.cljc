@@ -25,7 +25,7 @@
    :title       '[:title {} title]
    :author      '[:author {:ref author} ???]
    :settlement  '[:settlement {:ref settlement} ???]
-   :repository  '[:repository {:ref repository} ???]
+   :repository  '[:repository {:ref repository} title]
    :collection  '[:collection {} collection]
    :objectDesc  '[:objectDesc {:form form}
                   [:supportDesc {}
@@ -139,8 +139,8 @@
            (id-triple :document/repository :repository)
            (id-triple :document/settlement :settlement)
            (let [collection (triple :document/collection :collection)]
-             (when (valid-int? (last collection))
-               (update collection 2 parse-int)))
+             (when (not-empty (last collection))
+               collection))
            (when-let [form (get-in objectDesc [0 'form])]
              [filename :document/form form])
            (when-let [sender (get-in correspDesc [0 'sender])]
