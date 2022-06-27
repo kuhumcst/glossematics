@@ -6,9 +6,9 @@
             [clojure.math.combinatorics :as combo]
             [asami.core :as d]
             [io.pedestal.log :as log]
-            [dk.ative.docjure.spreadsheet :as xl]
             [dk.cst.glossematics.static-data :as sd]
-            [dk.cst.glossematics.shared :as shared :refer [resource]]
+            [dk.cst.glossematics.shared :refer [resource]]
+            [dk.cst.glossematics.db.person :as db.person]
             [dk.cst.glossematics.db.timeline :as db.timeline]
             [dk.cst.glossematics.db.bibliography :as db.bibliography]
             [dk.cst.glossematics.db.tei :as db.tei])
@@ -23,23 +23,6 @@
 
 (defonce conn
   (d/connect db-uri))
-
-(defn normalize-name-data
-  [person]
-  (-> person
-      (update-vals #(cond
-                      (string? %)
-                      (let [s (str/trim %)]
-                        (when (not-empty s)
-                          (when-not (re-find #"\?" s)
-                            s)))
-
-                      (number? %)
-                      (int %)
-
-                      :else %))
-      (update :db/ident #(when % (str "#np" %)))
-      (assoc :entity/type :entity.type/person)))
 
 (defn- multiple?
   [x]
@@ -127,23 +110,6 @@
 
 (alter-var-root #'search-metadata memoize)
 
-(defn person-entities
-  []
-  (->> (resource "Navneliste_gennemgået-FINAL.xlsx")
-       (io/input-stream)
-       (xl/load-workbook)
-       (xl/select-sheet "Sheet1")
-       (xl/select-columns {:A :db/ident
-                           :B :person/first-name
-                           :C :person/last-name
-                           :D :entity/full-name
-                           :E :person/birth
-                           :F :person/death})
-       (rest)                                               ; skip title
-       (map normalize-name-data)
-       (map shared/remove-nil-vals)
-       (remove #(= {:entity/type :entity.type/person} %)))) ; empty
-
 (defn other-entities
   [filename id-prefix entity-type]
   (->> (-> filename resource io/input-stream io/reader line-seq dedupe)
@@ -216,7 +182,7 @@
 
   ;; Search entities
   (log-transaction! :repositories sd/repositories)
-  (log-transaction! :person (person-entities))
+  (log-transaction! :person (db.person/person-entities))
   (log-transaction! :linguistic-organisation (other-entities "Lingvistiske_organisationer_og_konferencer-gennemgået-FINAL.txt" "#nlingorg" "linguistic-organisation"))
   (log-transaction! :organisation (other-entities "Organisationer-gennemgået-FINAL.txt" "#norg" "organisation"))
   (log-transaction! :publication (other-entities "Publikationer-gennemgået-FINAL.txt" "#npub" "publication"))
@@ -354,7 +320,6 @@
   (count (file-entities "/Users/rqf595/Desktop/Glossematics-data"))
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
-  (person-entities)
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")
