@@ -13,7 +13,8 @@
             [dk.cst.pedestal.sp.example :as example]
             [dk.cst.glossematics.backend.index :as index]
             [dk.cst.glossematics.backend.endpoints :as endpoints]
-            [dk.cst.glossematics.db :as db])
+            [dk.cst.glossematics.db :as db :refer [conn]]
+            [dk.cst.glossematics.db.search :as db.search])
   (:gen-class))
 
 (defonce server (atom nil))
@@ -114,7 +115,7 @@
         service-map (->service-map conf)]
     (db/bootstrap! conf)
     (log/info :bootstrap.asami/begin-cache-names true)
-    (->> (update-vals (db/search-metadata) count)           ; memoize
+    (->> (update-vals (db.search/search-metadata conn) count)           ; memoize
          (log/info :bootstrap.asami/names-cache))
     (log/info :bootstrap.server/service-map service-map)
     (http/start (http/create-server service-map))))

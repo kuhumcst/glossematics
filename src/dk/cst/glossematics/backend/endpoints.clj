@@ -7,6 +7,7 @@
             [com.wsscode.transito :as transito]
             [asami.core :as d]
             [dk.cst.glossematics.db :as db :refer [conn]]   ; TODO: attach this in an interceptor instead, reducing decoupling?
+            [dk.cst.glossematics.db.search :as db.search]
             [dk.cst.glossematics.shared :refer [parse-date utc-dtf]]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
@@ -147,18 +148,19 @@
         entity   (-> (handle-file-extension params)
                      (dissoc :_ :limit :offset :order-by :from :to)
                      (cond-> wildcard (assoc '_ wildcard)))
-        raw      (db/search conn entity
-                            :limit (when limit (parse-long (first limit)))
-                            :offset (when offset (parse-long (first offset)))
-                            :order-by (when order-by (map keyword order-by))
-                            :from (when-let [from (first from)]
-                                    (if (re-matches #"\d+" from)
-                                      (parse-long from)
-                                      (parse-date utc-dtf from)))
-                            :to (when-let [to (first to)]
-                                  (if (re-matches #"\d+" to)
-                                    (parse-long to)
-                                    (parse-date utc-dtf to))))
+        raw      (db.search/search
+                   conn entity
+                   :limit (when limit (parse-long (first limit)))
+                   :offset (when offset (parse-long (first offset)))
+                   :order-by (when order-by (map keyword order-by))
+                   :from (when-let [from (first from)]
+                           (if (re-matches #"\d+" from)
+                             (parse-long from)
+                             (parse-date utc-dtf from)))
+                   :to (when-let [to (first to)]
+                         (if (re-matches #"\d+" to)
+                           (parse-long to)
+                           (parse-date utc-dtf to))))
         final    (with-meta
                    (map clean-entity raw)
                    (meta raw))]
@@ -173,7 +175,7 @@
 
 (defn search-metadata-handler
   [request]
-  (let [search-metadata (db/search-metadata)]
+  (let [search-metadata (db.search/search-metadata conn)]
     (log/info :endpoints/search-metadata (update-vals search-metadata count))
     (-> (assoc request
           :status 200
