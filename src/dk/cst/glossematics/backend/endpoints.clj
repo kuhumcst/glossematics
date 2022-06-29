@@ -6,7 +6,7 @@
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
             [asami.core :as d]
-            [dk.cst.glossematics.db :refer [conn]]   ; TODO: attach this in an interceptor instead, reducing decoupling?
+            [dk.cst.glossematics.db :refer [conn]]          ; TODO: attach this in an interceptor instead, reducing decoupling?
             [dk.cst.glossematics.db.search :as db.search]
             [dk.cst.glossematics.shared :refer [parse-date utc-dtf]]
             [dk.cst.glossematics.static-data :as sd]
@@ -78,21 +78,18 @@
                   "Cache-Control" one-day-cache))
       {:status 404})))
 
-(defn- split-params
-  "Split comma-separated strings in `query-params`."
-  [query-params]
-  (update-vals query-params #(str/split % #"\s*,\s*")))
+(defn- comma-split
+  "Split comma-separated string `s`; otherwise return `s`."
+  [s]
+  (let [parts (str/split s #"\s*,\s*")]
+    (if (= (count parts) 1)
+      (first parts)
+      parts)))
 
-(defn- ?keywordize
-  "Conditionally keywordize value `s`; otherwise:
-
-     * turn _ into a symbol (wildcard value, but value must be present).
-     * turn :ANY into a keyword (marks key for removal)"
+(defn- ?keywordize-val
+  "Conditionally keywordize value `s` or turn _ into a symbol."
   [s]
   (cond
-    (= s ":ANY")
-    :ANY
-
     (str/starts-with? s ":")
     (keyword (subs s 1))
 
@@ -102,17 +99,23 @@
     :else
     s))
 
-(defn ?keywordize-coll
+(defn- ?keywordize-coll
   [coll]
-  (into #{}
+  (into (empty coll)
         (comp
-          (map ?keywordize)
+          (map ?keywordize-val)
           (remove nil?))
         coll))
 
+(defn- ?keywordize
+  [x]
+  (if (coll? x)
+    (?keywordize-coll x)
+    (?keywordize-val x)))
+
 (def whitelisted
   "Whitelist certain searches for unauthenticated access based on entity type."
-  #{#{:entity.type/bibliographic-entry}})
+  #{:entity.type/bibliographic-entry})
 
 (defn- handle-file-extension
   "Behaviour when dealing with :file/extension in search `params`.
@@ -122,7 +125,7 @@
   [params]
   (case (:file/extension params)
     nil (assoc params :file/extension "xml")
-    #{:ANY} (dissoc params :file/extension)
+    :ANY (dissoc params :file/extension)
     params))
 
 (defn search-handler
@@ -140,8 +143,7 @@
                 from
                 to
                 _]
-         :as   params} (-> (split-params query-params)
-                           (update-vals ?keywordize-coll))
+         :as   params} (update-vals query-params (comp ?keywordize comma-split))
         wildcard _                                          ; _ is used for noop
         _        (when-not (whitelisted (:entity/type params))
                    (sp.auth/enforce-condition request :authenticated))
@@ -150,17 +152,20 @@
                      (cond-> wildcard (assoc '_ wildcard)))
         raw      (db.search/search
                    conn entity
-                   :limit (when limit (parse-long (first limit)))
-                   :offset (when offset (parse-long (first offset)))
-                   :order-by (when order-by (map keyword order-by))
-                   :from (when-let [from (first from)]
+                   :limit (when limit (parse-long limit))
+                   :offset (when offset (parse-long offset))
+                   :order-by (if order-by
+                               (map keyword order-by)
+                               [:document/send-date :asc])
+                   :from (when from
                            (if (re-matches #"\d+" from)
                              (parse-long from)
                              (parse-date utc-dtf from)))
-                   :to (when-let [to (first to)]
+                   :to (when to
                          (if (re-matches #"\d+" to)
                            (parse-long to)
                            (parse-date utc-dtf to))))
+        ;;TODO: remove meta?
         final    (with-meta
                    (map clean-entity raw)
                    (meta raw))]
@@ -205,6 +210,6 @@
    search-metadata-handler])
 
 (comment
-  (split-params {:glen "1,2,   3"
-                 :john "something"})
+  (update-vals {:glen "1,2,   3" :john "something"}
+               (comp ?keywordize comma-split))
   #_.)
