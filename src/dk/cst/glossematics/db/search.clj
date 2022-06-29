@@ -80,14 +80,14 @@
            :where [?e :db/ident ?id]]
          (entity->where-triples entity))))
 
-(defn- ignore-tg-nil
-  "Fixes sorting when there is a mix of e.g. dates and :tg/nil"
+(defn- ignore-asami-nil
+  "Fixes sorting when there is a mix of e.g. dates and :a/nil"
   [x]
-  (when-not (= :tg/nil x) x))
+  (when-not (= :a/nil x) x))
 
 (def sort-keyfn
   "Helper function to order search results by the sort-val first & ID second."
-  (juxt (comp ignore-tg-nil second) first))
+  (juxt (comp ignore-asami-nil second) first))
 
 (defn- sort-results
   "Sort 2-tuple `search-results` containing sort values in the second position.
@@ -98,7 +98,7 @@
   (->> search-results
        (filter (comp (or sort-pred
                          (constantly true))
-                     ignore-tg-nil
+                     ignore-asami-nil
                      second))
        (sort-by sort-keyfn)
        (map first)
