@@ -21,31 +21,31 @@
 ;; TODO: is ?optional switched with non-optional? see :document-type
 ;; TODO: the ... pattern not working correctly in Cuphic?
 (def header-patterns
-  {:language    '[:language {:ident language} ???]
-   :title       '[:title {} title]
-   :author      '[:author {:ref author} ???]
-   :settlement  '[:settlement {:ref settlement} ???]
-   :repository  '[:repository {:ref repository} title]
-   :collection  '[:collection {} collection]
-   :objectDesc  '[:objectDesc {:form form}
-                  [:supportDesc {}
-                   [:support {} support]
-                   [:extent {}
-                    [:note {} page-count]]]]
+  {:language      '[:language {:ident language} ???]
+   :title         '[:title {} title]
+   :author        '[:author {:ref author} ???]
+   :settlement    '[:settlement {:ref settlement} ???]
+   :repository    '[:repository {:ref repository} title]
+   :collection    '[:collection {} collection]
+   :objectDesc    '[:objectDesc {:form form}
+                    [:supportDesc {}
+                     [:support {} support]
+                     [:extent {}
+                      [:note {} page-count]]]]
 
-   ;; TODO: adjust - doesn't match in https://glossematics.dk/app/reader/20.9.1945-Holt-LH-tei-final.xml
-   :correspDesc '[:correspDesc
-                  {}
-                  [:correspAction
-                   {:type "sent"}
-                   [:persName {:ref sender} ???]
-                   [:placeName {:ref sender-loc}]
-                   [:date {} sent-at]]
-                  [:correspAction {:type "received"}
-                   [:persName {:ref recipient} ???]
-                   [:placeName {:ref recipient-loc}]]]
+   ;; Explodes [:correspDesc ...] into its constituent parts.
+   :sender        '[:correspAction {:type "sent"}
+                    ??? [:persName {:ref sender} ???] ???]
+   :sender-loc    '[:correspAction {:type "sent"}
+                    ??? [:placeName {:ref sender-loc}] ???]
+   :sent-at       '[:correspAction {:type "sent"}
+                    ??? [:date {} sent-at] ???]
+   :recipient     '[:correspAction {:type "received"}
+                    ??? [:persName {:ref recipient} ???] ???]
+   :recipient-loc '[:correspAction {:type "received"}
+                    ??? [:placeName {:ref recipient-loc}] ???]
 
-   :hand-desc   '[:handDesc {} [:p {} hand-desc]]})
+   :hand-desc     '[:handDesc {} [:p {} hand-desc]]})
 
 (def facsimile-patterns
   {:facsimile '[:graphic {:xml/id id}]})
@@ -116,13 +116,12 @@
 
 (defn document-triples
   [filename {:keys [objectDesc
-                    correspDesc
                     facsimile
                     body-refs
                     lang-refs
                     body-dates]
              :as   result}]
-  (let [triple    (partial single-triple result filename valid?)
+  (let [triple    (partial single-triple result filename)
         id-triple (comp
                     (fn [[e a v :as eav]] (when eav [e a (fix-id v)]))
                     (partial single-triple result filename valid-id?))]
@@ -132,32 +131,23 @@
         (reduce
           conj
           #{}
-          [(triple :document/title :title)
-           (triple :document/hand :hand-desc)
+          [(triple valid? :document/title :title)
+           (triple valid? :document/hand :hand-desc)
            (id-triple :document/author :author)
            (id-triple :document/language :language)
            (id-triple :document/repository :repository)
            (id-triple :document/settlement :settlement)
-           (let [collection (triple :document/collection :collection)]
+           (id-triple :document/sender :sender)
+           (id-triple :document/sender-location :sender-loc)
+           (id-triple :document/recipient :recipient)
+           (id-triple :document/recipient-location :recipient-loc)
+           (when-let [sent-at (triple valid-date? :document/sent-at :sent-at)]
+             (update sent-at 2 (partial shared/parse-date utc-dtf')))
+           (let [collection (triple valid? :document/collection :collection)]
              (when (not-empty (last collection))
                collection))
            (when-let [form (get-in objectDesc [0 'form])]
-             [filename :document/form form])
-           (when-let [sender (get-in correspDesc [0 'sender])]
-             (when (valid-id? sender)
-               [filename :document/sender sender]))
-           (when-let [sender-loc (get-in correspDesc [0 'sender-loc])]
-             (when (valid-id? sender-loc)
-               [filename :document/sender-location sender-loc]))
-           (when-let [sent-at (get-in correspDesc [0 'sent-at])]
-             (when (valid-date? sent-at)
-               [filename :document/sent-at (shared/parse-date utc-dtf' sent-at)]))
-           (when-let [recipient (get-in correspDesc [0 'recipient])]
-             (when (valid-id? recipient)
-               [filename :document/recipient recipient]))
-           (when-let [recipient-loc (get-in correspDesc [0 'recipient-loc])]
-             (when (valid-id? recipient-loc)
-               [filename :document/recipient-location recipient-loc]))])
+             [filename :document/form form])])
         [(for [{:syms [id]} facsimile]
            [filename :document/facsimile id])
          (for [{:syms [when]} body-dates]
