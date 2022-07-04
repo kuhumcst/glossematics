@@ -87,7 +87,11 @@
 
 (def sort-keyfn
   "Helper function to order search results by the sort-val first & ID second."
-  (juxt (comp ignore-asami-nil second) first))
+  (juxt second first))
+
+(defn unsortable?
+  [[k v]]
+  (contains? #{nil :a/nil} v))
 
 (defn- sort-results
   "Sort 2-tuple `search-results` containing sort values in the second position.
@@ -96,10 +100,7 @@
   only keeping results with a sort-val within some range."
   [search-results & [sort-pred]]
   (->> search-results
-       (filter (comp (or sort-pred
-                         (constantly true))
-                     ignore-asami-nil
-                     second))
+       (filter (comp (or sort-pred (constantly true)) second))
        (sort-by sort-keyfn)
        (map first)
        (distinct)))
@@ -107,14 +108,19 @@
 (defn match-entity
   "Look up entity IDs in `conn` matching partial `entity` description.
 
-  An `order-by` vector of [sort-key sort-dir] may also be supplied.
-  The sort direction can be either :asc (default) or :desc."
+  An `order-by` vector of [sort-key sort-dir] may also be supplied;
+  the sort direction can be either :asc (default) or :desc.
+
+  Unsortable results are *ALWAYS* placed at the end, no matter the direction.
+  For reproducibility's sake, unsorted results do in fact get sorted by name!"
   ([conn entity [sort-key sort-dir :as order-by] & [sort-pred]]
-   (let [results (sort-results (d/q (entity->search-query entity sort-key) conn)
-                               sort-pred)]
-     (if (= sort-dir :desc)
-       (reverse results)
-       results)))
+   (let [raw-results (d/q (entity->search-query entity sort-key) conn)
+         unsorted    (sort (map first (filter unsortable? raw-results)))
+         results     (sort-results (remove unsortable? raw-results) sort-pred)
+         sorted      (if (= sort-dir :desc)
+                       (reverse results)
+                       results)]
+     (concat sorted unsorted)))
   ([conn entity]
    (d/q (entity->search-query entity) conn)))
 
