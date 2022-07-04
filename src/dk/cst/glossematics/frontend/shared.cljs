@@ -140,6 +140,77 @@
   [s]
   (into [:<>] break-str-xf s))
 
+(defn single
+  "If `x` is a 'coll' return the first item; else return `x`."
+  [x]
+  (if (coll? x)
+    (first (sort x))
+    x))
+
+;; TODO: make IDs into clickable search links
+(defn- handle-name
+  "Ensures that `x` -- which can be either an ID, a name, or a set of either IDs
+  or names -- parses correctly."
+  [id->name x]
+  (when x
+    (let [id->name' #(get id->name % %)]
+      (if (set? x)
+        (->> (map id->name' x)
+             (sort)
+             (interpose "; ")
+             (into [:<>]))
+        (id->name' x)))))
+
+;; https://examples.yourdictionary.com/bibliography-examples.html
+(defn bib-line
+  "A bibliography entry as Hiccup based on `id->name` mapping and the `entry`.
+
+  Optionally, if `backlink?` is true the entry will link to the bibliography
+  section rather than the reader."
+  [id->name
+   {:keys [document/author
+           document/title
+           document/publisher
+           document/publication
+           document/settlement
+           document/bib-entry
+           document/pp
+           file/name]
+    :as   entry}
+   & [backlink?]]
+  (let [title'  (when title
+                  (str/replace (single title) #"\.$" ""))
+        title'' (if (and name (not backlink?))
+                  [:a {:href (reader-href name)} title']
+                  title')
+        bib-entry' (if (re-find #"[a-z]$" bib-entry)
+                     [:strong
+                      (subs bib-entry 0 (dec (count bib-entry)))
+                      [:sup (last bib-entry)]]
+                     [:strong bib-entry])]
+    [:<>
+     (when-let [author-name (handle-name id->name author)]
+       [:<> (surname-first author-name) ". "])
+     (if publication
+       [:<>
+        "\"" title'' "\". "
+        [:em (handle-name id->name publication)]]
+       [:em title''])
+     (when pp
+       [:<> ", pp. " pp])
+     (when-let [publisher-name (handle-name id->name publisher)]
+       [:<> ", " publisher-name])
+     (when-let [settlement-name (handle-name id->name settlement)]
+       [:<> ", " settlement-name])
+     ", "
+     (if backlink?
+       (let [href     (-> entry :document/author sd/id->author bib-href)
+             fragment (-> entry :document/year str legal-id)]
+         [:a {:href (str href "#" fragment)}
+          bib-entry'])
+       bib-entry')
+     "."]))
+
 (defn- metadata-table-val
   "Create a Hiccup representation for `v` based on `k` and the source `m`;
   names are sourced via the `search-state`."
@@ -161,10 +232,7 @@
         1)
 
       (= k :document/bib-entry)
-      (let [href     (-> m :document/author sd/id->author bib-href)
-            fragment (-> m :document/year str legal-id)]
-        [:a {:href (str href "#" fragment)}
-         v])
+      [bib-line id->name m true]
 
       ;; Individual entities caught here.
       (and (string? v) (str/starts-with? v "#"))
@@ -222,10 +290,4 @@
       [:dd
        [val-com v]]])])
 
-(defn- single
-  "If `x` is a 'coll' return the first item; else return `x`."
-  [x]
-  (if (coll? x)
-    (first (sort x))
-    x))
 
