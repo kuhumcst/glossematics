@@ -41,13 +41,11 @@
   ([kvs]
    (heterostyled kvs identity))
   ([kvs order-fn]
-   (let [backgrounds     (cycle (order-fn background-colours))
-         add-background' (partial add-background backgrounds)]
-     (into (empty kvs) (map-indexed add-background' kvs))))
+   (heterostyled kvs order-fn background-colours))
   ([kvs order-fn backgrounds]
    (let [backgrounds     (cycle (order-fn backgrounds))
          add-background' (partial add-background backgrounds)]
-     (into (empty kvs) (map-indexed add-background' kvs)))))
+     (into [] (map-indexed add-background' kvs)))))
 
 ;; TODO: what to do when drag-and-dropping from tabs using same state?
 ;; Currently, the two tabs components have their tabs reordered, but should
