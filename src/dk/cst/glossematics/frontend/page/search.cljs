@@ -222,7 +222,10 @@
      [:select {:id        "sort-key"
                :value     (rel->s order-rel)
                :on-change (->order 0)}
-      [select-opts sd/order-rels [:option {:value ""} "nothing"]]]
+      [select-opts sd/order-rels
+       [:option {:value ""
+                 :disabled (some? order-rel)}
+        "-"]]]
 
      [:select {:id        "sort-dir"
                :disabled  (nil? order-rel)
@@ -385,7 +388,7 @@
 
 (defn- set-offset
   [f n]
-  (let [new-offset    (fn [offset & args] (apply f offset args))]
+  (let [new-offset (fn [offset & args] (apply f offset args))]
     (->> (swap! state/query update :offset new-offset n)
          (state->params)
          (rfe/replace-state ::page {}))))

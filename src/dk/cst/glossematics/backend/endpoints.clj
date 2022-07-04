@@ -156,7 +156,7 @@
                    :offset (when offset (parse-long offset))
                    :order-by (if order-by
                                (map keyword order-by)
-                               [:document/sent-at :asc])
+                               [:document/sent-at :asc])    ;TODO: differentiate by entity type?
                    :from (when from
                            (if (re-matches #"\d+" from)
                              (parse-long from)
