@@ -133,7 +133,11 @@
    :document/language           {:label      "language"
                                  :compatible #{:entity.type/language}}
    :document/publication        {:label      "publication"
-                                 :compatible #{:entity.type/publication}}})
+                                 :compatible #{:entity.type/publication}}
+
+   ;; Special relation -- expands to a more complex operation during search.
+   :correspondent               {:label      "correspondent"
+                                 :compatible #{:entity.type/person}}})
 
 (def order-rels
   {:document/date-mention {:label "mentioned date"

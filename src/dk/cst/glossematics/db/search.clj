@@ -35,12 +35,18 @@
 (alter-var-root #'search-metadata memoize)
 
 (defn- entity->where-triples
-  "Deconstruct partial `entity` description into triples for a search query."
+  "Deconstruct partial `entity` description into triples for a search query,
+  with collections and special relations expanded into complex expressions."
   [entity]
   (->> (for [[k v] entity]
-         (if (coll? v)
-           (map #(vector '?e k %) v)
-           [['?e k v]]))
+         (cond
+           (coll? v)
+           (mapcat (comp entity->where-triples (partial hash-map k)) v)
+
+           (= k :correspondent)
+           [(list 'or ['?e :document/sender v] ['?e :document/recipient v])]
+
+           :else [['?e k v]]))
        (apply concat)
        (set)))
 
@@ -187,4 +193,10 @@
   ((between-pred #inst"1948-08-30T23:00:00.000-00:00"
                  #inst"1950-08-30T23:00:00.000-00:00")
    #inst"1949-08-30T23:00:00.000-00:00")
+
+  ;; Test correspondence triples between entities 7 and 8.
+  (entity->where-triples {:a             1
+                          :b             2
+                          :c             [4 5 6]
+                          :correspondent [7 8]})
   #_.)
