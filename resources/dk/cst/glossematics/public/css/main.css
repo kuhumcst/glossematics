@@ -442,20 +442,17 @@ details[open] summary {
     appearance: none;
 
     transition: all 0.33s;
-    min-height: 28px;
-    min-width: 28px;
     font-size: 16px;
     color: var(--color);
     border: var(--border);
     border-radius: var(--border-radius);
     background: var(--background);
-}
+    padding: 6px;
+    line-height: 1;
 
-.input-row input[type=list],
-.input-row input[type=checkbox],
-.input-row select
-{
-    padding: 4px 8px;
+    /* Fix Safari issue in search result paging. */
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .input-row input[type=date]::placeholder {
@@ -463,10 +460,8 @@ details[open] summary {
     opacity: 1;
 }
 
+/* Safari weirdness: https://stackoverflow.com/questions/69888903/text-color-is-not-working-on-safari-iphone*/
 .input-row input[type=date] {
-    padding: 0 8px; /* TODO: something off about input[type=date] top-padding */
-
-    /* Safari weirdness: https://stackoverflow.com/questions/69888903/text-color-is-not-working-on-safari-iphone*/
     -webkit-text-fill-color: rgba(0,0,0,0.9);
 }
 
@@ -547,11 +542,8 @@ details[open] summary {
 .search-result__paging button,
 .search-result__paging select {
     width: 120px;
-    height: 100%; /* Safari vertical stretch fix. */
     cursor: pointer;
     background: rgba(255,255,255,0.7);
-    padding: var(--padding);
-    font-size: var(--font-size-l);
     color: var(--color);
     border: none;
     border-right: var(--border);
@@ -800,7 +792,7 @@ dl.kvs-list dd:not(:last-child) {
   }
 
   .search-result__paging {
-    top: 35px;
+    top: 38px;
   }
 }
 
