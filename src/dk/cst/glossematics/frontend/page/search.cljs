@@ -132,11 +132,21 @@
     state))
 
 (defn- remove-kv
-  [{:keys [items] :as old-state} kv]
-  (-> old-state
+  [{:keys [items] :as state} kv]
+  (-> state
       (assoc :items (vec (remove (partial = kv) items))
              :offset 0)
       (update :unique disj kv)))
+
+(defn- replace-kv
+  [{:keys [items unique] :as state} old-kv new-kv]
+  (let [replace-kv* (fn [acc kv]
+                      (conj acc (if (= kv old-kv)
+                                  new-kv
+                                  kv)))]
+    (assoc state
+      :items (reduce replace-kv* (empty items) items)
+      :unique (-> unique (disj old-kv) (conj new-kv)))))
 
 (defn multi-input-data
   [name-kvs]
@@ -192,6 +202,7 @@
   (rfe/push-state ::page {} (state->params @state/query)))
 
 (defn- submit
+  "Submit a new search criteria."
   []
   (let [{:keys [name->id]} @state/search
         {:keys [rel in unique]} @state/query]
@@ -223,7 +234,7 @@
                :value     (rel->s order-rel)
                :on-change (->order 0)}
       [select-opts sd/order-rels
-       [:option {:value ""
+       [:option {:value    ""
                  :disabled (some? order-rel)}
         "-"]]]
 
@@ -277,6 +288,17 @@
      (when order-rel
        [search-result-between order-by from to])]))
 
+(def anything-opt
+  [:option {:value (rel->s '_)} "any role"])
+
+(defn rel-select-opts
+  [entity-type]
+  (if entity-type
+    (let [compatible? (comp boolean entity-type :compatible second)
+          ?disable    #(with-meta % {:disabled (not (compatible? %))})]
+      [select-opts (map ?disable sd/search-rels) anything-opt])
+    [select-opts sd/search-rels anything-opt]))
+
 (defn search-criteria
   [id->type items]
   [:fieldset
@@ -293,20 +315,31 @@
 
    (for [[k v :as kv] items
          :let [{:keys [label style]} (meta kv)
+               entity-type (id->type v)
+               ->set-rel   (fn [e]
+                             (let [rel (s->rel (e->v e))
+                                   kv' (assoc kv 0 rel)]
+                               (swap! state/query replace-kv kv kv')
+                               (new-page!)))
                {:keys [img-src
-                       entity-label]} (when id->type
-                                        (-> v id->type sd/entity-types))]]
+                       entity-label]} (when entity-type
+                                        (get sd/entity-types entity-type))]]
      [:<> {:key kv}
-      [:span.search-form__item {:style style
+      [:span.search-form__item {:style (assoc style
+                                         :position "relative")
                                 :title entity-label}
        (when img-src
          [:img.entity-icon {:src img-src
                             :alt entity-label}])
+       [:select.search-form__item-select {:on-change ->set-rel
+                                          :value     (rel->s k)}
+        [rel-select-opts entity-type]]
+
        (when (not= k '_)
          [:span.search-form__item-key
           (or (:label (sd/search-rels k))
               (str k))
-          " → "])
+          " | "])
        [:span.search-form__item-label (or label (str v))]
        [:button {:type     "button"                         ; prevent submit
                  :title    "Remove criterion"
@@ -320,16 +353,15 @@
 (defn search-form
   []
   (let [{:keys [name-kvs name->id id->type name->type]} @state/search
-        set-in       (fn [e]
-                       (let [in (e->v e)]
-                         (swap! state/query assoc
-                                :in in
-                                :bad-input? false
-                                :not-allowed? false)))
-        set-rel      (fn [e]
-                       (swap! state/query assoc :rel (s->rel (e->v e)))
-                       (submit))
-        anything-opt [:option {:value (rel->s '_)} "anything"]]
+        set-in  (fn [e]
+                  (let [in (e->v e)]
+                    (swap! state/query assoc
+                           :in in
+                           :bad-input? false
+                           :not-allowed? false)))
+        set-rel (fn [e]
+                  (swap! state/query assoc :rel (s->rel (e->v e)))
+                  (submit))]
 
     (fn [_ _]
       (let [{:keys [items in rel order-by bad-input? not-allowed?]} @state/query
@@ -357,17 +389,18 @@
           (when name->id
             [multi-input-data name-kvs])
 
-          [:label {:for "k"} " as "]
-          [:select
-           {:id        "k"
-            :value     (rel->s rel)
-            :on-change set-rel
-            :disabled  (not (get name->id in))}
-           (if-let [entity-type (and name->type (name->type in))]
-             (let [compatible? (comp boolean entity-type :compatible second)
-                   ?disable    #(with-meta % {:disabled (not (compatible? %))})]
-               [select-opts (map ?disable sd/search-rels) anything-opt])
-             [select-opts sd/search-rels anything-opt])]
+          ;; TODO: experimenting with removing the select. Make permanent?
+          #_[:label {:for "k"} " as "]
+          #_[:select
+             {:id        "k"
+              :value     (rel->s rel)
+              :on-change set-rel
+              :disabled  (not (get name->id in))}
+             (if-let [entity-type (and name->type (name->type in))]
+               (let [compatible? (comp boolean entity-type :compatible second)
+                     ?disable    #(with-meta % {:disabled (not (compatible? %))})]
+                 [select-opts (map ?disable sd/search-rels) anything-opt])
+               [select-opts sd/search-rels anything-opt])]
 
           [:input {:type     "submit"
                    :value    "Search"

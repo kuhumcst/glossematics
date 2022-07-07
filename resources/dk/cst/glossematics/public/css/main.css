@@ -302,11 +302,6 @@ label {
     margin-right: 0;
 }
 
-.search-form__item:hover {
-    transform: var(--transform-elevated);
-    box-shadow: var(--box-shadow-elevated);
-}
-
 .search-form__item > button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
@@ -389,10 +384,20 @@ a:hover img.action__icon {
 }
 
 .search-form__item-key {
-    color: var(--color);
+    color: rgba(0,0,0,0.66);
+    text-transform: capitalize;
     font-variant: small-caps;
-    font-weight: bold;
     margin-right: var(--margin-s);
+}
+
+.search-form__item-select {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    margin: -12px; /* Counter parent margin. */
+    min-height: 30px;
+    font-size: 16px;
+    width: calc(100% - 24px);
 }
 
 details summary {
