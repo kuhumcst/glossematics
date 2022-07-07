@@ -115,7 +115,10 @@
         (prep m)))
 
     (reset! state/location m)
-    (shared/scroll-reset! "body")))
+
+    ;; Scroll state is always reset when no intra-page navigation is expected.
+    (when (empty? js/window.location.hash)
+      (shared/scroll-reset! "body"))))
 
 (defn ^:dev/after-load render
   []
