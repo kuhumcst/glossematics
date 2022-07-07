@@ -447,8 +447,8 @@ details[open] summary {
     border: var(--border);
     border-radius: var(--border-radius);
     background: var(--background);
-    padding: 6px;
-    line-height: 1;
+    padding: 4px 6px;
+    line-height: 20px;
 
     /* Fix Safari issue in search result paging. */
     margin-top: 0;
@@ -463,6 +463,7 @@ details[open] summary {
 /* Safari weirdness: https://stackoverflow.com/questions/69888903/text-color-is-not-working-on-safari-iphone*/
 .input-row input[type=date] {
     -webkit-text-fill-color: rgba(0,0,0,0.9);
+    line-height: 16px;
 }
 
 .input-row input[type=submit] {
