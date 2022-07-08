@@ -308,9 +308,13 @@
   [e]
   (.-parentElement (first (.-selectedOptions (.-target e)))))
 
-(defn- not-opt?
+(defn- negated-opt?
   [e]
   (some? (.getAttribute (event-optgroup e) "data-not")))
+
+(defn- negated?
+  [s]
+  (str/starts-with? s "!"))
 
 (defn search-criteria
   [id->type items]
@@ -328,11 +332,22 @@
 
    (for [[k v :as kv] items
          :let [{:keys [label style]} (meta kv)
+               negated-triple? (negated? v)
                entity-type (id->type v)
                ->set-rel   (fn [e]
                              (let [rel (s->rel (e->v e))
-                                   kv' (cond-> (assoc kv 0 rel)
-                                         (not-opt? e) (update 1 (partial str "!")))]
+                                   kv' (assoc kv
+                                         0 rel
+                                         1 (cond
+                                             (and (not (negated? v))
+                                                  (negated-opt? e))
+                                             (str "!" v)
+
+                                             (and (negated? v)
+                                                  (not (negated-opt? e)))
+                                             (subs v 1)
+
+                                             :else v))]
                                (swap! state/query replace-kv kv kv')
                                (new-page!)))
                {:keys [img-src
@@ -349,10 +364,13 @@
                                           :value     (rel->s k)}
         [rel-select-opts entity-type]]
 
-       (when (not= k '_)
+       (when (or (not= k '_) negated-triple?)
          [:span.search-form__item-key
-          (or (:label (sd/search-rels k))
-              (str k))
+          (when negated-triple?
+            "not ")
+          (when-not (= k '_)
+            (or (:label (sd/search-rels k))
+                (str k)))
           " | "])
        [:span.search-form__item-label (or label (str v))]
        [:button {:type     "button"                         ; prevent submit
