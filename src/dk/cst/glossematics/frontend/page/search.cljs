@@ -27,12 +27,12 @@
   (let [items (params->items query-params id->name)]
     (cond-> {:items  (vec items)
              :unique (set items)}
-            order-by (assoc :order-by (->> (str/split order-by #",")
-                                           (mapv (comp keyword str/trim))))
-            limit (assoc :limit (js/parseInt limit))
-            offset (assoc :offset (js/parseInt offset))
-            from (assoc :from from)
-            to (assoc :to to))))
+      order-by (assoc :order-by (->> (str/split order-by #",")
+                                     (mapv (comp keyword str/trim))))
+      limit (assoc :limit (js/parseInt limit))
+      offset (assoc :offset (js/parseInt offset))
+      from (assoc :from from)
+      to (assoc :to to))))
 
 (def backgrounds
   (cycle stp/background-colours))
@@ -179,11 +179,11 @@
   (when-let [params (items->query-params items)]            ; clear other params
     (let [[rel] order-by]
       (cond-> params
-              rel (assoc :order-by (str/join "," (map rel->s order-by)))
-              limit (assoc :limit limit)
-              offset (assoc :offset offset)
-              from (assoc :from from)
-              to (assoc :to to)))))
+        rel (assoc :order-by (str/join "," (map rel->s order-by)))
+        limit (assoc :limit limit)
+        offset (assoc :offset offset)
+        from (assoc :from from)
+        to (assoc :to to)))))
 
 (defn- select-opts
   [rels & [default-option]]
@@ -295,9 +295,22 @@
   [entity-type]
   (if entity-type
     (let [compatible? (comp boolean entity-type :compatible second)
-          ?disable    #(with-meta % {:disabled (not (compatible? %))})]
-      [select-opts (map ?disable sd/search-rels) anything-opt])
+          rels        (filter compatible? sd/search-rels)]
+      [:<>
+       [:optgroup {:label "SHOULD BE"}
+        [select-opts rels anything-opt]]
+       [:optgroup {:label    "SHOULD NOT BE"
+                   :data-not true}
+        [select-opts rels anything-opt]]])
     [select-opts sd/search-rels anything-opt]))
+
+(defn- event-optgroup
+  [e]
+  (.-parentElement (first (.-selectedOptions (.-target e)))))
+
+(defn- not-opt?
+  [e]
+  (some? (.getAttribute (event-optgroup e) "data-not")))
 
 (defn search-criteria
   [id->type items]
@@ -318,7 +331,8 @@
                entity-type (id->type v)
                ->set-rel   (fn [e]
                              (let [rel (s->rel (e->v e))
-                                   kv' (assoc kv 0 rel)]
+                                   kv' (cond-> (assoc kv 0 rel)
+                                         (not-opt? e) (update 1 (partial str "!")))]
                                (swap! state/query replace-kv kv kv')
                                (new-page!)))
                {:keys [img-src
