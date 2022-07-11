@@ -319,6 +319,8 @@
                ->set-rel   (fn [e]
                              (let [rel (s->rel (e->v e))
                                    kv' (assoc kv 0 rel)]
+                               (when (not= kv kv')
+                                 (swap! state/query assoc :offset 0))
                                (swap! state/query replace-kv kv kv')
                                (new-page!)))
                {:keys [img-src
