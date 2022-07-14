@@ -2,21 +2,22 @@
   "Page containing a range of indices of important entities."
   (:require [clojure.string :as str]
             [dk.cst.glossematics.static-data :as sd]
-            [dk.cst.glossematics.frontend.shared :as shared]
-            [dk.cst.glossematics.frontend.state :as state]))
+            [dk.cst.glossematics.frontend.shared :as fshared]
+            [dk.cst.glossematics.frontend.state :as state]
+            [dk.cst.glossematics.shared :as shared]))
 
 (defn str->index-group
   "The canonical index group for a given `s`; used for group-by."
   [s]
   (when s
-    (first (str/upper-case (shared/str-sort-val s)))))
+    (first (str/upper-case (fshared/str-sort-val s)))))
 
 (defn- index-groups
   [search-metadata entity-type]
   (let [entities (get search-metadata entity-type)]
     (->> (if (= entity-type :entity.type/person)
            (map (fn [[k v]]
-                  (let [k' (shared/surname-first k)]
+                  (let [k' (fshared/surname-first k)]
                     [(if (str/ends-with? k' ", ") k k') v]))
                 entities)
            entities)
@@ -32,7 +33,7 @@
               (if (= current-type entity-type)
                 [:span [:img.entity-icon {:src img-src}]
                  entity-label]
-                [:a {:href     (shared/index-href entity-type)
+                [:a {:href     (fshared/index-href entity-type)
                      :disabled (= current-type entity-type)}
                  [:img.entity-icon {:src img-src}]
                  entity-label])))
@@ -44,9 +45,9 @@
   (into [:p.index-page__skip-links]
         (->> groups
              (map (fn [[letter]]
-                    (let [fragment (str "#" (shared/legal-id letter))]
+                    (let [fragment (str "#" (fshared/legal-id letter))]
                       [:a {:href     fragment
-                           :on-click #(shared/find-fragment fragment)}
+                           :on-click #(fshared/find-fragment fragment)}
                        letter])))
              (interpose ", ")
              (vec))))
@@ -54,10 +55,10 @@
 (defn index-content
   [kvs]
   [:ul
-   (for [[k v] (sort-by (comp shared/str-sort-val first) kvs)]
+   (for [[k v] (sort-by (comp fshared/str-sort-val first) kvs)]
      [:li {:key k}
-      [:a {:href (shared/search-href v)}
-       (str k)]])])
+      [:a {:href (fshared/search-href v)}
+       (shared/local-name (str k))]])])
 
 (defn page
   []
@@ -75,4 +76,4 @@
            [index-links entity-type]
            [:hr]
            [skip-links groups]]
-          ^{:key groups} [shared/kvs-list groups index-content]]))]))
+          ^{:key groups} [fshared/kvs-list groups index-content]]))]))

@@ -43,7 +43,22 @@
   [m]
   (into {} (remove (comp nil? second) m)))
 
+(defn capitalize-words
+  "Capitalise every word in `s` (not just the first)."
+  [s]
+  (str/join " " (map str/capitalize (str/split s #"\s"))))
+
+(defn local-name
+  "Use the local name version of `s`, i.e. without a clarifying entity type."
+  [s]
+  (if (str/includes? s "—")
+    (first (str/split s #"\s—"))
+    s))
+
 (comment
+  (capitalize-words "ACTA JUTLANDICA")
+  (capitalize-words "Acta Jutlandica")
+  (capitalize-words "acta jutlandica")
   (parse-date utc-fallback-dtf "1899-10-03")
   (parse-date utc-dtf "2022-03-25")
   #_.)

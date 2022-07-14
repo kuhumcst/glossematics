@@ -2,35 +2,47 @@
   (:require [asami.core :as d]
             [io.pedestal.log :as log]))
 
+(defn- duplicate-names
+  [type->name->id]
+  (->> (vals type->name->id)
+       (mapcat keys)
+       (remove nil?)
+       (frequencies)
+       (filter (fn [[k v]] (> v 1)))
+       (map first)
+       (into #{})))
+
 (defn search-metadata
   "Return a mapping from entity type->name->id to be used by the frontend."
   [conn]
-  (->> (d/q '[:find [?id ...]
-              :where
-              (or
-                [?p :entity/type :entity.type/repository]
-                [?p :entity/type :entity.type/person]
-                [?p :entity/type :entity.type/linguistic-organisation]
-                [?p :entity/type :entity.type/organisation]
-                [?p :entity/type :entity.type/publication]
-                [?p :entity/type :entity.type/language]
-                [?p :entity/type :entity.type/place]
-                [?p :entity/type :entity.type/term]
-                [?p :entity/type :entity.type/english-term])
-              [?p :db/ident ?id]
+  (let [m (->> (d/q '[:find [?id ...]
+                      :where
+                      (or
+                        [?p :entity/type :entity.type/repository]
+                        [?p :entity/type :entity.type/person]
+                        [?p :entity/type :entity.type/linguistic-organisation]
+                        [?p :entity/type :entity.type/organisation]
+                        [?p :entity/type :entity.type/publication]
+                        [?p :entity/type :entity.type/language]
+                        [?p :entity/type :entity.type/place]
+                        [?p :entity/type :entity.type/term]
+                        [?p :entity/type :entity.type/english-term])
+                      [?p :db/ident ?id]
 
-              ;; Only include refs currently found in the TEI files.
-              [?f _ ?id]
-              [?f :entity/type :entity.type/file]
-              [?f :file/extension "xml"]]
-            conn)
-       (map (fn [id]
-              (let [{:keys [entity/full-name entity/type]} (d/entity conn id)]
-                (if (coll? full-name)
-                  {type (into {} (for [variant full-name]
-                                   [variant id]))}
-                  {type {full-name id}}))))
-       (apply merge-with merge)))
+                      ;; Only include refs currently found in the TEI files.
+                      [?f _ ?id]
+                      [?f :entity/type :entity.type/file]
+                      [?f :file/extension "xml"]]
+                    conn)
+               (map (fn [id]
+                      (let [{:keys [entity/full-name
+                                    entity/type]} (d/entity conn id)]
+                        (if (coll? full-name)
+                          {type (into {} (for [variant full-name]
+                                           [variant id]))}
+                          {type {full-name id}}))))
+               (apply merge-with merge))]
+    (with-meta m {:duplicates (duplicate-names m)})))
 
 (alter-var-root #'search-metadata memoize)
 

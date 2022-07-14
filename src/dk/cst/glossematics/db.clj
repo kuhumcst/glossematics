@@ -79,13 +79,15 @@
        (reverse)))
 
 (defn other-entities
-  [filename id-prefix entity-type]
-  (->> (-> filename shared/resource io/input-stream io/reader line-seq dedupe)
+  "Load TSV resource from `file` with the given `id-prefix` and `entity-type`;
+  the returned data can be transacted into Asami."
+  [file id-prefix entity-type]
+  (->> (-> file shared/resource io/input-stream io/reader line-seq dedupe)
        (map #(str/split % #"\t"))
        (map (fn [[id full-name]]
               {:db/ident         (str id-prefix id)
                :entity/type      (keyword "entity.type" entity-type)
-               :entity/full-name full-name}))))
+               :entity/full-name (shared/capitalize-words full-name)}))))
 
 (defn tei-files
   [conn]
@@ -145,5 +147,5 @@
                 [?e :file/extension "jpg"]
                 [?e :file/name ?name]
                 [?e :file/path ?path]]
-              (d/db conn)))
+              conn))
   #_.)

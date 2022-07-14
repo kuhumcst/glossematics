@@ -5,10 +5,11 @@
             [reitit.frontend.easy :as rfe]
             [dk.cst.stucco.pattern :as stp]
             [dk.cst.glossematics.static-data :as sd]
-            [dk.cst.glossematics.frontend.shared :as shared]
+            [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.page.index :as index]
-            [dk.cst.glossematics.frontend.api :as api]))
+            [dk.cst.glossematics.frontend.api :as api]
+            [dk.cst.glossematics.shared :as shared]))
 
 ;; TODO: bad ref for LOUIS HJELMSLEV (missing "np") http://localhost:9000/app/reader/acc-1992_0005_035_Uldall_0110-tei-final.xml
 ;; TODO: missing name http://localhost:8080/app/search?limit=10&offset=0&_=%23npl737
@@ -27,12 +28,12 @@
   (let [items (params->items query-params id->name)]
     (cond-> {:items  (vec items)
              :unique (set items)}
-            order-by (assoc :order-by (->> (str/split order-by #",")
-                                           (mapv (comp keyword str/trim))))
-            limit (assoc :limit (js/parseInt limit))
-            offset (assoc :offset (js/parseInt offset))
-            from (assoc :from from)
-            to (assoc :to to))))
+      order-by (assoc :order-by (->> (str/split order-by #",")
+                                     (mapv (comp keyword str/trim))))
+      limit (assoc :limit (js/parseInt limit))
+      offset (assoc :offset (js/parseInt offset))
+      from (assoc :from from)
+      to (assoc :to to))))
 
 (def backgrounds
   (cycle stp/background-colours))
@@ -60,20 +61,41 @@
           (->> (update query :items add-backgrounds)
                (reset! state/query)))))))
 
+(defn- rename-duplicates*
+  "Helper function for 'rename-duplicates'; uses a set of marked `duplicates` to
+  rename every `kv` in the search-metadata."
+  [duplicates [entity-type local-name->id :as kv]]
+  (let [type->label (fn [entity-type]
+                      (-> entity-type sd/entity-types :entity-label))]
+    [entity-type
+     (into {} (for [[full-name id :as original-kv] local-name->id]
+                (if (get duplicates full-name)
+                  [(str full-name " — " (type->label entity-type)) id]
+                  original-kv)))]))
+
+(defn- rename-duplicates
+  "Rename duplicate keys in the `search-metadata` such that the name of every
+  entity has a 1:1 relationship with an entity ID."
+  [search-metadata]
+  (let [duplicates (-> search-metadata meta :duplicates)
+        rename     #(rename-duplicates* duplicates %)]
+    (into {} (map rename search-metadata))))
+
 (defn fetch-metadata!
   "Fetches and post-processes metadata used to populate the search form."
   []
   (.then (api/fetch "/search/metadata")
          (fn [{:keys [search-metadata top-30-kvs]}]
-           (let [name->id   (apply merge (vals search-metadata))
-                 id->name   (set/map-invert name->id)
-                 name->type (fn [entity-name]
-                              (loop [groups (seq search-metadata)]
-                                (let [[[type name->id]] groups]
-                                  (when type
-                                    (if (name->id entity-name)
-                                      type
-                                      (recur (rest groups)))))))]
+           (let [search-metadata (rename-duplicates search-metadata)
+                 name->id        (apply merge (vals search-metadata))
+                 id->name        (set/map-invert name->id)
+                 name->type      (fn [entity-name]
+                                   (loop [groups (seq search-metadata)]
+                                     (let [[[type name->id]] groups]
+                                       (when type
+                                         (if (name->id entity-name)
+                                           type
+                                           (recur (rest groups)))))))]
              (swap! state/search assoc
 
                     ;; Core metadata. TODO: keep or remove?
@@ -179,11 +201,11 @@
   (when-let [params (items->query-params items)]            ; clear other params
     (let [[rel] order-by]
       (cond-> params
-              rel (assoc :order-by (str/join "," (map rel->s order-by)))
-              limit (assoc :limit limit)
-              offset (assoc :offset offset)
-              from (assoc :from from)
-              to (assoc :to to)))))
+        rel (assoc :order-by (str/join "," (map rel->s order-by)))
+        limit (assoc :limit limit)
+        offset (assoc :offset offset)
+        from (assoc :from from)
+        to (assoc :to to)))))
 
 (defn- select-opts
   [rels & [default-option]]
@@ -342,7 +364,7 @@
           (or (:label (sd/search-rels k))
               (str k))
           " | "])
-       [:span.search-form__item-label (or label (str v))]
+       [:span.search-form__item-label (or (shared/local-name label) (str v))]
        [:button {:type     "button"                         ; prevent submit
                  :title    "Remove criterion"
                  :on-click (fn [e]
@@ -461,13 +483,13 @@
 (defn search-result-table
   [search-state {:keys [document/title file/name] :as entity}]
   (let [hyperlink [:a.action {:title "View in the reader"
-                              :href  (shared/reader-href name)}
-                   (shared/break-str title)
+                              :href  (fshared/reader-href name)}
+                   (fshared/break-str title)
                    [:img.action__icon
                     {:src "/images/external-link-svgrepo-com.svg"}]]
         kvs       (concat [[:document/title hyperlink]]
                           (select-keys entity sd/search-result-rels))]
-    [shared/metadata-table search-state entity kvs]))
+    [fshared/metadata-table search-state entity kvs]))
 
 (defn explanation
   [name->id]
@@ -523,7 +545,7 @@
            (when id->name
              (let [kvs          (map (juxt :file/name identity) results)
                    entity-table (partial search-result-table search-state)]
-               [shared/kvs-list kvs entity-table offset]))]])
+               [fshared/kvs-list kvs entity-table offset]))]])
        (if (empty? query-params)
          [explanation name->id]
          ;; TODO: put this in main.css

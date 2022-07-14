@@ -15,7 +15,7 @@
             [dk.cst.glossematics.db.tei :as db.tei]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
-            [dk.cst.glossematics.frontend.shared :as shared]
+            [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.static-data :as sd]))
 
 ;; TODO: wrong author? https://glossematics.dk/app/search?limit=10&offset=0&_=%23norg113
@@ -65,7 +65,7 @@
          :type ?type} ???]
 
     (fn [{:syms [ref ?type]}]
-      [:a {:href  (shared/search-href ref)
+      [:a {:href  (fshared/search-href ref)
            :title (da-type ?type)}
        [:slot]])))
 
@@ -309,7 +309,7 @@
                                        (when-let [v (get entity' k)]
                                          [k v])))
                         (sort-by first (apply dissoc entity' sd/reader-rels)))]
-    [shared/metadata-table search-state entity kvs]))
+    [fshared/metadata-table search-state entity kvs]))
 
 (defn pdf-object
   [pdf-src]

@@ -8,7 +8,7 @@
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.glossematics.frontend.shared :as shared]
+            [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
             [dk.cst.glossematics.frontend.page.search :as search]
@@ -118,7 +118,7 @@
 
     ;; Scroll state is always reset when no intra-page navigation is expected.
     (when (empty? js/window.location.hash)
-      (shared/scroll-reset! "body"))))
+      (fshared/scroll-reset! "body"))))
 
 (defn ^:dev/after-load render
   []

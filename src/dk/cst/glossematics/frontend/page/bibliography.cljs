@@ -2,7 +2,7 @@
   "Bibliography modeled after the search index page."
   (:require [clojure.string :as str]
             [dk.cst.glossematics.static-data :as sd]
-            [dk.cst.glossematics.frontend.shared :as shared]
+            [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.api :as api]))
 
@@ -11,9 +11,9 @@
   (into [:p.index-page__skip-links]
         (->> groups
              (map (fn [[year]]
-                    (let [fragment (str "#" (shared/legal-id year))]
+                    (let [fragment (str "#" (fshared/legal-id year))]
                       [:a {:href     fragment
-                           :on-click #(shared/find-fragment fragment)}
+                           :on-click #(fshared/find-fragment fragment)}
                        year])))
              (interpose ", ")
              (vec))))
@@ -23,7 +23,7 @@
   [:ul
    (for [{:keys [document/bib-entry] :as entry} entries]
      [:li {:key bib-entry}
-      [shared/bib-line id->name entry]])])
+      [fshared/bib-line id->name entry]])])
 
 (defn fetch-results!
   []
@@ -38,13 +38,13 @@
         full-name (-> other-author
                       (sd/author->id)
                       (id->name)
-                      (shared/surname-first)
+                      (fshared/surname-first)
                       (str/split #",")
                       (first))]
     (if (= current-author other-author)
       [:span [:img.entity-icon {:src img-src}]
        full-name]
-      [:a {:href (shared/bib-href other-author)}
+      [:a {:href (fshared/bib-href other-author)}
        [:img.entity-icon {:src img-src}]
        full-name])))
 
@@ -60,7 +60,7 @@
       " Bibliography"]
      (when (and id->name results)
        (let [groups (->> (filter #(= (:document/author %) id) results)
-                         (group-by (comp shared/single :document/year))
+                         (group-by (comp fshared/single :document/year))
                          (sort-by first)
                          (mapv (fn [[k v]]
                                  [(str k) (sort-by :document/bib-entry v)])))]
@@ -73,4 +73,4 @@
            [:hr]
            [skip-links groups]]
           ^{:key author}
-          [shared/kvs-list groups (partial bibliography-content id->name)]]))]))
+          [fshared/kvs-list groups (partial bibliography-content id->name)]]))]))

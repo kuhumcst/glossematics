@@ -3,6 +3,7 @@
   (:require [clojure.string :as str]
             [reitit.frontend.easy :as rfe]
             [tick.core :as t]
+            [dk.cst.glossematics.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.stucco.pattern :as stp]))
@@ -240,7 +241,7 @@
            :key   v}
        (when-let [img-src (some-> v id->type sd/entity-types :img-src)]
          [:img.entity-icon {:src img-src :alt ""}])
-       (get id->name v v)]
+       (shared/local-name (get id->name v v))]
 
       ;; Collections caught here.
       (set? v)
