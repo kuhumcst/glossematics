@@ -199,9 +199,9 @@
 (defn- state->params
   [{:keys [items limit offset order-by from to]}]
   (when-let [params (items->query-params items)]            ; clear other params
-    (let [[rel] order-by]
+    (let [[order-rel] order-by]
       (cond-> params
-        rel (assoc :order-by (str/join "," (map rel->s order-by)))
+        order-rel (assoc :order-by (str/join "," (map rel->s order-by)))
         limit (assoc :limit limit)
         offset (assoc :offset offset)
         from (assoc :from from)
@@ -227,11 +227,11 @@
   "Submit a new search criteria."
   []
   (let [{:keys [name->id]} @state/search
-        {:keys [rel in unique]} @state/query]
+        {:keys [in unique]} @state/query]
     (if-let [id (name->id in)]
-      (if-not (get unique [rel id])
+      (if-not (get unique ['_ id])
         (do
-          (swap! state/query add-kv (with-meta [rel id] {:label in}))
+          (swap! state/query add-kv (with-meta ['_ id] {:label in}))
           (swap! state/query update :n inc)
           (swap! state/query assoc
                  :in ""
@@ -376,19 +376,16 @@
 
 (defn search-form
   []
-  (let [{:keys [name-kvs name->id id->type name->type]} @state/search
-        set-in  (fn [e]
-                  (let [in (e->v e)]
-                    (swap! state/query assoc
-                           :in in
-                           :bad-input? false
-                           :not-allowed? false)))
-        set-rel (fn [e]
-                  (swap! state/query assoc :rel (s->rel (e->v e)))
-                  (submit))]
+  (let [{:keys [name-kvs name->id id->type]} @state/search
+        set-in (fn [e]
+                 (let [in (e->v e)]
+                   (swap! state/query assoc
+                          :in in
+                          :bad-input? false
+                          :not-allowed? false)))]
 
     (fn [_ _]
-      (let [{:keys [items in rel order-by bad-input? not-allowed?]} @state/query
+      (let [{:keys [items in order-by bad-input? not-allowed?]} @state/query
             {:keys [results]} @state/search
             [order-rel] order-by
             good-input? (and (not-empty in) (name->id in))]
@@ -413,22 +410,8 @@
           (when name->id
             [multi-input-data name-kvs])
 
-          ;; TODO: experimenting with removing the select. Make permanent?
-          #_[:label {:for "k"} " as "]
-          #_[:select
-             {:id        "k"
-              :value     (rel->s rel)
-              :on-change set-rel
-              :disabled  (not (get name->id in))}
-             (if-let [entity-type (and name->type (name->type in))]
-               (let [compatible? (comp boolean entity-type :compatible second)
-                     ?disable    #(with-meta % {:disabled (not (compatible? %))})]
-                 [select-opts (map ?disable sd/search-rels) anything-opt])
-               [select-opts sd/search-rels anything-opt])]
-
           [:input {:type     "submit"
                    :value    "Search"
-                   ;; TODO: disable when entity-type is incompatible with rel
                    :disabled (empty? in)}]]
 
          (when (not-empty items)

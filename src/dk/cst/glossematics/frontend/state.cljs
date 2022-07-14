@@ -32,7 +32,7 @@
 
 (def local-query-keys
   "Keys used locally by the search page; not transferable via query-params."
-  #{:rel :in :n :bad-input? :not-allowed?})
+  #{:in :n :bad-input? :not-allowed?})
 
 (def query-result-set-keys
   "Keys that only affect the size/order of the query result set.
@@ -44,7 +44,6 @@
   {:unique   #{} :items []                                  ; = an ordered set
    :n        0                                              ; background index
    :in       ""                                             ; input text
-   :rel      '_                                             ; current relation
    :limit    10
    :offset   0
    :order-by [nil :asc]
