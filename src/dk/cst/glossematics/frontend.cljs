@@ -90,8 +90,10 @@
            :title "Settings"}
        [:img.nav-icon {:src "/images/person-sharp-yellow-svgrepo-com.svg"
                        :alt ""}]]]
-     [:div.shell__content {:class (when (= name ::timeline/page)
-                                    "fill-mode")}
+     [:div.shell__content {:class [(when (= name ::timeline/page)
+                                     "fill-mode")
+                                   (when (not-empty @state/fetches)
+                                     "fetching")]}
       (if page
         [page]
         [:p "unknown page"])]]))

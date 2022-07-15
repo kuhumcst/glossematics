@@ -26,6 +26,9 @@
       true
       false)))
 
+(defonce fetches
+  (r/atom #{}))
+
 ;; To avoid having multiple modals in succession after multiple bad API fetches,
 ;; additional modals will be blocked until the route changes.
 (def ^:dynamic *block-modal-dialogs*)

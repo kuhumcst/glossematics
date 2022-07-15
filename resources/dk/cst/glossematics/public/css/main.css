@@ -198,6 +198,18 @@ nav a:not(:first-child)::first-letter {
     padding: var(--padding-xl);
 }
 
+.shell__content .search-result .kvs-list {
+    transition: all 0.66s;
+}
+
+/* While loading content, the search results blur out and become inactive. */
+.shell__content.fetching .search-result .kvs-list {
+    opacity: 0.5;
+    filter: blur(5px);
+    filter: blur(5px);
+    pointer-events: none;
+}
+
 .shell__content.fill-mode {
     padding: 0;
 }

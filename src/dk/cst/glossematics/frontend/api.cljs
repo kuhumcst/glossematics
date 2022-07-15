@@ -35,7 +35,12 @@
   Usually, bad responses (e.g. 403) are caused by frontend-server mismatch
   which can be resolved by loading the latest version of the frontend app."
   [url & [opts]]
-  (p/let [{:keys [status body]} (fetch/get (normalize-url url) opts)]
-    (if (not= status 200)
-      (refresh-dialog status)
-      body)))
+  (let [current-fetch [url opts]]
+    (when-not (get @state/fetches current-fetch)
+      (swap! state/fetches conj current-fetch)
+      (p/let [{:keys [status body]} (fetch/get (normalize-url url) opts)]
+        (if (not= status 200)
+          (refresh-dialog status)
+          (do
+            (swap! state/fetches disj current-fetch)
+            body))))))
