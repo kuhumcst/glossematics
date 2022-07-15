@@ -87,7 +87,7 @@
        (map (fn [[id full-name]]
               {:db/ident         (str id-prefix id)
                :entity/type      (keyword "entity.type" entity-type)
-               :entity/full-name (shared/capitalize-words full-name)}))))
+               :entity/full-name (shared/capitalize-all full-name)}))))
 
 (defn tei-files
   [conn]
