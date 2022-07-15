@@ -198,16 +198,35 @@ nav a:not(:first-child)::first-letter {
     padding: var(--padding-xl);
 }
 
-.shell__content .search-result .kvs-list {
+.shell .search-result .kvs-list {
     transition: all 0.66s;
 }
 
-/* While loading content, the search results blur out and become inactive. */
-.shell__content.fetching .search-result .kvs-list {
+/* While fetching, the search results blur out and become inactive. */
+.shell.fetching .search-result .kvs-list {
     opacity: 0.5;
     filter: blur(5px);
     filter: blur(5px);
     pointer-events: none;
+}
+
+img.loading-indicator {
+    transition: all 0.66s;
+    transition-delay: 0; /* Should disappear quick. */
+    position: fixed;
+    opacity: 0;
+    width: 100px;
+    height: 100px;
+    z-index: 999;
+    top: calc(50vh - 50px);
+    left: calc(50vw - 50px);
+}
+
+/* While fetching, the generic loading indicator starts to appear after 1s. */
+.shell.fetching img.loading-indicator {
+    opacity: 0.8;
+    transform: scale(2);
+    transition-delay: 1s;
 }
 
 .shell__content.fill-mode {

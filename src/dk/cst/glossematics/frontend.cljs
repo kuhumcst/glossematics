@@ -70,8 +70,11 @@
   []
   (let [{:keys [page name]} (:data @state/location)
         authenticated? @state/authenticated?]
-    [:div.shell {:class (when (get #{::reader/page ::timeline/page} name)
-                          "reader-mode")}
+    [:div.shell {:class [(when (get #{::reader/page ::timeline/page} name)
+                           "reader-mode")
+                         (when (not-empty @state/fetches)
+                           "fetching")]}
+     [:img.loading-indicator {:src "/images/loading.svg"}]
      [:nav
       [:a {:href (href ::main)}
        [:h1 "Glossematics"]]
@@ -90,10 +93,8 @@
            :title "Settings"}
        [:img.nav-icon {:src "/images/person-sharp-yellow-svgrepo-com.svg"
                        :alt ""}]]]
-     [:div.shell__content {:class [(when (= name ::timeline/page)
-                                     "fill-mode")
-                                   (when (not-empty @state/fetches)
-                                     "fetching")]}
+     [:div.shell__content {:class (when (= name ::timeline/page)
+                                    "fill-mode")}
       (if page
         [page]
         [:p "unknown page"])]]))

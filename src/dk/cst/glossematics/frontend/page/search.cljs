@@ -529,13 +529,5 @@
              (let [kvs          (map (juxt :file/name identity) results)
                    entity-table (partial search-result-table search-state)]
                [fshared/kvs-list kvs entity-table offset]))]])
-       (if (empty? query-params)
-         [explanation name->id]
-         ;; TODO: put this in main.css
-         [:div {:style {:text-align      "center"
-                        :opacity         "0"
-                        :animation       "fade-in-xy 1s ease-out forwards"
-                        :animation-delay "0.5s"}}
-          [:img {:style {:width  150
-                         :height 150}
-                 :src   "/images/loading.svg"}]]))]))
+       (when (empty? query-params)
+         [explanation name->id]))]))
