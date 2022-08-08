@@ -1,1 +1,0 @@
-{"version":3,"sources":["dk/cst/glossematics/frontend/page/main.cljs"],"mappings":";AAGA,8CAAA,9CAAMA;AAAN,AAAA,0FAAA,8CAAA","names":["dk.cst.glossematics.frontend.page.main/page"],"sourcesContent":["(ns dk.cst.glossematics.frontend.page.main)\n\n;; TODO: how to trigger re-render when changing e.g. this text?\n(defn page\n  []\n  [:p \"TODO\"])\n"]}
