@@ -6,7 +6,7 @@
             #?(:clj  [io.pedestal.log :as log]
                :cljs [lambdaisland.glogi :as log]))
   #?(:clj (:import [java.sql Date]
-                   [java.time LocalDate]
+                   [java.time LocalDate ZoneOffset]
                    [java.time.format DateTimeParseException])))
 
 #?(:clj
@@ -18,10 +18,14 @@
 (def utc-dtf
   (t/formatter "yyyy-MM-dd"))
 
-;; TODO: is this right?
+;; Dates are always imported as UTC and displayed as UTC; see: #69.
+;; We are ignoring the concept of timezones entirely, since we are only
+;; using the date itself and not the hour of day. It would be preferable
+;; to have a shared JS/Java date type which didn't care about timezones,
+;; but unfortunately LocalDate doesn't exist in JavaScript AFAIK.
 (defn value-of
   [d]
-  #?(:clj  (Date/valueOf ^LocalDate d)
+  #?(:clj  (Date/from (.toInstant (.atStartOfDay ^LocalDate d) ZoneOffset/UTC))
      :cljs (.valueOf d)))
 
 (defn parse-date
@@ -61,6 +65,6 @@
      (capitalize-all "Acta Jutlandica")
      (capitalize-all " acta  jutlandica"))
 
-  (parse-date utc-fallback-dtf "1899-10-03")
+  (parse-date utc-dtf "1899-10-03")
   (parse-date utc-dtf "2022-03-25")
   #_.)

@@ -259,6 +259,8 @@
         [:em "available"]
         [:span.weak "n/a"])
 
+      ;; Dates are always imported as UTC and displayed as UTC; see: #69.
+      ;; This is to account for the fact that there is not LocalDate type in JS.
       (inst? v)
       (let [d   (.toISOString v)
             ret (str/split d #"T")]
