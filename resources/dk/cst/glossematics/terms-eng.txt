@@ -221,16 +221,16 @@
 221	fundamental variety
 222	fusion
 223	general
-225	general-system
 224	generalization, principle of
+225	general-system
 226	generic
 227	genetic relationship
 228	glossary
 229	glossematy
+230	glossemes
 231	glosseme-category
 232	glosseme-sum
 233	glosseme-unit
-230	glossemes
 234	glossia
 235	government
 236	greatest-sum
@@ -319,13 +319,13 @@
 319	median variety
 320	member
 321	meta-(scientific semiotic)
+322	metasemiotic
 323	metachrony
 324	metadescript
 325	metadescriptor
 326	metasemiological
 327	metasemiological plane
 328	metasemiology
-322	metasemiotic
 329	metasemiotic
 330	minimal sum
 331	modulation
@@ -347,8 +347,8 @@
 347	obligatory (dominance)
 348	octuplex sum
 349	op-chain
-351	op-series
 350	operation
+351	op-series
 352	optional (dominance)
 353	order
 354	overlapping
@@ -377,8 +377,8 @@
 377	polarity
 378	polyphthong
 379	power
-381	pre-relate
 380	preposition
+381	pre-relate
 382	primary
 383	primary glosseme
 384	primary variety
@@ -464,10 +464,10 @@
 464	side
 465	sign
 466	sign function
-469	sign-process
-470	sign-system
 467	signal
 468	signal for, be
+469	sign-process
+470	sign-system
 471	simple accessory
 472	simple accessory glosseme
 473	simple constitutive
@@ -581,8 +581,6 @@
 581	words
 582	cenology
 583	phonematics
-583	phonematic
-584	phonemateme
 584	sound-types
 585	types
 586	homonexual ceneme
@@ -591,22 +589,16 @@
 589	heteroplane selection
 590	homoplane selection
 591	extrinsic selection
-414	Pr. of Reduction
-160	Pr. of Economy
-59	Classes
 592	Glossematics
-592	glossematics
 593	glossematic 
 594	Equipollent
 595	functival field
 596	coherence
 597	equivalence
-230	glosseme
 598	strata and stratum
 599	intrinsic
 600	resultant
 601	sematic
 602	grapheme
-42	cenematia
 603	equipollent
 604	engintrinsic

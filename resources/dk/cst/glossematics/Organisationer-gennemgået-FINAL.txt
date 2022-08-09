@@ -1,58 +1,41 @@
 1	Berlingske Forlag
 2	Aarhus Universitet
-2	Århus Universitet
-2	AU
 3	Selskab for nordisk filologi
 4	Carlsbergfondet
 5	Humanistisk Samfund
 6	Københavns Universitet
-6	KU
-6	University of Copenhagen
 7	Statsbiblioteket i Aarhus
 8	Société genevoise de linguistique
 9	Norsk selskap f. sprvsk.
 10	Conseil international
 11	K.B. Hallen
 12	Rask-Ørstedfondet
-12	Rask-Ørsted Fondet
-12	R-Ø fondet
 13	Åbo Universitet
-13	universitet i Aabo
 14	Det Kongelige Bibliotek
 15	Brandbjerg Højskole
 18	Nordisk sprog- og kulturforlag
 19	Jydsk Selskab for Nordisk Filologi
-19	Jysk selskab for nordisk filologi
 20	Columbia University
-20	Columbia Univ.
 21	Oslo Universitet
 24	Jyllandsposten
 25	Stiftstidende
 26	Dansk Samling
 27	Aarhus Kommunehospital
-27	Århus kommunehospital
-27	Kommunehospitalet
-27	Århus Kommunehospital
 28	Det Kongelige Danske Videnskabernes Selskab
-29	Fil.-hist.samf.
 29	Filologisk-historisk samfund
 30	Selskabet for historiske kildeskrifters oversættelse
 31	Jysk selskab for nordisk filologi
 34	Carlsbergfondens Direktion
-35	Handelshojskolen i Kobehavn
 35	Handelshøjskolen i Købehavn
 36	Hansens Musikforlag
 38	Laurits Andersens Fond
 39	Rask-Ørsted Fondets Bestyrelse
-40	Rask-Orsted Fondets Sekretariat
+40	Rask-Ørsted Fondets Sekretariat
 41	Det Kongelige Teater
 42	Busck
 43	Forhistorisk Museum
-44	statsbiblioteket
 44	Statsbiblioteket
 46	Jyllandsposten
-46	Jyllands-posten
-46	Jyllands-Posten
 47	Stiftstidende
 48	Berlingske Forlag
 49	Politiken
@@ -84,21 +67,15 @@
 76	the Egyptian University
 77	U.C.
 78	The Ralph C. Coxhead Corporation
-79	Hamburg universitet
 79	Hamburg Universitet
-80	Selskab for filosofi
-80	Filosofisk selskab
 80	Filosofisk Selskab
 81	Filologisk samfund
 82	Summer Institute
-83	University of Edinburgh
-83	Universitet i Edinburgh
 83	Universitet i Edinburgh
 84	University of New Mexico
 85	Herlufsholm
 86	University of Cape Town
 87	School of Oriental Studies
-88	Amer. Council of Learned Societies
 88	American Council of Learned Societies
 89	Association phonétique internationale
 90	Ford Foundation
@@ -112,22 +89,45 @@
 97	The British Council
 98	UNESCO
 99	Philological Society
-99	Phil. Soc. tilføjes #norg99
 100	Allen and Unwin
 101	Brown
 102	COMITÉ INTERNATIONAL DE LA CROIX ROUGE
 103	Tucuman Universitet
 104	The InterUniversity Council
-104	Inter-University Council
-104	Inter-University Council for Higher Education in the Colonies
 105	University of London
-105	Londons universitet
 106	University of Virginia
 107	Americanist Congress 
 108	City College of New York
-108	College of the City of New York
 109	Unesco
 110	IPA's Council
 111	universitetet i Capetown
-112	Rockefeller
-113	Vetenskapssocietetens i Lund
+112	The Rockfeller Foundation
+113	Les Éditions de Minuit
+114	Munksgaards Forlag
+115	Undervisningsministeriet
+116	Det filosofiske fakultet
+117	Danmarks Nationalbank
+118	Chr. Erichsen Forlag
+119	American Embassy
+120	Fulbright-Hays Center Faculty Fellowship
+121	Kinokuniya Book Store of America
+122	Naturmetodens Sproginstitut
+123	Philological Club
+123	Harvard Philological Club
+124	Société scandinave
+125	Yale
+126	Institute of Technology
+126	Massachusetts Institute of Technology
+127	University of Minnesota
+128	Ecole Libre des Hautes Etudes
+129	New York French University
+130	Bell Company
+131	King's Library
+132	Institut for sammenlignende kulturforskning
+133	The Acoustics Laboratory of the Massachusetts Institute of Technology
+133	Acoustic Laboratory of M.I.T.
+134	Warsaw University
+135	Vetenskapssocietetens i Lund
+137	Guggenheim
+138	Cambridge University Press
+139	University College

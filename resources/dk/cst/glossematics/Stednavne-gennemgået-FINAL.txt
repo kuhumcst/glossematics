@@ -2248,7 +2248,7 @@
 2405	Fife
 2406	Kullen
 2407	Aberdeenshire
-2408	Barra 
+2408	Barra
 2409	Prestwick
 2410	Kent
 2411	Hebriderne
@@ -2261,3 +2261,16 @@
 2418	Bloomsbury
 2419	Nordeuropa
 2420	Leith
+2421	Lvov
+2422	Kroscienko
+2423	Wroclaw 
+2424	Duszniki
+2425	Poznan
+2426	Rogalin
+2427	Burdegalia
+2428	Vandbakken
+2429	Houilles
+2430	Krakow
+2431	Fredrikstad
+2432	Christiansholms Ø
+2433	Criccieth

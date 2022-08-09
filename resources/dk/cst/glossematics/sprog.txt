@@ -1,1040 +1,502 @@
 abk	Abkhasisk
-abk	abkhasisk
 ace	Achinesisk
-ace	achinesisk
 ach	Acoli
-ach	acoli
 ada	Adangme
-ada	adangme
 afa	Afro-asiatiske sprog
-afa	afro-asiatiske sprog
 afh	Afrihili
-afh	afrihili
 afr	Afrikaans
-afr	afrikaans
 ain	Ainu
-ain	ainu
 aka	Akan
-aka	akan
 akk	Akkadisk
-akk	akkadisk
 alb	Albansk
-alb	albansk
-alb	Albanesisk
-alb	albanesisk
 ale	Aleutiske sprog
-ale	aleutiske sprog
-ale	aleutisk
 alg	Algonkiske sprog
-alg	algonkiske sprog
 amh	Amharisk
-amh	amharisk
 ang	Angelsaksisk
-ang	angelsaksisk
 apa	Apache sprog
-apa	apache sprog
 ara	Arabisk
-ara	arabisk
 arc	Aramæisk
-arc	aramæisk
 arm	Armensk
-arm	armensk
 arn	Araukansk
-arn	araukansk
 arp	Arapaho
-arp	arapaho
 art	Kunstsprog
-art	kunstsprog
 arw	Arawak
-arw	arawak
 asm	Assamesisk
-asm	assamesisk
 ath	Athapascan
-ath	athapascan
 aus	Australske sprog
-aus	australske sprog
 ava	Avarisk
-ava	avarisk
 ave	Avestisk
-ave	avestisk
 awa	Awadhi
-awa	awadhi
 aym	Aymará
-aym	aymará
 aze	Aserbajdsjansk
-aze	aserbajdsjansk
 bad	Banda
-bad	banda
 bai	Bamileke
-bai	bamileke
 bak	Bajkirsk
-bak	bajkirsk
 bal	Baluchi
-bal	baluchi
 bam	Bambara
-bam	bambara
 ban	Balinesisk
-ban	balinesisk
 baq	Baskisk
-baq	baskisk
 bas	Basa
-bas	basa
 bat	Baltiske sprog
-bat	baltiske sprog
-bat	baltisk
-bat	baltisk
 bej	Beja
-bej	beja
 bel	Hviderussisk
-bel	hviderussisk
 bem	Bemba
-bem	bemba
 ben	Bengali
-ben	bengali
 ber	Berberiske sprog
-ber	berberiske sprog
 bho	Bhojpuri
-bho	bhojpuri
 bih	Bihari
-bih	bihari
 bik	Bikol
-bik	bikol
 bin	Bini
-bin	bini
 bis	Bislama
-bis	bislama
 bla	Siksika
-bla	siksika
 bnt	Bantu
-bnt	bantu
 bos	Bosnisk
-bos	bosnisk
 bra	Braj
-bra	braj
 bre	Bretonsk
-bre	bretonsk
 btk	Batak
-btk	batak
 bua	Buriat
-bua	buriat
 bug	Buginesisk
-bug	buginesisk
 bul	Bulgarsk
-bul	bulgarsk
 bur	Burmesisk
-bur	burmesisk
 cad	Caddo
-cad	caddo
 cai	Mellemamerikanske indianske sprog
-cai	mellemamerikanske indianske sprog
 car	Caribisk
-car	caribisk
 cat	Catalansk
-cat	catalansk
 cau	Kaukasiske sprog
-cau	kaukasiske sprog
 ceb	Cebuano
-ceb	cebuano
 cel	Keltiske sprog
-cel	keltiske sprog
 cha	Chamorro
-cha	chamorro
 chb	Chibcha
-chb	chibcha
 che	Tjetjensk
-che	tjetjensk
 chg	Chagatai
-chg	chagatai
 chi	Kinesisk
-chi	kinesisk
 chk	Chuukese
-chk	chuukese
 chm	Mari
-chm	mari
 chn	Chinook
-chn	chinook
 cho	Choctaw
-cho	choctaw
 chp	Chipewyan
-chp	chipewyan
 chr	Cherokee
-chr	cherokee
 chu	Kirkeslavisk
-chu	kirkeslavisk
 chv	Tjuvasisk
-chv	tjuvasisk
 chy	Cheyenne
-chy	cheyenne
 cmc	Chamik sprog
-cmc	chamik sprog
 cop	Koptisk
-cop	koptisk
 cor	Cornisk
-cor	cornisk
 cos	Korsikansk
-cos	korsikansk
 cpe	Kreolsk
-cpe	kreolsk
 cpe	Pidgin
-cpe	pidgin
 cre	Cree
-cre	cree
 crp	Kreolsk og pidgin
-crp	kreolsk og pidgin
 cus	Kusjitiske sprog
-cus	kusjitiske sprog
+cze	tchèque
 cze	Tjekkisk
-cze	tjekkisk
 dak	Dakota
-dak	dakota
 dan	Dansk
-dan	dansk
-dan	nydansk
 day	Dayak
-day	dayak
 del	Delaware
-del	delaware
 den	Slave
-den	slave
 dgr	Dogrib
-dgr	dogrib
 din	Dinka
-din	dinka
 div	Divehi
-div	divehi
 doi	Dogri
-doi	dogri
 dra	Dravidiske sprog
-dra	dravidiske sprog
 dua	Duala
-dua	duala
 dut	Hollandsk
-dut	hollandsk
 dyu	Dyula
-dyu	dyula
 dzo	Dzongkha
-dzo	dzongkha
 efi	Efik
-efi	efik
 egy	Egyptisk
-egy	egyptisk
 eka	Ekajuk
-eka	ekajuk
 elx	Elamitisk
-elx	elamitisk
 eng	Engelsk
-eng	engelsk
-eng	nyengelsk
 enm	Middelengelsk
-enm	middelengelsk
 epo	Eperanto
-epo	eperanto
 est	Estisk
-est	estisk
 ewe	Ewe
-ewe	ewe
 ewo	Ewondo
-ewo	ewondo
 fan	Fang
-fan	fang
 fao	Færøsk
-fao	færøsk
 fat	Fanti
-fat	fanti
 fij	Fijian
-fij	fijian
 fin	Finsk
-fin	finsk
 fiu	Finsk - ugrisk
-fiu	Finsk-ugrisk
-fiu	finsk - ugrisk
-fiu	finsk-ugrisk
-fiu	Finsk-ugriske sprog
-fiu	finsk-ugriske sprog
-fiu	finsk-ugrisk
 fon	Fon
-fon	fon
 fre	Fransk
-fre	fransk
-fre	nyfransk
 frm	Middelfransk
-frm	middelfransk
 fro	Oldfransk
-fro	oldfransk
 fry	Frisisk
-fry	frisisk
 ful	Fulah
-ful	fulah
 fur	Friulian
-fur	friulian
 gay	Gayo
-gay	gayo
 gba	Gbaya
-gba	gbaya
 gem	Germansk
-gem	germansk
-gem	Germanske sprog
-gem	germanske sprog
-gem	moderne germansk
 geo	Georgisk
-geo	georgisk
+ger	allemand
 ger	Tysk
-ger	tysk
 gez	Geez
-gez	geez
 gil	Gilbertesisk
-gil	gilbertesisk
 gla	Gælisk
-gla	gælisk
 gle	Irsk
-gle	irsk
 glg	Gallegan
-glg	gallegan
 glv	Manx
-glv	manx
 gmh	Middelhøjtysk
-gmh	middelhøjtysk
 goh	Oldhøjtysk
-goh	oldhøjtysk
 gon	Gondi
-gon	gondi
 gor	Gorontalo
-gor	gorontalo
 got	Gotisk
-got	gotisk
 grb	Grebo
-grb	grebo
 grc	Oldgræsk
 grc	oldgræsk
-grc	oldgræsk
-grc	oldgræsk
 gre	Græsk
-gre	græsk
-gre	nygræsk
 grn	Guarani
-grn	guarani
 guj	Gujarati
-guj	gujarati
 gwi	Gwich'in
-gwi	gwich'in
 gaa	Ga
-gaa	ga
 hai	Haida
-hai	haida
 hau	Hausa
-hau	hausa
 haw	Hawaiiansk
-haw	hawaiiansk
 heb	Hebraisk
-heb	hebraisk
-heb	hebræisk
 her	Herero
-her	herero
 hil	Hiligaynon
-hil	hiligaynon
 him	Himachali
-him	himachali
 hin	Hindi
-hin	hindi
 hit	Hittitisk
-hit	hittitisk
-hit	hittittisk
 hmn	Hmong
-hmn	hmong
 hmo	Hiri motu
-hmo	hiri motu
 hrv	Kroatisk
-hrv	Kroatisk
-hrv	kroatisk
-hrv	kroatisk
 hun	Ungarsk
-hun	ungarsk
 hup	Hupa
-hup	hupa
 iba	Iban
-iba	iban
 ibo	Igbo
-ibo	igbo
 ice	Islandsk
-ice	islandsk
 ijo	Ijo
-ijo	ijo
 iku	Inuktitut
-iku	inuktitut
 ile	Interlingue
-ile	interlingue
 ilo	Iloko
-ilo	iloko
 ina	Interlingua
-ina	interlingua
 inc	Indiske sprog
-inc	indiske sprog
 ind	Indonesisk
-ind	indonesisk
+ine	indo-européen
 ine	Indoeuropæisk
-ine	indoeuropæisk
-ine	Indoeuropæiske sprog
-ine	indoeuropæiske sprog
-ine	indo - europæiske
-ine	indo-europæiske
-ine	indo-europæisk
-ine	indoeuropæisk
 ipk	Inupiaq
-ipk	inupiaq
 ira	Iranske sprog
-ira	iranske sprog
 iro	Irokesiske sprog
-iro	irokesiske sprog
 ita	Italiensk
-ita	italiensk
 jav	Javanesisk
-jav	javanesisk
 jpn	Japansk
-jpn	japansk
 jpr	Jødisk-persisk
-jpr	jødisk-persisk
 jrb	Jødisk-arabisk
-jrb	jødisk-arabisk
 kab	Kabyle
-kab	kabyle
 kac	Kachin
-kac	kachin
 kal	Kalaallisut
-kal	kalaallisut
 kam	Kamba
-kam	kamba
 kan	Kannaresisk
-kan	kannaresisk
 kar	Karen
-kar	karen
 kas	Kashmiri
-kas	kashmiri
 kau	Kanuri
-kau	kanuri
 kaw	Kawi
-kaw	kawi
 kaz	Kasakhisk
-kaz	kasakhisk
 kha	Khasi
-kha	khasi
 khi	Khoisan
-khi	khoisan
 khm	Khmer
-khm	khmer
 kho	Khotanesisk
-kho	khotanesisk
 kik	Kikuyu
-kik	kikuyu
 kin	Kinyarwanda
-kin	kinyarwanda
 kir	Kirgisisk
-kir	kirgisisk
 kmb	Kimbundu
-kmb	kimbundu
 kok	Konkani
-kok	konkani
 kom	Komi
-kom	komi
 kon	Kongo
-kon	kongo
 kor	Koreansk
-kor	koreansk
 kos	Kosraean
-kos	kosraean
 kpe	Kpelle
-kpe	kpelle
 kro	Kru
-kro	kru
 kru	Kurukh
-kru	kurukh
 kua	Kuanyama
-kua	kuanyama
 kum	Kumyk
-kum	kumyk
 kur	Kurdisk
-kur	kurdisk
 kut	Kutenai
-kut	kutenai
 kaa	Karakalpakisk
-kaa	karakalpakisk
 lad	Ladino
-lad	ladino
 lah	Lahnda
-lah	lahnda
 lam	Lamba
-lam	lamba
 lao	Laotisk
-lao	laotisk
 lat	Latin
-lat	latin
 lav	Lettisk
-lav	lettisk
 lez	Lezghian
-lez	lezghian
 lin	Lingala
-lin	lingala
 lit	Litauisk
-lit	litauisk
 lol	Mongo
-lol	mongo
 loz	Lozi
-loz	lozi
 ltz	Letzeburgesch
-ltz	letzeburgesch
 lua	Luba-lulua
-lua	luba-lulua
 lub	Luba-katanga
-lub	luba-katanga
 lug	Luganda
-lug	luganda
 lui	Luiseño
-lui	luiseño
 lun	Lunda
-lun	lunda
 luo	Luo
-luo	luo
 lus	Lushai
-lus	lushai
 mac	Makedonsk
-mac	makedonsk
 mad	Madurese
-mad	madurese
 mag	Magahi
-mag	magahi
 mah	Marshall
-mah	marshall
 mai	Maithili
-mai	maithili
 mak	Makasar
-mak	makasar
 mal	Malayalam
-mal	malayalam
 man	Mandingo
-man	mandingo
 mao	Maori
-mao	maori
 map	Malajo-polynesiske sprog
-map	malajo-polynesiske sprog
 mar	Marathi
-mar	marathi
 mas	Masai
-mas	masai
 may	Malajisk
-may	malajisk
 mdr	Mandar
-mdr	mandar
 men	Mende
-men	mende
 mga	Middelirsk
-mga	middelirsk
 mic	Micmac
-mic	micmac
 min	Minangkabau
-min	minangkabau
 mkh	Mon-khmer
-mkh	mon-khmer
 mlg	Malagasy
-mlg	malagasy
 mlt	Maltesisk
-mlt	maltesisk
 mnc	Manchu
-mnc	manchu
 mni	Manipuri
-mni	manipuri
 mno	Manobo
-mno	manobo
 moh	Mohawk
-moh	mohawk
 mol	Moldovisk
-mol	moldovisk
 mon	Mongolsk
-mon	mongolsk
 mos	Mossi
-mos	mossi
 mun	Munda
-mun	munda
 mus	Muskogee
-mus	muskogee
 mwr	Marwari
-mwr	marwari
 myn	Maya sprog
-myn	maya sprog
 nah	Nahuatl
-nah	nahuatl
 nai	Nordamerikanske indianske sprog
-nai	nordamerikanske indianske sprog
 nau	Nauru
-nau	nauru
 nav	Navaho
-nav	navaho
 nbl	Sydndebele
-nbl	sydndebele
 nde	Nordndebele
-nde	nordndebele
 ndo	Ndonga
-ndo	ndonga
 nep	Nepalesisk
-nep	nepalesisk
 new	Newari
-new	newari
 nia	Nias
-nia	nias
 nic	Niger-congo sprog
-nic	niger-congo sprog
 niu	Niuean
-niu	niuean
+nmx	nama
 nno	Nynorsk
-nno	nynorsk
-nno	nynorsk
 nob	Bokmål
-nob	bokmål
 non	Oldislandsk
-non	oldislandsk
 nor	Norsk
-nor	norsk
 nso	Nordsotho
-nso	nordsotho
 nub	Nubiske sprog
-nub	nubiske sprog
 nya	Nyanja
-nya	nyanja
 nym	Nyamwezi
-nym	nyamwezi
 nyn	Nyankole
-nyn	nyankole
 nyo	Nyoro sprog
-nyo	nyoro sprog
 nzi	Nzima
-nzi	nzima
 oci	Occitansk
-oci	occitansk
 oji	Ojibwa
-oji	ojibwa
 ori	Orija
-ori	orija
 orm	Oromo
-orm	oromo
 osa	Osage
-osa	osage
 oss	Ossetisk
-oss	ossetisk
 ota	Osmannisk
-ota	osmannisk
 oto	Otomi sprog
-oto	otomi sprog
 pag	Pangasinan
-pag	pangasinan
 pal	Pahlavi
-pal	pahlavi
 pam	Pampanga
-pam	pampanga
 pan	Panjabi
-pan	panjabi
 pap	Papiamento
-pap	papiamento
 pau	Paluansk
-pau	paluansk
 peo	Oldpersisk
-peo	oldpersisk
 per	Persisk
-per	persisk
 phi	Filippinske sprog
-phi	filippinske sprog
 phn	Fønikisk
-phn	fønikisk
 pli	Pali
-pli	pali
-pli	pāli
 pol	Polsk
-pol	polsk
 pon	Ponape
-pon	ponape
 por	Portugisisk
-por	portugisisk
 pra	Prakit
-pra	prakit
 pro	Provencalsk
-pro	provencalsk
 pus	Pashto
-pus	pashto
 paa	Papua-australske sprog
-paa	papua-australske sprog
 que	Kechua
-que	kechua
 raj	Rajasthani
-raj	rajasthani
 rap	Rapanui
-rap	rapanui
 rar	Rarotongan
-rar	rarotongan
 roa	Romanske sprog
-roa	romanske sprog
 roh	Rætoromansk
-roh	rætoromansk
-roh	ræto - romansk
 rom	Romani
-rom	romani
 rum	Rumænsk
-rum	rumænsk
 run	Rundi
-run	rundi
 rus	Russisk
-rus	russisk
 sad	Sandawe
-sad	sandawe
 sag	Sango
-sag	sango
 sah	Yakut
-sah	yakut
 sai	Sydamerikanske indianske sprog
-sai	sydamerikanske indianske sprog
 sal	Salishan languages
-sal	salishan languages
 sam	Samaritansk
-sam	samaritansk
 san	Sanskrit
-san	sanskrit
 sas	Sasak
-sas	sasak
 sat	Santali
-sat	santali
 sco	Skotsk
-sco	skotsk
 sel	Selkupisk
-sel	selkupisk
 sem	Semitisk
-sem	semitisk
-sem	Semitiske sprog
-sem	semitiske sprog
 ser	Serbokroatisk
-ser	serbokroatisk
 sga	Oldirsk
-sga	oldirsk
 shn	Shan
-shn	shan
 sid	Sidamo
-sid	sidamo
 sin	Singalesisk
-sin	singalesisk
 sio	Siouan languages
-sio	siouan languages
 sit	Sino-tibetanske sprog
-sit	sino-tibetanske sprog
+sla	slave
 sla	Slaviske sprog
-sla	slaviske sprog
-sla	slavisk
 slo	Slovakisk
-slo	slovakisk
 slv	Slovensk
-slv	slovensk
 smi	Sami languages
-smi	sami languages
 smo	Samoansk
-smo	samoansk
 sna	Shona
-sna	shona
 snd	Sindhi
-snd	sindhi
 snk	Soninke
-snk	soninke
 sog	Sogdiansk
-sog	sogdiansk
 som	Somali
-som	somali
 son	Songe
-son	songe
 sot	Sotho
-sot	sotho
 spa	Spansk
-spa	spansk
 srd	Sardinsk
-srd	sardinsk
 srp	Serbisk
-srp	Serbisk
-srp	serbisk
-srp	serbisk
 srr	Serer
-srr	serer
 ssa	Afrikanske sprog
-ssa	afrikanske sprog
 ssw	Swati
-ssw	swati
 suk	Sukuma
-suk	sukuma
 sun	Sundanesisk
-sun	sundanesisk
 sus	Susu
-sus	susu
 sux	Sumerisk
-sux	sumerisk
 swa	Swahili
-swa	swahili
 swe	Svensk
-swe	svensk
 syr	Syrisk
-syr	syrisk
 tah	Tahitiansk
-tah	tahitiansk
 tai	Tai
-tai	tai
 tam	Tamil
-tam	tamil
 tat	Tatarisk
-tat	tatarisk
 tel	Telugu
-tel	telugu
 tem	Temne
-tem	temne
 ter	Tereno
-ter	tereno
 tet	Tetum
-tet	tetum
 tgk	Tajik
-tgk	tajik
 tgl	Tagalog
-tgl	tagalog
 tha	Thai
-tha	thai
 tib	Tibetansk
-tib	tibetansk
 tig	Tigré
-tig	tigré
 tir	Tigrinja
-tir	tigrinja
 tiv	Tivi
-tiv	tivi
 tkl	Tokelau
-tkl	tokelau
 tli	Tlingit
-tli	tlingit
 tmh	Tamashek
-tmh	tamashek
 tog	Tonga
-tog	tonga
 ton	Tonga
-ton	tonga
 tpi	Tok pisin
-tpi	tok pisin
 tsi	Tsimshisk
-tsi	tsimshisk
 tsn	Tswana
-tsn	tswana
 tso	Tsonga
-tso	tsonga
 tuk	Turkmensk
-tuk	turkmensk
 tum	Tumbuka
-tum	tumbuka
 tur	Tyrkisk
-tur	tyrkisk
 tut	Tyrkisk-tatariske sprog
-tut	tyrkisk-tatariske sprog
 tvl	Tuvalu
-tvl	tuvalu
 twi	Twi
-twi	twi
 tyv	Tuvinian
-tyv	tuvinian
 uga	Ugaritisk
-uga	ugaritisk
 uig	Uigurisk
-uig	uigurisk
 ukr	Ukrainsk
-ukr	ukrainsk
 umb	Umbundu
-umb	umbundu
 urd	Urdu
-urd	urdu
 uzb	Usbekisk
-uzb	usbekisk
 vai	Vai
-vai	vai
 ven	Venda
-ven	venda
 vie	Vietnamesisk
-vie	vietnamesisk
 vol	Volapük
-vol	volapük
 vot	Votisk
-vot	votisk
 wak	Wakashan
-wak	wakashan
 wal	Walamo
-wal	walamo
 war	Waray
-war	waray
 was	Washo
-was	washo
 wel	Walisisk
-wel	walisisk
 wen	Vendiske sprog
-wen	vendiske sprog
 wol	Wolof
-wol	wolof
 xho	Xhosa
-xho	xhosa
 yao	Yao
-yao	yao
 yap	Yap
-yap	yap
 yid	Jiddisch
-yid	jiddisch
 yor	Yoruba
-yor	yoruba
 ypk	Yupik
-ypk	yupik
 zap	Zapotec
-zap	zapotec
-zap	zapotec
 zen	Zenega
-zen	zenega
 zha	Zhuang
-zha	zhuang
 znd	Zande
-znd	zande
 zul	Zulu
-zul	zulu
 zun	Zuni
-zun	zuni
 aar	Afar
-aar	afar
-gre	ModGreek
-chi	Chinesisk
-fin	Finnish
-214	Lapp
-slo	Slovakkisk
-cze	Čechisk
-eng	English
 111	Abazinsk
-111	abazinsk
 112	Adygisk
-112	adygisk
 113	Agul
-113	agul
 114	Akhvakh
-114	akhvakh
 115	Andi
-115	andi
 116	Andi-sprogene
-116	andi-sprogene
 117	Artjinsk
-117	artjinsk
 118	Avarisk
-118	avarisk
 119	Avaro-andi-dido-sprogene 
-119	avaro-andi-dido-sprogene 
 120	Bagulal
-120	bagulal
 121	Bats
-121	bats
 122	Bezhta
-122	bezhta
 123	Botlikh
-123	botlikh
 124	Budukh
-124	budukh
 125	Dagestanske sprog
-125	dagestanske sprog
-126	Dagestansprog
-126	dagestansprog
 127	Darginsk
-127	darginsk
 128	Dargwa
-128	dargwa
 129	Dido
-129	dido
 130	Dido-sprogene
-130	dido-sprogene
 131	Godoberi
-131	godoberi
 132	Grusis
-132	grusis
 133	Hinukh
-133	hinukh
 134	Hunzib
-134	hunzib
 135	Ingusjisk
-135	ingusjisk
 136	Kabardinsk
-136	kabardinsk
 137	Kaputji
-137	kaputji
 138	Karata
-138	karata
 139	Kartvelske sprog
-139	kartvelske sprog
 140	Khinalug
-140	khinalug
 141	Khjurkili
-141	khjurkili
 142	Khvarsji
-142	khvarsji
 143	Kolchidiske 
-143	kolchidiske 
 144	Kryts
-144	kryts
 145	Kuri
-145	kuri
 146	Lak
-146	lak
 147	Lak - dargwa - sprogene
-147	Lak-dargwa-sprogene
-147	lak - dargwa - sprogene
-147	lak-dargwa-sprogene
 148	Laz
-148	laz
 149	Lezgisk
-149	lezgisk
 150	Lezgiske sprog
-150	lezgiske sprog
 151	Mingrelsk
-151	mingrelsk
 152	Nakhsprog
-152	nakhsprog
 153	Nordvestkaukasiske sprog
-153	nordvestkaukasiske sprog
 154	Nordøstkaukasisk
-154	nordøstkaukasisk
 155	Nordøstkaukasiske sprog
-155	nordøstkaukasiske sprog
 156	Rutul
-156	rutul
 157	Svan
-157	svan
 158	Tabasaran 
-158	tabasaran 
 159	Tapanta
-159	tapanta
 160	Tindi
-160	tindi
 161	Tjamalal
-161	tjamalal
 162	Tjan
-162	tjan
 163	Tjerkessisk
-163	tjerkessisk
 164	Tsakhur
-164	tsakhur
 165	Tsez
-165	tsez
 166	Tsova-tush
-166	tsova-tush
 167	Ubykhisk
-167	ubykhisk
 168	Udisk
-168	udisk
 169	Vesttjerkessisk
-169	vesttjerkessisk
 170	Zan
-170	zan
 171	Østtjerkessisk
-171	østtjerkessisk
-172	Ikke - indoeuropæisk
-172	ikke - indoeuropæisk
 172	Ikke-indoeuropæiske sprog
-172	ikke-indoeuropæiske sprog
 173	Oldnordisk
-173	oldnordisk
 174	ældre litauisk
 175	archaisk
 176	assyrisk
@@ -1045,7 +507,6 @@ eng	English
 181	ikke-germanske sprog
 182	klassiske sprog
 183	landsmål
-183	landsmål
 184	oldkirkeslavisk
 185	oldnorsk
 186	oldslavisk
@@ -1055,8 +516,6 @@ eng	English
 190	riksmål
 191	samojedisk
 192	serbo-kroatisk
-193	tokharisk
-193	Tokharisk
 193	tokharisk
 194	uralske sprog
 195	vestzemaitisk
@@ -1080,43 +539,34 @@ eng	English
 213	mordvinsk
 214	lappisk
 215	eskimoisk
-215	Eskimo
 216	miwok
 217	achumawi
-217	Achumawi
 218	burushaski
 219	maidu
-219	Maidu
-219	North - Eastern Maidu
-219	Sydmaidu
 220	byzantisk
-220	Byzantisk
 221	Tabassaransk
-221	tabassaransk
 222	Altasisk
-222	altasisk
 223	Near Eastern languages
 224	Pomo
 225	Cantonese
 226	Yuki
 227	Kamtlaroy
 228	kyrkansk
-228	Kyrkansk
 229	labarsaransk
-229	Labarsaransk
 230	lakkisk
-230	Lakkisk
 231	aranda
-231	Aranta
 232	Kalispel
 233	ubychisk
 234	Austrian
-234	østrigsk
 235	aranta
 236	amerikansk
-sla	slave
-ine	indo-européen
-ger	allemand
-cze	tchèque
 237	Paleosiberian
 238	Gilyak
+239	nordisk
+340	tjuktjisk
+341	oldeng
+341	oldengelsk
+342	jysk
+343	Lilleasiatisk
+344	Kamilaroi
+345	rigsmål
