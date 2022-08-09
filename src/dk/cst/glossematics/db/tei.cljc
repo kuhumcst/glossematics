@@ -72,26 +72,27 @@
   #{"xx" "#xx" "NA"})
 
 (defn valid?
-  [v]
-  (not (or (str/blank? v)
-           (placeholder? v))))
+  [s]
+  (not (or (str/blank? s)
+           (placeholder? s))))
 
 (defn valid-int?
-  [v]
-  (and (valid? v)
-       (re-matches #"\d+" v)))
+  [s]
+  (and (valid? s)
+       (re-matches #"\d+" s)))
 
 (defn valid-id?
-  [v]
-  (and (valid? v)
+  [s]
+  (and (valid? s)
        ;; TODO: make Dorte streamline archive IDs in the TEI files
-       (or (str/starts-with? v "n")                         ; used for archives
-           (str/starts-with? v "#n"))
-       (re-find #"\d$" v)))
+       (or (str/starts-with? s "n")                         ; used for archives
+           (str/starts-with? s "#n"))
+       (or (re-matches #"#ns..." s)                         ; refer to sprog.txt
+           (re-find #"\d$" s))))
 
 (defn valid-date?
-  [v]
-  (re-matches #"\d\d\d\d-\d\d-\d\d" v))
+  [s]
+  (re-matches #"\d\d\d\d-\d\d-\d\d" s))
 
 ;; Since Dorte's IDs sometimes have a prefixed # and sometimes don't
 (defn fix-id
