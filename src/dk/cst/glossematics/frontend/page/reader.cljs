@@ -43,6 +43,7 @@
 (defn da-type
   [type]
   (let [type->s {"conference" "denne konference"
+                 "language"   "dette sprog"
                  "org"        "denne organisation"
                  "pers"       "denne person"
                  "place"      "dette sted"
@@ -67,6 +68,16 @@
     (fn [{:syms [ref ?type]}]
       [:a {:href  (fshared/search-href ref)
            :title (da-type ?type)}
+       [:slot]])))
+
+(def language-as-anchor
+  (cup/->transformer
+    '[_ {:type "language"
+         :n    ref} ???]
+
+    (fn [{:syms [ref]}]
+      [:a {:href  (fshared/search-href ref)
+           :title (da-type "language")}
        [:slot]])))
 
 (def date-as-time
@@ -232,6 +243,7 @@
 (def inner-stage
   "Makes virtual changes to TEI document features using the shadow DOM."
   {:transformers [ref-as-anchor
+                  language-as-anchor
                   list-as-ul
                   date-as-time]
    :wrapper      shadow-dom-wrapper
