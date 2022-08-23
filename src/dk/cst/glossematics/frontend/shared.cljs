@@ -6,6 +6,11 @@
             [dk.cst.glossematics.shared :as shared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.glossematics.frontend.page.index :as-alias index]
+            [dk.cst.glossematics.frontend.page.search :as-alias search]
+            [dk.cst.glossematics.frontend.page.reader :as-alias reader]
+            [dk.cst.glossematics.frontend.page.bibliography :as-alias bib]
+            [dk.cst.glossematics.frontend.page.encyclopedia :as-alias enc]
             [dk.cst.stucco.pattern :as stp]))
 
 (defn -surname-first
@@ -56,37 +61,29 @@
       (.scrollIntoView top-elem true)
       (.scroll js/window 0 (+ js/window.scrollY header-height)))))
 
-;; TODO: eventually use :as-alias
 (defn encyclopedia-href
   [ref]
-  (rfe/href :dk.cst.glossematics.frontend.page.search.encyclopedia/entry
-            {:ref (if (str/starts-with? ref "#")
-                    (subs ref 1)
-                    ref)}))
+  (rfe/href ::enc/page {:ref (if (str/starts-with? ref "#")
+                               (subs ref 1)
+                               ref)}))
 
-;; TODO: eventually use :as-alias
 (defn search-href
   [ref]
-  (rfe/href :dk.cst.glossematics.frontend.page.search/page {}
+  (rfe/href ::search/page {}
             (merge (select-keys state/query-defaults [:limit :offset])
                    {'_ ref})))
 
-;; TODO: eventually use :as-alias
 (defn index-href
   [entity-type]
-  (rfe/href :dk.cst.glossematics.frontend.page.index/page
-            {:kind (name entity-type)}))
+  (rfe/href ::index/page {:kind (name entity-type)}))
 
-;; TODO: eventually use :as-alias
 (defn reader-href
   [document]
-  (rfe/href :dk.cst.glossematics.frontend.page.reader/page
-            {:document document}))
+  (rfe/href ::reader/page {:document document}))
 
 (defn bib-href
   [author]
-  (rfe/href :dk.cst.glossematics.frontend.page.bibliography/page
-            {:author author}))
+  (rfe/href ::bib/page {:author author}))
 
 (defn legal-id
   "Make sure `s` is a legal HTML id/fragment, e.g. doesn't start with a number."
