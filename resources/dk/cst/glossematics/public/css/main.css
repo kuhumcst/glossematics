@@ -211,6 +211,7 @@ nav a:not(:first-child)::first-letter {
 }
 
 img.loading-indicator {
+    pointer-events: none; /* Allow click-through. */
     transition: all 0.66s;
     transition-delay: 0; /* Should disappear quick. */
     position: fixed;

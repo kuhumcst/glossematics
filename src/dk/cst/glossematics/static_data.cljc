@@ -157,6 +157,7 @@
    :document/collection {:label "collection"}
    :document/form       {:label "form"}
    :document/hand       {:label "representation"}
+   :document/paper      {:label "paper"}
    :document/facsimile  {:label "facsimile"}
    :document/settlement {:label "place"}
    :document/year       {:label "year"}
@@ -172,6 +173,7 @@
    :document/author
    :document/recipient
    :document/sent-at
+   :document/paper
    :file/body?])
 
 (def reader-rels

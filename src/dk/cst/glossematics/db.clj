@@ -9,6 +9,7 @@
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.shared :as shared]
             [dk.cst.glossematics.db.file :as db.file]
+            [dk.cst.glossematics.db.paper :as db.paper]
             [dk.cst.glossematics.db.person :as db.person]
             [dk.cst.glossematics.db.timeline :as db.timeline]
             [dk.cst.glossematics.db.bibliography :as db.bibliography]
@@ -127,6 +128,7 @@
 
   ;; Add the file entities found in the files-dir.
   ;; Then parse each TEI file and link the document data to the file entities.
+  (log-transaction! :paper db.paper/static-data)
   (log-transaction! :files (db.file/file-entities files-dir))
   (log-transaction! :tei-data (map db.tei/file->entity (tei-files conn))))
 

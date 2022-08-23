@@ -86,11 +86,15 @@
 
   A `sort-key` may also be supplied to allow sorting of the results afterwards.
   When supplying a `sort-key` the result set is different (2-tuples rather than
-  strings) and requires postprocessing to perform the actual sorting operation."
+  strings) and requires postprocessing to perform the actual sorting operation.
+
+  Furthermore, the :document/paper attribute is always retrieved for sortable
+  results in order to present original copies first."
   ([entity sort-key]
-   (into [:find '?id '?sort-value
+   (into [:find '?id '?paper '?sort-value
           :where
           ['?e :db/ident '?id]
+          '(optional [?e :document/paper ?paper])
           (concat '(optional) [['?e sort-key '?sort-value]])]
          (entity->where-triples entity)))
   ([entity]
@@ -103,13 +107,19 @@
   [x]
   (when-not (= :a/nil x) x))
 
-(def sort-keyfn
-  "Helper function to order search results by the sort-val first & ID second."
-  (juxt second first))
+(def paper-rank
+  {"original"    1
+   "photocopy"   2
+   "carbon copy" 3})
+
+(defn sort-keyfn
+  "Helper function to order search results by the ?sort-value-value."
+  [[?id ?paper ?sort-value]]
+  [?sort-value (or (paper-rank ?paper) 0) ?id])
 
 (defn unsortable?
-  [[k v]]
-  (contains? #{nil :a/nil} v))
+  [[_ _ ?sort-value]]
+  (contains? #{nil :a/nil} ?sort-value))
 
 (defn- sort-results
   "Sort 2-tuple `search-results` containing sort values in the second position.
@@ -118,7 +128,10 @@
   only keeping results with a sort-val within some range."
   [search-results & [sort-pred]]
   (->> search-results
-       (filter (comp (or sort-pred (constantly true)) second))
+       (filter (fn [[_ _ ?sort-value]]
+                 (if sort-pred
+                   (sort-pred ?sort-value)
+                   true)))
        (sort-by sort-keyfn)
        (map first)
        (distinct)))
