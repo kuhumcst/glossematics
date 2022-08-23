@@ -675,6 +675,17 @@ table.entity-metadata dl ul li {
     margin-bottom: var(--margin-xl);
 }
 
+
+h2 {
+    text-align: center;
+    font-weight: normal;
+    font-family: PoiretOne, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-top: 0;
+    margin-bottom: var(--margin-l);
+}
+
 .index-page dl,
 .index-page ul {
     margin: 0;
