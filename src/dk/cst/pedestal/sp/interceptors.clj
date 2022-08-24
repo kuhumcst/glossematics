@@ -5,6 +5,9 @@
   SAML-authorized routes. A SAML-authorized route is constructed by appending to
   the output of the `chain` function.
 
+  By default, the SAML RelayState is assumed to be a redirect URL which has been
+  encoded using the 'safe-encode' function in 'dk.cst.pedestal.sp.auth'.
+
   Route-level authorisation checks can be made using the `permit-request?` fn
   from within an interceptor. For inline condition definitions and checks
   (available in both Clojure/ClojureScript) refer to `dk.cst.pedestal.sp.auth`."
@@ -21,7 +24,7 @@
             [saml20-clj.core :as saml]
             [saml20-clj.coerce :as coerce]
             [saml20-clj.encode-decode :as saml-decode]
-            [dk.cst.pedestal.sp.static :refer [never css-centred css-spaced]]
+            [dk.cst.pedestal.sp.static :refer [css-centred css-spaced]]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
 
 ;; Make sure that echo-assertions prints timestamps in a nice way
@@ -105,6 +108,7 @@
           relay-state* (or (:RelayState query-params)
                            relay-state
                            "/")]
+      ;; Note that the RelayState is URI-encoded inside 'idp-redirect-response'.
       (assoc (saml/idp-redirect-response saml-request idp-url relay-state*)
         :session {:saml {:request     (coerce/->xml-string saml-request)
                          :relay-state relay-state*}}))))
@@ -142,10 +146,9 @@
       {:status  303
        :session (update session :saml merge {:assertions assertions
                                              :response   xml})
-       :headers (if (and saml-consent
-                         (not= "on" pedestal-sp))
+       :headers (if (and saml-consent (not= "on" pedestal-sp))
                   {"Location" (str saml-consent "?RelayState=" RelayState)}
-                  {"Location" RelayState})})))
+                  {"Location" (sp.auth/safe-decode RelayState)})})))
 
 (defn logout-ic
   "Delete current SAML-related session info related to the user, i.e. log out.
@@ -159,7 +162,7 @@
         session (not-empty (update req :session dissoc :saml))]
     (if RelayState
       {:status  303
-       :headers {"Location" RelayState}
+       :headers {"Location" (sp.auth/safe-decode RelayState)}
        :session session}
       {:status  204
        :headers {}
@@ -216,7 +219,7 @@
                  [:body
                   [:h1 "Login required"]
                   [:p "You must "
-                   [:a {:href (str (:saml-login paths) "?RelayState=" uri)}
+                   [:a {:href (sp.auth/saml-path paths :saml-login uri)}
                     "log in"]
                    " before you can access this resource."]]])}))
 
@@ -360,7 +363,7 @@
                                         cookie-attrs
                                         (assoc (dissoc cookie-attrs :max-age)
                                           :expires "")))))
-         :headers {"Location" RelayState}}
+         :headers {"Location" (sp.auth/safe-decode RelayState)}}
 
         ;; Edit state
         :else

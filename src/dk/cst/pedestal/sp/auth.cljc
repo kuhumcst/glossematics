@@ -4,8 +4,42 @@
 
   For route-level authorisation + ahead-of-time checks from within interceptors,
   use the `permit-request?` function from `dk.cst.pedestal.sp.interceptors`."
-  (:require [clojure.data :as data])
+  (:require [clojure.data :as data]
+            #?(:clj [ring.util.codec :as codec])
+            [clojure.string :as str])
   #?(:cljs (:require-macros [dk.cst.pedestal.sp.auth])))
+
+(defn- safe-base64
+  "Replace certain characters in base64 with ones that won't be URL-encoded."
+  [s]
+  (str/replace s #"/|\+|=" {"/" "_", "+" "-", "=" "."}))
+
+(defn- unsafe-base64
+  "Undo the transformation of 'safe-base64'."
+  [s]
+  (str/replace s #"_|-|\." {"_" "/", "-" "+", "." "="}))
+
+(defn safe-encode
+  "Encode a `url` as base64 with certain problematic characters replaced.
+
+  This encoding should survive any URL encoding/decoding scheme it may be passed
+  through, ensuring that the input `url` survives until decoded."
+  [url]
+  (safe-base64 #?(:clj  (codec/base64-encode (.getBytes (codec/url-encode url)))
+                  :cljs (js/btoa (js/encodeURIComponent url)))))
+
+(defn safe-decode
+  "Decode a URL encoded as `base64` via 'safe-encode'."
+  [base64]
+  #?(:clj  (-> base64 unsafe-base64 codec/base64-decode slurp codec/url-decode)
+     :cljs (-> base64 unsafe-base64 js/atob js/decodeURIComponent)))
+
+;; TODO: misplaced...? put in another CLJC file?
+(defn saml-path
+  "Get the specified `saml-type` in `paths` with an encoded `RelayState`."
+  [paths saml-type & [RelayState]]
+  (str (get paths saml-type) (when RelayState
+                               (str "?RelayState=" (safe-encode RelayState)))))
 
 (defn submap?
   "Is `m` a submap of `parent`?"
@@ -63,3 +97,8 @@
      "Fail fast if the `request` assertions do not meet a `condition`."
      [request condition]
      (only-permit [(request->assertions request) condition])))
+
+(comment
+  (let [url "https://glossematics.dk/app/search?limit=10&offset=0&correspondent=%23np56%2C%23np145"]
+    (= url (safe-decode (safe-encode url))))
+  #_.)

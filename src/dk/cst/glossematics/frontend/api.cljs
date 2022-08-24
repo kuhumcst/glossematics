@@ -2,6 +2,7 @@
   "Common API access operations."
   (:require [lambdaisland.fetch :as fetch]
             [kitchen-async.promise :as p]
+            [dk.cst.pedestal.sp.auth :as sp.auth]
             [dk.cst.glossematics.frontend.state :as state]))
 
 (defn- refresh-dialog-msg
@@ -19,8 +20,8 @@
   (when-not state/*block-modal-dialogs*
     (set! state/*block-modal-dialogs* true)
     (when (js/confirm (refresh-dialog-msg status))
-      (js/location.replace (str (:saml-login state/paths)
-                                "?RelayState=" js/location.href)))))
+      (-> (sp.auth/saml-path state/paths :saml-login js/location.href)
+          (js/location.replace)))))
 
 (defn normalize-url
   [url]

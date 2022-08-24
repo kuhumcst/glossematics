@@ -1,22 +1,19 @@
 (ns dk.cst.glossematics.frontend.page.user
   "Page for logging in/out and managing user settings."
   (:require [dk.cst.glossematics.frontend.state :as state]
+            [dk.cst.pedestal.sp.auth :as sp.auth]
             [lambdaisland.fetch :as fetch]
             [clojure.string :as str]))
 
-(defn saml-path
-  [saml-type]
-  (str (get state/paths saml-type)
-       "?RelayState=" (js/encodeURIComponent js/location.href)))
-
 (defn logout [e]
   (.preventDefault e)
-  (.then (fetch/post (saml-path :saml-logout))
-         (reset! state/authenticated? false)))
+  (.then (fetch/post (sp.auth/saml-path state/paths :saml-logout))
+         #(reset! state/authenticated? false)))
 
 (defn login [e]
   (.preventDefault e)
-  (set! js/location.href (saml-path :saml-login)))
+  (->> (sp.auth/saml-path state/paths :saml-login js/location.href)
+       (set! js/location.href)))
 
 (defn assertions->institution
   [assertions]
