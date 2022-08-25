@@ -15,7 +15,6 @@
             [dk.cst.glossematics.frontend.page.bibliography :as bibliography]
             [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.page.reader :as reader]
-            [dk.cst.glossematics.frontend.page.user :as user]
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
@@ -27,9 +26,6 @@
     {:name ::encyclopedia/entry
      :page encyclopedia/page
      :prep #(prn 'encyclopedia @state/location)}]
-   ["/app/user"
-    {:name ::user/page
-     :page user/page}]
    ["/app/search"
     {:name ::search/page
      :page search/page
@@ -88,11 +84,7 @@
        "Timeline"]
       [:a {:href  (href ::bibliography/page {:author "lh"})
            :title "Relevant works"}
-       "Bibl."]
-      [:a {:href  (href ::user/page)
-           :title "Settings"}
-       [:img.nav-icon {:src "/images/person-sharp-yellow-svgrepo-com.svg"
-                       :alt ""}]]]
+       "Bibl."]]
      [:div.shell__content {:class (when (= name ::timeline/page)
                                     "fill-mode")}
       (if page

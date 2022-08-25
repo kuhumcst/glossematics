@@ -250,7 +250,7 @@ img.loading-indicator {
 
 .search-page,
 .index-page,
-.user-page,
+.main-page,
 .reader-preview
 {
     max-width: 90ch;
@@ -270,11 +270,15 @@ img.loading-indicator {
     letter-spacing: 1.25;
 }
 
+.text-content + .text-content {
+    margin-top: var(--margin-l);
+}
+
 .text-content p {
     margin: 0;
 }
 
-.text-content p + * {
+.text-content > p + * {
     margin-top: var(--margin-l);
 }
 
@@ -666,7 +670,7 @@ table.entity-metadata dl ul li {
     padding: 0;
 }
 
-.user-page h1,
+.main-page h1,
 .index-page h1 {
     text-align: center;
     font-weight: normal;
@@ -880,10 +884,14 @@ dl.kvs-list dd:not(:last-child) {
     color: var(--color-subtle);
 }
 
+.login-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
 button.logout-button,
 button.login-button {
-    display: inline-flex;
-    width: 100%;
     align-items: center;
     transition: all 0.2s;
     color: rgba(0,0,0,0.66);
@@ -893,7 +901,8 @@ button.login-button {
     word-spacing: 2;
     border: var(--border);
     border-radius: var(--border-radius);
-    padding: var(--padding);
+    padding: var(--padding) var(--padding-xl);
+    margin-left: var(--margin-l);
 }
 
 button.logout-button:hover,
@@ -929,12 +938,12 @@ button.login-button img {
     opacity: 0.66;
 }
 
-.user-page em {
+.main-page em {
     font-weight: bold;
     font-style: italic;
     font-size: 20;
 }
 
-.user-page table.entity-metadata td:first-child {
+.main-page table.entity-metadata td:first-child {
     font-weight: bold;
 }
