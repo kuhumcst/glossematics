@@ -226,9 +226,10 @@
 (defn- submit
   "Submit a new search criteria."
   []
-  (let [{:keys [name->id]} @state/search
+  (let [{:keys [name->id id->name]} @state/search
         {:keys [in unique]} @state/query]
-    (if-let [id (name->id in)]
+    (if-let [id (or (name->id in)
+                    (and (id->name in) in))]
       (if-not (get unique ['_ id])
         (do
           (swap! state/query add-kv (with-meta ['_ id] {:label in}))
@@ -242,7 +243,6 @@
       (swap! state/query assoc
              :bad-input? true
              :not-allowed? true))))
-
 
 (defn search-result-order
   [[order-rel order-dir :as order-by]]
@@ -376,7 +376,7 @@
 
 (defn search-form
   []
-  (let [{:keys [name-kvs name->id id->type]} @state/search
+  (let [{:keys [name-kvs name->id id->name id->type]} @state/search
         set-in (fn [e]
                  (let [in (e->v e)]
                    (swap! state/query assoc
@@ -388,7 +388,8 @@
       (let [{:keys [items in order-by bad-input? not-allowed?]} @state/query
             {:keys [results]} @state/search
             [order-rel] order-by
-            good-input? (and (not-empty in) (name->id in))]
+            good-input? (and (not-empty in) (or (name->id in)
+                                                (id->name in)))]
         [:form.search-form
          {:on-submit (fn [e] (.preventDefault e) (submit))}
 
