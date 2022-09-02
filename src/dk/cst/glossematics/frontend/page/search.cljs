@@ -124,16 +124,25 @@
          {k v})
        (apply merge-with (fn [& args] (str/join "," args)))))
 
+(defn- attach-indices
+  "Store the local index of each of the search result `entities` as metadata."
+  [entities]
+  (with-meta
+    (map (fn [m i] (with-meta m {:i i})) entities (range))
+    (meta entities)))
+
 (defn fetch-results!
-  [{:keys [query-params]}]
+  "Fetch search results based on the `query-params`; triggered indirectly.
+  An optional `f` may be used to execute side-effects when the results change."
+  [{:keys [query-params]} & [f]]
   (if (empty? (apply dissoc query-params state/query-result-set-keys))
     (do
       (swap! state/search dissoc :results)
       (reset! state/query state/query-defaults))
     (.then (api/fetch "/search" {:query-params query-params})
            #(do
-              (swap! state/search assoc :results %)
-              (?query-reset!)))))
+              (swap! state/search assoc :results (attach-indices %))
+              (when f (f))))))
 
 (defn- add-kv
   "Add a `kv` to the :items in the passed-in `state` with background `n`."
@@ -219,7 +228,8 @@
                 label])))])
 
 (defn- new-page!
-  "Add a new page to the HTML history stack based on the current query state."
+  "Add a new page to the HTML history stack based on the current query state.
+  This will trigger a backend fetch via 'fetch-results!' as a side-effect."
   []
   (rfe/push-state ::page {} (state->params @state/query)))
 
@@ -233,7 +243,7 @@
       (if-not (get unique ['_ id])
         (do
           (swap! state/query add-kv (with-meta ['_ id] {:label in}))
-          (swap! state/query update :n inc)
+          (swap! state/query update :n inc)                 ; cycle colour
           (swap! state/query assoc
                  :in ""
                  :offset 0)
@@ -464,10 +474,16 @@
                   :on-click #(set-offset + limit)}
          "next →"]]])))
 
+(defn- cache-document-index!
+  "Cache the search result index stored in the `entity` metadata."
+  [entity]
+  (swap! state/search assoc :i (:i (meta entity))))
+
 (defn search-result-table
   [search-state {:keys [document/title file/name] :as entity}]
-  (let [hyperlink [:a.action {:title "View in the reader"
-                              :href  (fshared/reader-href name)}
+  (let [hyperlink [:a.action {:title    "View in the reader"
+                              :on-click #(cache-document-index! entity)
+                              :href     (fshared/reader-href name)}
                    (fshared/break-str title)
                    [:img.action__icon
                     {:src "/images/external-link-svgrepo-com.svg"}]]

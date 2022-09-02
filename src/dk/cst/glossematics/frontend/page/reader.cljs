@@ -3,6 +3,7 @@
   (:require [clojure.string :as str]
             [shadow.resource :as resource]
             [kitchen-async.promise :as p]
+            [reitit.frontend.easy :as rfe]
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml]
             [rescope.core :as rescope]
@@ -13,6 +14,7 @@
             [dk.cst.stucco.document :as document]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.glossematics.db.tei :as db.tei]
+            [dk.cst.glossematics.frontend.page.search :as search-page]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.shared :as fshared]
@@ -332,10 +334,62 @@
    [:a {:href pdf-src}
     "Download facsimile"]])
 
+(defn nth-document!
+  [n]
+  (let [{:keys [results]} @state/search
+        {:keys [limit]} @state/query]
+    (cond
+      (>= n limit)
+      (do
+        (swap! state/query update :offset + limit)
+        (search-page/fetch-results!
+          {:query-params (search-page/state->params @state/query)}
+          #(nth-document! 0)))
+
+      (< n 0)
+      (do
+        (swap! state/query update :offset - limit)
+        (search-page/fetch-results!
+          {:query-params (search-page/state->params @state/query)}
+          #(nth-document! (dec limit))))
+
+      :else
+      (do
+        (swap! state/search assoc :i n)
+        (rfe/push-state ::page {:document (:file/name (nth results n))})))))
+
+;; TODO: redo the .search-result__paging CSS now that it fills two roles
+(defn reader-paging
+  [results i {:keys [offset limit] :as query-state}]
+  [:div.search-result__paging
+   [:div.input-row
+    [:button {:disabled (= i offset 0)
+              :on-click #(nth-document! (dec i))}
+     "← previous"]
+    [:select {:on-change #(nth-document! (js/parseInt (.-value (.-target %))))
+              :value     i}
+     (when (> offset 0)
+       [:option {:value -1}
+        "previous results..."])
+     (for [entity results
+           :let [n    (:i (meta entity))
+                 file (:file/name entity)]]
+       [:option {:key   file
+                 :value n}
+        file])
+     (when (< (+ offset limit) (:total (meta results)))
+       [:option {:value (+ offset limit)}
+        "more results..."])]
+    [:button {:disabled (= (dec (:total (meta results)))
+                           (+ i offset))
+              :on-click #(nth-document! (inc i))}
+     "next →"]]])
+
 (defn page
   []
   (let [{:keys [hiccup tei document entity]} @state/reader
-        {:keys [id->name] :as search-state} @state/search
+        {:keys [id->name results i] :as search-state} @state/search
+        {:keys [limit offset] :as query-state} @state/query
         location*          @state/location
         current-document   (get-in location* [:path-params :document])
         local-preview?     (empty? current-document)
@@ -410,4 +464,7 @@
                             (into
                               [["Transcription"
                                 ^{:key tei} [rescope/scope hiccup tei-css]]])))}
-           {:id "tei-tabs"}]]))]))
+           {:id "tei-tabs"}]]))
+
+     (when i
+       [reader-paging results i query-state])]))

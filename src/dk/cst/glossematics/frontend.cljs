@@ -29,7 +29,7 @@
    ["/app/search"
     {:name ::search/page
      :page search/page
-     :prep #(search/fetch-results! %)}]
+     :prep #(search/fetch-results! % search/?query-reset!)}]
    ["/app/bibliography/:author"
     {:name ::bibliography/page
      :page bibliography/page
