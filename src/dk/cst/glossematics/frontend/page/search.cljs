@@ -323,6 +323,7 @@
 (def anything-opt
   [:option {:value (rel->s '_)} "any role"])
 
+;; TODO: if only one option is available, display by default in UI
 (defn rel-select-opts
   [entity-type]
   (if entity-type

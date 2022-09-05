@@ -35,7 +35,8 @@
    ["Eberhard Zwirner" "#np166"]
    ["Svend Ranulf" "#np115"]])
 
-(def entity-types
+(def real-entity-types
+  "The core searchable entities (with index pages)."
   {:entity.type/repository
    {:entity-label "Repository"
     :img-src      "/images/archive-svgrepo-com.svg"}
@@ -71,6 +72,36 @@
    :entity.type/linguistic-organisation
    {:entity-label "Linguistic organisation"
     :img-src      "/images/people-group-svgrepo-com.svg"}})
+
+(def special-entity-types
+  "These do not correspond to actual entities, but rather to searchable
+  attributes that we want to be able to filter by in searches.
+
+  The :vs key correspond to the set of allowed value."
+  {:document/appearance
+   {:entity-label "Appearance"
+    :vs           #{"transcribed"
+
+                    "original"
+                    "photocopy"
+                    "carbon copy"
+
+                    ;; form
+                    "postcard"
+                    "document"
+                    "letter"
+
+                    ;; hand
+                    "stenographed"
+                    "typed"
+                    "handwritten"}
+    :img-src      "/images/paper-sheet-svgrepo-com.svg"}})
+
+(def special-entity-vs
+  (apply set/union (map (comp :vs second) special-entity-types)))
+
+(def entity-types
+  (merge real-entity-types special-entity-types))
 
 (def repositories
   [{:db/ident         "#narch1"
@@ -117,7 +148,7 @@
 
 (def search-rels
   {:document/mention            {:label      "mentioned"
-                                 :compatible (set (keys entity-types))}
+                                 :compatible (set (keys real-entity-types))}
    :document/author             {:label      "author"
                                  :compatible #{:entity.type/person}}
    :document/sender             {:label      "sender"
@@ -134,8 +165,14 @@
                                  :compatible #{:entity.type/language}}
    :document/publication        {:label      "publication"
                                  :compatible #{:entity.type/publication}}
+   :document/settlement         {:label      "place"
+                                 :compatible #{:entity.type/place}}
 
-   ;; Special relation -- expands to a more complex operation during search.
+   ;; Special relations -- various strings treated as searchable entities.
+   :document/appearance         {:label      "appearance"
+                                 :compatible #{:document/appearance}}
+
+   ;; Dynamic relations -- expands to a more complex operation during search.
    :correspondent               {:label      "correspondent"
                                  :compatible #{:entity.type/person}}})
 
@@ -155,34 +192,26 @@
    :document/pp         {:label "pp."}
    :document/publisher  {:label "publisher"}
    :document/collection {:label "collection"}
-   :document/form       {:label "form"}
-   :document/hand       {:label "representation"}
-   :document/paper      {:label "paper"}
    :document/facsimile  {:label "facsimile"}
-   :document/settlement {:label "place"}
    :document/year       {:label "year"}
    :document/end-year   {:label "year (end)"}
    :file/name           {:label "file name"}
-   :file/extension      {:label "file extension"}
-   :file/body?          {:label "transcription"}})
+   :file/extension      {:label "file extension"}})
 
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels
   [:document/sent-at
-   :document/form
+   :document/appearance
    :document/author
    :document/recipient
-   :document/sent-at
-   :document/paper
-   :file/body?])
+   :document/sent-at])
 
 (def reader-rels
   [:document/title
    :document/sent-at
-   :document/form
+   :document/appearance
    :document/author
-   :document/recipient
-   :file/body?])
+   :document/recipient])
 
 (def rel->label
   (->> (merge search-rels order-rels other-rels)

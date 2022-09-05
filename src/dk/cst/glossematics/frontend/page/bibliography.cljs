@@ -34,7 +34,7 @@
 
 (defn- bib-selection
   [id->name current-author other-author]
-  (let [img-src   (-> :entity.type/person sd/entity-types :img-src)
+  (let [img-src   (-> :entity.type/person sd/real-entity-types :img-src)
         full-name (-> other-author
                       (sd/author->id)
                       (id->name)

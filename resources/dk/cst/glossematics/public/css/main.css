@@ -668,11 +668,15 @@ table.entity-metadata tr:last-child {
     border-bottom: none;
 }
 
+table.entity-metadata dl {
+    margin: 0;
+}
+
 table.entity-metadata dl dt {
     text-transform: uppercase;
-    font-weight: bold;
     font-size: var(--font-size-s);
     border-bottom: var(--border-subtle);
+    width: fit-content;
     padding-bottom: var(--padding-s);
     margin-bottom: var(--margin);
 }
@@ -681,13 +685,21 @@ table.entity-metadata dl dd {
     margin: 0;
 }
 
-table.entity-metadata dl ul {
-    margin: 0 0 var(--margin-l) 0;
+table.entity-metadata ul {
     padding-left: var(--padding-l);
     list-style-type: none;
 }
 
-table.entity-metadata dl ul li {
+table.entity-metadata dd > ul {
+    margin: 0 0 var(--margin-l) 0;
+}
+
+table.entity-metadata td > ul,
+table.entity-metadata dd:last-child > ul {
+    margin: 0;
+}
+
+table.entity-metadata ul li {
     padding: 0;
 }
 

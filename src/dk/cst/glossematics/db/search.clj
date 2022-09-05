@@ -1,6 +1,8 @@
 (ns dk.cst.glossematics.db.search
-  (:require [asami.core :as d]
-            [io.pedestal.log :as log]))
+  (:require [clojure.set :as set]
+            [asami.core :as d]
+            [io.pedestal.log :as log]
+            [dk.cst.glossematics.static-data :as sd]))
 
 (defn- duplicate-names
   [type->name->id]
@@ -11,6 +13,10 @@
        (filter (fn [[k v]] (> v 1)))
        (map first)
        (into #{})))
+
+(def special-entity-types
+  (into {} (for [[rel {:keys [vs]}] sd/special-entity-types]
+             [rel (into {} (for [v vs] [v v]))])))
 
 (defn search-metadata
   "Return a mapping from entity type->name->id to be used by the frontend."
@@ -41,7 +47,7 @@
                           {type (into {} (for [variant full-name]
                                            [variant id]))}
                           {type {full-name id}}))))
-               (apply merge-with merge))]
+               (apply merge-with merge special-entity-types))]
     (with-meta m {:duplicates (duplicate-names m)})))
 
 (alter-var-root #'search-metadata memoize)
@@ -88,13 +94,13 @@
   When supplying a `sort-key` the result set is different (2-tuples rather than
   strings) and requires postprocessing to perform the actual sorting operation.
 
-  Furthermore, the :document/paper attribute is always retrieved for sortable
+  Furthermore, :document/appearance attribute is always retrieved for sortable
   results in order to present original copies first."
   ([entity sort-key]
    (into [:find '?id '?paper '?sort-value
           :where
           ['?e :db/ident '?id]
-          '(optional [?e :document/paper ?paper])
+          '(optional [?e :document/appearance ?paper])
           (concat '(optional) [['?e sort-key '?sort-value]])]
          (entity->where-triples entity)))
   ([entity]
@@ -114,8 +120,8 @@
 
 (defn sort-keyfn
   "Helper function to order search results by the ?sort-value-value."
-  [[?id ?paper ?sort-value]]
-  [?sort-value (or (paper-rank ?paper) 0) ?id])
+  [[?id ?condition ?sort-value]]
+  [?sort-value (or (paper-rank ?condition) 0) ?id])
 
 (defn unsortable?
   [[_ _ ?sort-value]]
@@ -134,6 +140,8 @@
                    true)))
        (sort-by sort-keyfn)
        (map first)
+
+       ;; This also ensures that the results follow the desired sort order.
        (distinct)))
 
 (defn match-entity
@@ -213,6 +221,15 @@
   (search conn {:document/mention #{"#npl1957"}}
           :order-by [:document/date-mention :asc]
           :limit 3)
+
+  ;; Test what kind of values are put into these searchable document attributes
+  (->> (search conn {:document/appearance '_})
+       (map :document/appearance)
+       (map (fn [x]
+              (if (set? x)
+                x
+                #{x})))
+       (apply set/union))
 
   ;; Test date predicates
   ((between-pred #inst"1948-08-30T23:00:00.000-00:00"

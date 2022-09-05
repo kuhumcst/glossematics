@@ -3,9 +3,12 @@
   (:require [clojure.string :as str]
             #?(:clj [clojure.java.io :as io])
             [clojure.set :as set]
+            #?(:clj  [io.pedestal.log :as log]
+               :cljs [lambdaisland.glogi :as log])
             [dk.cst.cuphic :as cup]
             [dk.cst.cuphic.xml :as xml]
-            [dk.cst.glossematics.shared :as shared])
+            [dk.cst.glossematics.shared :as shared]
+            [dk.cst.glossematics.static-data :as sd])
   #?(:clj (:import [java.time.temporal ChronoField]
                    [java.time.format DateTimeFormatterBuilder])))
 
@@ -27,11 +30,12 @@
    :settlement    '[:settlement {:ref settlement} ???]
    :repository    '[:repository {:ref repository} title]
    :collection    '[:collection {} collection]
-   :objectDesc    '[:objectDesc {:form form}
+   :object-desc   '[:objectDesc {:form form}
                     [:supportDesc {}
                      [:support {} support]
                      [:extent {}
                       [:note {} page-count]]]]
+   :hand-desc     '[:handDesc {} [:p {} hand]]
 
    ;; Explodes [:correspDesc ...] into its constituent parts.
    :sender        '[:correspAction {:type "sent"}
@@ -43,9 +47,7 @@
    :recipient     '[:correspAction {:type "received"}
                     ??? [:persName {:ref recipient} ???] ???]
    :recipient-loc '[:correspAction {:type "received"}
-                    ??? [:placeName {:ref recipient-loc}] ???]
-
-   :hand-desc     '[:handDesc {} [:p {} hand-desc]]})
+                    ??? [:placeName {:ref recipient-loc}] ???]})
 
 (def facsimile-patterns
   {:facsimile '[:graphic {:xml/id id}]})
@@ -116,7 +118,8 @@
      :cljs js/parseInt))
 
 (defn document-triples
-  [filename {:keys [objectDesc
+  [filename {:keys [object-desc
+                    hand-desc
                     facsimile
                     body-refs
                     lang-refs
@@ -133,7 +136,6 @@
           conj
           #{}
           [(triple valid? :document/title :title)
-           (triple valid? :document/hand :hand-desc)
            (id-triple :document/author :author)
            (id-triple :document/language :language)
            (id-triple :document/repository :repository)
@@ -147,10 +149,24 @@
            (let [collection (triple valid? :document/collection :collection)]
              (when (not-empty (last collection))
                collection))
-           (when-let [form (get-in objectDesc [0 'form])]
-             [filename :document/form form])])
+           (when-let [v (get-in object-desc [0 'form])]
+             (if (get (-> sd/special-entity-types :document/appearance :vs) v)
+               [filename :document/appearance v]
+               (log/info :tei/unsupported {:document/appearance v})))
+           (when-let [v (get-in object-desc [0 'support])]
+             (let [v (if (= v "copy") "photocopy" v)]
+               (if (get (-> sd/special-entity-types :document/appearance :vs) v)
+                 [filename :document/appearance v]
+                 (log/info :tei/unsupported {:document/appearance v}))))])
         [(for [{:syms [id]} facsimile]
            [filename :document/facsimile id])
+         (when-let [hands (get-in hand-desc [0 'hand])]
+           (for [hand (->> (str/split hands #"\s+and\s+")
+                           (map str/trim)
+                           (filter (-> sd/special-entity-types
+                                       :document/appearance
+                                       :vs)))]
+             [filename :document/appearance hand]))
          (for [{:syms [when]} body-dates]
            [filename :document/date-mention (shared/parse-date utc-dtf' when)])
          (for [{:syms [tag ref ?type]} body-refs]

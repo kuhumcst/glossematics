@@ -181,11 +181,11 @@
            file/name]
     :as   entry}
    & [backlink?]]
-  (let [title'  (when title
-                  (str/replace (single title) #"\.$" ""))
-        title'' (if (and name (not backlink?))
-                  [:a {:href (reader-href name)} title']
-                  title')
+  (let [title'     (when title
+                     (str/replace (single title) #"\.$" ""))
+        title''    (if (and name (not backlink?))
+                     [:a {:href (reader-href name)} title']
+                     title')
         bib-entry' (if (re-find #"[a-z]$" bib-entry)
                      [:strong
                       (subs bib-entry 0 (dec (count bib-entry)))
@@ -238,9 +238,14 @@
       [bib-line id->name m true]
 
       ;; Individual entities caught here.
-      (and (string? v) (str/starts-with? v "#"))
+      (and (string? v)
+           (or (str/starts-with? v "#")
+               (get sd/special-entity-vs v)))
       [:a {:href  (search-href v)
-           :title "View in the reader"
+           :title (case k
+                    :document/title "View in the reader"
+                    :document/appearance "Find documents with this appearance"
+                    "Find documents with this entity")
            :key   v}
        (when-let [img-src (some-> v id->type sd/entity-types :img-src)]
          [:img.entity-icon {:src img-src :alt ""}])
@@ -248,19 +253,14 @@
 
       ;; Collections caught here.
       (set? v)
-      (into [:dl]
-            (->> (group-coll id->type v)
-                 (sort-by key)
-                 (map (fn [[k coll]]
-                        [:<>
-                         [:dt k]
-                         [:dd (into-ul coll)]]))))
-
-      ;; :file/body?
-      (boolean? v)
-      (if v
-        [:em "available"]
-        [:span.weak "n/a"])
+      (let [colls (group-coll id->type v)]
+        (if (= 1 (count colls))
+          (into-ul (second (first colls)))
+          (into [:dl] (->> (sort-by key colls)
+                           (map (fn [[k coll]]
+                                  [:<>
+                                   [:dt k]
+                                   [:dd (into-ul coll)]]))))))
 
       ;; Dates are always imported as UTC and displayed as UTC; see: #69.
       ;; This is to account for the fact that there is not LocalDate type in JS.

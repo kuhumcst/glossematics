@@ -318,7 +318,7 @@
 
 (defn entity-meta
   [search-state entity]
-  (let [entity' (dissoc entity :file/extension :file/body?) ; not interesting
+  (let [entity' (dissoc entity :file/extension)             ; not interesting
         kvs     (concat (remove nil? (for [k sd/reader-rels]
                                        (when-let [v (get entity' k)]
                                          [k v])))
@@ -395,7 +395,8 @@
         local-preview?     (empty? current-document)
         document-selected? (= ::page (get-in location* [:data :name]))
         new-document?      (not= document current-document)
-        {:keys [file/body? document/facsimile]} entity
+        {:keys [document/appearance document/facsimile]} entity
+        body?              (get appearance "transcribed")
         pdf-src            (and (not body?)
                                 (string? facsimile)
                                 (str/ends-with? facsimile ".pdf")

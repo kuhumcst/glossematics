@@ -28,7 +28,7 @@
 
 (defn index-links
   [& [current-type]]
-  (->> (sort-by (comp :entity-label second) sd/entity-types)
+  (->> (sort-by (comp :entity-label second) sd/real-entity-types)
        (map (fn [[entity-type {:keys [entity-label img-src]}]]
               (if (= current-type entity-type)
                 [:span [:img.entity-icon {:src img-src}]
@@ -66,7 +66,7 @@
         entity-type (->> (get-in @state/location [:path-params :kind])
                          (keyword "entity.type"))
         {:keys [entity-label
-                img-src]} (get sd/entity-types entity-type)]
+                img-src]} (get sd/real-entity-types entity-type)]
     [:div.index-page
      [:h1 [:img {:src img-src}] " " entity-label]
      (when metadata

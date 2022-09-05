@@ -14,13 +14,15 @@
     (map (fn [file]
            (let [filename  (.getName ^File file)
                  extension (last (str/split filename #"\."))
-                 path      (.getPath ^File file)]
-             {:db/ident       filename
-              :entity/type    :entity.type/file
-              :file/body?     (with-body? filename)
-              :file/name      filename
-              :file/extension extension
-              :file/path      path})))))
+                 path      (.getPath ^File file)
+                 m         {:db/ident       filename
+                            :entity/type    :entity.type/file
+                            :file/name      filename
+                            :file/extension extension
+                            :file/path      path}]
+             (if (with-body? filename)
+               (assoc m :document/appearance "transcribed")
+               m))))))
 
 (def duplicates-xf
   (comp
