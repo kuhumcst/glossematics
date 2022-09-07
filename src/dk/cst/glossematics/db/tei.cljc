@@ -103,6 +103,13 @@
     id
     (str "#" id)))
 
+(def language-ref
+  {"en"  "#nseng"
+   "eng" "#nseng"                                           ; used in some TEI documents
+   "fr"  "#nsfre"
+   "da"  "#nsdan"
+   "de"  "#nsger"})
+
 (defn single-val
   [result k]
   (-> (get result k) first (get (symbol k))))
@@ -121,6 +128,7 @@
   [filename {:keys [object-desc
                     hand-desc
                     facsimile
+                    language
                     body-refs
                     lang-refs
                     body-dates]
@@ -137,13 +145,14 @@
           #{}
           [(triple valid? :document/title :title)
            (id-triple :document/author :author)
-           (id-triple :document/language :language)
            (id-triple :document/repository :repository)
            (id-triple :document/settlement :settlement)
            (id-triple :document/sender :sender)
            (id-triple :document/sender-location :sender-loc)
            (id-triple :document/recipient :recipient)
            (id-triple :document/recipient-location :recipient-loc)
+           (when-let [ref (language-ref (get-in language [0 'language]))]
+             [filename :document/language ref])
            (when-let [sent-at (triple valid-date? :document/sent-at :sent-at)]
              (update sent-at 2 (partial shared/parse-date utc-dtf')))
            (let [collection (triple valid? :document/collection :collection)]
