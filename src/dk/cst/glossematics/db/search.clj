@@ -24,7 +24,7 @@
   (let [m (->> (d/q '[:find [?id ...]
                       :where
                       (or
-                        [?p :entity/type :entity.type/repository]
+                        [?p :entity/type :entity.type/archive]
                         [?p :entity/type :entity.type/person]
                         [?p :entity/type :entity.type/linguistic-organisation]
                         [?p :entity/type :entity.type/organisation]
@@ -131,7 +131,9 @@
   "Sort 2-tuple `search-results` containing sort values in the second position.
 
   A `sort-pred` may be supplied to filter the results prior to sorting, e.g.
-  only keeping results with a sort-val within some range."
+  only keeping results with a sort-val within some range.
+
+  NOTE: the output will contain duplicates, so it should be further reduced!"
   [search-results & [sort-pred]]
   (->> search-results
        (filter (fn [[_ _ ?sort-value]]
@@ -139,10 +141,7 @@
                    (sort-pred ?sort-value)
                    true)))
        (sort-by sort-keyfn)
-       (map first)
-
-       ;; This also ensures that the results follow the desired sort order.
-       (distinct)))
+       (map first)))
 
 (defn match-entity
   "Look up entity IDs in `conn` matching partial `entity` description.
@@ -159,7 +158,7 @@
          sorted      (if (= sort-dir :desc)
                        (reverse results)
                        results)]
-     (concat sorted unsorted)))
+     (distinct (concat sorted unsorted))))
   ([conn entity]
    (d/q (entity->search-query entity) conn)))
 

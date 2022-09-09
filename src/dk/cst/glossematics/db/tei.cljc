@@ -148,7 +148,7 @@
           #{}
           [(triple valid? :document/title :title)
            (id-triple :document/author :author)
-           (id-triple :document/repository :repository)
+           (id-triple :document/archive :repository)
            (id-triple :document/sender :sender)
            (id-triple :document/sender-location :sender-loc)
            (id-triple :document/recipient :recipient)

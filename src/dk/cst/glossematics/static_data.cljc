@@ -37,8 +37,8 @@
 
 (def real-entity-types
   "The core searchable entities (with index pages)."
-  {:entity.type/repository
-   {:entity-label "Repository"
+  {:entity.type/archive
+   {:entity-label "Archive"
     :img-src      "/images/archive-svgrepo-com.svg"}
 
    :entity.type/person
@@ -106,37 +106,37 @@
 (def repositories
   [{:db/ident         "#narch1"
     :entity/full-name "Louis Hjelmslev's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch2"
     :entity/full-name "Det Universitetshistoriske Arkiv"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch3"
     :entity/full-name "Lingvistisk Bibliotek"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch4"
     :entity/full-name "Eli Fischer-Jørgensen's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch5"
     :entity/full-name "Francis Whitfield's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch6"
     :entity/full-name "Hans Jørgen Uldall's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch7"
     :entity/full-name "Henning Spang-Hanssen's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch8"
     :entity/full-name "Harry Wett Frederiksen's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch9"
     :entity/full-name "Paul Diderichsen's archive"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch10"
     :entity/full-name "Acta Jutlandica"
-    :entity/type      :entity.type/repository}
+    :entity/type      :entity.type/archive}
    {:db/ident         "#narch11"
     :entity/full-name "Travaux du Cercle de Linguistique Copenhague"
-    :entity/type      :entity.type/repository}])
+    :entity/type      :entity.type/archive}])
 
 (def danish-letter->ascii
   {"æ" "ae"
@@ -159,8 +159,8 @@
                                  :compatible #{:entity.type/person}}
    :document/recipient-location {:label      "recipient location"
                                  :compatible #{:entity.type/place}}
-   :document/repository         {:label      "repository"
-                                 :compatible #{:entity.type/repository}}
+   :document/archive            {:label      "archive"
+                                 :compatible #{:entity.type/archive}}
    :document/language           {:label      "document language"
                                  :compatible #{:entity.type/language}}
    :document/publication        {:label      "publication"

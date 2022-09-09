@@ -68,7 +68,7 @@
             (update entry :document/author bib-val->ref'))
           (update-vals str/trim)
           (update :document/place bib-val->ref')
-          (update :document/repository bib-val->ref')
+          (update :document/archive bib-val->ref')
           (update :document/publisher bib-val->ref')
           (dissoc :tei-id :short-title)                     ; remove unused vals
           (assoc :entity/type :entity.type/bibliographic-entry
