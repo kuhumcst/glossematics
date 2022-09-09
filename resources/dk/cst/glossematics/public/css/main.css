@@ -578,6 +578,7 @@ details[open] summary {
     position: static;
     border-radius: var(--border-radius);
     margin-bottom: var(--margin-l);
+    box-shadow: none;
 }
 
 .reader .search-result__paging:last-child {
