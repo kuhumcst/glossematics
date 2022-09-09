@@ -175,7 +175,7 @@
            document/title
            document/publisher
            document/publication
-           document/settlement
+           document/place
            document/bib-entry
            document/pp
            file/name]
@@ -203,8 +203,8 @@
        [:<> ", pp. " pp])
      (when-let [publisher-name (handle-name id->name publisher)]
        [:<> ", " publisher-name])
-     (when-let [settlement-name (handle-name id->name settlement)]
-       [:<> ", " settlement-name])
+     (when-let [place-name (handle-name id->name place)]
+       [:<> ", " place-name])
      ", "
      (if backlink?
        (let [href     (-> entry :document/author sd/id->author bib-href)

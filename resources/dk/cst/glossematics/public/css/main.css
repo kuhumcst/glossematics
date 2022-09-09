@@ -694,13 +694,21 @@ table.entity-metadata dd > ul {
     margin: 0 0 var(--margin-l) 0;
 }
 
-table.entity-metadata td > ul,
+table.entity-metadata td > ul {
+    margin: 0;
+    padding: 0;
+}
+
 table.entity-metadata dd:last-child > ul {
     margin: 0;
 }
 
 table.entity-metadata ul li {
     padding: 0;
+}
+
+table.entity-metadata ul li + li {
+    margin-top: var(--margin-s);
 }
 
 .main-page h1,

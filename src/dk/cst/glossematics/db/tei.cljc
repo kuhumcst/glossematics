@@ -27,6 +27,9 @@
   {:language      '[:language {:ident language} ???]
    :title         '[:title {} title]
    :author        '[:author {:ref author} ???]
+   :place         '[:msIdentifier {}
+                    [:placeName {:ref place} _]
+                    ???]
    :settlement    '[:settlement {:ref settlement} ???]
    :repository    '[:repository {:ref repository} title]
    :collection    '[:collection {} collection]
@@ -146,11 +149,13 @@
           [(triple valid? :document/title :title)
            (id-triple :document/author :author)
            (id-triple :document/repository :repository)
-           (id-triple :document/settlement :settlement)
            (id-triple :document/sender :sender)
            (id-triple :document/sender-location :sender-loc)
            (id-triple :document/recipient :recipient)
            (id-triple :document/recipient-location :recipient-loc)
+           ;; Unfortunately, some documents use settlement & others use place...
+           (id-triple :document/place :settlement)
+           (id-triple :document/place :place)
            (when-let [ref (language-ref (get-in language [0 'language]))]
              [filename :document/language ref])
            (when-let [sent-at (triple valid-date? :document/sent-at :sent-at)]

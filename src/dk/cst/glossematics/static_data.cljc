@@ -161,12 +161,13 @@
                                  :compatible #{:entity.type/place}}
    :document/repository         {:label      "repository"
                                  :compatible #{:entity.type/repository}}
-   :document/language           {:label      "language"
+   :document/language           {:label      "document language"
                                  :compatible #{:entity.type/language}}
    :document/publication        {:label      "publication"
                                  :compatible #{:entity.type/publication}}
-   :document/settlement         {:label      "place"
-                                 :compatible #{:entity.type/place}}
+   :document/place              {:label      "place"
+                                 :compatible #{:entity.type/place
+                                               :entity.type/organisation}}
 
    ;; Special relations -- various strings treated as searchable entities.
    :document/appearance         {:label      "appearance"

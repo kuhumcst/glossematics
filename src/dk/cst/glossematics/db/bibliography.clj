@@ -6,7 +6,8 @@
 
 (def bib-val->ref
   "Incomplete mapping from the strings used in the bibliography files to IDs."
-  {"København"                                       "#npl283"
+  {"?"                                               nil
+   "København"                                       "#npl283"
    "København."                                      "#npl283"
    "Copenhagen"                                      "#npl283"
    "Aarhus"                                          "#npl1"
@@ -19,6 +20,12 @@
    "New York"                                        "#npl1200"
    "Helsinki"                                        "#npl931"
    "Beograd"                                         "#npl683"
+   "Madrid"                                          "#npl1110"
+   "Bruges"                                          "#npl1110" ; Belgien
+   "Louvain"                                         "#npl1110" ; Belgien
+   "Ghent"                                           "#npl1110" ; Belgien
+   "Münster"                                         "#npl1173"
+   "Baltimore"                                       "#npl1957" ; Amerika
    "Madison"                                         "#norg72"
    "Nice"                                            "#npl1203"
    "Bruxelles-Tervuren"                              "#npl2000"
@@ -60,7 +67,7 @@
             (dissoc entry :document/title :document/author)
             (update entry :document/author bib-val->ref'))
           (update-vals str/trim)
-          (update :document/settlement bib-val->ref')
+          (update :document/place bib-val->ref')
           (update :document/repository bib-val->ref')
           (update :document/publisher bib-val->ref')
           (dissoc :tei-id :short-title)                     ; remove unused vals
@@ -78,7 +85,7 @@
    :document/title
    :document/publication
    :document/publisher
-   :document/settlement
+   :document/place
    :document/pp
    :document/notes
    :short-title                                             ; unused
