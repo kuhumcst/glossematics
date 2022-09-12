@@ -106,6 +106,13 @@
     id
     (str "#" id)))
 
+;; Since Heidi has been manually modifying some facsimile IDs to this standard.
+(defn fix-facsimile-id
+  [facsimile]
+  (if (str/starts-with? facsimile "facc-")
+    (subs facsimile 1)
+    facsimile))
+
 (def language-ref
   {"en"  "#nseng"
    "eng" "#nseng"                                           ; used in some TEI documents
@@ -173,7 +180,7 @@
                  [filename :document/appearance v]
                  (log/info :tei/unsupported {:document/appearance v}))))])
         [(for [{:syms [id]} facsimile]
-           [filename :document/facsimile id])
+           [filename :document/facsimile (fix-facsimile-id id)])
          (when-let [hands (get-in hand-desc [0 'hand])]
            (for [hand (->> (str/split hands #"\s+and\s+")
                            (map str/trim)

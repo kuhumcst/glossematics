@@ -267,10 +267,15 @@
   (let [url (api/normalize-url (str "/file/" id ".jpg"))]
     [id [document/illustration {:src url :alt (str "Illustration of " id)}]]))
 
-(defn get-facs
-  [hiccup]
-  (->> (:graphic (cup/scrape hiccup {:graphic '[:graphic {:xml/id id}]}))
-       (mapv (comp facs-id->facs-page #(get % 'id)))))
+(defn normalize-facs
+  "Turn `raw-facsimile` into a sorted sequential collection."
+  [raw-facsimile]
+  (cond
+    (coll? raw-facsimile)
+    (sort raw-facsimile)
+
+    (some? raw-facsimile)
+    [raw-facsimile]))
 
 ;; Keep track of document fetches
 (def ^:dynamic *current-fetch* nil)
@@ -293,7 +298,8 @@
                                  (db.tei/triples->entity))
                              (api/fetch (str "/entity/" document)))
           raw-hiccup       (parse tei)
-          facs             (get-facs raw-hiccup)
+          facs             (->> (normalize-facs (:document/facsimile entity))
+                                (mapv facs-id->facs-page))
           rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)
           tei-kvs          (:kvs @state/tei-carousel)
           missing-count    (- (count facs) (count tei-kvs))
