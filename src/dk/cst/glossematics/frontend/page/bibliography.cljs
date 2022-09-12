@@ -2,9 +2,11 @@
   "Bibliography modeled after the search index page."
   (:require [clojure.string :as str]
             [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.glossematics.frontend :as-alias frontend]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state]
-            [dk.cst.glossematics.frontend.api :as api]))
+            [dk.cst.glossematics.frontend.api :as api]
+            [dk.cst.glossematics.frontend.i18n :as i18n]))
 
 (defn skip-links
   [groups]
@@ -52,12 +54,12 @@
   []
   (let [{:keys [id->name]} @state/search
         {:keys [results]} @state/bibliography
+        tr     (i18n/->tr)
         author (-> @state/location :path-params :author)
         id     (sd/author->id author)]
     [:div.index-page
      [:h1
-      [:img {:src "/images/book-fill.svg"}]
-      " Bibliography"]
+      [:img {:src "/images/book-fill.svg"}] " " (tr ::frontend/bibliography)]
      (when (and id->name results)
        (let [groups (->> (filter #(= (:document/author %) id) results)
                          (group-by (comp fshared/single :document/year))

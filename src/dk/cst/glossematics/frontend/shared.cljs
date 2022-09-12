@@ -121,10 +121,10 @@
            coll))
 
 (defn- group-coll
-  [id->type coll]
+  [id->type coll tr]
   (group-by (if (inst? (first coll))
               (comp str t/year)
-              (comp :entity-label sd/entity-types id->type))
+              (comp tr id->type))
             coll))
 
 (def break-str-xf
@@ -216,11 +216,11 @@
 (defn- metadata-table-val
   "Create a Hiccup representation for `v` based on `k` and the source `m`;
   names are sourced via the `search-state`."
-  [{:keys [id->name id->type] :as search-state} m k v]
+  [tr {:keys [id->name id->type] :as search-state} m k v]
   (let [into-ul (fn [coll]
                   (into [:ul]
                         (->> (sort-coll id->name coll)
-                             (map #(metadata-table-val search-state m k %))
+                             (map #(metadata-table-val tr search-state m k %))
                              (map #(vector :li %)))))]
     (cond
       ;; Hiccup passes unchanged
@@ -252,7 +252,7 @@
 
       ;; Collections caught here.
       (set? v)
-      (let [colls (group-coll id->type v)]
+      (let [colls (group-coll id->type v tr)]
         (if (= 1 (count colls))
           (into-ul (second (first colls)))
           (into [:dl] (->> (sort-by key colls)
@@ -274,13 +274,13 @@
       (str v))))
 
 (defn metadata-table
-  [search-state m kvs]
+  [tr search-state m kvs]
   [:table.entity-metadata
    [:tbody
     (for [[k v] kvs]
       [:tr {:key k}
-       [:td [:strong (str (get sd/rel->label k k))]]
-       [:td (metadata-table-val search-state m k v)]])]])
+       [:td [:strong (str (tr k k))]]
+       [:td (metadata-table-val tr search-state m k v)]])]])
 
 (defn kvs-list
   "Generic display of title+content `kvs`; `val-com` renders the content."
@@ -293,5 +293,3 @@
        k]
       [:dd
        [val-com v]]])])
-
-

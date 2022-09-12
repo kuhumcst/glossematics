@@ -18,7 +18,8 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.shared :as fshared]
-            [dk.cst.glossematics.static-data :as sd]))
+            [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.glossematics.frontend.i18n :as i18n]))
 
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
@@ -33,17 +34,32 @@
   "The complete set of styles (widgets and TEI documents)."
   (str css/shadow-style "\n\n/*\n\t === tei.css ===\n*/\n" tei-css))
 
+;; TODO: convert to i18n ns translations?
 (defn da-type
   [type]
-  (let [type->s {"conference" "denne konference"
-                 "language"   "dette sprog"
-                 "org"        "denne organisation"
-                 "pers"       "denne person"
-                 "place"      "dette sted"
-                 "publ"       "denne publikation"
-                 "receiver"   "denne modtager"
-                 "sender"     "denne afsender"}]
-    (str "Vis mere om " (type->s type "dette"))))
+  (let [da?     (= "da" (:type @state/language))
+        type->s (if da?
+                  {"conference" "denne konference"
+                   "term"       "dette begreb"
+                   "language"   "dette sprog"
+                   "org"        "denne organisation"
+                   "pers"       "denne person"
+                   "place"      "dette sted"
+                   "publ"       "denne udgivelse"
+                   "receiver"   "denne modtager"
+                   "sender"     "denne afsender"}
+                  {"conference" "this conference"
+                   "term"       "this term"
+                   "language"   "this language"
+                   "org"        "this organisation"
+                   "pers"       "this person"
+                   "place"      "this place"
+                   "publ"       "this publication"
+                   "receiver"   "this recipient"
+                   "sender"     "this sender"})]
+    (if da?
+      (str "Vis mere om " (type->s type "dette"))
+      (str "Show more about " (type->s type "this")))))
 
 (def list-as-ul
   (cup/->transformer
@@ -253,9 +269,10 @@
   (memoize xml/parse))
 
 (defn facs-id->facs-page
-  [id]
+  [tr id]
   (let [url (api/normalize-url (str "/file/" id ".jpg"))]
-    [id [document/illustration {:src url :alt (str "Illustration of " id)}]]))
+    [id [document/illustration {:src url
+                                :alt (tr ::illustration-of-1 id)}]]))
 
 (defn normalize-facs
   "Turn `raw-facsimile` into a sorted sequential collection."
@@ -288,12 +305,13 @@
                                  (db.tei/triples->entity))
                              (api/fetch (str "/entity/" document)))
           raw-hiccup       (parse tei)
+          tr               (i18n/->tr)
           facs             (->> (normalize-facs (:document/facsimile entity))
-                                (mapv facs-id->facs-page))
+                                (mapv (partial facs-id->facs-page tr)))
           rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)
           tei-kvs          (:kvs @state/tei-carousel)
           missing-count    (- (count facs) (count tei-kvs))
-          placeholder      ["N/A" "[content missing]"]]
+          placeholder      (tr ::placeholder)]
     (swap! state/reader assoc
 
            :document document
@@ -313,13 +331,13 @@
                       tei-kvs))))
 
 (defn entity-meta
-  [search-state entity]
+  [tr search-state entity]
   (let [entity' (dissoc entity :file/extension)             ; not interesting
         kvs     (concat (remove nil? (for [k sd/reader-rels]
                                        (when-let [v (get entity' k)]
                                          [k v])))
                         (sort-by first (apply dissoc entity' sd/reader-rels)))]
-    [fshared/metadata-table search-state entity kvs]))
+    [fshared/metadata-table tr search-state entity kvs]))
 
 (defn pdf-object
   [pdf-src]
@@ -356,17 +374,17 @@
 
 ;; TODO: redo the .search-result__paging CSS now that it fills two roles
 (defn reader-paging
-  [results i {:keys [offset limit] :as query-state}]
+  [tr results i {:keys [offset limit] :as query-state}]
   [:div.search-result__paging
    [:div.input-row
     [:button {:disabled (= i offset 0)
               :on-click #(nth-document! (dec i))}
-     "← previous"]
+     [tr ::search-page/prev]]
     [:select {:on-change #(nth-document! (js/parseInt (.-value (.-target %))))
               :value     i}
      (when (> offset 0)
        [:option {:value -1}
-        "previous results..."])
+        (tr ::prev-results)])
      (for [entity results
            :let [n    (:i (meta entity))
                  file (:file/name entity)]]
@@ -375,17 +393,18 @@
         file])
      (when (< (+ offset limit) (:total (meta results)))
        [:option {:value (+ offset limit)}
-        "more results..."])]
+        (tr ::next-results)])]
     [:button {:disabled (= (dec (:total (meta results)))
                            (+ i offset))
               :on-click #(nth-document! (inc i))}
-     "next →"]]])
+     [tr ::search-page/next]]]])
 
 (defn page
   []
   (let [{:keys [hiccup tei document entity]} @state/reader
         {:keys [id->name results i] :as search-state} @state/search
-        {:keys [limit offset] :as query-state} @state/query
+        query-state        @state/query
+        tr                 (i18n/->tr)
         location*          @state/location
         current-document   (get-in location* [:path-params :document])
         local-preview?     (empty? current-document)
@@ -410,7 +429,7 @@
                     "reader-preview"
                     "reader")}
      (when local-preview?
-       [:input {:aria-label "Local TEI-file"
+       [:input {:aria-label (tr ::local-file)
                 :type       "file"
                 :on-change  (fn [e]
                               (when-let [file (.item e.target.files 0)]
@@ -424,13 +443,13 @@
          [pattern/tabs
           {:i   0
            :kvs (pattern/heterostyled
-                  [["Transcription"
+                  [[[tr ::transcription]
                     ^{:key tei} [rescope/scope hiccup tei-css]]
 
                    ["Metadata"
                     (when id->name
                       [:div.reader-content
-                       [entity-meta search-state entity]])]
+                       [entity-meta tr search-state entity]])]
 
                    ["TEI"
                     [:pre.reader-content
@@ -450,7 +469,7 @@
                    (cond->> [["Metadata"
                               (when id->name
                                 [:div.reader-content
-                                 [entity-meta search-state entity]])]
+                                 [entity-meta tr search-state entity]])]
 
                              ["TEI"
                               [:pre.reader-content
@@ -459,9 +478,9 @@
 
                             body?
                             (into
-                              [["Transcription"
+                              [[[tr ::transcription]
                                 ^{:key tei} [rescope/scope hiccup tei-css]]])))}
            {:id "tei-tabs"}]]))
 
      (when i
-       [reader-paging results i query-state])]))
+       [reader-paging tr results i query-state])]))

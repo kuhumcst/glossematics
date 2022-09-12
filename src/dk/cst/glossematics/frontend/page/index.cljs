@@ -2,6 +2,7 @@
   "Page containing a range of indices of important entities."
   (:require [clojure.string :as str]
             [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.glossematics.frontend.i18n :as i18n]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.shared :as shared]))
@@ -27,16 +28,16 @@
          (into []))))
 
 (defn index-links
-  [& [current-type]]
-  (->> (sort-by (comp :entity-label second) sd/real-entity-types)
-       (map (fn [[entity-type {:keys [entity-label img-src]}]]
+  [tr & [current-type]]
+  (->> (sort-by (comp tr first) sd/real-entity-types)
+       (map (fn [[entity-type {:keys [img-src]}]]
               (if (= current-type entity-type)
                 [:span [:img.entity-icon {:src img-src}]
-                 entity-label]
+                 (tr entity-type)]
                 [:a {:href     (fshared/index-href entity-type)
                      :disabled (= current-type entity-type)}
                  [:img.entity-icon {:src img-src}]
-                 entity-label])))
+                 (tr entity-type)])))
        (interpose " / ")
        (into [:p.index-links])))
 
@@ -63,17 +64,17 @@
 (defn page
   []
   (let [{:keys [metadata]} @state/search
+        tr          (i18n/->tr)
         entity-type (->> (get-in @state/location [:path-params :kind])
                          (keyword "entity.type"))
-        {:keys [entity-label
-                img-src]} (get sd/real-entity-types entity-type)]
+        {:keys [img-src]} (get sd/real-entity-types entity-type)]
     [:div.index-page
-     [:h1 [:img {:src img-src}] " " entity-label]
+     [:h1 [:img {:src img-src}] " " (tr entity-type)]
      (when metadata
        (let [groups (index-groups metadata entity-type)]
          [:<>
           [:div.text-content
-           [index-links entity-type]
+           [index-links tr entity-type]
            [:hr]
            [skip-links groups]]
           ^{:key groups} [fshared/kvs-list groups index-content]]))]))

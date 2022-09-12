@@ -38,40 +38,31 @@
 (def real-entity-types
   "The core searchable entities (with index pages)."
   {:entity.type/archive
-   {:entity-label "Archive"
-    :img-src      "/images/archive-svgrepo-com.svg"}
+   {:img-src "/images/archive-svgrepo-com.svg"}
 
    :entity.type/person
-   {:entity-label "Person"
-    :img-src      "/images/person-sharp-svgrepo-com.svg"}
+   {:img-src "/images/person-sharp-svgrepo-com.svg"}
 
    :entity.type/publication
-   {:entity-label "Publication"
-    :img-src      "/images/book-fill.svg"}
+   {:img-src "/images/book-fill.svg"}
 
    :entity.type/term
-   {:entity-label "Term (Danish)"
-    :img-src      "/images/label-svgrepo-com.svg"}
+   {:img-src "/images/label-svgrepo-com.svg"}
 
    :entity.type/english-term
-   {:entity-label "Term (English)"
-    :img-src      "/images/label-svgrepo-com.svg"}
+   {:img-src "/images/label-svgrepo-com.svg"}
 
    :entity.type/language
-   {:entity-label "Language"
-    :img-src      "/images/speech-bubble-svgrepo-com.svg"}
+   {:img-src "/images/speech-bubble-svgrepo-com.svg"}
 
    :entity.type/place
-   {:entity-label "Place"
-    :img-src      "/images/earth-fill.svg"}
+   {:img-src "/images/earth-fill.svg"}
 
    :entity.type/organisation
-   {:entity-label "Organisation"
-    :img-src      "/images/people-group-svgrepo-com.svg"}
+   {:img-src "/images/people-group-svgrepo-com.svg"}
 
    :entity.type/linguistic-organisation
-   {:entity-label "Linguistic organisation"
-    :img-src      "/images/people-group-svgrepo-com.svg"}})
+   {:img-src "/images/people-group-svgrepo-com.svg"}})
 
 (def special-entity-types
   "These do not correspond to actual entities, but rather to searchable
@@ -79,23 +70,22 @@
 
   The :vs key correspond to the set of allowed value."
   {:document/appearance
-   {:entity-label "Appearance"
-    :vs           #{"transcribed"
+   {:vs      #{"transcribed"
 
-                    "original"
-                    "photocopy"
-                    "carbon copy"
+               "original"
+               "photocopy"
+               "carbon copy"
 
-                    ;; form
-                    "postcard"
-                    "document"
-                    "letter"
+               ;; form
+               "postcard"
+               "document"
+               "letter"
 
-                    ;; hand
-                    "stenographed"
-                    "typed"
-                    "handwritten"}
-    :img-src      "/images/paper-sheet-svgrepo-com.svg"}})
+               ;; hand
+               "stenographed"
+               "typed"
+               "handwritten"}
+    :img-src "/images/paper-sheet-svgrepo-com.svg"}})
 
 (def special-entity-vs
   (apply set/union (map (comp :vs second) special-entity-types)))
@@ -147,57 +137,27 @@
    "Ø" "Oe"})
 
 (def search-rels
-  {:document/mention            {:label      "mentioned"
-                                 :compatible (set (keys real-entity-types))}
-   :document/author             {:label      "author"
-                                 :compatible #{:entity.type/person}}
-   :document/sender             {:label      "sender"
-                                 :compatible #{:entity.type/person}}
-   :document/sender-location    {:label      "sender location"
-                                 :compatible #{:entity.type/place}}
-   :document/recipient          {:label      "recipient"
-                                 :compatible #{:entity.type/person}}
-   :document/recipient-location {:label      "recipient location"
-                                 :compatible #{:entity.type/place}}
-   :document/archive            {:label      "archive"
-                                 :compatible #{:entity.type/archive}}
-   :document/language           {:label      "document language"
-                                 :compatible #{:entity.type/language}}
-   :document/publication        {:label      "publication"
-                                 :compatible #{:entity.type/publication}}
-   :document/place              {:label      "place"
-                                 :compatible #{:entity.type/place
+  {:document/mention            {:compatible (set (keys real-entity-types))}
+   :document/author             {:compatible #{:entity.type/person}}
+   :document/sender             {:compatible #{:entity.type/person}}
+   :document/sender-location    {:compatible #{:entity.type/place}}
+   :document/recipient          {:compatible #{:entity.type/person}}
+   :document/recipient-location {:compatible #{:entity.type/place}}
+   :document/archive            {:compatible #{:entity.type/archive}}
+   :document/language           {:compatible #{:entity.type/language}}
+   :document/publication        {:compatible #{:entity.type/publication}}
+   :document/place              {:compatible #{:entity.type/place
                                                :entity.type/organisation}}
 
    ;; Special relations -- various strings treated as searchable entities.
-   :document/appearance         {:label      "appearance"
-                                 :compatible #{:document/appearance}}
+   :document/appearance         {:compatible #{:document/appearance}}
 
    ;; Dynamic relations -- expands to a more complex operation during search.
-   :correspondent               {:label      "correspondent"
-                                 :compatible #{:entity.type/person}}})
+   :correspondent               {:compatible #{:entity.type/person}}})
 
 (def order-rels
-  {:document/date-mention {:label "mentioned date"
-                           :type  "date"}
-   :document/sent-at      {:label "date"
-                           :type  "date"}})
-
-;; TODO: make collection searchable too (add to search-rels)
-(def other-rels
-  "Relations that are not available as search/order params."
-  {:db/ident            {:label "id"}
-   :document/title      {:label "title"}
-   :document/bib-entry  {:label "bibliography entry"}
-   :document/notes      {:label "notes"}
-   :document/pp         {:label "pp."}
-   :document/publisher  {:label "publisher"}
-   :document/collection {:label "collection"}
-   :document/facsimile  {:label "facsimile"}
-   :document/year       {:label "year"}
-   :document/end-year   {:label "year (end)"}
-   :file/name           {:label "file name"}
-   :file/extension      {:label "file extension"}})
+  {:document/date-mention {:type "date"}
+   :document/sent-at      {:type "date"}})
 
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels
@@ -213,11 +173,6 @@
    :document/appearance
    :document/author
    :document/recipient])
-
-(def rel->label
-  (->> (merge search-rels order-rels other-rels)
-       (map (juxt key (comp :label val)))
-       (into {})))
 
 (def author->id
   {"lh"  "#np56"

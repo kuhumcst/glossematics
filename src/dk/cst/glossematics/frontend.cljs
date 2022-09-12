@@ -8,7 +8,7 @@
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.glossematics.frontend.i18n :as i18n]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
@@ -19,39 +19,45 @@
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
+(defn title-tr
+  [k]
+  (fn [_] ((i18n/->tr) k)))
+
 (def routes
   [["/app"
     {:name ::main
      :page main/page}]
    ["/app/encyclopedia/:ref"
     {:name  ::encyclopedia/entry
-     :title "Encyclopedia"
+     :title (title-tr ::encyclopedia)
      :page  encyclopedia/page
      :prep  #(prn 'encyclopedia @state/location)}]
    ["/app/search"
     {:name  ::search/page
-     :title "Search"
+     :title (title-tr ::search)
      :page  search/page
      :prep  #(search/fetch-results! % search/?query-reset!)}]
    ["/app/bibliography/:author"
     {:name  ::bibliography/page
      :title (fn [m]
-              (get {"lh"  "Hjelmslev bibliography"
-                    "efj" "Fischer-Jørgensen bibliography"
-                    "pd"  "Diderichsen bibliography"}
-                   (get-in m [:path-params :author])))
+              (str
+                ((i18n/->tr) ::bibliography) ": "
+                ({"lh"  "Hjelmslev"
+                  "efj" "Fischer-Jørgensen"
+                  "pd"  "Diderichsen"}
+                 (get-in m [:path-params :author]))))
      :page  bibliography/page
      :prep  #(bibliography/fetch-results!)}]
    ["/app/index/:kind"
     {:name  ::index/page
      :title (fn [m]
-              (let [entity-type (->> (get-in m [:path-params :kind])
-                                     (keyword "entity.type"))]
-                (:entity-label (get sd/real-entity-types entity-type))))
+              (->> (get-in m [:path-params :kind])
+                   (keyword "entity.type")
+                   ((i18n/->tr))))
      :page  index/page}]
    ["/app/reader"
     {:name  ::reader/preview
-     :title "Local reader"
+     :title (title-tr ::local-reader)
      :page  reader/page}]
    ["/app/reader/:document"
     {:name  ::reader/page
@@ -60,7 +66,7 @@
      :page  reader/page}]
    ["/app/timeline"
     {:name  ::timeline/page
-     :title "Timeline"
+     :title (title-tr ::timeline)
      :page  timeline/page
      :prep  timeline/fetch-timeline-data!}]])
 
@@ -81,6 +87,7 @@
   "A container component that wraps the various pages of the app."
   []
   (let [{:keys [page name]} (:data @state/location)
+        tr             (i18n/->tr)
         authenticated? @state/authenticated?]
     [:div.shell {:class [(when (get #{::reader/page ::timeline/page} name)
                            "reader-mode")
@@ -91,21 +98,21 @@
       [:a {:href (href ::main)}
        [:h1 "Glossematics"]]
       [:a {:href      (href ::search/page)
-           :title     "Find documents to read"
+           :title     (tr ::search-caption)
            :tab-index (if authenticated? "0" "-1")          ; for accessibility
            :disabled  (not authenticated?)}
-       "Find"]
+       [tr ::search]]
       [:a {:href  (href ::timeline/page)
-           :title "The life Louis Hjelmslev"}
-       "Timeline"]
+           :title (tr ::timeline-caption)}
+       [tr ::timeline]]
       [:a {:href  (href ::bibliography/page {:author "lh"})
-           :title "Relevant works"}
-       "Bibl."]]
+           :title (tr ::bibliography-caption)}
+       [tr ::bibliography]]]
      [:div.shell__content {:class (when (= name ::timeline/page)
                                     "fill-mode")}
       (if page
         [page]
-        [:p "unknown page"])]]))
+        [tr ::unknown-page])]]))
 
 (defn universal-prep!
   "Prepare widely needed state."
