@@ -8,6 +8,7 @@
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
+            [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.page.main :as main]
@@ -23,30 +24,45 @@
     {:name ::main
      :page main/page}]
    ["/app/encyclopedia/:ref"
-    {:name ::encyclopedia/entry
-     :page encyclopedia/page
-     :prep #(prn 'encyclopedia @state/location)}]
+    {:name  ::encyclopedia/entry
+     :title "Encyclopedia"
+     :page  encyclopedia/page
+     :prep  #(prn 'encyclopedia @state/location)}]
    ["/app/search"
-    {:name ::search/page
-     :page search/page
-     :prep #(search/fetch-results! % search/?query-reset!)}]
+    {:name  ::search/page
+     :title "Search"
+     :page  search/page
+     :prep  #(search/fetch-results! % search/?query-reset!)}]
    ["/app/bibliography/:author"
-    {:name ::bibliography/page
-     :page bibliography/page
-     :prep #(bibliography/fetch-results!)}]
+    {:name  ::bibliography/page
+     :title (fn [m]
+              (get {"lh"  "Hjelmslev bibliography"
+                    "efj" "Fischer-Jørgensen bibliography"
+                    "pd"  "Diderichsen bibliography"}
+                   (get-in m [:path-params :author])))
+     :page  bibliography/page
+     :prep  #(bibliography/fetch-results!)}]
    ["/app/index/:kind"
-    {:name ::index/page
-     :page index/page}]
+    {:name  ::index/page
+     :title (fn [m]
+              (let [entity-type (->> (get-in m [:path-params :kind])
+                                     (keyword "entity.type"))]
+                (:entity-label (get sd/real-entity-types entity-type))))
+     :page  index/page}]
    ["/app/reader"
-    {:name ::reader/preview
-     :page reader/page}]
+    {:name  ::reader/preview
+     :title "Local reader"
+     :page  reader/page}]
    ["/app/reader/:document"
-    {:name ::reader/page
-     :page reader/page}]
+    {:name  ::reader/page
+     :title (fn [m]
+              (get-in m [:path-params :document]))
+     :page  reader/page}]
    ["/app/timeline"
-    {:name ::timeline/page
-     :page timeline/page
-     :prep timeline/fetch-timeline-data!}]])
+    {:name  ::timeline/page
+     :title "Timeline"
+     :page  timeline/page
+     :prep  timeline/fetch-timeline-data!}]])
 
 ;; TODO: remove...?
 (defn debug-view
@@ -98,6 +114,20 @@
     (when-not name->id
       (search/fetch-metadata!))))
 
+(defn page-title
+  [m]
+  (let [title (get-in m [:data :title])]
+    (str (when state/development?
+           "(dev) ")
+         "Glossematics"
+         (when title
+           (str " | " (cond
+                        (string? title)
+                        title
+
+                        (fn? title)
+                        (title m)))))))
+
 (defn on-navigate
   [{:keys [path query-params] :as m}]
   (let [old-location @state/location]
@@ -110,6 +140,7 @@
         (prep m)))
 
     (reset! state/location m)
+    (set! js/document.title (page-title m))
 
     ;; Scroll state is always reset when no intra-page navigation is expected.
     (when (empty? js/window.location.hash)
