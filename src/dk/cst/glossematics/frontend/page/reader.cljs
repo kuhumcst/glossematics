@@ -20,18 +20,9 @@
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.static-data :as sd]))
 
-;; TODO: wrong author? https://glossematics.dk/app/search?limit=10&offset=0&_=%23norg113
-;; TODO: missing transcription https://glossematics.dk/app/reader/acc-1992_0005_125_MTG_0810-tei.xml
-;; TODO: wrong sender https://glossematics.dk/app/reader/acc-1992_0005_022_Bierwisch_0010-tei.xml
-;; TODO: yuki not linked http://localhost:9000/app/reader/HJUtilDJ-1932-09-28-tei-final.xml
-;; TODO: missing facs http://localhost:8080/app/reader/acc-1992_0005_025_Jakobson_0160-tei-final.xml
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
-;; TODO: acc-1992_0005_024_Holt_0900-final.xml - error on line 150 at column 25
-;; TODO: acc-1992_0005_024_Holt_0230-final.xml - note in note?
 ;; TODO: acc-1992_0005_024_Holt_0170-final.xml - facs wrong order
-;; TODO: acc-1992_0005_024_Holt_0530-final.xml - note type=top vs type=above
-;; TODO: in general: why resp attr used for hand/machine, while hand attr used for people?
 
 (def tei-css
   "Styles used for TEI documents specifically. They are written in a regular CSS
@@ -95,7 +86,6 @@
   (and (vector? x)
        (= :pb (first x))))
 
-;; TODO: doesn't work properly for acc-1992_0005_032_Uldall_1000-tei-final.xml
 (def inlined-pbs
   "In certain cases, <pb> tags don't appear at the same level as <p> tags, but
   rather nested inside them. This transformer splits those <p> tags into

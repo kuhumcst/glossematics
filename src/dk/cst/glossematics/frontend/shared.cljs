@@ -150,7 +150,6 @@
     (first (sort x))
     x))
 
-;; TODO: make IDs into clickable search links
 (defn- handle-name
   "Ensures that `x` -- which can be either an ID, a name, or a set of either IDs
   or names -- parses correctly."

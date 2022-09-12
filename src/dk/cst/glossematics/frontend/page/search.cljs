@@ -11,9 +11,6 @@
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.shared :as shared]))
 
-;; TODO: bad ref for LOUIS HJELMSLEV (missing "np") http://localhost:9000/app/reader/acc-1992_0005_035_Uldall_0110-tei-final.xml
-;; TODO: missing name http://localhost:8080/app/search?limit=10&offset=0&_=%23npl737
-
 (defn params->items
   [query-params id->name]
   (->> (dissoc query-params :limit :offset :order-by :from :to)

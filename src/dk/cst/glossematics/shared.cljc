@@ -55,9 +55,10 @@
 (defn local-name
   "Use the local name version of `s`, i.e. without a clarifying entity type."
   [s]
-  (if (str/includes? s "—")
-    (first (str/split s #"\s—"))
-    s))
+  (when s
+    (if (str/includes? s "—")
+      (first (str/split s #"\s—"))
+      s)))
 
 (comment
   ;; These should all be true
