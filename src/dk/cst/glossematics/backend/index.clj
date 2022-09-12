@@ -30,7 +30,7 @@
   (= main-js "main.js"))
 
 (defn index-hiccup
-  [assertions saml-paths]
+  [assertions saml-paths negotiated-language]
   [:html {:lang "da"}
    [:head
     [:meta {:charset "utf-8"}]
@@ -70,21 +70,23 @@
      ;; values are passed on to the SPA along with the compiled main.js code.
      (str "var SAMLAssertions = '" (pr-str assertions) "';\n"
           "var SAMLPaths = '" (pr-str saml-paths) "';\n"
+          "var negotiatedLanguage = '" (pr-str negotiated-language) "';\n"
           "var inDevelopmentEnvironment = " development? ";\n")]
     [:script {:src (cb (str "/js/compiled/" main-js))}]]])
 
 (defn index-html
-  [assertions saml-paths]
+  [assertions saml-paths negotiated-language]
   (str
     "<!DOCTYPE html>"
-    (hiccup/html (index-hiccup assertions saml-paths))))
+    (hiccup/html (index-hiccup assertions saml-paths negotiated-language))))
 
 (defn handler
-  [request]
+  [{:keys [accept-language] :as request}]
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    (index-html (sp.auth/request->assertions request)
-                        (-> request :conf :paths))})
+                        (-> request :conf :paths)
+                        accept-language)})
 
 (defn shadow-handler
   "Handler used by the shadow-cljs watch process which overrides auth."

@@ -37,7 +37,7 @@
         conf-ic         (->conf-ic conf)
         all             (conj (sp.ic/auth-chain conf :all) conf-ic)
         authenticated   (conj (sp.ic/auth-chain conf :authenticated) conf-ic)
-        spa-chain       (conj all index/handler)]
+        spa-chain       (conj all endpoints/lang-neg index/handler)]
 
     ;; These first few routes all lead to the SPA
     #{["/" :get redirect-to-spa :route-name ::root]
@@ -115,7 +115,7 @@
         service-map (->service-map conf)]
     (db/bootstrap! conf)
     (log/info :bootstrap.asami/begin-cache-names true)
-    (->> (update-vals (db.search/search-metadata conn) count)           ; memoize
+    (->> (update-vals (db.search/search-metadata conn) count) ; memoize
          (log/info :bootstrap.asami/names-cache))
     (log/info :bootstrap.server/service-map service-map)
     (http/start (http/create-server service-map))))

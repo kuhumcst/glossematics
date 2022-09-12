@@ -2,6 +2,7 @@
   "The various handlers/interceptors provided by the backend web service."
   (:require [clojure.string :as str]
             [io.pedestal.http.route :refer [path-params-decoder]]
+            [io.pedestal.http.content-negotiation :as conneg]
             [io.pedestal.log :as log]
             [ring.util.response :as ring]
             [com.wsscode.transito :as transito]
@@ -17,6 +18,31 @@
 
 (def one-day-cache
   "private, max-age=86400")
+
+(defn ->language-negotiation-ic
+  "Make a language negotiation interceptor from a coll of `supported-languages`.
+  The interceptor reuses Pedestal's content-negotiation logic, but unlike the
+  included content negotiation interceptor this one does not create a 406
+  response if no match is found."
+  [supported-languages]
+  (let [match-fn   (conneg/best-match-fn supported-languages)
+        lang-paths [[:request :headers "accept-language"]
+                    [:request :headers :accept-language]]]
+    {:name  ::negotiate-language
+     :enter (fn [ctx]
+              (if-let [accept-param (loop [[path & paths] lang-paths]
+                                      (if-let [param (get-in ctx path)]
+                                        param
+                                        (when (not-empty paths)
+                                          (recur paths))))]
+                (if-let [language (->> (conneg/parse-accept-* accept-param)
+                                       (conneg/best-match match-fn))]
+                  (assoc-in ctx [:request :accept-language] language)
+                  ctx)
+                ctx))}))
+
+(def lang-neg
+  (->language-negotiation-ic ["da" "en"]))
 
 (defn timeline-handler
   "A handler to serve individual files."

@@ -20,6 +20,12 @@
     (edn/read-string js/SAMLPaths)
     {}))
 
+(defonce language
+  (r/atom
+    (if (exists? js/negotiatedLanguage)
+      (edn/read-string js/negotiatedLanguage)
+      {})))
+
 (defonce authenticated?
   (r/atom
     (sp.auth/if-permit [assertions :authenticated]
