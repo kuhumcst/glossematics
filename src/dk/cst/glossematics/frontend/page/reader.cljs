@@ -37,7 +37,7 @@
 ;; TODO: convert to i18n ns translations?
 (defn da-type
   [type]
-  (let [da?     (= "da" (:type @state/language))
+  (let [da?     (= "da" @state/language)
         type->s (if da?
                   {"conference" "denne konference"
                    "term"       "dette begreb"

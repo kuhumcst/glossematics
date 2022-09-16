@@ -11,7 +11,8 @@
             [dk.cst.glossematics.frontend.page.reader :as-alias reader]
             [dk.cst.glossematics.frontend.page.bibliography :as-alias bib]
             [dk.cst.glossematics.frontend.page.encyclopedia :as-alias enc]
-            [dk.cst.stucco.pattern :as stp]))
+            [dk.cst.stucco.pattern :as stp]
+            [dk.cst.glossematics.frontend.i18n :as i18n]))
 
 (defn -surname-first
   [s]
@@ -248,7 +249,7 @@
            :key   v}
        (when-let [img-src (some-> v id->type sd/entity-types :img-src)]
          [:img.entity-icon {:src img-src :alt ""}])
-       (if-let [attribute (and (= "da" (:type @state/language))
+       (if-let [attribute (and (= tr i18n/tr-da)
                                (get sd/en-attr->da-attr v))]
          attribute
          (shared/local-name (get id->name v v)))]

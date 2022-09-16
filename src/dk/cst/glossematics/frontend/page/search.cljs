@@ -385,7 +385,7 @@
          [:span.search-form__item-key
           (tr k k)
           " | "])
-       [:span.search-form__item-label (or (when (= "da" (:type @state/language))
+       [:span.search-form__item-label (or (when (= tr i18n/tr-da)
                                             (get sd/en-attr->da-attr label))
                                           (shared/local-name label)
                                           (str v))]
@@ -399,7 +399,7 @@
       " "])])
 
 (defn search-form
-  [tr]
+  [_]
   (let [{:keys [en-name-kvs
                 da-name-kvs
                 name->id
@@ -411,7 +411,7 @@
                           :bad-input? false
                           :not-allowed? false)))]
 
-    (fn [_ _]
+    (fn [tr]
       (let [{:keys [items in order-by bad-input? not-allowed?]} @state/query
             {:keys [results] :as search-state} @state/search
             [order-rel] order-by]
@@ -434,7 +434,7 @@
                    :on-change   set-in
                    :value       in}]
           (when name->id
-            (if (= "da" (:type @state/language))
+            (if (= "da" @state/language)
               [multi-input-data da-name-kvs]
               [multi-input-data en-name-kvs]))
 
@@ -528,7 +528,7 @@
         tr (i18n/->tr)]
     [:div.search-page
      ;; React key needed for input to update after name->id has been fetched!
-     ^{:key name->id} [search-form tr]
+     ^{:key [name->id tr]} [search-form tr]
      (if results
        (if (empty? results)
          [:div.text-content

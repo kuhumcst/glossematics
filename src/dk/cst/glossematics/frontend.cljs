@@ -88,6 +88,7 @@
   []
   (let [{:keys [page name]} (:data @state/location)
         tr             (i18n/->tr)
+        da?            (= "da" @state/language)
         authenticated? @state/authenticated?]
     [:div.shell {:class [(when (get #{::reader/page ::timeline/page} name)
                            "reader-mode")
@@ -107,7 +108,17 @@
        [tr ::timeline]]
       [:a {:href  (href ::bibliography/page {:author "lh"})
            :title (tr ::bibliography-caption)}
-       [tr ::bibliography]]]
+       [tr ::bibliography]]
+      ;; TODO: set a cookie too
+      [:button.language {:title    (if da?
+                                     "Danish (click to switch to English)"
+                                     "Engelsk (klik for skifte til dansk)")
+                         :on-click (fn [e]
+                                     (swap! state/language {"da" "en"
+                                                            "en" "da"}))}
+       (if da?
+         "\uD83C\uDDE9\uD83C\uDDF0"
+         "\uD83C\uDDEC\uD83C\uDDE7")]]
      [:div.shell__content {:class (when (= name ::timeline/page)
                                     "fill-mode")}
       (if page

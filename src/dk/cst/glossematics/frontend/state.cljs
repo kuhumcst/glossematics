@@ -23,7 +23,7 @@
 (defonce language
   (r/atom
     (if (exists? js/negotiatedLanguage)
-      (edn/read-string js/negotiatedLanguage)
+      (:type (edn/read-string js/negotiatedLanguage))
       {})))
 
 (defonce authenticated?

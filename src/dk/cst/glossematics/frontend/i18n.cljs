@@ -308,6 +308,6 @@
 (defn ->tr
   "Return a translation function/reagent component translating into da/en."
   []
-  (if (= "da" (:type @state/language))
+  (if (= "da" @state/language)
     tr-da
     tr-en))

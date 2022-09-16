@@ -136,7 +136,7 @@ nav {
         var(--padding-l);
 }
 
-nav, nav h1, nav a {
+nav, nav h1, nav a, nav button.language {
     transition: all 0.33s;
 }
 
@@ -184,7 +184,21 @@ nav a:not(:first-child)::first-letter {
     color: #ffc92e;
 }
 
+nav button.language {
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: var(--margin-l);
+    font-size: 24px;
+}
+
+nav button.language:hover {
+    transform: scale(1.25);
+}
+
 .shell.reader-mode nav h1,
+.shell.reader-mode button.language,
 .shell.reader-mode nav a:not(:first-child),
 .shell.reader-mode nav a:not(:first-child)::first-letter {
   font-size: 16px;
@@ -426,6 +440,7 @@ a:hover img.action__icon {
     margin-right: var(--margin-s);
 }
 
+/* TODO: fix - no outline when tabbing to this element. */
 .search-form__item-select {
     position: absolute;
     opacity: 0;
@@ -869,6 +884,7 @@ dl.kvs-list dd:not(:last-child) {
 /* Responsive media query changes for small screens. */
 @media only screen and (max-width: 850px) {
   nav h1,
+  nav button.language,
   nav a:not(:first-child),
   nav a:not(:first-child)::first-letter {
     font-size: 16px;
@@ -893,6 +909,7 @@ dl.kvs-list dd:not(:last-child) {
 
 @media only screen and (max-width: 600px) {
     nav h1,
+    nav button.language,
     nav a:not(:first-child),
     nav a:not(:first-child)::first-letter {
       font-size: 12px;
