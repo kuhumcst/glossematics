@@ -21,7 +21,7 @@
                             :file/extension extension
                             :file/path      path}]
              (if (with-body? filename)
-               (assoc m :document/appearance "transcribed")
+               (assoc m :document/condition "transcribed")
                m))))))
 
 (def duplicates-xf

@@ -3,6 +3,7 @@
   (:require [tongue.core :as tongue]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend :as-alias frontend]
+            [dk.cst.glossematics.frontend.shared :as-alias fshared]
             [dk.cst.glossematics.frontend.page.main :as-alias main]
             [dk.cst.glossematics.frontend.page.reader :as-alias reader]
             [dk.cst.glossematics.frontend.page.search :as-alias search]))
@@ -143,7 +144,7 @@
                           :da "Begræns fra "}
    ::search/limit-to     {:en " to "
                           :da " til "}
-   :search/order-by      {:en "Sort by"
+   ::search/order-by     {:en "Sort by"
                           :da "Sortér via"}
    ::search/ascending    {:en "▲ ascending"
                           :da "▲ opadgående"}
@@ -217,8 +218,7 @@
                                          :da "Organisation"}
    :entity.type/linguistic-organisation {:en "Linguistic organisation"
                                          :da "Lingvistisk organisation"}
-   ;TODO: :document/condition
-   :document/appearance                 {:en "condition"
+   :document/condition                  {:en "condition"
                                          :da "tilstand"}
    :document/mention                    {:en "mentioned"
                                          :da "omtalt"}
@@ -268,6 +268,14 @@
                                          :da "filnavn"}
    :file/extension                      {:en "file extension"
                                          :da "filendelse"}
+
+   ;; Some captions in use
+   ::fshared/title-caption              {:en "View in the reader"
+                                         :da "Vis i læseren"}
+   ::fshared/condition-caption          {:en "Find documents in this condition"
+                                         :da "Find dokumenter i denne tilstand"}
+   ::fshared/entity-caption             {:en "Find documents with this entity"
+                                         :da "Find relevante dokumenter for denne entitet"}
 
    ;; Dynamic relations -- expands to a more complex operation during search.
    :correspondent                       {:en "correspondent"

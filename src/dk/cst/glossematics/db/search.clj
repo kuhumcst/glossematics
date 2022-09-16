@@ -15,8 +15,8 @@
        (into #{})))
 
 (def special-entity-types
-  (into {} (for [[rel {:keys [vs]}] sd/special-entity-types]
-             [rel (into {} (for [v vs] [v v]))])))
+  (into {} (for [[rel {:keys [en->da]}] sd/special-entity-types]
+             [rel (into {} (for [v (keys en->da)] [v v]))])))
 
 (defn search-metadata
   "Return a mapping from entity type->name->id to be used by the frontend."
@@ -94,13 +94,13 @@
   When supplying a `sort-key` the result set is different (2-tuples rather than
   strings) and requires postprocessing to perform the actual sorting operation.
 
-  Furthermore, :document/appearance attribute is always retrieved for sortable
+  Furthermore, :document/condition attribute is always retrieved for sortable
   results in order to present original copies first."
   ([entity sort-key]
    (into [:find '?id '?paper '?sort-value
           :where
           ['?e :db/ident '?id]
-          '(optional [?e :document/appearance ?paper])
+          '(optional [?e :document/condition ?paper])
           (concat '(optional) [['?e sort-key '?sort-value]])]
          (entity->where-triples entity)))
   ([entity]
@@ -222,8 +222,8 @@
           :limit 3)
 
   ;; Test what kind of values are put into these searchable document attributes
-  (->> (search conn {:document/appearance '_})
-       (map :document/appearance)
+  (->> (search conn {:document/condition '_})
+       (map :document/condition)
        (map (fn [x]
               (if (set? x)
                 x

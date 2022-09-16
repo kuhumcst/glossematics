@@ -171,23 +171,23 @@
              (when (not-empty (last collection))
                collection))
            (when-let [v (get-in object-desc [0 'form])]
-             (if (get (-> sd/special-entity-types :document/appearance :vs) v)
-               [filename :document/appearance v]
-               (log/info :tei/unsupported {:document/appearance v})))
+             (if (get (-> sd/special-entity-types :document/condition :en->da) v)
+               [filename :document/condition v]
+               (log/info :tei/unsupported {:document/condition v})))
            (when-let [v (get-in object-desc [0 'support])]
              (let [v (if (= v "copy") "photocopy" v)]
-               (if (get (-> sd/special-entity-types :document/appearance :vs) v)
-                 [filename :document/appearance v]
-                 (log/info :tei/unsupported {:document/appearance v}))))])
+               (if (get (-> sd/special-entity-types :document/condition :en->da) v)
+                 [filename :document/condition v]
+                 (log/info :tei/unsupported {:document/condition v}))))])
         [(for [{:syms [id]} facsimile]
            [filename :document/facsimile (fix-facsimile-id id)])
          (when-let [hands (get-in hand-desc [0 'hand])]
            (for [hand (->> (str/split hands #"\s+and\s+")
                            (map str/trim)
                            (filter (-> sd/special-entity-types
-                                       :document/appearance
-                                       :vs)))]
-             [filename :document/appearance hand]))
+                                       :document/condition
+                                       :en->da)))]
+             [filename :document/condition hand]))
          (for [{:syms [when]} body-dates]
            [filename :document/date-mention (shared/parse-date utc-dtf' when)])
          (for [{:syms [tag ref ?type]} body-refs]

@@ -239,16 +239,19 @@
       ;; Individual entities caught here.
       (and (string? v)
            (or (str/starts-with? v "#")
-               (get sd/special-entity-vs v)))
+               (get sd/en-attr->da-attr v)))
       [:a {:href  (search-href v)
            :title (case k
-                    :document/title "View in the reader"
-                    :document/appearance "Find documents with this appearance"
-                    "Find documents with this entity")
+                    :document/title (tr ::title-caption)
+                    :document/condition (tr ::condition-caption)
+                    (tr ::entity-caption))
            :key   v}
        (when-let [img-src (some-> v id->type sd/entity-types :img-src)]
          [:img.entity-icon {:src img-src :alt ""}])
-       (shared/local-name (get id->name v v))]
+       (if-let [attribute (and (= "da" (:type @state/language))
+                               (get sd/en-attr->da-attr v))]
+         attribute
+         (shared/local-name (get id->name v v)))]
 
       ;; Collections caught here.
       (set? v)

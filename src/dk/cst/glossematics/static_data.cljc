@@ -68,27 +68,31 @@
   "These do not correspond to actual entities, but rather to searchable
   attributes that we want to be able to filter by in searches.
 
-  The :vs key correspond to the set of allowed value."
-  {:document/appearance
-   {:vs      #{"transcribed"
+  The keys of the :en->da map correspond to the set of allowed values."
+  {:document/condition
+   ;; TODO: move translations to i18n ns??
+   {:en->da  {"transcribed"  "transkriberet"
 
-               "original"
-               "photocopy"
-               "carbon copy"
+              "original"     "original"
+              "photocopy"    "fotokopi"
+              "carbon copy"  "gennemslagspapir"
 
-               ;; form
-               "postcard"
-               "document"
-               "letter"
+              ;; form
+              "postcard"     "postkort"
+              "document"     "dokument"
+              "letter"       "brev"
 
-               ;; hand
-               "stenographed"
-               "typed"
-               "handwritten"}
+              ;; hand
+              "stenographed" "stenografi"
+              "typed"        "maskinskrevet"
+              "handwritten"  "håndskrevet"}
     :img-src "/images/paper-sheet-svgrepo-com.svg"}})
 
-(def special-entity-vs
-  (apply set/union (map (comp :vs second) special-entity-types)))
+(def en-attr->da-attr
+  (apply merge (map (comp :en->da second) special-entity-types)))
+
+(def da-attr->en-attr
+  (set/map-invert en-attr->da-attr))
 
 (def entity-types
   (merge real-entity-types special-entity-types))
@@ -150,7 +154,7 @@
                                                :entity.type/organisation}}
 
    ;; Special relations -- various strings treated as searchable entities.
-   :document/appearance         {:compatible #{:document/appearance}}
+   :document/condition          {:compatible #{:document/condition}}
 
    ;; Dynamic relations -- expands to a more complex operation during search.
    :correspondent               {:compatible #{:entity.type/person}}})
@@ -162,7 +166,7 @@
 ;; Used for select-keys (NOTE: relies on n<8 keys to keep order)
 (def search-result-rels
   [:document/sent-at
-   :document/appearance
+   :document/condition
    :document/author
    :document/recipient
    :document/sent-at])
@@ -170,7 +174,7 @@
 (def reader-rels
   [:document/title
    :document/sent-at
-   :document/appearance
+   :document/condition
    :document/author
    :document/recipient])
 

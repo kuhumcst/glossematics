@@ -410,8 +410,8 @@
         local-preview?     (empty? current-document)
         document-selected? (= ::page (get-in location* [:data :name]))
         new-document?      (not= document current-document)
-        {:keys [document/appearance document/facsimile]} entity
-        body?              (get appearance "transcribed")
+        {:keys [document/condition document/facsimile]} entity
+        body?              (get condition "transcribed")
         pdf-src            (and (not body?)
                                 (string? facsimile)
                                 (str/ends-with? facsimile ".pdf")

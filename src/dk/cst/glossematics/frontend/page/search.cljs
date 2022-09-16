@@ -78,6 +78,13 @@
         rename     #(rename-duplicates* duplicates %)]
     (into {} (map rename search-metadata))))
 
+(defn- ->name-kvs
+  [top-30-kvs name->id]
+  (->> (map first top-30-kvs)
+       (apply dissoc name->id)
+       (sort-by first)
+       (concat top-30-kvs)))
+
 (defn fetch-metadata!
   "Fetches and post-processes metadata used to populate the search form."
   []
@@ -85,6 +92,7 @@
          (fn [{:keys [search-metadata top-30-kvs]}]
            (let [search-metadata (rename-duplicates search-metadata)
                  name->id        (apply merge (vals search-metadata))
+                 da-name->id     (merge name->id sd/da-attr->en-attr)
                  id->name        (set/map-invert name->id)
                  name->type      (fn [entity-name]
                                    (loop [groups (seq search-metadata)]
@@ -109,10 +117,11 @@
                     ;; Sorted entity list for the form input's <datalist>.
                     ;; The entities with the highest document frequency are put
                     ;; at the top; the rest are sorted according to the name.
-                    :name-kvs (->> (map first top-30-kvs)
-                                   (apply dissoc name->id)
-                                   (sort-by first)
-                                   (concat top-30-kvs))))
+                    :en-name-kvs (->name-kvs top-30-kvs name->id)
+
+                    ;; Hack to support Danish translations for attributes.
+                    :da-name->id da-name->id
+                    :da-name-kvs (->name-kvs top-30-kvs da-name->id)))
            (?query-reset!))))
 
 (defn items->query-params
@@ -230,13 +239,18 @@
   []
   (rfe/push-state ::page {} (state->params @state/query)))
 
+(defn- good-input
+  [{:keys [name->id da-name->id id->name] :as search-state} in]
+  (when (not-empty in)
+    (or (name->id in)
+        (da-name->id in)
+        (and (id->name in) in))))
+
 (defn- submit
   "Submit a new search criteria."
   []
-  (let [{:keys [name->id id->name]} @state/search
-        {:keys [in unique]} @state/query]
-    (if-let [id (or (name->id in)
-                    (and (id->name in) in))]
+  (let [{:keys [in unique]} @state/query]
+    (if-let [id (good-input @state/search in)]
       (if-not (get unique ['_ id])
         (do
           (swap! state/query add-kv (with-meta ['_ id] {:label in}))
@@ -371,7 +385,10 @@
          [:span.search-form__item-key
           (tr k k)
           " | "])
-       [:span.search-form__item-label (or (shared/local-name label) (str v))]
+       [:span.search-form__item-label (or (when (= "da" (:type @state/language))
+                                            (get sd/en-attr->da-attr label))
+                                          (shared/local-name label)
+                                          (str v))]
        [:button {:type     "button"                         ; prevent submit
                  :title    (tr ::remove)
                  :on-click (fn [e]
@@ -383,7 +400,10 @@
 
 (defn search-form
   [tr]
-  (let [{:keys [name-kvs name->id id->name id->type]} @state/search
+  (let [{:keys [en-name-kvs
+                da-name-kvs
+                name->id
+                id->type]} @state/search
         set-in (fn [e]
                  (let [in (e->v e)]
                    (swap! state/query assoc
@@ -393,10 +413,8 @@
 
     (fn [_ _]
       (let [{:keys [items in order-by bad-input? not-allowed?]} @state/query
-            {:keys [results]} @state/search
-            [order-rel] order-by
-            good-input? (and (not-empty in) (or (name->id in)
-                                                (id->name in)))]
+            {:keys [results] :as search-state} @state/search
+            [order-rel] order-by]
         [:form.search-form
          {:on-submit (fn [e] (.preventDefault e) (submit))}
 
@@ -409,14 +427,16 @@
                                    "not-allowed")
                                  (when bad-input?
                                    "bad-input")
-                                 (when good-input?
+                                 (when (good-input search-state in)
                                    "good-input")]
                    :id          "v"
                    :disabled    (nil? name->id)
                    :on-change   set-in
                    :value       in}]
           (when name->id
-            [multi-input-data name-kvs])
+            (if (= "da" (:type @state/language))
+              [multi-input-data da-name-kvs]
+              [multi-input-data en-name-kvs]))
 
           [:input {:type     "submit"
                    :value    (tr ::go)
