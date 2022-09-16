@@ -137,7 +137,7 @@
    ::search/next         {:en "next →"
                           :da "næste →"}
    ::search/empty        {:en "No documents match the criteria. Perhaps try removing a criterion?"
-                          :da "Ingen dokumener matcher kriterierne.  Prøv evt. at fjerne et kriterie?"}
+                          :da "Ingen dokumenter matcher kriterierne.  Prøv evt. at fjerne et kriterie?"}
    ::search/view-caption {:en "View in the reader"
                           :da "Vis i læseren"}
    ::search/limit-from   {:en "Limit from "
