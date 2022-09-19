@@ -23,11 +23,11 @@
 
 (defonce language
   (r/atom
-    (if-let [previously-specified (cookie/get :language)]
+    (if-let [previously-specified (cookie/get-raw :language)]
       previously-specified
       (if (exists? js/negotiatedLanguage)
         (:type (edn/read-string js/negotiatedLanguage))
-        {}))))
+        "en"))))
 
 (defonce authenticated?
   (r/atom

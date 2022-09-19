@@ -84,6 +84,19 @@
    [:details [:summary "@db"]
     [:pre (with-out-str (pprint @db))]]])
 
+(def lang
+  {"da" "en"
+   "en" "da"})
+
+(def year-in-seconds
+  (* 60 60 12 365))
+
+(def cookie-opts
+  {:max-age year-in-seconds
+   :path    "/"
+   :raw?    true                                            ; use raw strings
+   :secure? true})
+
 (defn shell
   "A container component that wraps the various pages of the app."
   []
@@ -114,10 +127,8 @@
                                      "Danish (click to switch to English)"
                                      "Engelsk (klik for skifte til dansk)")
                          :on-click (fn [_]
-                                     (->> {"da" "en"
-                                           "en" "da"}
-                                          (swap! state/language)
-                                          (cookie/set! :language)))}
+                                     (let [v (swap! state/language lang "da")]
+                                       (cookie/set! :language v cookie-opts)))}
        (if da?
          "\uD83C\uDDE9\uD83C\uDDF0"
          "\uD83C\uDDEC\uD83C\uDDE7")]]

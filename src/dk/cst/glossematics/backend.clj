@@ -66,7 +66,7 @@
       ;; pages such as the bibliography page. Otherwise, that page would have to
       ;; be hidden. Under GDPR this will likely constitute legitimate interest.
       ["/search/metadata"
-       :get (into all endpoints/search-metadata-chain)
+       :get endpoints/search-metadata-chain
        :route-name ::endpoints/search-metadata]}))
 
 (defn routes
