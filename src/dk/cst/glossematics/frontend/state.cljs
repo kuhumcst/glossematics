@@ -1,6 +1,7 @@
 (ns dk.cst.glossematics.frontend.state
   "Contains both static and dynamic frontend state."
   (:require [reagent.core :as r]
+            [reagent.cookies :as cookie]
             [clojure.edn :as edn]
             [dk.cst.stucco.util.state :as su]
             [dk.cst.pedestal.sp.auth :as sp.auth]))
@@ -22,9 +23,11 @@
 
 (defonce language
   (r/atom
-    (if (exists? js/negotiatedLanguage)
-      (:type (edn/read-string js/negotiatedLanguage))
-      {})))
+    (if-let [previously-specified (cookie/get :language)]
+      previously-specified
+      (if (exists? js/negotiatedLanguage)
+        (:type (edn/read-string js/negotiatedLanguage))
+        {}))))
 
 (defonce authenticated?
   (r/atom

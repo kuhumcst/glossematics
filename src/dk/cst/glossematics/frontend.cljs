@@ -3,6 +3,7 @@
   (:require [clojure.string :as str]
             [cljs.pprint :refer [pprint]]
             [reagent.dom :as rdom]
+            [reagent.cookies :as cookie]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe :refer [href]]
             [time-literals.read-write :as tl]
@@ -109,13 +110,14 @@
       [:a {:href  (href ::bibliography/page {:author "lh"})
            :title (tr ::bibliography-caption)}
        [tr ::bibliography]]
-      ;; TODO: set a cookie too
       [:button.language {:title    (if da?
                                      "Danish (click to switch to English)"
                                      "Engelsk (klik for skifte til dansk)")
-                         :on-click (fn [e]
-                                     (swap! state/language {"da" "en"
-                                                            "en" "da"}))}
+                         :on-click (fn [_]
+                                     (->> {"da" "en"
+                                           "en" "da"}
+                                          (swap! state/language)
+                                          (cookie/set! :language)))}
        (if da?
          "\uD83C\uDDE9\uD83C\uDDF0"
          "\uD83C\uDDEC\uD83C\uDDE7")]]
