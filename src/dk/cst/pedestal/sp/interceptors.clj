@@ -424,6 +424,10 @@
                         route)]
      (permit-request? ctx query-string :get))))
 
+;; TODO: duplicate cookies from session-ic?
+;; It seems that the presence of the 'session-ic' results in duplicate cookies
+;; being issued for certain paths. However, these cookies seem to be entirely
+;; temporary session cookies, so they may not matter much in practice.
 (defn auth-chain
   "Create an interceptor chain to make sure that a user is authorized to access
   a resource based on the expanded `conf` and a `condition`.
