@@ -48,6 +48,7 @@ GLOSSEMATICS_CONF=${HOME}/.glossematics/conf.edn
 GLOSSEMATICS_IDP_CERTIFICATE=${HOME}/.glossematics/idp-certificate.pem
 GLOSSEMATICS_SAML_KEYSTORE=${HOME}/.glossematics/saml-keystore.jks
 GLOSSEMATICS_FILES_DIR=${HOME}/.glossematics/files
+GLOSSEMATICS_DB_DIR=${HOME}/.glossematics/db
 ```
 
 These volumes allow the container to access this content in the local filesystem. Assuming the files all exist in those locations, these lines should ideally be put inside a `.env` file located in the `docker/` directory to allow them to be picked up by the `docker-compose.yml` file.

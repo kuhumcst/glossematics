@@ -33,5 +33,6 @@ services:
       - ${GLOSSEMATICS_IDP_CERTIFICATE}:/etc/glossematics/idp-certificate.pem
       - ${GLOSSEMATICS_SAML_KEYSTORE}:/etc/glossematics/saml-keystore.jks
       - ${GLOSSEMATICS_FILES_DIR}:/etc/glossematics/files
+      - ${GLOSSEMATICS_DB_DIR}:/etc/glossematics/db
     ports:
       - 8080:8080

@@ -18,12 +18,17 @@
 ;; Syntax errors (fixed)
 ;; acc-1992_0005_025_Jakobson_0180-tei-final.xml:127:64
 
-(defonce db-uri
-  (doto "asami:mem://glossematics"
-    (d/create-database)))
-
 (defonce conn
-  (d/connect db-uri))
+  (d/connect "asami:mem://glossematics"))
+
+(defn pconn
+  "Get a connection to the persisted storage graph located in `db-dir`.
+
+  While the regular in-memory graph in 'conn' is a product of the input dataset,
+  the persisted storage graph returned by 'pconn' is a smaller one consisting
+  only of user-submitted data, e.g. bookmarks or comments."
+  [db-dir]
+  (d/connect (str "asami:local://" db-dir)))
 
 (defn- multiple?
   [x]
@@ -107,7 +112,10 @@
 
 (defn bootstrap!
   "Asynchronously bootstrap an in-memory Asami database from a `conf`."
-  [{:keys [files-dir] :as conf}]
+  [{:keys [files-dir db-dir] :as conf}]
+  ;; Ensure that persisted storage exists and can be accessed.
+  (log/info :bootstrap.asami/persisted-storage {:db (pconn db-dir)})
+
   (log-transaction! :timeline (db.timeline/timeline-entities))
 
   ;; Bibliography
@@ -135,6 +143,13 @@
 (comment
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
+
+  ;; Test persisted storage
+  (d/transact (pconn "/Users/rqf595/.glossematics/db")
+              {:tx-data [{:db/ident   "glen"
+                          :glen/name  "Glen"
+                          :glen/thing 123}]})
+  (d/entity (pconn "/Users/rqf595/.glossematics/db") "glen")
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")
