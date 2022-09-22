@@ -164,6 +164,12 @@
              (into [:<>]))
         (id->name' x)))))
 
+(defn ?condition-tr
+  "Translate the special :document/condition  `v` using `tr`."
+  [tr v]
+  (and (= tr i18n/tr-da)
+       (get sd/en-attr->da-attr v)))
+
 ;; https://examples.yourdictionary.com/bibliography-examples.html
 (defn bib-line
   "A bibliography entry as Hiccup based on `id->name` mapping and the `entry`.
@@ -249,8 +255,7 @@
            :key   v}
        (when-let [img-src (some-> v id->type sd/entity-types :img-src)]
          [:img.entity-icon {:src img-src :alt ""}])
-       (if-let [attribute (and (= tr i18n/tr-da)
-                               (get sd/en-attr->da-attr v))]
+       (if-let [attribute (?condition-tr tr v)]
          attribute
          (shared/local-name (get id->name v v)))]
 
@@ -297,3 +302,30 @@
        k]
       [:dd
        [val-com v]]])])
+
+(defn current-path
+  []
+  (str js/location.pathname
+       js/location.search
+       js/location.hash))
+
+(defn location->page-title
+  "Generate a page title from the reitit on-navigate `location`; uses the
+  specified title data for the given route."
+  [location]
+  (let [title (get-in location [:data :title])]
+    (cond
+      (string? title)
+      title
+
+      (keyword? title)
+      ((i18n/->tr) title)
+
+      (fn? title)
+      (title location))))
+
+(defn set-title!
+  [title]
+  (set! js/document.title (str (when state/development?
+                                 "(dev) ")
+                               title)))

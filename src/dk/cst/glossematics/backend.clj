@@ -11,6 +11,7 @@
             [dk.cst.pedestal.sp.conf :as sp.conf]
             [dk.cst.pedestal.sp.interceptors :as sp.ic]
             [dk.cst.pedestal.sp.example :as example]
+            [dk.cst.glossematics.backend.shared :as bshared]
             [dk.cst.glossematics.backend.index :as index]
             [dk.cst.glossematics.backend.endpoints :as endpoints]
             [dk.cst.glossematics.db :as db :refer [conn]]
@@ -54,6 +55,18 @@
       ["/entity/:id"
        :get (into authenticated endpoints/entity-chain)
        :route-name ::endpoints/entity]
+      ["/user/:author/bookmarks"
+       :get (into authenticated endpoints/bookmarks-chain)
+       :route-name ::endpoints/bookmarks]
+      ["/user/:author/bookmarks"
+       :post (into authenticated endpoints/add-bookmark-chain)
+       :route-name ::endpoints/add-bookmark]
+      ["/user/:author/bookmarks/:id"
+       :get (into authenticated endpoints/single-bookmark-chain)
+       :route-name ::endpoints/get-bookmark]
+      ["/user/:author/bookmarks/:id"
+       :delete (into authenticated endpoints/single-bookmark-chain)
+       :route-name ::endpoints/delete-bookmark]
 
       ;; Unrestricted at the route level, but performs local authorization.
       ;; Refer to the source code of the 'search-handler' for details.
@@ -80,7 +93,7 @@
   (when-let [conf-error (s/explain-data ::sp.conf/config sp-conf)]
     (log/error :bootstrap.conf/invalid conf-error)
     (throw (ex-info "invalid configuration" conf-error)))
-  (let [csp (if index/development?
+  (let [csp (if bshared/development?
               {:default-src "'self' 'unsafe-inline' 'unsafe-eval' localhost:* 0.0.0.0:* ws://localhost:* ws://0.0.0.0:*"}
               {:default-src "'self'"
                :base-uri    "'self'"
@@ -96,7 +109,7 @@
              ::http/secure-headers {:content-security-policy-settings csp}}
 
       ;; Make sure we can communicate with the Shadow CLJS app during dev.
-      index/development? (assoc ::http/allowed-origins (constantly true)))))
+      bshared/development? (assoc ::http/allowed-origins (constantly true)))))
 
 (defn load-sp-conf!
   "Load the config file (superset of a Pedestal SP config) at `conf-path`."
@@ -105,7 +118,7 @@
   (reset! sp-conf (cond-> (sp.conf/init (sp.conf/read-file! conf-path))
                     ;; Comment out this line to use auth during dev.
                     ;; Make sure to reload the sp-conf and restart!
-                    index/development? (assoc :auth-override :all))))
+                    bshared/development? (assoc :auth-override :all))))
 
 (defn start-prod
   "Start a production environment using the config file at `conf-path`."

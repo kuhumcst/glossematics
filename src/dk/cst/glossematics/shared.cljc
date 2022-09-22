@@ -1,6 +1,8 @@
 (ns dk.cst.glossematics.shared
+  "Shared functionality usable from both frontend and backend."
   (:require [clojure.string :as str]
-            #?(:clj [clojure.java.io :as io])
+            #?(:clj  [dk.cst.glossematics.backend.shared :refer [development?]]
+               :cljs [dk.cst.glossematics.frontend.state :refer [development?]])
             [tick.core :as t]
             [tick.locale-en-us]                             ; need it for some reason
             #?(:clj  [io.pedestal.log :as log]
@@ -8,12 +10,6 @@
   #?(:clj (:import [java.sql Date]
                    [java.time LocalDate ZoneOffset]
                    [java.time.format DateTimeParseException])))
-
-#?(:clj
-   (defn resource
-     "Load a Glossematics resource from `path` (avoids resource shadowing)."
-     [path]
-     (io/resource (str "dk/cst/glossematics/" path))))
 
 (def utc-dtf
   (t/formatter "yyyy-MM-dd"))
@@ -59,6 +55,30 @@
     (if (str/includes? s "—")
       (first (str/split s #"\s—"))
       s)))
+
+(defn single
+  [coll]
+  (if (not= (count coll) 1)
+    (throw (ex-info "Must be exactly one item in coll" {:coll coll}))
+    (first coll)))
+
+(defn assertions->institution
+  [assertions]
+  (let [{:strs [organizationName schacHomeOrganization]} (:attrs assertions)]
+    (or (first organizationName)
+        (first schacHomeOrganization))))
+
+(defn assertions->individual
+  [assertions]
+  (let [{:strs [cn displayName]} (:attrs assertions)]
+    (or (first cn)
+        (first displayName))))
+
+(defn assertions->user-id
+  [assertions]
+  (if development?
+    "UNKNOWN"
+    (single (-> assertions :attrs "eduPersonTargetedID"))))
 
 (comment
   ;; These should all be true

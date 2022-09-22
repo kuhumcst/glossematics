@@ -8,6 +8,7 @@
             [io.pedestal.log :as log]
             [dk.cst.glossematics.static-data :as sd]
             [dk.cst.glossematics.shared :as shared]
+            [dk.cst.glossematics.backend.shared :as bshared]
             [dk.cst.glossematics.db.file :as db.file]
             [dk.cst.glossematics.db.paper :as db.paper]
             [dk.cst.glossematics.db.person :as db.person]
@@ -21,6 +22,10 @@
 (defonce conn
   (d/connect "asami:mem://glossematics"))
 
+(defn- puri
+  [db-dir]
+  (str "asami:local://" db-dir))
+
 (defn pconn
   "Get a connection to the persisted storage graph located in `db-dir`.
 
@@ -28,7 +33,7 @@
   the persisted storage graph returned by 'pconn' is a smaller one consisting
   only of user-submitted data, e.g. bookmarks or comments."
   [db-dir]
-  (d/connect (str "asami:local://" db-dir)))
+  (d/connect (puri db-dir)))
 
 (defn- multiple?
   [x]
@@ -88,7 +93,7 @@
   "Load TSV resource from `file` with the given `id-prefix` and `entity-type`;
   the returned data can be transacted into Asami."
   [file id-prefix entity-type]
-  (->> (-> file shared/resource io/input-stream io/reader line-seq dedupe)
+  (->> (-> file bshared/resource io/input-stream io/reader line-seq dedupe)
        (map #(str/split % #"\t"))
        (map (fn [[id full-name]]
               {:db/ident         (str id-prefix id)
@@ -102,6 +107,42 @@
          [?e :file/extension "xml"]
          [?e :file/path ?path]]
        conn))
+
+(defn bookmarks
+  [conn assertions author]
+  (d/q (cond-> '[:find [?ident ...]
+                 :in $ ?author
+                 :where
+                 [?e :entity/type :entity.type/bookmark]
+                 [?e :bookmark/author ?author]
+                 [?e :db/ident ?ident]]
+
+         ;; Authorization required for non-public bookmarks!
+         (not= author (shared/assertions->user-id assertions))
+         (conj '[?e :bookmark/visibility :public]))
+
+       conn author))
+
+(defn entity-triples
+  "Find the triples in `conn` of the entity identified by `ident` (:db/ident)."
+  [conn ident]
+  (d/q '[:find ?e ?a ?v
+         :in $ ?ident
+         :where
+         [?e :db/ident ?ident]
+         [?e ?a ?v]]
+       conn ident))
+
+(defn- retracted-eav
+  [[e a v]]
+  [:db/retract e a v])
+
+(defn retract-entity!
+  "Retracts the entity in `conn` identified by `ident`."
+  [conn ident]
+  (when-let [triples (entity-triples conn ident)]
+    (d/transact conn {:tx-data (map retracted-eav triples)})
+    (log/info :asami/retract-entity {:db/ident ident})))
 
 (defn- log-transaction!
   "Transact `tx-data`, logging its count using the supplied `description`."
@@ -144,12 +185,24 @@
   (bootstrap! {:files-dir "/Users/rqf595/Desktop/Glossematics-data"})
   (count (tei-files conn))
 
+  ;; Delete everything in persisted storage -- for development use.
+  (d/delete-database (puri "/Users/rqf595/.glossematics/db"))
+
   ;; Test persisted storage
   (d/transact (pconn "/Users/rqf595/.glossematics/db")
               {:tx-data [{:db/ident   "glen"
                           :glen/name  "Glen"
                           :glen/thing 123}]})
   (d/entity (pconn "/Users/rqf595/.glossematics/db") "glen")
+  (d/q '[:find ?e ?a ?v
+         :where
+         [?e :db/ident #uuid"e4040c7d-9020-3e45-92ed-d57f1cd86abd"]
+         [?e ?a ?v]]
+       (pconn "/Users/rqf595/.glossematics/db"))
+
+  (bookmarks (pconn "/Users/rqf595/.glossematics/db")
+             {}
+             "UNKNOWN")
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")

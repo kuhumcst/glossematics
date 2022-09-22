@@ -64,8 +64,9 @@
 
 ;; Local page data should all be cursors into this central data structure.
 (defonce db
-  (r/atom {:reader nil
-           :search {:query query-defaults}}))
+  (r/atom {:reader    nil
+           :bookmarks nil
+           :search    {:query query-defaults}}))
 
 (defonce location
   (r/cursor db [:location]))
@@ -81,6 +82,9 @@
 
 (defonce bibliography
   (r/cursor db [:bibliography]))
+
+(defonce bookmarks
+  (r/cursor db [:bookmarks]))
 
 (defonce reader
   (r/cursor db [:reader]))

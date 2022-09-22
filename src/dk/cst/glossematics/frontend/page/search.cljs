@@ -5,12 +5,43 @@
             [reitit.frontend.easy :as rfe]
             [dk.cst.stucco.pattern :as stp]
             [dk.cst.glossematics.static-data :as sd]
+            [dk.cst.glossematics.frontend :as-alias frontend]
             [dk.cst.glossematics.frontend.i18n :as i18n]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.shared :as shared]))
+
+(defn- kv-label
+  [tr id->name [k v]]
+  (let [v' (or (fshared/?condition-tr tr v)
+               (id->name v))]
+    (if (= k '_)
+      v'
+      (str v' " (" (tr k) ")"))))
+
+(defn page-title
+  "Page title generator for searches."
+  [& [_]]
+  (let [{:keys [id->name
+                results]} @state/search
+        {:keys [offset
+                limit
+                items]} @state/query
+        tr       (i18n/->tr)
+        begin    (inc offset)
+        total    (:total (meta results))
+        end      (min (+ offset limit) total)
+        pp       (str "pp. " begin "-" end
+                      (when (and total (not= total end))
+                        (str " (" total ")")))
+        criteria (map (partial kv-label tr id->name) items)]
+    (if (not-empty items)
+      (str (when id->name
+             (str (str/join ", " criteria) ", "))
+           pp)
+      (tr ::frontend/search))))
 
 (defn params->items
   [query-params id->name]
@@ -122,7 +153,9 @@
                     ;; Hack to support Danish translations for attributes.
                     :da-name->id da-name->id
                     :da-name-kvs (->name-kvs top-30-kvs da-name->id)))
-           (?query-reset!))))
+           (?query-reset!)
+           (-> (fshared/location->page-title @state/location)
+               (fshared/set-title!)))))
 
 (defn items->query-params
   [items]
@@ -485,7 +518,7 @@
          (for [[from-item to-item] pp]
            [:option {:key   [from-item to-item]
                      :value (dec from-item)}
-            (str from-item "-" to-item)])]
+            (str from-item " ⋯ " to-item)])]
         [:button {:disabled (or (= num-results total)
                                 (< total (+ offset limit)))
                   :on-click #(set-offset + limit)}

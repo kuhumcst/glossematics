@@ -247,3 +247,4 @@ package-lock.json
 *.iml
 
 ~*.xlsx
+asami.durable.store.DurableConnection*

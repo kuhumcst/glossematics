@@ -5,6 +5,7 @@
             [dk.cst.glossematics.frontend :as-alias frontend]
             [dk.cst.glossematics.frontend.shared :as-alias fshared]
             [dk.cst.glossematics.frontend.page.main :as-alias main]
+            [dk.cst.glossematics.frontend.page.bookmarks :as-alias bookmarks]
             [dk.cst.glossematics.frontend.page.reader :as-alias reader]
             [dk.cst.glossematics.frontend.page.search :as-alias search]))
 
@@ -28,7 +29,9 @@
               x)) v)))
 
 (def frontend-translations
-  {::frontend/encyclopedia         {:en "Encyclopedia"
+  {::frontend/main-caption         {:en "Go to the main page"
+                                    :da "Gå til hovedsiden"}
+   ::frontend/encyclopedia         {:en "Encyclopedia"
                                     :da "Encyklopædi"}
    ::frontend/local-reader         {:en "Local reader"
                                     :da "Lokal læser"}
@@ -44,6 +47,16 @@
                                     :da "Bibliografi"}
    ::frontend/bibliography-caption {:en "View relevant works"
                                     :da "Se relevante værker"}
+   ::frontend/language-flag        {:en "\uD83C\uDDEC\uD83C\uDDE7"
+                                    :da "\uD83C\uDDE9\uD83C\uDDF0"}
+   ::frontend/language-caption     {:en "English (klik for skifte til dansk)"
+                                    :da "Dansk (click to switch to English)"}
+   ::frontend/bookmarks            {:en "Bookmarks"
+                                    :da "Bogmærker"}
+   ::frontend/add-bookmark-caption {:en "Add bookmark for this page"
+                                    :da "Opret bogmærke for denne side"}
+   ::frontend/rem-bookmark-caption {:en "Remove bookmark for this page"
+                                    :da "Fjern bogmærke for denne side"}
    ::frontend/unknown-page         {:en [:p "Unknown page."]
                                     :da [:p "Ukendt side."]}})
 
@@ -52,16 +65,20 @@
                               :da [:h1 "Velkommen"]}
    ::main/welcome-1          {:en [:h1 "Welcome, " [:arg 0]]
                               :da [:h1 "Velkommen, " [:arg 0]]}
-   ::main/logged-in-status   {:en [:p "You are currently " [:em "logged in"] " via your institution. "]
-                              :da [:p "Du er i øjeblikket " [:em "logget ind"] " via din institution. "]}
-   ::main/logged-in-status-1 {:en [:p "You are currently " [:em "logged in"] " via " [:arg 0] ". "]
-                              :da [:p "Du er i øjeblikket " [:em "logget ind"] " via " [:arg 0] ". "]}
+   ::main/logged-in-status   {:en [:p "You are currently " [:em "logged in"] " via your institution"
+                                   " (" [:a {:href "/app/bookmarks"} "bookmarks"] ")."]
+                              :da [:p "Du er i øjeblikket " [:em "logget ind"] " via din institution"
+                                   " (" [:a {:href "/app/bookmarks"} "bogmærker"] ")."]}
+   ::main/logged-in-status-1 {:en [:p "You are currently " [:em "logged in"] " via " [:arg 0]
+                                   " (" [:a {:href "/app/bookmarks"} "bookmarks"] ")."]
+                              :da [:p "Du er i øjeblikket " [:em "logget ind"] " via " [:arg 0]
+                                   " (" [:a {:href "/app/bookmarks"} "bogmærker"] ")."]}
    ::main/log-out            {:en "Log out"
                               :da "Log ud"}
    ::main/log-out-long       {:en "Log out of Glossematics"
                               :da "Log ud af Glossematics"}
-   ::main/login-details      {:en "Login details"
-                              :da "Logind-detaljer"}
+   ::main/user-details       {:en "User details"
+                              :da "Brugerdetaljer"}
    ::main/logged-out-status  {:en [:p "You are currently " [:em "not"] " logged in. "]
                               :da [:p "Du er i øjeblikket " [:em "ikke"] " logget ind. "]}
    ::main/log-in             {:en "Log in"
@@ -199,6 +216,22 @@
                                "Et eksempel på en entitet, der kan bruges som kriterie, kunne være \""
                                [:arg 1] "\". "]}})
 
+(def bookmarks-page-translations
+  {::bookmarks/other        {:en "Other"
+                             :da "Andet"}
+   ::bookmarks/encyclopedia {:en "Encyclopedia"
+                             :da "Encyklopædi"}
+   ::bookmarks/searches     {:en "Searches"
+                             :da "Søgninger"}
+   ::bookmarks/documents    {:en "Documents"
+                             :da "Dokumenter"}
+   ::bookmarks/go-caption   {:en "Go to this page"
+                             :da "Gå til denne side"}
+   ::bookmarks/empty        {:en (str "You do not seem to have bookmarked any pages. "
+                                      "Click on the star in the top-right corner to bookmark a page.")
+                             :da (str "Det ser ikke ud til, at du har tilføjet nogen bogmærker. "
+                                      "Klik på stjernen i det øverste højre hjørne for at tilføje den nuværende side som bogmærke.")}})
+
 (def other-translations
   {:entity.type/archive                 {:en "Archive"
                                          :da "Arkiv"}
@@ -294,6 +327,7 @@
                                main-page-translations
                                reader-page-translations
                                search-page-translations
+                               bookmarks-page-translations
                                other-translations)))
 
 (def tr

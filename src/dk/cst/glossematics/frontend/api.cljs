@@ -3,7 +3,8 @@
   (:require [lambdaisland.fetch :as fetch]
             [kitchen-async.promise :as p]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.glossematics.frontend.state :as state]))
+            [dk.cst.glossematics.frontend.state :as state]
+            [dk.cst.glossematics.frontend.shared :as fshared]))
 
 (defn- refresh-dialog-msg
   [status]
@@ -23,7 +24,7 @@
       (-> (sp.auth/saml-path state/paths :saml-login js/location.href)
           (js/location.replace)))))
 
-(defn normalize-url
+(defn api-url
   [url]
   (if state/development?
     (str "http://localhost:8080" url)
@@ -39,9 +40,39 @@
   (let [current-fetch [url opts]]
     (when-not (get @state/fetches current-fetch)
       (swap! state/fetches conj current-fetch)
-      (p/let [{:keys [status body]} (fetch/get (normalize-url url) opts)]
-        (if (not= status 200)
+      (p/let [{:keys [status body] :as m} (fetch/get (api-url url) opts)]
+        (if-not (<= 200 status 299)
           (refresh-dialog status)
           (do
             (swap! state/fetches disj current-fetch)
             body))))))
+
+(defn login
+  []
+  (->> (sp.auth/saml-path state/paths :saml-login js/location.href)
+       (set! js/location.href)))
+
+(defn logout
+  []
+  (.then (fetch/post (api-url (sp.auth/saml-path state/paths :saml-logout)))
+         #(reset! state/authenticated? false)))
+
+(defn add-bookmark
+  [user path page]
+  (let [title (fshared/location->page-title @state/location)]
+    (.then (fetch/post (api-url (str "/user/" user "/bookmarks"))
+                       {:body {:path       path
+                               :page       page
+                               :title      title
+                               :visibility :public}})
+           (fn [{:keys [status body]}]
+             (when (get #{200 201} status)
+               (let [[k v] body]
+                 (swap! state/bookmarks assoc k v)))))))
+
+(defn del-bookmark
+  [user path id]
+  (.then (fetch/delete (api-url (str "/user/" user "/bookmarks/" id)))
+         (fn [{:keys [status]}]
+           (when (= status 204)
+             (swap! state/bookmarks dissoc path)))))

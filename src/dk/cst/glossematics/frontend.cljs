@@ -9,35 +9,39 @@
             [time-literals.read-write :as tl]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.pedestal.sp.auth :as sp.auth]
+            [dk.cst.glossematics.shared :as shared]
             [dk.cst.glossematics.frontend.i18n :as i18n]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
+            [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.page.main :as main]
             [dk.cst.glossematics.frontend.page.search :as search]
             [dk.cst.glossematics.frontend.page.bibliography :as bibliography]
+            [dk.cst.glossematics.frontend.page.bookmarks :as bookmarks]
             [dk.cst.glossematics.frontend.page.index :as index]
             [dk.cst.glossematics.frontend.page.reader :as reader]
             [dk.cst.glossematics.frontend.page.encyclopedia :as encyclopedia]
             [dk.cst.glossematics.frontend.page.timeline :as timeline]))
 
-(defn title-tr
-  [k]
-  (fn [_] ((i18n/->tr) k)))
-
 (def routes
   [["/app"
-    {:name ::main
-     :page main/page}]
+    {:name  ::main/page
+     :title "Glossematics"
+     :page  main/page}]
    ["/app/encyclopedia/:ref"
-    {:name  ::encyclopedia/entry
-     :title (title-tr ::encyclopedia)
+    {:name  ::encyclopedia/page
+     :title ::encyclopedia
      :page  encyclopedia/page
      :prep  #(prn 'encyclopedia @state/location)}]
    ["/app/search"
     {:name  ::search/page
-     :title (title-tr ::search)
+     :title search/page-title
      :page  search/page
-     :prep  #(search/fetch-results! % search/?query-reset!)}]
+     :prep  #(search/fetch-results!
+               % (fn []
+                   (do
+                     (search/?query-reset!)
+                     (fshared/set-title! (search/page-title)))))}]
    ["/app/bibliography/:author"
     {:name  ::bibliography/page
      :title (fn [m]
@@ -49,6 +53,10 @@
                  (get-in m [:path-params :author]))))
      :page  bibliography/page
      :prep  #(bibliography/fetch-results!)}]
+   ["/app/bookmarks"
+    {:name  ::bookmarks/page
+     :title ::bookmarks
+     :page  bookmarks/page}]
    ["/app/index/:kind"
     {:name  ::index/page
      :title (fn [m]
@@ -58,7 +66,7 @@
      :page  index/page}]
    ["/app/reader"
     {:name  ::reader/preview
-     :title (title-tr ::local-reader)
+     :title ::local-reader
      :page  reader/page}]
    ["/app/reader/:document"
     {:name  ::reader/page
@@ -67,7 +75,7 @@
      :page  reader/page}]
    ["/app/timeline"
     {:name  ::timeline/page
-     :title (title-tr ::timeline)
+     :title ::timeline
      :page  timeline/page
      :prep  timeline/fetch-timeline-data!}]])
 
@@ -101,17 +109,30 @@
   "A container component that wraps the various pages of the app."
   []
   (let [{:keys [page name]} (:data @state/location)
+        authenticated? @state/authenticated?
         tr             (i18n/->tr)
-        da?            (= "da" @state/language)
-        authenticated? @state/authenticated?]
+        bookmarks      @state/bookmarks
+        user           (shared/assertions->user-id state/assertions)
+        path           (fshared/current-path)
+        {:keys [db/ident] :as bookmark} (get bookmarks path)]
     [:div.shell {:class [(when (get #{::reader/page ::timeline/page} name)
                            "reader-mode")
                          (when (not-empty @state/fetches)
                            "fetching")]}
      [:img.loading-indicator {:src "/images/loading.svg"}]
      [:nav
-      [:a {:href (href ::main)}
-       [:h1 "Glossematics"]]
+      [:h1
+       [:a {:href  (href ::main/page)
+            :title (tr ::main-caption)}
+        "Glossematics"]
+       [:button.language {:title    (tr ::language-caption)
+                          :on-click (fn [_]
+                                      (let [v (swap! state/language lang "da")]
+                                        (cookie/set! :language v cookie-opts)
+                                        (-> @state/location
+                                            (fshared/location->page-title)
+                                            (fshared/set-title!))))}
+        (tr ::language-flag)]]
       [:a {:href      (href ::search/page)
            :title     (tr ::search-caption)
            :tab-index (if authenticated? "0" "-1")          ; for accessibility
@@ -123,41 +144,38 @@
       [:a {:href  (href ::bibliography/page {:author "lh"})
            :title (tr ::bibliography-caption)}
        [tr ::bibliography]]
-      [:button.language {:title    (if da?
-                                     "Danish (click to switch to English)"
-                                     "Engelsk (klik for skifte til dansk)")
-                         :on-click (fn [_]
-                                     (let [v (swap! state/language lang "da")]
-                                       (cookie/set! :language v cookie-opts)))}
-       (if da?
-         "\uD83C\uDDE9\uD83C\uDDF0"
-         "\uD83C\uDDEC\uD83C\uDDE7")]]
+      [:input.bookmark {:type      "checkbox"
+                        :checked   (boolean bookmark)
+                        :title     (if bookmark
+                                     (tr ::rem-bookmark-caption)
+                                     (tr ::add-bookmark-caption))
+                        :on-change (fn [e]
+                                     (.preventDefault e)
+                                     (if bookmark
+                                       (api/del-bookmark user path ident)
+                                       (api/add-bookmark user path name)))}]]
      [:div.shell__content {:class (when (= name ::timeline/page)
                                     "fill-mode")}
       (if page
         [page]
         [tr ::unknown-page])]]))
 
+(defn fetch-bookmarks!
+  "Fetches and post-processes metadata used to populate the search form."
+  [user]
+  (.then (api/fetch (str "/user/" user "/bookmarks"))
+         (fn [bookmarks]
+           (reset! state/bookmarks bookmarks))))
+
 (defn universal-prep!
   "Prepare widely needed state."
   []
-  (let [{:keys [name->id]} @state/search]
+  (let [{:keys [name->id]} @state/search
+        bookmarks @state/bookmarks]
+    (when (and (not bookmarks) state/assertions)
+      (fetch-bookmarks! (shared/assertions->user-id state/assertions)))
     (when-not name->id
       (search/fetch-metadata!))))
-
-(defn page-title
-  [m]
-  (let [title (get-in m [:data :title])]
-    (str (when state/development?
-           "(dev) ")
-         "Glossematics"
-         (when title
-           (str " | " (cond
-                        (string? title)
-                        title
-
-                        (fn? title)
-                        (title m)))))))
 
 (defn on-navigate
   [{:keys [path query-params] :as m}]
@@ -171,7 +189,7 @@
         (prep m)))
 
     (reset! state/location m)
-    (set! js/document.title (page-title m))
+    (fshared/set-title! (fshared/location->page-title m))
 
     ;; Scroll state is always reset when no intra-page navigation is expected.
     (when (empty? js/window.location.hash)

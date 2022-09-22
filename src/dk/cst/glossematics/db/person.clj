@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [dk.ative.docjure.spreadsheet :as xl]
-            [dk.cst.glossematics.shared :as shared]))
+            [dk.cst.glossematics.shared :as shared]
+            [dk.cst.glossematics.backend.shared :as bshared]))
 
 (defn normalize-name-data
   [person]
@@ -23,7 +24,7 @@
 
 (defn person-entities
   []
-  (->> (shared/resource "Navneliste_gennemgået-FINAL.xlsx")
+  (->> (bshared/resource "Navneliste_gennemgået-FINAL.xlsx")
        (io/input-stream)
        (xl/load-workbook)
        (xl/select-sheet "Sheet1")

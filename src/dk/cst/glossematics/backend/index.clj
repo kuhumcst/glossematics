@@ -1,10 +1,9 @@
 (ns dk.cst.glossematics.backend.index
   "Generate the index.html file using Clojure. This is mostly done to streamline
   fingerprinting of any included files in the release version."
-  (:require [clojure.edn :as edn]
-            [hiccup.core :as hiccup]
+  (:require [hiccup.core :as hiccup]
             [dk.cst.pedestal.sp.auth :as sp.auth]
-            [dk.cst.glossematics.shared :refer [resource]])
+            [dk.cst.glossematics.backend.shared :as bshared])
   (:import [java.util Date]))
 
 (def init-hash
@@ -16,19 +15,6 @@
   [path]
   (str path "?" init-hash))
 
-(def main-js
-  "When making a release, the filename will be appended with a hash;
-  that is not the case when running the regular shadow-cljs watch process.
-
-  This relies on the :module-hash-names being set to true in shadow-cljs.edn."
-  (if-let [url (resource "public/js/compiled/manifest.edn")]
-    (-> url slurp edn/read-string first :output-name)
-    "main.js"))
-
-(def development?
-  "Source of truth for whether this is a development build or not. "
-  (= main-js "main.js"))
-
 (defn index-hiccup
   [assertions saml-paths negotiated-language]
   [:html {:lang "da"}
@@ -36,7 +22,7 @@
     [:meta {:charset "utf-8"}]
     [:meta {:name    "viewport"
             :content "width=device-width, initial-scale=1.0"}]
-    [:title (str (when development? "(dev) ") "Glossematics")]
+    [:title (str (when bshared/development? "(dev) ") "Glossematics")]
     [:link {:rel "icon" :href (cb "/images/favicon.svg")}]
     [:link {:rel "mask-icon" :href (cb "/images/favicon.svg") :color "#a02c2c"}]
     [:link {:rel "stylesheet" :href (cb "/css/main.css")}]
@@ -71,8 +57,8 @@
      (str "var SAMLAssertions = '" (pr-str assertions) "';\n"
           "var SAMLPaths = '" (pr-str saml-paths) "';\n"
           "var negotiatedLanguage = '" (pr-str negotiated-language) "';\n"
-          "var inDevelopmentEnvironment = " development? ";\n")]
-    [:script {:src (cb (str "/js/compiled/" main-js))}]]])
+          "var inDevelopmentEnvironment = " bshared/development? ";\n")]
+    [:script {:src (cb (str "/js/compiled/" bshared/main-js))}]]])
 
 (defn index-html
   [assertions saml-paths negotiated-language]

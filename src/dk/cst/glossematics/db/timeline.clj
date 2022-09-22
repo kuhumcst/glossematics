@@ -3,7 +3,8 @@
             [clojure.java.io :as io]
             [tick.core :as t]
             [dk.ative.docjure.spreadsheet :as xl]
-            [dk.cst.glossematics.shared :as shared]))
+            [dk.cst.glossematics.shared :as shared]
+            [dk.cst.glossematics.backend.shared :as bshared]))
 
 (def chronology-columns
   {:A :event/start
@@ -69,7 +70,7 @@
 
 (defn timeline-entities
   []
-  (->> (shared/resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
+  (->> (bshared/resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
        (io/input-stream)
        (xl/load-workbook)
        (xl/select-sheet "Ark1")

@@ -12,6 +12,31 @@
   100% { transform: translate(0px, -1px) rotate(-1deg); }
 }
 
+/* Keyframes */
+@keyframes wiggle {
+  0%, 7% {
+    transform: rotateZ(0);
+  }
+  15% {
+    transform: rotateZ(-15deg);
+  }
+  20% {
+    transform: rotateZ(10deg);
+  }
+  25% {
+    transform: rotateZ(-10deg);
+  }
+  30% {
+    transform: rotateZ(6deg);
+  }
+  35% {
+    transform: rotateZ(-4deg);
+  }
+  40%, 100% {
+    transform: rotateZ(0);
+  }
+}
+
 @keyframes fade-in-x {
   from {
     opacity: 1;
@@ -153,6 +178,7 @@ nav h1, nav a {
 nav h1 {
     margin-right: auto;
     font-size: 40px;
+    display: inline;
 }
 
 nav a {
@@ -189,12 +215,40 @@ nav button.language {
     background: none;
     border: none;
     cursor: pointer;
-    margin-left: var(--margin-l);
+    margin-left: var(--margin);
     font-size: 24px;
+    opacity: 0.33;
 }
 
 nav button.language:hover {
-    transform: scale(1.25);
+    animation: wiggle 2s ease-in;
+    opacity: 1;
+}
+
+nav input[type=checkbox].bookmark {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    transition: all 0.2s;
+    opacity: 0.33;
+    cursor: pointer;
+    margin-left: var(--margin-l);
+    width: 24px;
+    height: 32px;
+    background: url(/images/star-empty.svg) no-repeat center;
+    background-size: contain;
+}
+
+nav input[type=checkbox].bookmark:hover {
+    opacity: 1;
+    animation: wiggle 2s ease-in;
+}
+
+nav input[type=checkbox].bookmark:checked {
+     background: url(/images/star-filled.svg) no-repeat center;
+     background-size: contain;
+     opacity: 1;
 }
 
 .shell.reader-mode nav h1,
@@ -202,6 +256,12 @@ nav button.language:hover {
 .shell.reader-mode nav a:not(:first-child),
 .shell.reader-mode nav a:not(:first-child)::first-letter {
   font-size: 16px;
+}
+
+.shell.reader-mode nav input[type=checkbox].bookmark {
+    width: 16px;
+    height: 16px;
+    margin-left: var(--margin);
 }
 
 .shell.reader-mode nav {
@@ -352,7 +412,8 @@ label {
     margin-right: 0;
 }
 
-.search-form__item > button {
+.search-form__item > button,
+ul.bookmarks > li button {
     all: unset; /* https://stackoverflow.com/questions/2460100/remove-the-complete-styling-of-an-html-button-submit */
     cursor: pointer;
     outline: revert;
@@ -362,14 +423,23 @@ label {
     background: url(/images/x-black.svg) no-repeat center;
     background-size: 12px;
     line-height: 16px;
+    height: 16px;
     width: 20px;
     vertical-align: text-bottom;
+}
+
+.search-form__item > button:hover,
+ul.bookmarks > li button:hover {
+    transform: rotate(90deg);
+    background-size: 20px;
+}
+
+.search-form__item > button {
     margin-left: 4px;
 }
 
-.search-form__item > button:hover {
-    transform: rotate(90deg);
-    background-size: 20px;
+ul.bookmarks > li button {
+    margin-right: 4px;
 }
 
 img.entity-icon {
@@ -896,6 +966,11 @@ dl.kvs-list dd:not(:last-child) {
       height: 32px;
       margin-bottom: -10px;
   }
+  nav input[type=checkbox].bookmark {
+      width: 16px;
+      height: 16px;
+      margin-left: var(--margin);
+    }
 
   dl.kvs-list dt {
       top: 35px;
@@ -918,6 +993,12 @@ dl.kvs-list dd:not(:last-child) {
           height: 24px;
           margin-bottom: -9.5px;
       }
+
+  nav input[type=checkbox].bookmark {
+    width: 12px;
+    height: 12px;
+    margin-left: var(--margin);
+  }
 
     dl.kvs-list dt {
         top: 30px;
@@ -945,7 +1026,6 @@ dl.kvs-list dd:not(:last-child) {
 
 .login-status {
     display: flex;
-    justify-content: space-between;
     align-items: baseline;
 }
 
@@ -961,7 +1041,7 @@ button.login-button {
     border: var(--border);
     border-radius: var(--border-radius);
     padding: var(--padding) var(--padding-xl);
-    margin-left: var(--margin-l);
+    margin-left: auto;
 }
 
 button.logout-button:hover,

@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.data.csv :as csv]
-            [dk.cst.glossematics.shared :as shared]))
+            [dk.cst.glossematics.shared :as shared]
+            [dk.cst.glossematics.backend.shared :as bshared]))
 
 (def bib-val->ref
   "Incomplete mapping from the strings used in the bibliography files to IDs."
@@ -108,7 +109,7 @@
 
 (defn bib-entries
   [filename]
-  (with-open [reader (io/reader (shared/resource filename))]
+  (with-open [reader (io/reader (bshared/resource filename))]
     (into [] bib-entries-xf (rest (csv/read-csv reader)))))
 
 (comment

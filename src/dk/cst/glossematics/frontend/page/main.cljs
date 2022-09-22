@@ -1,38 +1,16 @@
 (ns dk.cst.glossematics.frontend.page.main
-  (:require [dk.cst.glossematics.frontend.shared :as fshared]
+  (:require [dk.cst.glossematics.shared :as shared]
+            [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.frontend.state :as state]
             [dk.cst.glossematics.frontend.i18n :as i18n]
-            [dk.cst.pedestal.sp.auth :as sp.auth]
-            [lambdaisland.fetch :as fetch]
+            [dk.cst.glossematics.frontend.api :as api]
             [clojure.string :as str]))
-
-(defn logout [e]
-  (.preventDefault e)
-  (.then (fetch/post (sp.auth/saml-path state/paths :saml-logout))
-         #(reset! state/authenticated? false)))
-
-(defn login [e]
-  (.preventDefault e)
-  (->> (sp.auth/saml-path state/paths :saml-login js/location.href)
-       (set! js/location.href)))
-
-(defn assertions->institution
-  [assertions]
-  (let [{:strs [organizationName schacHomeOrganization]} (:attrs assertions)]
-    (or (first organizationName)
-        (first schacHomeOrganization))))
-
-(defn assertions->individual
-  [assertions]
-  (let [{:strs [cn displayName]} (:attrs assertions)]
-    (or (first cn)
-        (first displayName))))
 
 (defn user-section
   [tr]
   (let [logged-in?  @state/authenticated?
-        individual  (assertions->individual state/assertions)
-        institution (assertions->institution state/assertions)
+        individual  (shared/assertions->individual state/assertions)
+        institution (shared/assertions->institution state/assertions)
         assertions  (some-> (not-empty (:attrs state/assertions))
                             (dissoc "eduPersonTargetedID")  ; not needed
                             (->> (sort-by first)))
@@ -47,16 +25,18 @@
            [tr ::logged-in-status-1 institution]
            [tr ::logged-in-status])
          [:button.logout-button
-          {:on-click logout
+          {:on-click (fn [e]
+                       (.preventDefault e)
+                       (api/logout))
            :title    (tr ::log-out-long)}
           [:span
            [:img {:src "/images/lock-svgrepo-com.svg" :alt ""}]
            [tr ::log-out]]]]
-        (when assertions
+        (when (or assertions state/development?)
           [:<>
            [:hr]
            [:details
-            [:summary [tr ::login-details]]
+            [:summary [tr ::user-details]]
             [:aside
              [:table.entity-metadata
               [:tbody
@@ -72,7 +52,9 @@
         [:div.login-status
          [tr ::logged-out-status]
          [:button.login-button
-          {:on-click login
+          {:on-click (fn [e]
+                       (.preventDefault e)
+                       (api/login))
            :title    (tr ::log-in-long)}
           [:span
            [:img {:src "/images/unlock-svgrepo-com-modified.svg" :alt ""}]
