@@ -240,7 +240,7 @@ nav input[type=checkbox].bookmark {
     background-size: contain;
 }
 
-nav input[type=checkbox].bookmark:hover {
+nav input[type=checkbox].bookmark:not(:disabled):hover {
     opacity: 1;
     animation: wiggle 2s ease-in;
 }

@@ -145,6 +145,7 @@
            :title (tr ::bibliography-caption)}
        [tr ::bibliography]]
       [:input.bookmark {:type      "checkbox"
+                        :disabled  (not authenticated?)
                         :checked   (boolean bookmark)
                         :title     (if bookmark
                                      (tr ::rem-bookmark-caption)
