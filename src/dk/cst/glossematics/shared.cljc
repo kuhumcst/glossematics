@@ -74,17 +74,25 @@
     (or (first cn)
         (first displayName))))
 
+(defn- assertions->user-ids
+  [assertions]
+  (-> assertions :attrs (get "eduPersonTargetedID")))
+
 (defn assertions->user-id
   [assertions]
   (if development?
     "UNKNOWN"
-    (single (-> assertions :attrs "eduPersonTargetedID"))))
+    (when-let [user (assertions->user-ids assertions)]
+      (single user))))
 
 (comment
   ;; These should all be true
   (= (capitalize-all "ACTA JUTLANDICA")
      (capitalize-all "Acta Jutlandica")
      (capitalize-all " acta  jutlandica"))
+
+  (single (assertions->user-ids {:attrs {"eduPersonTargetedID" #{"glen"}}}))
+  (single (assertions->user-ids {:attrs {"eduPersonTargetedID" #{}}}))
 
   (parse-date utc-dtf "1899-10-03")
   (parse-date utc-dtf "2022-03-25")
