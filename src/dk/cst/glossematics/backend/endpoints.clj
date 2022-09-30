@@ -111,7 +111,10 @@
 (defn add-bookmark-handler
   "A handler to add a bookmark to the persisted storage graph."
   [{:keys [path-params transit-params conf] :as request}]
-  (let [{:keys [path page title visibility]} transit-params
+  (let [{:keys [bookmark/path
+                bookmark/page
+                bookmark/title
+                bookmark/visibility]} transit-params
         {:keys [author]} path-params
         {:keys [db-dir]} conf
         assertions (sp.auth/request->assertions request)
@@ -124,7 +127,7 @@
       (not= user author)
       {:status 403}
 
-      (not (and path page visibility))                      ; i.e. 500 status
+      (not (and path page title visibility))                ; i.e. 500 status
       (throw (ex-info "missing args in request" transit-params))
 
       :else

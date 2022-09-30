@@ -58,21 +58,36 @@
          #(reset! state/authenticated? false)))
 
 (defn add-bookmark
+  "Optimistically add bookmark for `user` at `path` (a type of `page`).
+
+  The frontend is updated immediately with partial data. If the backend request
+  fails, the frontend change is also reverted."
   [user path page]
-  (let [title (fshared/location->page-title @state/location)]
-    (.then (fetch/post (api-url (str "/user/" user "/bookmarks"))
-                       {:body {:path       path
-                               :page       page
-                               :title      title
-                               :visibility :public}})
+  (let [endpoint (api-url (str "/user/" user "/bookmarks"))
+        title    (fshared/location->page-title @state/location)
+        bookmark {:bookmark/path       path
+                  :bookmark/page       page
+                  :bookmark/title      title
+                  :bookmark/visibility :public}]
+    (swap! state/bookmarks assoc path bookmark)             ; optimistic change
+    (.then (fetch/post endpoint {:body bookmark})
            (fn [{:keys [status body]}]
-             (when (get #{200 201} status)
-               (let [[k v] body]
-                 (swap! state/bookmarks assoc k v)))))))
+             (if (get #{200 201} status)
+               (let [[_ bookmark] body]
+                 (swap! state/bookmarks assoc path bookmark)) ; confirm change
+               (swap! state/bookmarks dissoc path))))))     ; revert change
 
 (defn del-bookmark
+  "Optimistically delete bookmark with specified `id` for `user` at `path`.
+
+  The frontend is updated immediately. If the backend request fails, the
+  frontend change is also reverted... unless we receive a 404 status, in which
+  case the bookmark must be assumed to not exist at all."
   [user path id]
-  (.then (fetch/delete (api-url (str "/user/" user "/bookmarks/" id)))
-         (fn [{:keys [status]}]
-           (when (= status 204)
-             (swap! state/bookmarks dissoc path)))))
+  (let [bookmark (get @state/bookmarks path)]
+    (swap! state/bookmarks dissoc path)                     ; optimistic change
+    (.then (fetch/delete (api-url (str "/user/" user "/bookmarks/" id)))
+           (fn [{:keys [status]}]
+             (if (get #{204 404} status)
+               (swap! state/bookmarks dissoc path)          ; confirm change
+               (swap! state/bookmarks assoc path bookmark)))))) ; revert change
