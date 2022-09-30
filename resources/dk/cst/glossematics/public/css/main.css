@@ -551,6 +551,7 @@ details[open] summary {
 
 .input-row input[type=list],
 .input-row #sort-key,
+.input-row #condition,
 .input-row input[type=date],
 .input-row input[type=number]
 {

@@ -279,24 +279,51 @@
         (da-name->id in)
         (and (id->name in) in))))
 
+(defn- add-criterion!
+  [kv]
+  (do
+    (swap! state/query add-kv kv)
+    (swap! state/query update :n inc)                       ; cycle colour
+    (swap! state/query assoc
+           :in ""
+           :offset 0)
+    (swap! state/search dissoc :results)
+    (new-page!)))
+
 (defn- submit
   "Submit a new search criteria."
   []
   (let [{:keys [in unique]} @state/query]
     (if-let [id (good-input @state/search in)]
       (if-not (get unique ['_ id])
-        (do
-          (swap! state/query add-kv (with-meta ['_ id] {:label in}))
-          (swap! state/query update :n inc)                 ; cycle colour
-          (swap! state/query assoc
-                 :in ""
-                 :offset 0)
-          (swap! state/search dissoc :results)
-          (new-page!))
+        (add-criterion! (with-meta ['_ id] {:label in}))
         (swap! state/query assoc :not-allowed? true))
       (swap! state/query assoc
              :bad-input? true
              :not-allowed? true))))
+
+(defn search-result-condition
+  [tr]
+  [:div.input-row
+   [:label {:for "condition"} (tr :document/condition)]
+   (let [{:keys [unique]} @state/query
+         v->k (if (= (i18n/->tr) i18n/tr-da)
+                sd/da-attr->en-attr
+                sd/en-attr->en-attr)]
+     [:select {:id        "condition"
+               :value     ""
+               :on-change (fn [e]
+                            (let [v  (.-value (.-target e))
+                                  kv (with-meta ['_ (v->k v)] {:label v})]
+                              (add-criterion! kv)))}
+
+      [:option {:value ""} "-"]
+      (for [[v k] v->k]
+        [:option {:key      v
+                  :value    v
+                  :disabled (or (get unique [:document/condition k])
+                                (get unique ['_ k]))}
+         v])])])
 
 (defn search-result-order
   [tr [order-rel order-dir :as order-by]]
@@ -360,6 +387,7 @@
   (let [{:keys [order-by from to]} @state/query
         [order-rel] order-by]
     [:<>
+     [search-result-condition tr]
      [search-result-order tr order-by]
      (when order-rel
        [search-result-between tr order-by from to])]))
@@ -431,6 +459,9 @@
         "x"]]
       " "])])
 
+(def condition-kv?
+  (comp sd/en-attr->da-attr second))
+
 (defn search-form
   [_]
   (let [{:keys [en-name-kvs
@@ -482,10 +513,13 @@
             ;; Remove when:
             ;;   1) There are no results.
             ;;   2) We can be sure it is not due to filtering by date.
-            (when-not (and (empty? results) (nil? order-rel))
-              [:details {:open (boolean order-rel)}
-               [:summary (tr ::options)]
-               [search-result-postprocessing tr]])])]))))
+            (let [condition? (some condition-kv? items)]
+              (when (or condition?
+                        (not (empty? results))
+                        (some? order-rel))
+                [:details {:open (boolean (or order-rel condition?))}
+                 [:summary (tr ::options)]
+                 [search-result-postprocessing tr]]))])]))))
 
 (defn- set-offset
   [f n]

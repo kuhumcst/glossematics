@@ -91,6 +91,9 @@
 (def en-attr->da-attr
   (apply merge (map (comp :en->da second) special-entity-types)))
 
+(def en-attr->en-attr
+  (zipmap (keys en-attr->da-attr) (keys en-attr->da-attr)))
+
 (def da-attr->en-attr
   (set/map-invert en-attr->da-attr))
 
