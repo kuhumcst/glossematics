@@ -58,7 +58,9 @@ pb:not(:first-of-type) {
 /* Marking incorrect spelling inline. */
 choice > sic::after {
     content: " [sic] ";
-    font-style: italic;
+    opacity: 0.5;
+    font-size: 75%;
+    vertical-align: top;
 }
 
 /* Removing corrected spelling from text. */
