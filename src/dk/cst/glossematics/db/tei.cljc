@@ -107,11 +107,17 @@
     (str "#" id)))
 
 ;; Since Heidi has been manually modifying some facsimile IDs to this standard.
+;; e.g. acc-1992_0005_030_Western_0110-tei-final.xml
 (defn fix-facsimile-id
   [facsimile]
-  (if (str/starts-with? facsimile "facc-")
+  (cond
+    (str/starts-with? facsimile "facc-")
     (subs facsimile 1)
-    facsimile))
+
+    (str/starts-with? facsimile "#facc-")
+    (str "#acc-" (subs facsimile 6))
+
+    :else facsimile))
 
 (def language-ref
   {"en"  "#nseng"

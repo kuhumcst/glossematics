@@ -135,18 +135,24 @@
     (let [[rogue-content pb page] sections]
       (into [pb (concat rogue-content page)] (drop 3 sections)))))
 
-;; e.g. acc-1992_0005_032_Uldall_1000-final.xml
+
+;; e.g. acc-1992_0005_032_Uldall_1000-tei-final.xml
 ;;      acc-1992_0005_032_Uldall_0830-tei-final.xml
-(defn- fix-rogue-div
-  "In some TEI documents, there is <DIV> inserted as a containing element inside
-  the document <DIV>. The contents of this div is pulled out and placed inside
-  the parent <DIV>."
-  [divs]
-  (when (= (count divs) 1)
-    (let [div (first divs)]
-      (when-let [[tag attr & content :as rogue-div] (get div 4)]
-        (when (= tag :div)
-          [(into (subvec div 0 4) (concat content (drop 4 divs)))])))))
+;;      acc-1992_0005_034_Uldall_1180-tei-final.xml
+(defn- flatten-div
+  "Flatten divs at the top level, pulling the content inside the input `div`.
+
+  In some TEI documents, there is <div> inserted as a containing element inside
+  primary the document <div>. The contents of this div is pulled out and placed
+  inside the parent <DIV>."
+  [div]
+  (reduce (fn [result x]
+            (if (and (vector? x)
+                     (= (first x) :div))
+              (into result (drop 2 x))                      ; removing :div + {}
+              (conj result x)))
+          []
+          div))
 
 (defn- flatten-notes
   "Given a polymorphic coll of `notes` return a coll of single note elements.
@@ -167,7 +173,7 @@
   [document]
   (fn [[tag {:keys [target]}]]
     (if target
-      (= target document)
+      (= (db.tei/fix-facsimile-id target) document)
       true)))
 
 (defn collect-notes
@@ -201,9 +207,12 @@
     '[:body (... content)]
 
     (fn [{:syms [content]}]
-      (let [not-notes?   (comp #(not= "notes" %) :type second)
+      (let [notes        #{"note" "notes"}                  ; both are in use...
+            not-notes?   (comp (complement notes) :type second)
             [divs notes] (split-with not-notes? content)
-            divs         (or (fix-rogue-div divs) divs)
+            divs         (if (= (count divs) 1)
+                           [(flatten-div (first divs))]
+                           divs)
             divs-content (apply concat (map #(subvec % 2) divs))
             pages        (->> (partition-by pb? divs-content)
                               (fix-rogue-content)
