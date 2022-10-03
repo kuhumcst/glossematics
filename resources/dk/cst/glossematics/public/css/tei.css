@@ -114,7 +114,9 @@ div {
 }
 
 [rend=handwritten],
-[resp=hand] {
+[rend=handwritten] div,
+[resp=hand],
+[resp=hand] div {
     font-family: cursive;
 }
 

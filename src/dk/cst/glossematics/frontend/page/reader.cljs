@@ -144,7 +144,7 @@
 
   In some TEI documents, there is <div> inserted as a containing element inside
   primary the document <div>. The contents of this div is pulled out and placed
-  inside the parent <DIV>."
+  inside the parent <div>."
   [div]
   (reduce (fn [result x]
             (if (and (vector? x)
@@ -198,11 +198,25 @@
     (when (not= (map first kvs) (map first old-kvs))
       (reset! carousel-state {:i 0 :kvs kvs}))))
 
+(defn- entity-aware
+  "Apply `entity` metadata knowledge to the Hiccup `container` element."
+  [{:keys [document/condition] :as entity} container]
+  (let [handwritten? (and (get condition "handwritten")
+                          (not (get condition "typed")))]
+    (cond-> container
+
+      ;; Fully handwritten documents are *NOT* marked as such in the text body,
+      ;; but rather in the document header, so that knowledge needs to be
+      ;; marked directly in the container element.
+      handwritten? (assoc-in [1 :rend] "handwritten"))))
+
 ;; Fairly complex transformer that restructures sibling-level page content into
-;; an interactive carousel recap component. The large amount of content captured
-;; as page content has to be explicitly rewritten in a separate call. Otherwise,
-;; it will be skipped entirely.
-(def pages-in-carousel
+;; a stucco carousel component. The large amount of content captured as page
+;; content has to be explicitly rewritten in a separate call; otherwise, it will
+;; be skipped entirely.
+(defn pages-in-carousel
+  "Get an `entity`-aware transformer for arranging a TEI document into pages."
+  [entity]
   (cup/->transformer
     '[:body (... content)]
 
@@ -219,7 +233,7 @@
                               (partition 2)
                               (map (partial apply concat)))
             pp           (count pages)
-            container    (subvec (first divs) 0 2)
+            container    (entity-aware entity (subvec (first divs) 0 2))
             kvs          (for [[[_ {:keys [n facs]}] :as page] pages]
                            (let [notes*     (collect-notes facs notes)
                                  page+notes (concat page [notes*])]
@@ -268,9 +282,10 @@
 
 ;; Note that this step *cannot* be memoised since the document rendering relies
 ;; on side-effects executed inside the 'pages-in-carousel' transformation.
-(def outer-stage
+(defn ->outer-stage
   "Places all TEI pages inside a carousel component in a shadow DOM."
-  {:transformers [pages-in-carousel]
+  [entity]
+  {:transformers [(pages-in-carousel entity)]
    :wrapper      shadow-dom-wrapper
    :default      default-fn})
 
@@ -317,6 +332,7 @@
           tr               (i18n/->tr)
           facs             (->> (normalize-facs (:document/facsimile entity))
                                 (mapv (partial facs-id->facs-page tr)))
+          outer-stage      (->outer-stage entity)
           rewritten-hiccup (cup/rewrite raw-hiccup pre-stage outer-stage)
           tei-kvs          (:kvs @state/tei-carousel)
           missing-count    (- (count facs) (count tei-kvs))
