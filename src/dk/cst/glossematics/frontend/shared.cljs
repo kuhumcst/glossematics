@@ -14,6 +14,12 @@
             [dk.cst.stucco.pattern :as stp]
             [dk.cst.glossematics.frontend.i18n :as i18n]))
 
+(defn backend-url
+  [url]
+  (if state/development?
+    (str "http://localhost:8080" url)
+    url))
+
 (defn -surname-first
   [s]
   (let [parts (str/split s #" ")]
@@ -242,6 +248,12 @@
 
       (= k :document/bib-entry)
       [bib-line id->name m true]
+
+
+      (= k :file/name)
+      [:a {:href     (backend-url (str "/file/" v))
+           :download true}
+       v]
 
       ;; Individual entities caught here.
       (and (string? v)

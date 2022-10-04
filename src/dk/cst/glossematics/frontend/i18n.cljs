@@ -297,8 +297,8 @@
                                          :da "år"}
    :document/end-year                   {:en "year (end)"
                                          :da "år (afslutning)"}
-   :file/name                           {:en "file name"
-                                         :da "filnavn"}
+   :file/name                           {:en "file"
+                                         :da "fil"}
    :file/extension                      {:en "file extension"
                                          :da "filendelse"}
 

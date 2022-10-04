@@ -294,7 +294,7 @@
 
 (defn facs-id->facs-page
   [tr id]
-  (let [url (api/api-url (str "/file/" id ".jpg"))]
+  (let [url (fshared/backend-url (str "/file/" id ".jpg"))]
     [id [document/illustration {:src url
                                 :alt (tr ::illustration-of-1 id)}]]))
 
@@ -440,7 +440,7 @@
         pdf-src            (and (not body?)
                                 (string? facsimile)
                                 (str/ends-with? facsimile ".pdf")
-                                (api/api-url (str "/file/" facsimile)))]
+                                (fshared/backend-url (str "/file/" facsimile)))]
 
     ;; Uses a side-effect of the rendering function to load new documents.
     ;; Probably a bad way to do this...

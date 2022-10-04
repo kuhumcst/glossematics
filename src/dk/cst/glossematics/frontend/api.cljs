@@ -24,12 +24,6 @@
       (-> (sp.auth/saml-path state/paths :saml-login js/location.href)
           (js/location.replace)))))
 
-(defn api-url
-  [url]
-  (if state/development?
-    (str "http://localhost:8080" url)
-    url))
-
 (defn fetch
   "Do a GET request for the resource at `url`, returning the response body.
   Bad response codes result in a dialog asking the user to log in again.
@@ -37,10 +31,11 @@
   Usually, bad responses (e.g. 403) are caused by frontend-server mismatch
   which can be resolved by loading the latest version of the frontend app."
   [url & [opts]]
-  (let [current-fetch [url opts]]
+  (let [url'          (fshared/backend-url url)
+        current-fetch [url' opts]]
     (when-not (get @state/fetches current-fetch)
       (swap! state/fetches conj current-fetch)
-      (p/let [{:keys [status body] :as m} (fetch/get (api-url url) opts)]
+      (p/let [{:keys [status body] :as m} (fetch/get url' opts)]
         (if-not (<= 200 status 299)
           (refresh-dialog status)
           (do
@@ -54,7 +49,9 @@
 
 (defn logout
   []
-  (.then (fetch/post (api-url (sp.auth/saml-path state/paths :saml-logout)))
+  (.then (-> (sp.auth/saml-path state/paths :saml-logout)
+             (fshared/backend-url)
+             (fetch/post))
          #(reset! state/authenticated? false)))
 
 (defn add-bookmark
@@ -63,7 +60,7 @@
   The frontend is updated immediately with partial data. If the backend request
   fails, the frontend change is also reverted."
   [user path page]
-  (let [endpoint (api-url (str "/user/" user "/bookmarks"))
+  (let [endpoint (fshared/backend-url (str "/user/" user "/bookmarks"))
         title    (fshared/location->page-title @state/location)
         bookmark {:bookmark/path       path
                   :bookmark/page       page
@@ -84,9 +81,10 @@
   frontend change is also reverted... unless we receive a 404 status, in which
   case the bookmark must be assumed to not exist at all."
   [user path id]
-  (let [bookmark (get @state/bookmarks path)]
+  (let [bookmark (get @state/bookmarks path)
+        url      (fshared/backend-url (str "/user/" user "/bookmarks/" id))]
     (swap! state/bookmarks dissoc path)                     ; optimistic change
-    (.then (fetch/delete (api-url (str "/user/" user "/bookmarks/" id)))
+    (.then (fetch/delete url)
            (fn [{:keys [status]}]
              (if (get #{204 404} status)
                (swap! state/bookmarks dissoc path)          ; confirm change
