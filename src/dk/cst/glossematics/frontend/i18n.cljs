@@ -61,11 +61,7 @@
                                     :da [:p "Ukendt side."]}})
 
 (def main-page-translations
-  {::main/welcome            {:en [:h1 "Welcome"]
-                              :da [:h1 "Velkommen"]}
-   ::main/welcome-1          {:en [:h1 "Welcome, " [:arg 0]]
-                              :da [:h1 "Velkommen, " [:arg 0]]}
-   ::main/logged-in-status   {:en [:p "You are currently " [:em "logged in"] " via your institution"
+  {::main/logged-in-status   {:en [:p "You are currently " [:em "logged in"] " via your institution"
                                    " (" [:a {:href "/app/bookmarks"} "bookmarks"] ")."]
                               :da [:p "Du er i øjeblikket " [:em "logget ind"] " via din institution"
                                    " (" [:a {:href "/app/bookmarks"} "bogmærker"] ")."]}
@@ -86,39 +82,87 @@
    ::main/log-in-long        {:en "Log in to Glossematics using your institution"
                               :da "Log ind i Glossematics vha. din institution"}
    ::main/introduction       {:en [:<>
-                                   [:h2 "Get access"]
-                                   [:p
-                                    "You may always view the timeline and the bibliography pages. "
-                                    "However, the search page and the facsimile reader "
-                                    "are not available unless you first log in. "]
-                                   [:p
-                                    "Glossematics allows you to log in through your own institution "
-                                    "as long as it is part of a common educational federation. "
-                                    "Clicking 'Log in' above will direct you to "
-                                    [:abbr {:title "Where Are You From"} "WAYF"] " "
-                                    "where you may choose your institution from a list (if applicable)."]
-                                   [:hr]
-                                   [:h2 "Correspondences"]
-                                   [:p
-                                    "Once authenticated, you may search all documents within our archive. "
-                                    "Below are exchanges that were important to the theory of Glossematics:"]]
+                                   [:section
+                                    [:h2 "Introduction"]
+                                    [:img.text-illustration {:src   "/images/hjelmslev_transparent.png"
+                                                             :alt   "Louis Hjelmslev"
+                                                             :style {:float "right"}}]
+                                    [:p
+                                     "The Royal Danish Library in Copenhagen is contains a multitude of letter correspondences
+                                     between leading characters in the domain of linguistics,
+                                     e.g. Louis Hjelmslev and Hans Jørgen Uldall.
+                                     These individuals were key to the creation of the Glossematics theory of linguistics
+                                     as an area of note within linguistic structuralism."]
+                                    [:p
+                                     "The letters and other relevant documents have been made available on this website to both Danish and international researchers.
+                                     The documents comprise anything from highly topical discussions to Christmas (and other) greetings
+                                     as well as day-to-day chatter.
+                                     This allows researchers to take a deep dive into linguistic structuralism,
+                                     investigating it from every relevant angle."]]
+                                   [:section
+                                    [:h2 "Get access"]
+                                    [:img.text-illustration {:src   "/images/efj_transparent.png"
+                                                             :alt   "Eli Fischer-Jørgensen"
+                                                             :style {:float "left"}}]
+                                    [:p
+                                     "You may always view the timeline and the bibliography pages. "
+                                     "However, the search page and the facsimile reader "
+                                     "are not available unless you first log in. "]
+                                    [:p
+                                     "Glossematics allows you to log in through your own institution "
+                                     "as long as it is part of a common educational federation. "
+                                     "Clicking 'Log in' above will direct you to "
+                                     [:abbr {:title "Where Are You From"} "WAYF"] " "
+                                     "where you may choose your institution from a list (if applicable)."]]
+                                   [:section
+                                    [:h2 "Correspondences"]
+                                    [:img.text-illustration {:src   "/images/pd_transparent.png"
+                                                             :Alt   "Paul Diderichsen"
+                                                             :style {:float "right"}}]
+                                    [:p
+                                     "Once authenticated, you may search all documents within our archive. "
+                                     "Below are exchanges that were important to the theory of Glossematics:"]]]
                               :da [:<>
-                                   [:h2 "Få adgang"]
-                                   [:p
-                                    "Du kan altid se tidslinjen og bibliografi-siderne. "
-                                    "Søgesiden og facsimile-læseren "
-                                    "vil dog ikke være tilgængelige før du logger ind."]
-                                   [:p
-                                    "Glossematics lader dig logge ind via din egen institution, "
-                                    "så længe den er en del af en kendt uddannelsesmæssig føderation. "
-                                    "Ved at klikke 'Log ind' ovenover kommer du videre til "
-                                    [:abbr {:title "Where Are You From"} "WAYF"] " "
-                                    "hvor du kan vælge din institution fra en liste, når førnævnte gælder."]
-                                   [:hr]
-                                   [:h2 "Korrespondancer"]
-                                   [:p
-                                    "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "
-                                    "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]}})
+                                   [:section
+                                    [:h2 "Introduktion"]
+                                    [:img.text-illustration {:src   "/images/hjelmslev_transparent.png"
+                                                             :alt   "Louis Hjelmslev"
+                                                             :style {:float "right"}}]
+                                    [:p
+                                     "På Det Kongelige Bibliotek i København findes der et væld af brevkorrespondancer
+                                     mellem de førende figurer i det sprogvidenskabelige miljø,
+                                     eksempelvis Louis Hjelmslev og Hans Jørgen Uldall.
+                                     Disse var centrale inden for dannelsen af sprogteorien Glossematik,
+                                     som et særligt område inden for strukturel lingvistik."]
+                                    [:p
+                                     "På denne hjemmeside gør vi disse breve og andre relevante dokumenter tilgængelige for danske og udenlandske forskere.
+                                     Dokumenterne kan være alt fra fagligt skarpe diskussioner til julehilsner og lykønskninger
+                                     samt aftaler om lavpraktiske emner.
+                                     Dette giver forskere mulighed for at dykke dybere ned i strukturalismen
+                                     og undersøge samtlige relevante facetter."]]
+                                   [:section
+                                    [:h2 "Få adgang"]
+                                    [:img.text-illustration {:src   "/images/efj_transparent.png"
+                                                             :alt   "Eli Fischer-Jørgensen"
+                                                             :style {:float "left"}}]
+                                    [:p
+                                     "Du kan altid se tidslinjen og bibliografi-siderne. "
+                                     "Søgesiden og facsimile-læseren "
+                                     "vil dog ikke være tilgængelige før du logger ind."]
+                                    [:p
+                                     "Glossematics lader dig logge ind via din egen institution, "
+                                     "så længe den er en del af en kendt uddannelsesmæssig føderation. "
+                                     "Ved at klikke 'Log ind' ovenover kommer du videre til "
+                                     [:abbr {:title "Where Are You From"} "WAYF"] " "
+                                     "hvor du kan vælge din institution fra en liste, når førnævnte gælder."]]
+                                   [:section
+                                    [:h2 "Korrespondancer"]
+                                    [:img.text-illustration {:src   "/images/pd_transparent.png"
+                                                             :Alt   "Paul Diderichsen"
+                                                             :style {:float "right"}}]
+                                    [:p
+                                     "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "
+                                     "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]]}})
 
 (def reader-page-translations
   {::reader/local-file        {:en "Local TEI file"
