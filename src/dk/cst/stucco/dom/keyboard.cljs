@@ -88,3 +88,12 @@
                                    before
                                    after)))
         :no-op))))
+
+(defn select-handler
+  [e]
+  (when (click-item e.key)
+    (.preventDefault e)
+    (.stopPropagation e)
+    (focus/request! e.target.id)
+    (.click e.target)
+    (.focus e.target)))

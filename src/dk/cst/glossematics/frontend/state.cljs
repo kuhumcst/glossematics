@@ -92,6 +92,9 @@
 (defonce bookmarks
   (r/cursor db [:bookmarks]))
 
+(defonce comments
+  (r/cursor db [:comments]))
+
 (defonce reader
   (r/cursor db [:reader]))
 

@@ -39,6 +39,16 @@
     }
 }
 
+@keyframes fade-in-comment {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* The full-screen representation. */
 .illustration--fullscreen > figure {
     display: flex;

@@ -108,6 +108,69 @@
                   "Cache-Control" one-day-cache))
       {:status 404})))
 
+(defn- fetch-comments
+  [conn ident]
+  (some->> (db/comments conn ident)
+           (not-empty)
+           (map (partial d/entity conn))
+           (map clean-entity)))
+
+(defn comment-handler
+  "A handler to get or create/update/delete comments in the persisted graph
+
+  The output is the same for any action, i.e. the entire selection of comments
+  for a given entity id is always what is returned."
+  [{:keys [request-method path-params transit-params conf] :as request}]
+  (let [{:keys [comment/target
+                comment/body
+                comment/author]} transit-params
+        {:keys [id]} path-params
+        {:keys [db-dir]} conf
+        db (pconn db-dir)]
+    (if (= request-method :get)
+
+      ;; get comments for entity id
+      (if-let [comments (fetch-comments db id)]
+        {:status  200
+         :body    (transito/write-str [id comments])
+         :headers {"Content-Type" "application/transit+json"}}
+        {:status  204})
+
+      ;; create/update/delete comment for entity id and target
+      (let [assertions (sp.auth/request->assertions request)
+            user       (shared/assertions->user-id assertions)
+            comment-id (if target
+                         [:entity.type/comment user id target]
+                         [:entity.type/comment user id])
+            body       (when (string? body)
+                         (not-empty (str/trim body)))
+            timestamp  (t/now)
+            existing   (d/entity db comment-id)]
+        (cond
+          (not= user author)
+          {:status 403}
+
+          (not author)                                      ; i.e. 500 status
+          (throw (ex-info "missing args in request" transit-params))
+
+          :else
+          (let [tx-data (if existing
+                          [{:db/ident       comment-id
+                            :entity/edited' timestamp
+                            :comment/body'  body}]
+                          [(cond-> {:db/ident       comment-id
+                                    :entity/type    :entity.type/comment
+                                    :entity/edited  timestamp
+                                    :entity/created timestamp
+                                    :comment/body   body
+                                    :comment/author author}
+                             target (assoc :comment/target target))
+                           [:db/add id :document/comment comment-id]])]
+            @(d/transact db {:tx-data tx-data})
+            {:status  200
+             :body    (transito/write-str [id (fetch-comments db id)])
+             :headers {"Content-Type" "application/transit+json"}}))))))
+
 (defn add-bookmark-handler
   "A handler to add a bookmark to the persisted storage graph."
   [{:keys [path-params transit-params conf] :as request}]
@@ -117,12 +180,12 @@
                 bookmark/visibility]} transit-params
         {:keys [author]} path-params
         {:keys [db-dir]} conf
-        assertions (sp.auth/request->assertions request)
-        user       (shared/assertions->user-id assertions)
-        db         (pconn db-dir)
-        id         (UUID/nameUUIDFromBytes (.getBytes (str user " " path)))
-        timestamp  (t/now)
-        existing   (d/entity db id)]
+        assertions  (sp.auth/request->assertions request)
+        user        (shared/assertions->user-id assertions)
+        db          (pconn db-dir)
+        bookmark-id [:entity.type/bookmark user path]
+        timestamp   (t/now)
+        existing    (d/entity db bookmark-id)]
     (cond
       (not= user author)
       {:status 403}
@@ -134,10 +197,10 @@
       (do
         (when (not= visibility (:bookmark/visibility existing))
           (let [tx-data [(if existing
-                           {:db/ident             id
+                           {:db/ident             bookmark-id
                             :entity/edited'       timestamp
                             :bookmark/visibility' visibility}
-                           {:db/ident            id
+                           {:db/ident            bookmark-id
                             :entity/type         :entity.type/bookmark
                             :entity/edited       timestamp
                             :entity/created      timestamp
@@ -148,12 +211,12 @@
                             :bookmark/visibility visibility})]]
             @(d/transact db {:tx-data tx-data})))
         {:status  (if existing 200 201)
-         :body    (let [{:keys [bookmark/path] :as entity} (d/entity db id)]
+         :body    (let [{:keys [bookmark/path] :as entity} (d/entity db bookmark-id)]
                     (transito/write-str [path (-> (clean-entity entity)
                                                   (dissoc :bookmark/path)
-                                                  (assoc :db/ident id))]))
+                                                  (assoc :db/ident bookmark-id))]))
          :headers {"Content-Type" "application/transit+json"
-                   "Location"     (str "/bookmark/" id)}}))))
+                   "Location"     (str "/bookmark/" bookmark-id)}}))))
 
 (defn single-bookmark-handler
   "A handler to get or delete a bookmark from the persisted storage graph."
@@ -331,6 +394,11 @@
   [path-params-decoder
    (body-params)
    add-bookmark-handler])
+
+(def comment-chain
+  [path-params-decoder
+   (body-params)
+   comment-handler])
 
 (def single-bookmark-chain
   [path-params-decoder

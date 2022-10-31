@@ -1,6 +1,7 @@
 (ns dk.cst.glossematics.frontend.page.reader
   "Page containing a synchronized facsimile & TEI transcription reader."
   (:require [clojure.string :as str]
+            [reagent.core :as r]
             [shadow.resource :as resource]
             [kitchen-async.promise :as p]
             [reitit.frontend.easy :as rfe]
@@ -12,6 +13,7 @@
             [dk.cst.stucco.pattern :as pattern]
             [dk.cst.stucco.group :as group]
             [dk.cst.stucco.document :as document]
+            [dk.cst.stucco.dom.keyboard :as kbd]
             [dk.cst.stucco.util.css :as css]
             [dk.cst.glossematics.db.tei :as db.tei]
             [dk.cst.glossematics.frontend.page.search :as search-page]
@@ -19,7 +21,8 @@
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.shared :as fshared]
             [dk.cst.glossematics.static-data :as sd]
-            [dk.cst.glossematics.frontend.i18n :as i18n]))
+            [dk.cst.glossematics.frontend.i18n :as i18n]
+            [dk.cst.glossematics.shared :as shared]))
 
 ;; TODO: acc-1992_0005_024_Holt_0780-final.xml - (count facs) > (count pbs)
 ;; TODO: acc-1992_0005_024_Holt_0930-final.xml - rogue ">" symbol
@@ -68,6 +71,88 @@
     (fn [{:syms [list-items]}]
       (into [:ul] (for [[tag attr & content] list-items]
                     (into [:li] content))))))
+
+(defn get-comment
+  [user entity-id & [target]]
+  (->> (get @state/comments entity-id)
+       (filter #(and (= target (:comment/target %))
+                     (= user (:comment/author %))))
+       (first)
+       (:comment/body)))
+
+(defn comment-input
+  [user entity-id & [target]]
+  (let [in (r/atom (get-comment user entity-id target))]
+    (fn [user entity-id & [target]]
+      (let [body     (get-comment user entity-id target)
+            tr       (if (= "da" @state/language)
+                       i18n/tr-da
+                       i18n/tr-en)
+            changed? (not= @in body)]
+        [:form {:class     "comment-input"
+                :method    "post"
+                :on-click  (fn [e] (.stopPropagation e))
+                :on-submit (fn [e]
+                             (.preventDefault e)
+                             (let [v (.get (js/FormData. (.-target e)) "v")]
+                               (api/add-comment! user entity-id v target)))}
+         [:img {:class       "comment-input__icon"
+                :src         "/images/dialog-svgrepo-com.svg"
+                :aria-hidden "true"}]
+         [:div.comment-input__widget
+          [:textarea {:name          "v"
+                      :auto-focus    true
+                      :placeholder   (tr ::comment-p-placeholder)
+                      :on-change     (fn [e]
+                                       (->> (.-value (.-target e))
+                                            (str/trim)
+                                            (not-empty)
+                                            (reset! in)))
+                      :default-value (str body)}]
+          (when changed?
+            [:input {:type  "submit"
+                     :value (tr ::save-changes)}])]]))))
+(defn commentable
+  "Component to make the shadow DOM element with the given `id` commentable."
+  [id]
+  (let [{:keys [document]} @state/reader
+        ;; Some paragraphs are split by page breaks and have generated IDs.
+        ;; In those cases we use the primary paragraph ID as found in TEI file.
+        ;; The entire paragraph is therefore selected -- not just the part that
+        ;; happened to appear on the page where the user clicked.
+        id'       (first (str/split id #"-"))
+        user      (shared/assertions->user-id state/assertions)
+        tr        (if (= "da" @state/language)
+                    i18n/tr-da
+                    i18n/tr-en)
+        targeted? (= (:target @state/reader) id')]
+    [:div {:class       ["commentable" (when targeted? "targeted")]
+           :tabindex    "0"
+           :title       (when-not targeted?
+                          (tr ::comment-p-title-1 id'))
+           :style       (when targeted?
+                          (let [bgs ["#ffc92e20"
+                                     "#ff663c20"
+                                     "#779eff20"]
+                                n   (dec (parse-long (subs id' 1)))]
+                            {:background (nth bgs (rem n 3))}))
+           ;; TODO:is more aria stuff is needed?
+           :on-key-down kbd/select-handler
+           :on-click    (fn []
+                          (when (empty? (str (js/window.getSelection)))
+                            (if targeted?
+                              (swap! state/reader dissoc :target)
+                              (swap! state/reader assoc :target id'))))}
+     [:slot]
+     (when targeted?
+       [comment-input user document id'])]))
+
+(def commentable-p
+  (cup/->transformer
+    '[:p {:xml/id id} ???]
+
+    (fn [{:syms [id]}]
+      [commentable id])))
 
 (def ref-as-anchor
   (cup/->transformer
@@ -275,10 +360,15 @@
   "Makes virtual changes to TEI document features using the shadow DOM."
   {:transformers [ref-as-anchor
                   language-as-anchor
+                  commentable-p
                   list-as-ul
                   date-as-time]
    :wrapper      shadow-dom-wrapper
    :default      default-fn})
+
+;; TODO: still buggy when selecting cross page p, e.g. http://localhost:8080/app/reader/acc-1992_0005_030_Western_0120-tei-final.xml
+(def cited-stage
+  (update inner-stage :transformers (partial remove #{commentable-p})))
 
 ;; Note that this step *cannot* be memoised since the document rendering relies
 ;; on side-effects executed inside the 'pages-in-carousel' transformation.
@@ -322,6 +412,9 @@
   (when (not= document (:document @state/reader))
     (swap! state/reader assoc :i 0 :document nil))
 
+  ;; Need not be synced with other document-related fetches.
+  (api/update-comments! document)
+
   ;; TODO: fix :tei-kvs side-effect, makes it hard to implement history/cache
   (p/let [tei              (or xml (api/fetch (str "/file/" document)))
           entity           (if xml
@@ -340,8 +433,10 @@
     (swap! state/reader assoc
 
            :document document
+           :target nil
            :entity entity
            :tei tei
+           :raw-hiccup raw-hiccup
            :hiccup rewritten-hiccup
            :facs-kvs facs
 
@@ -424,9 +519,33 @@
               :on-click #(nth-document! (inc i))}
      [tr ::search-page/next]]]])
 
+(defn comments-tab
+  [document]
+  (let [{:keys [raw-hiccup target]} @state/reader
+        user (shared/assertions->user-id state/assertions)]
+    [:div.reader-content
+     (when-let [comments (get @state/comments document)]
+       [:details
+        [:summary "Existing comments"]
+        (for [{:keys [comment/body
+                      comment/target
+                      comment/author]} comments]
+          [:li {:key (if target
+                       (keyword author target)
+                       (keyword author))}
+           "@" target ", " author ": " body])])
+     (when target
+       (let [pattern [:p {:xml/id target} '???]
+             p       (-> raw-hiccup
+                         (cup/select-one pattern)
+                         (cup/rewrite cited-stage))]
+         [:blockquote #_{:cite target}
+          [rescope/scope p tei-css]]))
+     [comment-input user document target]]))
+
 (defn page
   []
-  (let [{:keys [hiccup tei document entity]} @state/reader
+  (let [{:keys [hiccup raw-hiccup tei document entity]} @state/reader
         {:keys [id->name results i] :as search-state} @state/search
         query-state        @state/query
         tr                 (i18n/->tr)
@@ -494,21 +613,32 @@
             [pattern/carousel state/facs-carousel])
           [pattern/tabs
            {:i   0
-            :kvs (pattern/heterostyled
-                   (cond->> [["Metadata"
-                              (when id->name
-                                [:div.reader-content
-                                 [entity-meta tr search-state entity]])]
+            :kvs (cond->>
+                   [(with-meta
+                      ["Metadata"
+                       (when id->name
+                         [:div.reader-content
+                          [entity-meta tr search-state entity]])]
+                      {:style {:background "var(--tab-background-2)"}})
 
-                             ["TEI"
-                              [:pre.reader-content
-                               [:code {:style {:white-space "pre-wrap"}}
-                                tei]]]]
+                    (with-meta
+                      ["TEI"
+                       [:pre.reader-content
+                        [:code {:style {:white-space "pre-wrap"}}
+                         tei]]]
+                      {:style {:background "var(--tab-background-3)"}})
 
-                            body?
-                            (into
-                              [[[tr ::transcription]
-                                ^{:key tei} [rescope/scope hiccup tei-css]]])))}
+                    (with-meta
+                      [[tr ::comments]
+                       [comments-tab document]]
+                      {:style {:background "var(--background)"}})]
+
+                   body?
+                   (into
+                     [(with-meta
+                        [[tr ::transcription]
+                         ^{:key tei} [rescope/scope hiccup tei-css]]
+                        {:style {:background "var(--tab-background-1)"}})]))}
            {:id "tei-tabs"}]]))
 
      (when paging?

@@ -3,9 +3,37 @@ teiHeader, facsimile {
     display: none;
 }
 
+body {
+    line-height: 1.25;
+    letter-spacing: 1.25;
+}
+
 /* HTML div. */
 div {
     display: block;
+}
+
+/* NOTE: the TEI Ps get their padding from the .commentable wrapper class. */
+div > *:not(p):not(:empty) {
+    padding-left: var(--padding);
+    padding-right: var(--padding);
+}
+
+p {
+    transition: border-color 0.33s;
+}
+
+.commentable {
+    transition: all 0.33s;
+    padding: 8px;
+    border-radius: var(--border-radius);
+}
+.commentable:not(.targeted):hover {
+    box-shadow: inset 0 0 2px 0 rgba(0,0,0,0.75);
+}
+
+.commentable.targeted {
+    box-shadow: inset 0 0 2px 0 rgba(0,0,0,1);
 }
 
 /* Forme work, a running header/footer. */
@@ -38,8 +66,8 @@ figure {
 /* HTML p. */
 p, opener, closer, postscript, salute {
     display: block;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
     margin-left: 0;
     margin-right: 0;
 }

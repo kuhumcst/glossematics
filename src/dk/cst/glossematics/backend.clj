@@ -55,6 +55,12 @@
       ["/entity/:id"
        :get (into authenticated endpoints/entity-chain)
        :route-name ::endpoints/entity]
+      ["/entity/:id/comments"
+       :get (into authenticated endpoints/comment-chain)
+       :route-name ::endpoints/get-comments]
+      ["/entity/:id/comments"
+       :post (into authenticated endpoints/comment-chain)
+       :route-name ::endpoints/add-delete-comment]
       ["/user/:author/bookmarks"
        :get (into authenticated endpoints/bookmarks-chain)
        :route-name ::endpoints/bookmarks]

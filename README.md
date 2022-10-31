@@ -26,6 +26,18 @@ The primary responsibility of the backend is
 1. serving the HTML page containing the frontend SPA and
 2. responding to API calls made from the SPA.
 
+### Graph database(s)
+All of the data available in Glossematics is contained within two Asami graphs:
+
+* An in-memory graph that contains the data of every input file, e.g. TEI documents, CSV files, spreadsheets, ...
+  * This graph is recompiled every time Glossematics is restarted based on the files found in the `:files-dir` as defined in the configuration file.
+  * The `:db/ident` identifiers of the graph entities are all based on the IDs found in these input documents.
+* A persisted graph which contains all user-generated data, e.g. bookmarks and comments.
+  * This graph is written to disk and persists between restarts of Glossematics.
+  * It uses vector-based `:db/ident` identifiers in the shape of `[entity-type & parts]`, e.g. `[:entity.type/bookmark user path]`.
+
+Both of these graphs attach an `:entity/type` attribute to _every_ entity added to them, e.g. `:entity.type/comment`, `:entity.type/file`, `:entity.type/person`, and so on.
+
 Server setup
 ------------
 In order for SAML encryption to work, a Java keystore needs to be created. This is the idiomatic way to handle certificates of any kind in Java... and therefore in Clojure. I generate a new keystore file from scratch in both production and on the development machine:

@@ -109,6 +109,7 @@
        conn))
 
 (defn bookmarks
+  "Find available bookmarks in `conn` of the `author` given `asssertions`."
   [conn assertions author]
   (d/q (cond-> '[:find [?ident ...]
                  :in $ ?author
@@ -122,6 +123,15 @@
          (conj '[?e :bookmark/visibility :public]))
 
        conn author))
+
+(defn comments
+  "Find the comments in `conn` of the entity identified by `ident` (:db/ident)."
+  [conn ident]
+  (d/q '[:find [?c ...]
+         :in $ ?ident
+         :where
+         [?ident :document/comment ?c]]
+       conn ident))
 
 (defn entity-triples
   "Find the triples in `conn` of the entity identified by `ident` (:db/ident)."
@@ -195,15 +205,14 @@
                           :glen/name  "Glen"
                           :glen/thing 123}]})
   (d/entity (pconn "/Users/rqf595/.glossematics/db") "glen")
-  (d/q '[:find ?e ?a ?v
-         :where
-         [?e :db/ident #uuid"e4040c7d-9020-3e45-92ed-d57f1cd86abd"]
-         [?e ?a ?v]]
-       (pconn "/Users/rqf595/.glossematics/db"))
 
-  (bookmarks (pconn "/Users/rqf595/.glossematics/db")
-             {}
-             "UNKNOWN")
+  ;; Retrieval of bookmarks.
+  (bookmarks (pconn "/Users/rqf595/.glossematics/db") {} "UNKNOWN")
+
+  ;; Retrieval of comments.
+  (->> (comments (pconn "/Users/rqf595/.glossematics/db")
+                 "ActaJutlandica_7_1-tei.xml")
+       (map (partial d/entity (pconn "/Users/rqf595/.glossematics/db"))))
 
   ;; Multiple names registered for the same person (very common)
   (d/entity conn "#np668")

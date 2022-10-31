@@ -55,7 +55,37 @@
              (fetch/post))
          #(reset! state/authenticated? false)))
 
-(defn add-bookmark
+(defn update-comments!
+  "Get current list of comments for `entity-id` and update frontend state."
+  [entity-id]
+  (let [endpoint (fshared/backend-url (str "/entity/" entity-id "/comments"))]
+    (.then (fetch/get endpoint)
+           (fn [{:keys [status body]}]
+             (if (= 200 status)
+               (let [[_ comments] body]
+                 (swap! state/comments assoc entity-id comments))
+               (swap! state/comments dissoc entity-id))))))
+
+(defn add-comment!
+  "Optimistically add comment `body` for `entity-id` at `target` for `user`.
+
+  The frontend is updated immediately with partial data. If the backend request
+  fails, the frontend change is also reverted."
+  [user entity-id body target]
+  (let [endpoint (fshared/backend-url (str "/entity/" entity-id "/comments"))
+        comment  {:comment/target target
+                  :comment/body   (not-empty body)
+                  :comment/author user}
+        cached   (get @state/comments entity-id)]
+    (swap! state/comments update entity-id conj comment)    ; optimistic change
+    (.then (fetch/post endpoint {:body comment})
+           (fn [{:keys [status body]}]
+             (if (= 200 status)
+               (let [[_ comments] body]
+                 (swap! state/comments assoc entity-id comments)) ; confirm
+               (swap! state/comments assoc entity-id cached)))))) ; revert
+
+(defn add-bookmark!
   "Optimistically add bookmark for `user` at `path` (a type of `page`).
 
   The frontend is updated immediately with partial data. If the backend request
@@ -72,10 +102,10 @@
            (fn [{:keys [status body]}]
              (if (get #{200 201} status)
                (let [[_ bookmark] body]
-                 (swap! state/bookmarks assoc path bookmark)) ; confirm change
-               (swap! state/bookmarks dissoc path))))))     ; revert change
+                 (swap! state/bookmarks assoc path bookmark)) ; confirm
+               (swap! state/bookmarks dissoc path))))))     ; revert
 
-(defn del-bookmark
+(defn del-bookmark!
   "Optimistically delete bookmark with specified `id` for `user` at `path`.
 
   The frontend is updated immediately. If the backend request fails, the
@@ -88,5 +118,5 @@
     (.then (fetch/delete url)
            (fn [{:keys [status]}]
              (if (get #{204 404} status)
-               (swap! state/bookmarks dissoc path)          ; confirm change
-               (swap! state/bookmarks assoc path bookmark)))))) ; revert change
+               (swap! state/bookmarks dissoc path)          ; confirm
+               (swap! state/bookmarks assoc path bookmark)))))) ; revert

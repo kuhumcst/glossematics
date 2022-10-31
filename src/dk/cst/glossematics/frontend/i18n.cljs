@@ -224,18 +224,26 @@
                          You can inspect this data under USER DETAILS on the frontpage."]]}})
 
 (def reader-page-translations
-  {::reader/local-file        {:en "Local TEI file"
-                               :da "Lokal TEI-fil"}
-   ::reader/transcription     {:en "Transcription"
-                               :da "Transkription"}
-   ::reader/prev-results      {:en "previous results..."
-                               :da "forrige resultater..."}
-   ::reader/next-results      {:en "more results..."
-                               :da "flere resultater..."}
-   ::reader/placeholder       {:en ["N/A" "[content missing]"]
-                               :da ["N/A" "[indhold mangler]"]}
-   ::reader/illustration-of-1 {:en "Illustration of {1}"
-                               :da "Illustration af {1}"}})
+  {::reader/local-file            {:en "Local TEI file"
+                                   :da "Lokal TEI-fil"}
+   ::reader/transcription         {:en "Transcription"
+                                   :da "Transkription"}
+   ::reader/comments              {:en "Comments"
+                                   :da "Kommentarer"}
+   ::reader/comment-p-title-1     {:en "Paragraph {1} (click to comment)"
+                                   :da "Paragraf {1} (klik for at kommentere)"}
+   ::reader/comment-p-placeholder {:en "Add your comment"
+                                   :da "Tilføj din kommentar"}
+   ::reader/save-changes          {:en "Save changes"
+                                   :da "Gem ændringer"}
+   ::reader/prev-results          {:en "previous results..."
+                                   :da "forrige resultater..."}
+   ::reader/next-results          {:en "more results..."
+                                   :da "flere resultater..."}
+   ::reader/placeholder           {:en ["N/A" "[content missing]"]
+                                   :da ["N/A" "[indhold mangler]"]}
+   ::reader/illustration-of-1     {:en "Illustration of {1}"
+                                   :da "Illustration af {1}"}})
 
 (def search-page-translations
   {::search/look-for     {:en "Look for"

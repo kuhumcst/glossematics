@@ -255,31 +255,53 @@ button.carousel__select:focus {
     filter: var(--inactive-filter-focus);
 }
 
+form.comment-input {
+    animation: fade-in-comment 0.33s;
+    margin-top: var(--margin-l);
+    padding: var(--padding);
+    display: flex;
+    flex-direction: row;
+}
 
+img.comment-input__icon {
+    width: 40px;
+    height: 40px;
+    margin-right: var(--margin-l);
+}
 
-/* === LENS === */
+.comment-input__widget {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
 
-.code-lens {
-    display: block;
-    overflow: auto;
+.comment-input__widget > textarea,
+.comment-input__widget > input[type=submit] {
+    appearance: none;
+
+    font-size: 16px;
+    font-family: Georgia, serif;
+    color: var(--color);
+    border: var(--border-subtle);
+    border-radius: var(--border-radius);
     background: var(--background);
-    border: var(--border);
-    border-radius: var(--border-radius);
-    padding: var(--padding);
-    font-size: var(--font-size);
+    padding: 4px 6px;
+    line-height: 20px;
 }
 
-.code-lens--empty {
-    display: inline-block;
-    color: var(--inactive-color);
+.comment-input__widget > textarea::placeholder {
+    color: rgba(0,0,0,0.3);
 }
 
-.code-lens__meta {
-    color: darkblue; /* TODO: theme it? */
-    background: #EEEEFF; /* TODO: theme it? */
-    padding: var(--padding);
-    border-radius: var(--border-radius);
-    font-size: var(--font-size-s);
-    font-style: italic;
-    margin-bottom: var(--margin);
+.comment-input__widget > input[type=submit] {
+    transition: all 0.33s;
+    background-color: rgba(255,255,255,0.7);
+    animation: fade-in-comment 0.33s;
+    margin-top: var(--margin-s);
+    padding: var(-padding-s);
+    cursor: pointer;
+}
+
+.comment-input__widget > input[type=submit]:hover {
+    background-color: rgba(255,255,255,0.95);
 }
