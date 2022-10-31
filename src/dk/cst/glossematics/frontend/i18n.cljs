@@ -117,7 +117,7 @@
                                    [:section
                                     [:h2 "Correspondences"]
                                     [:img.text-illustration {:src   "/images/pd_transparent.png"
-                                                             :Alt   "Paul Diderichsen"
+                                                             :alt   "Paul Diderichsen"
                                                              :style {:float "right"}}]
                                     [:p
                                      "Once authenticated, you may search all documents within our archive. "
@@ -158,7 +158,7 @@
                                    [:section
                                     [:h2 "Korrespondancer"]
                                     [:img.text-illustration {:src   "/images/pd_transparent.png"
-                                                             :Alt   "Paul Diderichsen"
+                                                             :alt   "Paul Diderichsen"
                                                              :style {:float "right"}}]
                                     [:p
                                      "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "

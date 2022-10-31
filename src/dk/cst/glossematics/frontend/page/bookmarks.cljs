@@ -28,7 +28,7 @@
      (for [{:keys [db/ident
                    bookmark/path
                    bookmark/title]} bookmarks]
-       [:li {:key ident}
+       [:li {:key path}
         [:button {:title    (tr ::frontend/rem-bookmark-caption)
                   :on-click #(api/del-bookmark user path ident)}]
         [:a {:title (tr ::go-caption)
