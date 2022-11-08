@@ -152,6 +152,25 @@ shadow-cljs release app
 
 Development notes
 -----------------
+### Periodic security check-up
+... via the National Vulnerability Database.
+
+>NOTE: this should be run **periodically** and the software should be updated accordingly to keep the threat level **as low as possible**!
+
+First install nvd-clojure as a tool [as per the instructions](https://github.com/rm-hull/nvd-clojure#clojure-cli-tool), e.g.
+
+```shell
+clojure -Ttools install nvd-clojure/nvd-clojure '{:mvn/version "2.10.0"}' :as nvd
+```
+
+Then run the actual task for all relevant aliases:
+
+```shell
+clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath \""$(clojure -Spath -A:frontend:build)\""
+```
+
+This will print to the terminal + create a detailed report in several file formats, where the HTML report will likely be the most relevant one.
+
 ### Timeline widget
 The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline_widget.cljs).
 
