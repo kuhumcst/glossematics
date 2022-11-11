@@ -177,16 +177,14 @@ More help:
 
 ```shell
 # print dependencies
-clj -A:frontend:build -X:deps tree
+clj -A:frontend:build -Stree
 
-# locate bad dep; replace 'bad-transitive-dependency-name' with an actual bad dependency
-clj -A:frontend:build -X:deps tree | grep -B 50 bad-transitive-dependency-name
+# locate transitive dep; replace 'bad-dependency' with an actual dependency
+clj -A:frontend:build -Stree | grep -B 50 bad-dependency
 
 # save dependency tree to a graph (deps.png)
 clj -A:frontend:build -X:graph graph :output '"deps.png"'
 ```
-
-> Note that certain "bad" JAR-file dependencies do not show up the dependency tree. Not sure what to do about those and how they even appear in the build...?
 
 ### Timeline widget
 The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline_widget.cljs).
