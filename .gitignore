@@ -248,3 +248,4 @@ package-lock.json
 
 ~*.xlsx
 asami.durable.store.DurableConnection*
+deps.png

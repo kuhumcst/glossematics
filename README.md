@@ -171,6 +171,23 @@ clojure -J-Dclojure.main.report=stderr -Tnvd nvd.task/check :classpath \""$(cloj
 
 This will print to the terminal + create a detailed report in several file formats, where the HTML report will likely be the most relevant one.
 
+----
+
+More help:
+
+```shell
+# print dependencies
+clj -A:frontend:build -X:deps tree
+
+# locate bad dep; replace 'bad-transitive-dependency-name' with an actual bad dependency
+clj -A:frontend:build -X:deps tree | grep -B 50 bad-transitive-dependency-name
+
+# save dependency tree to a graph (deps.png)
+clj -A:frontend:build -X:graph graph :output '"deps.png"'
+```
+
+> Note that certain "bad" JAR-file dependencies do not show up the dependency tree. Not sure what to do about those and how they even appear in the build...?
+
 ### Timeline widget
 The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline_widget.cljs).
 
