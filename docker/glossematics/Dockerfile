@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:jammy-20221101
 
 RUN apt-get clean && \
     apt-get update && \
