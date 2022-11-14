@@ -186,6 +186,20 @@ clj -A:frontend:build -Stree | grep -B 50 bad-dependency
 clj -A:frontend:build -X:graph graph :output '"deps.png"'
 ```
 
+### Server permissions
+The Docker container is run using a user created for the purpose.
+However, access to the volumes on the host is predicated on the existence of group with id 1024 owning both volumes!
+
+I ran the following on the KU server to prepare it:
+
+```shell
+chown -R :1024 /data
+chmod -R 775 /data
+chmod g+s /data
+```
+
+> Based on advice found here: https://medium.com/@nielssj/docker-volumes-and-file-system-permissions-772c1aee23ca
+
 ### Timeline widget
 The timeline used in the frontend is a fork of the obsolete [SIMILE Timeline](https://www.simile-widgets.org/timeline/docs/). The underlying JavaScript source code has been taken directly from the SIMILE project and reduced significantly in size. This JS source is then wrapped in ClojureScript in [timeline.cljs](/src/dk/cst/glossematics/frontend/timeline_widget.cljs).
 

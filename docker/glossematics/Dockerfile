@@ -49,9 +49,18 @@ COPY ./resources /etc/glossematics/resources
 RUN shadow-cljs --aliases :frontend release app
 
 # Build an uberjar for the backend
-RUN clojure -T:build org.corfield.build/uber :lib dk.cst/glossematics :main dk.cst.glossematics.backend :uber-file \"glossematics.jar\"
+RUN clojure -T:build org.corfield.build/uber :lib dk.cst/glossematics :main dk.cst.glossematics.backend :uber-file "\"glossematics.jar\""
 
-# Run the backend web service
+# Prepare the start script
 COPY ./docker/glossematics/start.sh /etc/glossematics/start.sh
 RUN chmod +x /etc/glossematics/start.sh
+
+# Switch to a non-root user
+# NOTE: the ownership of the volumes must be set to group id 1024 on the host!
+# https://medium.com/@nielssj/docker-volumes-and-file-system-permissions-772c1aee23ca
+RUN addgroup --gid 1024 glossematics
+RUN adduser --disabled-password --gecos "" --force-badname --ingroup glossematics glossematics-user
+USER glossematics-user
+
+# Run the backend web service
 ENTRYPOINT ["./start.sh"]
