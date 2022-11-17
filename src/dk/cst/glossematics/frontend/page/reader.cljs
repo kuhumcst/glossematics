@@ -81,8 +81,11 @@
        (:comment/body)))
 
 (defn comment-input
+  "A smart and relatively keyboard-accessible input widget for adding comments."
   [user entity-id & [target]]
-  (let [in (r/atom (get-comment user entity-id target))]
+  (let [in       (r/atom (get-comment user entity-id target))
+        textarea (r/atom nil)
+        save     #(api/add-comment! user entity-id % target)]
     (fn [user entity-id & [target]]
       (let [body     (get-comment user entity-id target)
             tr       (if (= "da" @state/language)
@@ -94,15 +97,26 @@
                 :on-click  (fn [e] (.stopPropagation e))
                 :on-submit (fn [e]
                              (.preventDefault e)
-                             (let [v (.get (js/FormData. (.-target e)) "v")]
-                               (api/add-comment! user entity-id v target)))}
+                             (save (.get (js/FormData. (.-target e)) "v"))
+                             (.focus @textarea))}
          [:img {:class       "comment-input__icon"
                 :src         "/images/dialog-svgrepo-com.svg"
                 :aria-hidden "true"}]
          [:div.comment-input__widget
           [:textarea {:name          "v"
+                      :ref           (fn [elem] (reset! textarea elem))
                       :auto-focus    true
-                      :placeholder   (tr ::comment-p-placeholder)
+                      :placeholder   (when-not (and (nil? @in) (some? body))
+                                       (tr ::comment-p-placeholder))
+                      :on-blur       (fn [e]
+                                       (and
+                                         changed?
+                                         (js/confirm (tr ::confirm-changes))
+                                         (save (.-value (.-target e))))
+                                       (swap! state/reader dissoc :target))
+                      :on-key-down   (fn [e]
+                                       ;; prevent outer div capturing keys
+                                       (.stopPropagation e))
                       :on-change     (fn [e]
                                        (->> (.-value (.-target e))
                                             (str/trim)
@@ -111,11 +125,19 @@
                       :default-value (str body)}]
           (when changed?
             [:input {:type  "submit"
-                     :value (tr ::save-changes)}])]]))))
+                     :value (cond
+                              (and (some? @in) (nil? body))
+                              (tr ::save-comment)
+
+                              (nil? @in)
+                              (tr ::delete-comment)
+
+                              :else
+                              (tr ::save-changes))}])]]))))
 (defn commentable
   "Component to make the shadow DOM element with the given `id` commentable."
   [id]
-  (let [{:keys [document]} @state/reader
+  (let [{:keys [document target]} @state/reader
         ;; Some paragraphs are split by page breaks and have generated IDs.
         ;; In those cases we use the primary paragraph ID as found in TEI file.
         ;; The entire paragraph is therefore selected -- not just the part that
@@ -125,24 +147,24 @@
         tr        (if (= "da" @state/language)
                     i18n/tr-da
                     i18n/tr-en)
-        targeted? (= (:target @state/reader) id')]
-    [:div {:class       ["commentable" (when targeted? "targeted")]
-           :tabindex    "0"
-           :title       (when-not targeted?
-                          (tr ::comment-p-title-1 id'))
-           :style       (when targeted?
-                          (let [bgs ["#ffc92e20"
-                                     "#ff663c20"
-                                     "#779eff20"]
-                                n   (dec (parse-long (subs id' 1)))]
-                            {:background (nth bgs (rem n 3))}))
-           ;; TODO:is more aria stuff is needed?
-           :on-key-down kbd/select-handler
-           :on-click    (fn []
-                          (when (empty? (str (js/window.getSelection)))
-                            (if targeted?
-                              (swap! state/reader dissoc :target)
-                              (swap! state/reader assoc :target id'))))}
+        targeted? (= target id')]
+    [:div
+     {:class       ["commentable" (when targeted? "targeted")]
+      :tab-index   "0"
+      :title       (when-not targeted?
+                     (tr ::comment-p-title-1 id'))
+      :style       (when targeted?
+                     (let [bgs ["#ffc92e20"
+                                "#ff663c20"
+                                "#779eff20"]
+                           n   (dec (parse-long (subs id' 1)))]
+                       {:background (nth bgs (rem n 3))}))
+      ;; TODO: is more aria stuff is needed?
+      :on-key-down kbd/select-handler
+      :on-click    (fn [e]
+                     (when (and (empty? (str (js/window.getSelection)))
+                                (not= target id'))
+                       (swap! state/reader assoc :target id')))}
      [:slot]
      (when targeted?
        [comment-input user document id'])]))
