@@ -108,12 +108,6 @@
                       :auto-focus    true
                       :placeholder   (when-not (and (nil? @in) (some? body))
                                        (tr ::comment-p-placeholder))
-                      :on-blur       (fn [e]
-                                       (and
-                                         changed?
-                                         (js/confirm (tr ::confirm-changes))
-                                         (save (.-value (.-target e))))
-                                       (swap! state/reader dissoc :target))
                       :on-key-down   (fn [e]
                                        ;; prevent outer div capturing keys
                                        (.stopPropagation e))
@@ -125,14 +119,8 @@
                       :default-value (str body)}]
           (when changed?
             [:input {:type  "submit"
-                     :value (cond
-                              (and (some? @in) (nil? body))
+                     :value (if (and (some? @in) (nil? body))
                               (tr ::save-comment)
-
-                              (nil? @in)
-                              (tr ::delete-comment)
-
-                              :else
                               (tr ::save-changes))}])]]))))
 (defn commentable
   "Component to make the shadow DOM element with the given `id` commentable."
@@ -148,9 +136,9 @@
                     i18n/tr-da
                     i18n/tr-en)
         targeted? (= target id')]
-    [:div
+    [:section
      {:class       ["commentable" (when targeted? "targeted")]
-      :tab-index   "0"
+      :tab-index   (when-not targeted? "0")
       :title       (when-not targeted?
                      (tr ::comment-p-title-1 id'))
       :style       (when targeted?
@@ -162,9 +150,10 @@
       ;; TODO: is more aria stuff is needed?
       :on-key-down kbd/select-handler
       :on-click    (fn [e]
-                     (when (and (empty? (str (js/window.getSelection)))
-                                (not= target id'))
-                       (swap! state/reader assoc :target id')))}
+                     (when (empty? (str (js/window.getSelection)))
+                       (if (= target id')
+                         (swap! state/reader dissoc :target)
+                         (swap! state/reader assoc :target id'))))}
      [:slot]
      (when targeted?
        [comment-input user document id'])]))
