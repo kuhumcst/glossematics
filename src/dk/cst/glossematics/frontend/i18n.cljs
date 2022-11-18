@@ -234,10 +234,16 @@
                                    :da "Paragraf {1} (klik for at kommentere)"}
    ::reader/comment-p-placeholder {:en "Your comment..."
                                    :da "Din kommentar..."}
+   ::reader/other-comments        {:en "1 comment"
+                                   :da "1 kommentar"}
+   ::reader/other-comments-1      {:en "{1} comments"
+                                   :da "{1} kommentarer"}
    ::reader/save-comment          {:en "Add comment"
                                    :da "Tilføj kommentar"}
    ::reader/save-changes          {:en "Save changes"
                                    :da "Gem ændringer"}
+   ::reader/delete-comment        {:en "Delete your comment"
+                                   :da "Slet din kommentar"}
    ::reader/prev-results          {:en "previous results..."
                                    :da "forrige resultater..."}
    ::reader/next-results          {:en "more results..."

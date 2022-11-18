@@ -93,6 +93,7 @@
                        i18n/tr-en)
             changed? (not= @in body)]
         [:form {:class     "comment-input"
+                :key       target
                 :method    "post"
                 :on-click  (fn [e] (.stopPropagation e))
                 :on-submit (fn [e]
@@ -104,6 +105,7 @@
                 :aria-hidden "true"}]
          [:div.comment-input__widget
           [:textarea {:name          "v"
+                      :class         (when changed? "changed")
                       :ref           (fn [elem] (reset! textarea elem))
                       :auto-focus    true
                       :placeholder   (when-not (and (nil? @in) (some? body))
@@ -119,9 +121,24 @@
                       :default-value (str body)}]
           (when changed?
             [:input {:type  "submit"
-                     :value (if (and (some? @in) (nil? body))
+                     :value (cond
+                              (and (some? @in) (nil? body))
                               (tr ::save-comment)
+
+                              (nil? @in)
+                              (tr ::delete-comment)
+
+                              :else
                               (tr ::save-changes))}])]]))))
+
+(defn comments-list
+  [comments]
+  [:ul
+   (for [{:keys [comment/body
+                 comment/author]} comments]
+     [:li {:key author}
+      author ": " (into [:<>] (interpose [:br] (str/split body #"\n")))])])
+
 (defn commentable
   "Component to make the shadow DOM element with the given `id` commentable."
   [id]
@@ -130,14 +147,19 @@
         ;; In those cases we use the primary paragraph ID as found in TEI file.
         ;; The entire paragraph is therefore selected -- not just the part that
         ;; happened to appear on the page where the user clicked.
-        id'       (first (str/split id #"-"))
-        user      (shared/assertions->user-id state/assertions)
-        tr        (if (= "da" @state/language)
-                    i18n/tr-da
-                    i18n/tr-en)
-        targeted? (= target id')]
+        id'            (first (str/split id #"-"))
+        user           (shared/assertions->user-id state/assertions)
+        other-comments (->> (get @state/comments document)
+                            (filter #(and (= target (:comment/target %))
+                                          ;; TODO: add this line back in
+                                          #_(not= user (:comment/author %)))))
+        tr             (if (= "da" @state/language)
+                         i18n/tr-da
+                         i18n/tr-en)
+        targeted?      (= target id')]
     [:section
      {:class       ["commentable" (when targeted? "targeted")]
+      :key         id
       :tab-index   (when-not targeted? "0")
       :title       (when-not targeted?
                      (tr ::comment-p-title-1 id'))
@@ -155,6 +177,13 @@
                          (swap! state/reader dissoc :target)
                          (swap! state/reader assoc :target id'))))}
      [:slot]
+     (when (and targeted? (not-empty other-comments))
+       [:details {:class    "targeted__comments"
+                  :on-click (fn [e] (.stopPropagation e))}
+        [:summary (if (= 1 (count other-comments))
+                    (tr ::other-comments)
+                    (tr ::other-comments-1 (count other-comments)))]
+        [comments-list other-comments]])
      (when targeted?
        [comment-input user document id'])]))
 

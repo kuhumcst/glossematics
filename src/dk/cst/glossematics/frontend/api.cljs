@@ -66,6 +66,17 @@
                  (swap! state/comments assoc entity-id comments))
                (swap! state/comments dissoc entity-id))))))
 
+(defn comment-matcher
+  [{:keys [comment/target comment/author] :as comment}]
+  (fn [comment]
+    (and (= target (:comment/target comment))
+         (= author (:comment/author comment)))))
+
+(defn update-comment
+  [comments {:keys [comment/body] :as comment}]
+  (cond-> (remove (comment-matcher comment) comments)
+    body (conj comment)))
+
 (defn add-comment!
   "Optimistically add comment `body` for `entity-id` at `target` for `user`.
 
@@ -77,7 +88,7 @@
                   :comment/body   (not-empty body)
                   :comment/author user}
         cached   (get @state/comments entity-id)]
-    (swap! state/comments update entity-id conj comment)    ; optimistic change
+    (swap! state/comments update entity-id update-comment comment) ; optimistic change
     (.then (fetch/post endpoint {:body comment})
            (fn [{:keys [status body]}]
              (if (= 200 status)

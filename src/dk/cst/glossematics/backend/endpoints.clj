@@ -113,6 +113,7 @@
   (some->> (db/comments conn ident)
            (not-empty)
            (map (partial d/entity conn))
+           (filter :comment/body)
            (map clean-entity)))
 
 (defn comment-handler
