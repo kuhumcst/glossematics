@@ -319,6 +319,15 @@ details[open].targeted__comments summary {
     margin-bottom: var(--margin);
 }
 
+details[open].targeted__comments ul {
+    background: rgba(0,0,0,0.1);
+    border-radius: var(--border-radius);
+    margin: 0 0 var(--margin) 0;
+    padding-top: var(--padding);
+    padding-right: var(--padding);
+    padding-bottom: var(--padding);
+}
+
 /* Adjust margin when details elem with other comments is available. */
 details.targeted__comments + form.comment-input {
     margin-top: var(--margin-s);

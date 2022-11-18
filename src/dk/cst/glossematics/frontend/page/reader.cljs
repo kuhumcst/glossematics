@@ -137,7 +137,10 @@
    (for [{:keys [comment/body
                  comment/author]} comments]
      [:li {:key author}
-      author ": " (into [:<>] (interpose [:br] (str/split body #"\n")))])])
+      [:strong author ": "]
+      (->> (str/split body #"\n")
+           (interpose [:br])
+           (into [:<>]))])])
 
 (defn commentable
   "Component to make the shadow DOM element with the given `id` commentable."
@@ -147,16 +150,14 @@
         ;; In those cases we use the primary paragraph ID as found in TEI file.
         ;; The entire paragraph is therefore selected -- not just the part that
         ;; happened to appear on the page where the user clicked.
-        id'            (first (str/split id #"-"))
-        user           (shared/assertions->user-id state/assertions)
-        other-comments (->> (get @state/comments document)
-                            (filter #(and (= target (:comment/target %))
-                                          ;; TODO: add this line back in
-                                          #_(not= user (:comment/author %)))))
-        tr             (if (= "da" @state/language)
-                         i18n/tr-da
-                         i18n/tr-en)
-        targeted?      (= target id')]
+        id'             (first (str/split id #"-"))
+        user            (shared/assertions->user-id state/assertions)
+        target-comments (->> (get @state/comments document)
+                             (filter #(= target (:comment/target %))))
+        tr              (if (= "da" @state/language)
+                          i18n/tr-da
+                          i18n/tr-en)
+        targeted?       (= target id')]
     [:section
      {:class       ["commentable" (when targeted? "targeted")]
       :key         id
@@ -177,13 +178,13 @@
                          (swap! state/reader dissoc :target)
                          (swap! state/reader assoc :target id'))))}
      [:slot]
-     (when (and targeted? (not-empty other-comments))
+     (when (and targeted? (not-empty target-comments))
        [:details {:class    "targeted__comments"
                   :on-click (fn [e] (.stopPropagation e))}
-        [:summary (if (= 1 (count other-comments))
+        [:summary (if (= 1 (count target-comments))
                     (tr ::other-comments)
-                    (tr ::other-comments-1 (count other-comments)))]
-        [comments-list other-comments]])
+                    (tr ::other-comments-1 (count target-comments)))]
+        [comments-list target-comments]])
      (when targeted?
        [comment-input user document id'])]))
 
