@@ -152,6 +152,7 @@
         ;; happened to appear on the page where the user clicked.
         id'             (first (str/split id #"-"))
         user            (shared/assertions->user-id state/assertions)
+        ;; TODO: comments should be structured associatively
         target-comments (->> (get @state/comments document)
                              (filter #(= target (:comment/target %))))
         tr              (if (= "da" @state/language)

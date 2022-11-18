@@ -240,10 +240,10 @@
                                    :da "{1} kommentarer"}
    ::reader/save-comment          {:en "Add comment"
                                    :da "Tilføj kommentar"}
-   ::reader/save-changes          {:en "Save changes"
-                                   :da "Gem ændringer"}
-   ::reader/delete-comment        {:en "Delete your comment"
-                                   :da "Slet din kommentar"}
+   ::reader/save-changes          {:en "Update comment"
+                                   :da "Opdatér kommentar"}
+   ::reader/delete-comment        {:en "Delete comment"
+                                   :da "Slet kommentar"}
    ::reader/prev-results          {:en "previous results..."
                                    :da "forrige resultater..."}
    ::reader/next-results          {:en "more results..."
