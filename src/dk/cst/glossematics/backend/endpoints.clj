@@ -200,10 +200,10 @@
      :body    (transito/write-str (or bookmarks {}))
      :headers {"Content-Type" "application/transit+json"}}))
 
-(defn- comma-split
-  "Split comma-separated string `s`; otherwise return `s`."
+(defn- pipe-split
+  "Split pipe-separated string `s`; otherwise return `s`."
   [s]
-  (let [parts (str/split s #"\s*,\s*")]
+  (let [parts (str/split s #"\s*\|\s*")]
     (if (= (count parts) 1)
       (first parts)
       parts)))
@@ -265,7 +265,7 @@
                 from
                 to
                 _]
-         :as   params} (update-vals query-params (comp ?keywordize comma-split))
+         :as   params} (update-vals query-params (comp ?keywordize pipe-split))
         wildcard _                                          ; _ is used for noop
         _        (when-not (whitelisted (:entity/type params))
                    (sp.auth/enforce-condition request :authenticated))
@@ -346,5 +346,5 @@
 
 (comment
   (update-vals {:glen "1,2,   3" :john "something"}
-               (comp ?keywordize comma-split))
+               (comp ?keywordize pipe-split))
   #_.)

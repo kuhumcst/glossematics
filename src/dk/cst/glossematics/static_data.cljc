@@ -69,7 +69,10 @@
   attributes that we want to be able to filter by in searches.
 
   The keys of the :en->da map correspond to the set of allowed values."
-  {:document/condition
+  {:entity.type/unknown
+   {:img-src "/images/question-mark-in-circular-shape-svgrepo-com.svg"}
+
+   :document/condition
    ;; TODO: move translations to i18n ns??
    {:en->da  {"transcribed"  "transkriberet"
 

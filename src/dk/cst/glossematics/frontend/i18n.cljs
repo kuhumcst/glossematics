@@ -199,6 +199,8 @@
                           :da "næste →"}
    ::search/empty        {:en "No documents match the criteria. Perhaps try removing a criterion?"
                           :da "Ingen dokumenter matcher kriterierne.  Prøv evt. at fjerne et kriterie?"}
+   ::search/empty-exact  {:en [:<> [:strong "NOTE:"] " search works better when you pick one of the " [:em "suggested entities"] " from the list."]
+                          :da [:<> [:strong "BEMÆRK:"] " søgning fungerer bedre, når du vælger en af de " [:em "foreslåede entiteter"] " fra listen."]}
    ::search/view-caption {:en "View in the reader"
                           :da "Vis i læseren"}
    ::search/limit-from   {:en "Limit from "
@@ -277,7 +279,9 @@
                                       "Klik på stjernen i det øverste højre hjørne for at tilføje den nuværende side som bogmærke.")}})
 
 (def other-translations
-  {:entity.type/archive                 {:en "Archive"
+  {:entity.type/unknown                 {:en "Unknown entity"
+                                         :da "Ukendt entitet"}
+   :entity.type/archive                 {:en "Archive"
                                          :da "Arkiv"}
    :entity.type/person                  {:en "Person"
                                          :da "Person"}
@@ -357,6 +361,8 @@
    ;; Dynamic relations -- expands to a more complex operation during search.
    :correspondent                       {:en "correspondent"
                                          :da "korrespondent"}
+   :exactly                             {:en "text"
+                                         :da "tekst"}
    :any                                 {:en "any role"
                                          :da "enhver rolle"}})
 

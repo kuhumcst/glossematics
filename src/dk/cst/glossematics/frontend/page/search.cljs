@@ -43,18 +43,19 @@
            pp)
       (tr ::frontend/search))))
 
-(defn params->items
+(defn query-params->items
   [query-params id->name]
   (->> (dissoc query-params :limit :offset :order-by :from :to)
        (mapcat (fn [[k v]]
                  (map (fn [id]
                         (with-meta [(if (= k :_) '_ k) id]
                                    {:label (get id->name id)}))
-                      (str/split v #","))))))
+                      (str/split v #"\|"))))))
 
-(defn parse-params
+(defn parse-query-params
+  "Parse the `query-params` as a map, using `id->name` to generate labels."
   [{:keys [order-by limit offset from to] :as query-params} id->name]
-  (let [items (params->items query-params id->name)]
+  (let [items (query-params->items query-params id->name)]
     (cond-> {:items  (vec items)
              :unique (set items)}
       order-by (assoc :order-by (->> (str/split order-by #",")
@@ -84,7 +85,7 @@
         {:keys [query-params]} @state/location]
     (when (and id->name query-params)
       (let [query (merge state/query-defaults
-                         (parse-params query-params id->name))]
+                         (parse-query-params query-params id->name))]
         (when (not= (apply dissoc query state/local-query-keys)
                     (apply dissoc @state/query state/local-query-keys))
           (->> (update query :items add-backgrounds)
@@ -121,17 +122,18 @@
   []
   (.then (api/fetch "/search/metadata")
          (fn [{:keys [search-metadata top-30-kvs]}]
-           (let [search-metadata (rename-duplicates search-metadata)
-                 name->id        (apply merge (vals search-metadata))
-                 da-name->id     (merge name->id sd/da-attr->en-attr)
-                 id->name        (set/map-invert name->id)
-                 name->type      (fn [entity-name]
-                                   (loop [groups (seq search-metadata)]
-                                     (let [[[type name->id]] groups]
-                                       (when type
-                                         (if (name->id entity-name)
-                                           type
-                                           (recur (rest groups)))))))]
+           (let [search-metadata    (rename-duplicates search-metadata)
+                 name->id           (apply merge (vals search-metadata))
+                 lowercase-name->id (update-keys name->id str/lower-case)
+                 da-name->id        (merge name->id sd/da-attr->en-attr)
+                 id->name           (set/map-invert name->id)
+                 name->type         (fn [entity-name]
+                                      (loop [groups (seq search-metadata)]
+                                        (let [[[type name->id]] groups]
+                                          (when type
+                                            (if (name->id entity-name)
+                                              type
+                                              (recur (rest groups)))))))]
              (swap! state/search assoc
 
                     ;; Core metadata. TODO: keep or remove?
@@ -139,6 +141,7 @@
 
                     ;; Name resolution for entities.
                     :name->id name->id
+                    :lowercase-name->id lowercase-name->id
                     :id->name id->name
 
                     ;; Type resolution for entities.
@@ -161,7 +164,7 @@
   [items]
   (->> (for [[k v] items]
          {k v})
-       (apply merge-with (fn [& args] (str/join "," args)))))
+       (apply merge-with (fn [& args] (str/join "|" args)))))
 
 (defn- attach-indices
   "Store the local index of each of the search result `entities` as metadata."
@@ -272,11 +275,17 @@
   []
   (rfe/push-state ::page {} (state->params @state/query)))
 
-(defn- good-input
-  [{:keys [name->id da-name->id id->name] :as search-state} in]
-  (when (not-empty in)
+(defn- known-id
+  [{:keys [name->id
+           lowercase-name->id
+           da-name->id
+           id->name]
+    :as search-state}
+   in]
+  (when-let [in (not-empty (str/trim in))]
     (or (name->id in)
         (da-name->id in)
+        (lowercase-name->id (str/lower-case in))
         (and (id->name in) in))))
 
 (defn- add-criterion!
@@ -294,13 +303,11 @@
   "Submit a new search criteria."
   []
   (let [{:keys [in unique]} @state/query]
-    (if-let [id (good-input @state/search in)]
+    (if-let [id (known-id @state/search in)]
       (if-not (get unique ['_ id])
         (add-criterion! (with-meta ['_ id] {:label in}))
         (swap! state/query assoc :not-allowed? true))
-      (swap! state/query assoc
-             :bad-input? true
-             :not-allowed? true))))
+      (add-criterion! (with-meta [:exactly in] {:label in})))))
 
 (defn search-result-condition
   [tr]
@@ -421,7 +428,8 @@
 
    (for [[k v :as kv] items
          :let [{:keys [label style]} (meta kv)
-               entity-type  (id->type v)
+               entity-type  (or (id->type v)
+                                :entity.type/unknown)
                ->set-rel    (fn [e]
                               (let [rel (s->rel (e->v e))
                                     kv' (assoc kv 0 rel)]
@@ -446,10 +454,14 @@
          [:span.search-form__item-key
           (tr k k)
           " | "])
-       [:span.search-form__item-label (or (when (= tr i18n/tr-da)
-                                            (get sd/en-attr->da-attr label))
-                                          (shared/local-name label)
-                                          (str v))]
+       [:span.search-form__item-label
+        (let [label (or (when (= tr i18n/tr-da)
+                          (get sd/en-attr->da-attr label))
+                        (shared/local-name label)
+                        (str v))]
+          (if (= k :exactly)
+            [:i (str "\"" label "\"")]
+            label))]
        [:button {:type     "button"                         ; prevent submit
                  :title    (tr ::remove)
                  :on-click (fn [e]
@@ -491,7 +503,7 @@
                                    "not-allowed")
                                  (when bad-input?
                                    "bad-input")
-                                 (when (good-input search-state in)
+                                 (when (known-id search-state in)
                                    "good-input")]
                    :id          "v"
                    :disabled    (nil? name->id)
@@ -590,7 +602,7 @@
 (defn page
   []
   (let [{:keys [results name->id id->name] :as search-state} @state/search
-        {:keys [offset]} @state/query
+        {:keys [offset items]} @state/query
         {:keys [query-params]} @state/location
         tr (i18n/->tr)]
     [:div.search-page
@@ -599,7 +611,9 @@
      (if results
        (if (empty? results)
          [:div.text-content
-          [:p (tr ::empty)]]
+          [:p (tr ::empty)]
+          (when (some (comp #{:exactly} first) items)
+            [:p (tr ::empty-exact)])]
          [:<>
           [:div.search-result
            [search-paging tr results]

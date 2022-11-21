@@ -64,6 +64,9 @@
            (= k :correspondent)
            [(list 'or ['?e :document/sender v] ['?e :document/recipient v])]
 
+           (= k :exactly)
+           [['?e '_ v]]
+
            :else [['?e k v]]))
        (apply concat)
        (set)))
