@@ -117,6 +117,25 @@
        (sort-by first)
        (concat top-30-kvs)))
 
+(defn- full-name->short-names
+  "Get shorter variants of `full-name`."
+  [full-name]
+  (let [parts      (clojure.string/split full-name #"\s")
+        first-name (clojure.string/lower-case (first parts))
+        last-name  (clojure.string/lower-case (last parts))]
+    (if (= first-name last-name)
+      [last-name]
+      [(str first-name " " last-name) last-name])))
+
+(defn- short-names
+  [search-metadata top-30-kvs]
+  (let [{:keys [entity.type/person]} search-metadata]
+    (persistent!
+      (reduce (fn [m [k v]]
+                (reduce #(assoc! %1 %2 v) m (full-name->short-names k)))
+              (transient {})
+              (concat (seq person) top-30-kvs)))))
+
 (defn fetch-metadata!
   "Fetches and post-processes metadata used to populate the search form."
   []
@@ -125,6 +144,7 @@
            (let [search-metadata    (rename-duplicates search-metadata)
                  name->id           (apply merge (vals search-metadata))
                  lowercase-name->id (update-keys name->id str/lower-case)
+                 short-name->id     (short-names search-metadata top-30-kvs)
                  da-name->id        (merge name->id sd/da-attr->en-attr)
                  id->name           (set/map-invert name->id)
                  name->type         (fn [entity-name]
@@ -142,6 +162,7 @@
                     ;; Name resolution for entities.
                     :name->id name->id
                     :lowercase-name->id lowercase-name->id
+                    :short-name->id short-name->id
                     :id->name id->name
 
                     ;; Type resolution for entities.
@@ -276,17 +297,22 @@
   (rfe/push-state ::page {} (state->params @state/query)))
 
 (defn- known-id
+  "Get the known ID of `in` (if one exists) based on the `search-state`.
+  The user input is compared to all the name variants in the search metadata."
   [{:keys [name->id
            lowercase-name->id
+           short-name->id
            da-name->id
            id->name]
-    :as search-state}
+    :as   search-state}
    in]
   (when-let [in (not-empty (str/trim in))]
-    (or (name->id in)
-        (da-name->id in)
-        (lowercase-name->id (str/lower-case in))
-        (and (id->name in) in))))
+    (or (name->id in)                                       ; exact name
+        (da-name->id in)                                    ; danish locale only
+        (and (id->name in) in)                              ; entity IDs
+        (let [lin (str/lower-case in)]
+          (or (lowercase-name->id lin)                      ; lower-case strings
+              (short-name->id lin))))))                     ; shorter variants
 
 (defn- add-criterion!
   [kv]
