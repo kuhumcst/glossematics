@@ -891,7 +891,7 @@ hr {
 img.text-illustration {
     width: 50%;
     max-width: 150px;
-    padding: var(--padding-l);
+    padding: var(--padding) 0 0 0;
     background: rgba(0,0,0,0.08);
     box-shadow:
         0 4px 8px rgba(0,0,0,0.2),
