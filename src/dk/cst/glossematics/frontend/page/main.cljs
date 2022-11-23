@@ -13,7 +13,7 @@
                             (dissoc "eduPersonTargetedID")  ; not needed
                             (->> (sort-by first)))]
     (if @state/authenticated?
-      [:div.text-content
+      [:div.text-content.menu
        [:div.login-status
         (if institution
           [tr ::logged-in-status-1 institution]
@@ -41,7 +41,7 @@
                                  [:<> [:wbr] c]
                                  c)))
                  [:td (->> v sort (str/join ", "))]])]]]]])]
-      [:div.text-content
+      [:div.text-content.menu
        [:div.login-status
         [tr ::logged-out-status]
         [:button.login-button

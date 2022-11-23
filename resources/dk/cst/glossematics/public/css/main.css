@@ -333,19 +333,39 @@ img.loading-indicator {
 
 .text-content {
     animation: fade-in-result 0.33s ease-out;
-    padding: var(--padding-l);
+    padding: var(--padding-xl);
     border: var(--border-subtle);
-    background: rgba(0,0,0,0.08);
+    background: var(--background);
+    box-shadow: inset 0 0 16px rgba(0,0,0,0.1);
     border-radius: var(--border-radius);
     font-family: Georgia, serif;
     font-size: 16px;
     color: var(--color);
-    line-height: 1.5;
+    line-height: 1.6;
     letter-spacing: 1.25;
 }
 
+.text-content.menu {
+    padding: var(--padding-l);
+    background: rgba(0,0,0,0.08);
+    box-shadow: none;
+}
+
 .text-content + .text-content {
-    margin-top: var(--margin-l);
+    margin-top: var(--margin-xl);
+}
+
+.text-content > section {
+    clear: both;
+    padding: var(--padding-xl) 0;
+}
+
+.text-content > section:first-child {
+    padding-top: 0;
+}
+
+.text-content > section:last-child {
+    padding-bottom: 0;
 }
 
 .text-content p {
@@ -353,7 +373,7 @@ img.loading-indicator {
 }
 
 .text-content p + * {
-    margin-top: var(--margin-l);
+    margin-top: var(--margin-xl);
 }
 
 .text-content ul,
@@ -810,11 +830,13 @@ table.entity-metadata ul li + li {
 
 .text-content h2 {
     text-align: center;
+    font-size: 28px;
     font-weight: normal;
     text-transform: uppercase;
+    border-bottom: var(--border-very-subtle);
     letter-spacing: 6px;
-    padding: var(--padding-s);
-    margin: var(--margin) 0;
+    padding: 0 0 var(--padding) 0;
+    margin: 0 0 var(--margin-xl) 0;
 
 }
 
@@ -866,16 +888,26 @@ hr {
     margin: var(--margin-l) 0;
 }
 
-.text-content section + section {
-    margin-top: var(--margin-xl);
-}
-
 img.text-illustration {
     width: 50%;
     max-width: 150px;
-    margin: 0 var(--margin-l);
-    margin-left: 0;
-    padding: 0;
+    padding: var(--padding-l);
+    background: rgba(0,0,0,0.08);
+    box-shadow:
+        0 4px 8px rgba(0,0,0,0.2),
+        inset 0 0 16px rgba(0,0,0,0.15);
+    border: var(--border-subtle);
+    border-radius: var(--border-radius);
+}
+
+img.text-illustration.right {
+    float: right;
+    margin-left: var(--margin-xl);
+}
+
+img.text-illustration.left {
+    float: left;
+    margin-right: var(--margin-xl);
 }
 
 dl.kvs-list {

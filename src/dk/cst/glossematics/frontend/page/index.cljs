@@ -73,7 +73,7 @@
      (when metadata
        (let [groups (index-groups metadata entity-type)]
          [:<>
-          [:div.text-content
+          [:div.text-content.menu
            [index-links tr entity-type]
            [:hr]
            [skip-links groups]]

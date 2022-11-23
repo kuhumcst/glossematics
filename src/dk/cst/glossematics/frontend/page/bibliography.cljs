@@ -67,7 +67,7 @@
                          (mapv (fn [[k v]]
                                  [(str k) (sort-by :document/bib-entry v)])))]
          [:<>
-          [:div.text-content
+          [:div.text-content.menu
            [:p.index-links
             [bib-selection id->name author "lh"] " / "
             [bib-selection id->name author "efj"] " / "

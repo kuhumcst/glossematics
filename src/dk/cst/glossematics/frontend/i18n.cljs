@@ -84,9 +84,8 @@
    ::main/introduction       {:en [:<>
                                    [:section
                                     [:h2 "Introduction"]
-                                    [:img.text-illustration {:src   "/images/hjelmslev_transparent.png"
-                                                             :alt   "Louis Hjelmslev"
-                                                             :style {:float "right"}}]
+                                    [:img.text-illustration.right {:src   "/images/hjelmslev_transparent.png"
+                                                                   :alt   "Louis Hjelmslev"}]
                                     [:p
                                      "The Royal Danish Library in Copenhagen is contains a multitude of letter correspondences
                                      between leading characters in the domain of linguistics,
@@ -101,9 +100,8 @@
                                      investigating it from every relevant angle."]]
                                    [:section
                                     [:h2 "Get access"]
-                                    [:img.text-illustration {:src   "/images/efj_transparent.png"
-                                                             :alt   "Eli Fischer-Jørgensen"
-                                                             :style {:float "left"}}]
+                                    [:img.text-illustration.left {:src   "/images/efj_transparent.png"
+                                                                  :alt   "Eli Fischer-Jørgensen"}]
                                     [:p
                                      "You may always view the timeline and the bibliography pages. "
                                      "However, the search page and the facsimile reader "
@@ -116,18 +114,16 @@
                                      "where you may choose your institution from a list (if applicable)."]]
                                    [:section
                                     [:h2 "Correspondences"]
-                                    [:img.text-illustration {:src   "/images/pd_transparent.png"
-                                                             :alt   "Paul Diderichsen"
-                                                             :style {:float "right"}}]
+                                    [:img.text-illustration.right {:src   "/images/pd_transparent.png"
+                                                                   :alt   "Paul Diderichsen"}]
                                     [:p
                                      "Once authenticated, you may search all documents within our archive. "
                                      "Below are exchanges that were important to the theory of Glossematics:"]]]
                               :da [:<>
                                    [:section
                                     [:h2 "Introduktion"]
-                                    [:img.text-illustration {:src   "/images/hjelmslev_transparent.png"
-                                                             :alt   "Louis Hjelmslev"
-                                                             :style {:float "right"}}]
+                                    [:img.text-illustration.right {:src   "/images/hjelmslev_transparent.png"
+                                                                   :alt   "Louis Hjelmslev"}]
                                     [:p
                                      "På Det Kongelige Bibliotek i København findes der et væld af brevkorrespondancer
                                      mellem de førende figurer i det sprogvidenskabelige miljø,
@@ -142,9 +138,8 @@
                                      og undersøge samtlige relevante facetter."]]
                                    [:section
                                     [:h2 "Få adgang"]
-                                    [:img.text-illustration {:src   "/images/efj_transparent.png"
-                                                             :alt   "Eli Fischer-Jørgensen"
-                                                             :style {:float "left"}}]
+                                    [:img.text-illustration.left {:src   "/images/efj_transparent.png"
+                                                                  :alt   "Eli Fischer-Jørgensen"}]
                                     [:p
                                      "Du kan altid se tidslinjen og bibliografi-siderne. "
                                      "Søgesiden og facsimile-læseren "
@@ -157,9 +152,8 @@
                                      "hvor du kan vælge din institution fra en liste, når førnævnte gælder."]]
                                    [:section
                                     [:h2 "Korrespondancer"]
-                                    [:img.text-illustration {:src   "/images/pd_transparent.png"
-                                                             :alt   "Paul Diderichsen"
-                                                             :style {:float "right"}}]
+                                    [:img.text-illustration.right {:src   "/images/pd_transparent.png"
+                                                                   :alt   "Paul Diderichsen"}]
                                     [:p
                                      "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "
                                      "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]]}})
@@ -214,6 +208,7 @@
    ::search/descending   {:en "▼ descending"
                           :da "▼ nedadgående"}
    ::search/explanation  {:en [:<>
+                               [:h2 "Find documents"]
                                [:p "Use this page to search for relevant documents in our archive."]
                                [:ul
                                 [:li
@@ -221,7 +216,7 @@
                                  [:strong [:em "one or more"]] " search criteria."]
                                 [:li
                                  "The search criteria comprise: "
-                                 [:em "people, places, organisations, publications, languages,"] " and "
+                                 [:em "archive, people, places, organisations, publications, languages,"] " and "
                                  [:em "terms"] "."]
                                 [:li
                                  "Note that " [:strong [:em "all"]]
@@ -233,6 +228,7 @@
                                  "The search results may also be sorted according to a specific field. "
                                  "They can be further restricted to a certain range too."]]]
                           :da [:<>
+                               [:h2 "Find dokumenter"]
                                [:p "Brug denne side til at søge efter relevante dokumenter i arkivet."]
                                [:ul
                                 [:li
@@ -240,7 +236,7 @@
                                  [:strong [:em "et eller flere"]] " søgekriterier."]
                                 [:li
                                  "Søgekriterier består af: "
-                                 [:em "personer, steder, organisationer, udgivelser, sprog "] " og "
+                                 [:em "arkiv, personer, steder, organisationer, udgivelser, sprog "] " og "
                                  [:em "begreber"] "."]
                                 [:li
                                  "Bemærk at " [:strong [:em "alle"]]

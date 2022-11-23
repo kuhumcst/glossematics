@@ -49,7 +49,7 @@
      [:h1
       [:img {:src "/images/book-fill.svg"}] " " (tr ::frontend/bookmarks)]
      (if (empty? bookmarks)
-       [:div.text-content
+       [:div.text-content.menu
         [:p (tr ::empty)]]
        (let [groups (as-> bookmarks $
                           (map (fn [[path bookmark]]
@@ -59,7 +59,7 @@
                           (update-keys $ (fnil tr ::other))
                           (sort-by key $))]
          [:<>
-          [:div.text-content
+          [:div.text-content.menu
            [skip-links groups]]
           ^{:key author}
           [fshared/kvs-list groups (partial bookmarks-content tr)]]))]))

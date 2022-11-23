@@ -617,8 +617,6 @@
   [tr name->id]
   (let [n (count name->id)]
     [:div.text-content
-     [index/index-links tr]
-     [:hr]
      [tr ::explanation]
      (when-let [[k v] (nth (seq name->id) (rand-int n))]
        [tr ::explanation+
@@ -648,4 +646,7 @@
                    entity-table (partial search-result-table tr search-state)]
                [fshared/kvs-list kvs entity-table offset]))]])
        (when (empty? query-params)
-         [explanation tr name->id]))]))
+         [:<>
+          [:div.text-content.menu
+           [index/index-links tr]]
+          [explanation tr name->id]]))]))
