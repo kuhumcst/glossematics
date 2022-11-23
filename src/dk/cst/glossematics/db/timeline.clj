@@ -70,7 +70,7 @@
 
 (defn timeline-entities
   []
-  (->> (bshared/resource "Reconstructed Hjelmslev kronologi 250122.xlsx")
+  (->> (bshared/resource "Reconstructed Hjelmslev kronologi 300822.xlsx")
        (io/input-stream)
        (xl/load-workbook)
        (xl/select-sheet "Ark1")
