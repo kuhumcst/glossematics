@@ -1019,7 +1019,7 @@ dl.kvs-list dd:not(:last-child) {
 }
 
 /* Responsive media query changes for small screens. */
-@media only screen and (max-width: 850px) {
+@media only screen and (max-width: 900px) {
   nav h1,
   nav button.language,
   nav a:not(:first-child),
@@ -1032,6 +1032,10 @@ dl.kvs-list dd:not(:last-child) {
   img.nav-icon {
       height: 32px;
       margin-bottom: -10px;
+  }
+  img.language-icon {
+      height: 16px;
+      width: 16px;
   }
   nav input[type=checkbox].bookmark {
       width: 16px;
@@ -1059,7 +1063,11 @@ dl.kvs-list dd:not(:last-child) {
     img.nav-icon {
           height: 24px;
           margin-bottom: -9.5px;
-      }
+    }
+    img.language-icon {
+        height: 12px;
+        width: 12px;
+    }
 
   nav input[type=checkbox].bookmark {
     width: 12px;
