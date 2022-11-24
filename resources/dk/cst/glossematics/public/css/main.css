@@ -469,6 +469,11 @@ img.entity-icon {
     margin-right: var(--margin);
 }
 
+img.language-icon {
+    height: 20px;
+    width: 20px;
+}
+
 img.nav-icon {
     transition: all 0.2s;
     height: 48px;
