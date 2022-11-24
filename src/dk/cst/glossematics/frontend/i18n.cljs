@@ -90,7 +90,7 @@
                                                                        :title "Louis Hjelmslev"
                                                                        :alt   "Louis Hjelmslev portrait"}]
                                     [:p
-                                     "The Royal Danish Library in Copenhagen is contains a multitude of letter correspondences
+                                     "The Royal Danish Library in Copenhagen contains a multitude of letter correspondences
                                      between leading characters in the domain of linguistics,
                                      e.g. Louis Hjelmslev and Hans Jørgen Uldall.
                                      These individuals were key to the creation of the Glossematics theory of linguistics
