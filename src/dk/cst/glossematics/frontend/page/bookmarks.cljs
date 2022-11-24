@@ -9,16 +9,16 @@
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.shared :as shared]))
 
-(defn skip-links
+(defn index-links
   [groups]
-  (into [:p.index-page__skip-links]
+  (into [:p.index-links]
         (->> groups
              (map (fn [[year]]
                     (let [fragment (str "#" (fshared/legal-id year))]
                       [:a {:href     fragment
                            :on-click #(fshared/find-fragment fragment)}
                        year])))
-             (interpose ", ")
+             (interpose " / ")
              (vec))))
 
 (defn bookmarks-content
@@ -60,6 +60,6 @@
                           (sort-by key $))]
          [:<>
           [:div.text-content.menu
-           [skip-links groups]]
+           [index-links groups]]
           ^{:key author}
           [fshared/kvs-list groups (partial bookmarks-content tr)]]))]))

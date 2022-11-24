@@ -162,7 +162,7 @@ nav {
 }
 
 nav, nav h1, nav a, nav button.language {
-    transition: all 0.33s;
+    transition: all 0.2s;
 }
 
 nav h1, nav a {
@@ -232,7 +232,6 @@ nav input[type=checkbox].bookmark {
 
     transition: all 0.2s;
     opacity: 0.33;
-    cursor: pointer;
     margin-left: var(--margin-l);
     width: 24px;
     height: 32px;
@@ -243,6 +242,7 @@ nav input[type=checkbox].bookmark {
 nav input[type=checkbox].bookmark:not(:disabled):hover {
     opacity: 1;
     animation: wiggle 2s ease-in;
+    cursor: pointer;
 }
 
 nav input[type=checkbox].bookmark:checked {
@@ -336,7 +336,7 @@ img.loading-indicator {
     padding: var(--padding-xl);
     border: var(--border-subtle);
     background: var(--background);
-    box-shadow: inset 0 0 16px rgba(0,0,0,0.1);
+    box-shadow: var(--box-shadow-container);
     border-radius: var(--border-radius);
     font-family: Georgia, serif;
     font-size: 16px;
@@ -372,7 +372,7 @@ img.loading-indicator {
     margin: 0;
 }
 
-.text-content p + * {
+.text-content:not(.menu) p + * {
     margin-top: var(--margin-xl);
 }
 
@@ -422,6 +422,7 @@ label {
     border: var(--border);
     border-radius: var(--border-radius);
     background-color: white;
+    box-shadow: var(--box-shadow-container);
     padding: 4px 4px 4px 12px;
     margin: 12px 6px 0 0;
     white-space: nowrap;
@@ -439,7 +440,7 @@ ul.bookmarks > li button {
     outline: revert;
     color: transparent;
 
-    transition: all 0.33s;
+    transition: all 0.2s;
     background: url(/images/x-black.svg) no-repeat center;
     background-size: 12px;
     line-height: 16px;
@@ -509,7 +510,7 @@ a:hover img.action__icon {
     outline: revert;
     color: transparent;
 
-    transition: all 0.33s;
+    transition: all 0.2s;
     background: url(/images/x-black.svg) no-repeat center;
     background-size: 16px;
     width: 20px;
@@ -588,7 +589,7 @@ details[open] summary {
 {
     appearance: none;
 
-    transition: all 0.33s;
+    transition: all 0.2s;
     font-size: 16px;
     color: var(--color);
     border: var(--border);
@@ -675,7 +676,7 @@ details[open] summary {
         var(--box-shadow-elevated);
     z-index: 998;
 
-    transition: all 0.33s;
+    transition: all 0.2s;
     position: sticky;
     top: 87px;
 }
@@ -684,7 +685,7 @@ details[open] summary {
     position: static;
     border-radius: var(--border-radius);
     margin-bottom: var(--margin-l);
-    box-shadow: none;
+    box-shadow: var(--box-shadow-container);
 }
 
 .reader .search-result__paging:last-child {
@@ -866,14 +867,12 @@ table.entity-metadata ul li + li {
     font-size: 18px;
     font-style: italic;
     word-spacing: 6px;
-    line-height: 1.5;
     margin: 0;}
 
 .index-links {
     text-align: center;
-    line-height: 1.5;
     margin: 0;
-    font-size: 20px;
+    font-size: 24px;
     font-family: PoiretOne, sans-serif;
 }
 
@@ -888,36 +887,45 @@ hr {
     margin: var(--margin-l) 0;
 }
 
-img.text-illustration {
-    width: 50%;
-    max-width: 150px;
+.text-illustration {
+    animation: fade-in 0.66s;
+    width: 200px;
+    max-width: 33%;
     padding: var(--padding) 0 0 0;
     background: rgba(0,0,0,0.08);
-    box-shadow:
-        0 4px 8px rgba(0,0,0,0.2),
-        inset 0 0 16px rgba(0,0,0,0.15);
     border: var(--border-subtle);
     border-radius: var(--border-radius);
 }
 
-img.text-illustration.right {
+.text-illustration.right {
     float: right;
     margin-left: var(--margin-xl);
 }
 
-img.text-illustration.left {
+.text-illustration.left {
     float: left;
     margin-right: var(--margin-xl);
+}
+
+.bg1 {
+    background: var(--tab-background-1);
+}
+.bg2 {
+    background: var(--tab-background-2);
+}
+.bg3 {
+    background: var(--tab-background-3);
 }
 
 dl.kvs-list {
     margin: 0; /* reset */
     animation: fade-in-result 0.33s ease-out;
+    box-shadow: var(--box-shadow-container);
 }
 
 
 dl.kvs-list dt {
-    transition: all 0.33s;
+    transition: all 0.2s;
 
     position: sticky;
     top: 87px;
@@ -948,7 +956,7 @@ dl.kvs-list dd {
     font-family: Georgia, serif;
     font-size: 16px;
     color: var(--color);
-    line-height: 1.5;
+    line-height: 1.6;
     letter-spacing: 1.25;
 }
 
@@ -1125,7 +1133,7 @@ button.login-button {
 
 button.logout-button img,
 button.login-button img {
-    transition: all 0.33s;
+    transition: all 0.2s;
     height: 20px;
     width: 20px;
     margin-right: var(--margin);

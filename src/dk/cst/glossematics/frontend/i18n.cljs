@@ -84,8 +84,9 @@
    ::main/introduction       {:en [:<>
                                    [:section
                                     [:h2 "Introduction"]
-                                    [:img.text-illustration.right {:src   "/images/hjelmslev_transparent.png"
-                                                                   :alt   "Louis Hjelmslev"}]
+                                    [:img.text-illustration.right.bg1 {:src   "/images/hjelmslev_transparent.png"
+                                                                       :title "Louis Hjelmslev"
+                                                                       :alt   "Louis Hjelmslev portrait"}]
                                     [:p
                                      "The Royal Danish Library in Copenhagen is contains a multitude of letter correspondences
                                      between leading characters in the domain of linguistics,
@@ -100,8 +101,9 @@
                                      investigating it from every relevant angle."]]
                                    [:section
                                     [:h2 "Get access"]
-                                    [:img.text-illustration.left {:src   "/images/efj_transparent.png"
-                                                                  :alt   "Eli Fischer-Jørgensen"}]
+                                    [:img.text-illustration.left.bg2 {:src   "/images/efj_transparent.png"
+                                                                      :title "Eli Fischer-Jørgensen"
+                                                                      :alt   "Eli Fischer-Jørgensen portrait"}]
                                     [:p
                                      "You may always view the timeline and the bibliography pages. "
                                      "However, the search page and the facsimile reader "
@@ -114,16 +116,18 @@
                                      "where you may choose your institution from a list (if applicable)."]]
                                    [:section
                                     [:h2 "Correspondences"]
-                                    [:img.text-illustration.right {:src   "/images/pd_transparent.png"
-                                                                   :alt   "Paul Diderichsen"}]
+                                    [:img.text-illustration.right.bg3 {:src   "/images/pd_transparent.png"
+                                                                       :title "Paul Diderichsen"
+                                                                       :alt   "Paul Diderichsen portait"}]
                                     [:p
                                      "Once authenticated, you may search all documents within our archive. "
                                      "Below are exchanges that were important to the theory of Glossematics:"]]]
                               :da [:<>
                                    [:section
                                     [:h2 "Introduktion"]
-                                    [:img.text-illustration.right {:src   "/images/hjelmslev_transparent.png"
-                                                                   :alt   "Louis Hjelmslev"}]
+                                    [:img.text-illustration.right.bg1 {:src   "/images/hjelmslev_transparent.png"
+                                                                       :title "Louis Hjelmslev"
+                                                                       :alt   "Louis Hjelmslev portræt"}]
                                     [:p
                                      "På Det Kongelige Bibliotek i København findes der et væld af brevkorrespondancer
                                      mellem de førende figurer i det sprogvidenskabelige miljø,
@@ -138,8 +142,9 @@
                                      og undersøge samtlige relevante facetter."]]
                                    [:section
                                     [:h2 "Få adgang"]
-                                    [:img.text-illustration.left {:src   "/images/efj_transparent.png"
-                                                                  :alt   "Eli Fischer-Jørgensen"}]
+                                    [:img.text-illustration.left.bg2 {:src   "/images/efj_transparent.png"
+                                                                      :title "Eli Fischer-Jørgensen"
+                                                                      :alt   "Eli Fischer-Jørgensen portræt"}]
                                     [:p
                                      "Du kan altid se tidslinjen og bibliografi-siderne. "
                                      "Søgesiden og facsimile-læseren "
@@ -152,8 +157,9 @@
                                      "hvor du kan vælge din institution fra en liste, når førnævnte gælder."]]
                                    [:section
                                     [:h2 "Korrespondancer"]
-                                    [:img.text-illustration.right {:src   "/images/pd_transparent.png"
-                                                                   :alt   "Paul Diderichsen"}]
+                                    [:img.text-illustration.right.bg3 {:src   "/images/pd_transparent.png"
+                                                                       :title "Paul Diderichsen"
+                                                                       :alt   "Paul Diderichsen portræt"}]
                                     [:p
                                      "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "
                                      "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]]}})

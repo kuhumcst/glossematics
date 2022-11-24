@@ -1,5 +1,9 @@
 /* === TABS === */
 
+.tabs {
+    box-shadow: var(--box-shadow-container);
+}
+
 .tab-list {
     display: flex;
     height: 36px; /* TODO: calculate dynamically? */
@@ -179,6 +183,7 @@
 .carousel {
     display: flex;
     justify-content: center;
+    box-shadow: var(--box-shadow-container);
 }
 
 .carousel__slide {

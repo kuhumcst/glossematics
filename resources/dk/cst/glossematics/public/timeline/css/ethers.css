@@ -155,6 +155,7 @@
     padding: 2px 6px;
     border: var(--border-subtle);
     background: var(--background);
+    box-shadow: var(--box-shadow-container);
     font-family: Georgia, serif;
     font-size: 16px;
     color: var(--color);
