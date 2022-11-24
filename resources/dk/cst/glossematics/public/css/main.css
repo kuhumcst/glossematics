@@ -334,7 +334,7 @@ img.loading-indicator {
 .text-content {
     animation: fade-in-result 0.33s ease-out;
     padding: var(--padding-xl);
-    border: var(--border-subtle);
+    border: var(--border);
     background: var(--background);
     box-shadow: var(--box-shadow-container);
     border-radius: var(--border-radius);
@@ -348,6 +348,7 @@ img.loading-indicator {
 .text-content.menu {
     padding: var(--padding-l);
     background: rgba(0,0,0,0.08);
+    border: var(--border-subtle);
     box-shadow: none;
 }
 
