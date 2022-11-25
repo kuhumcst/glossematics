@@ -108,6 +108,8 @@
   [search-metadata]
   (let [duplicates (-> search-metadata meta :duplicates)
         rename     #(rename-duplicates* duplicates %)]
+    (println "Renamed" (count duplicates) "duplicate entities:"
+             (str/join ", " (sort duplicates)))
     (into {} (map rename search-metadata))))
 
 (defn- ->name-kvs

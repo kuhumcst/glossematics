@@ -174,6 +174,7 @@
   (log-transaction! :place (other-entities "Stednavne-gennemgået-FINAL.txt" "#npl" "place"))
   (log-transaction! :terms (other-entities "terms.txt" "#nt" "term"))
   (log-transaction! :english-terms (other-entities "terms-eng.txt" "#nteng" "english-term"))
+  (log-transaction! :domain (other-entities "Domain.txt" "#ndom" "domain"))
 
   ;; Add the file entities found in the files-dir.
   ;; Then parse each TEI file and link the document data to the file entities.

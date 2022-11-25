@@ -1,0 +1,10 @@
+1	Semiotics
+2	Linguistics
+3	Logic
+4	Mathematics
+5	Glossematics
+6	Epistemology
+7	Psychology
+8	Semantics
+9	Physics
+10	Anthropology

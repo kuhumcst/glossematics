@@ -24,6 +24,7 @@
   (let [m (->> (d/q '[:find [?id ...]
                       :where
                       (or
+                        [?p :entity/type :entity.type/domain]
                         [?p :entity/type :entity.type/archive]
                         [?p :entity/type :entity.type/person]
                         [?p :entity/type :entity.type/linguistic-organisation]

@@ -40,8 +40,9 @@
 40	cell-cohesion
 41	cenemateme
 42	cenematic
+42	cenematia
 43	cenematic functive
-44	cenematy 
+44	cenematy
 45	ceneme
 46	cenia
 47	central
@@ -57,6 +58,7 @@
 57	characteristic
 58	circumscribe
 59	class
+59	Classes
 60	cohesion
 61	cohesive
 62	combination
@@ -158,6 +160,7 @@
 158	dominate
 159	duplex sum
 160	economy, principle of
+160	Pr. of Economy
 161	election
 162	element
 163	empirical principle
@@ -228,6 +231,7 @@
 228	glossary
 229	glossematy
 230	glossemes
+230	glosseme
 231	glosseme-category
 232	glosseme-sum
 233	glosseme-unit
@@ -401,7 +405,7 @@
 401	pseudotheme
 402	purport
 403	purport test
-404	quadruplex sum 
+404	quadruplex sum
 405	quincuplex sum
 406	radical
 407	rank
@@ -412,6 +416,7 @@
 412	redistribution
 413	reduced to, be
 414	reduction
+414	Pr. of Reduction
 415	principle of reduction
 416	refined principle of reduction
 417	relate
@@ -590,7 +595,8 @@
 590	homoplane selection
 591	extrinsic selection
 592	Glossematics
-593	glossematic 
+592	glossematics
+593	glossematic
 594	Equipollent
 595	functival field
 596	coherence
@@ -602,3 +608,6 @@
 602	grapheme
 603	equipollent
 604	engintrinsic
+581	word
+605	case
+606	grammar

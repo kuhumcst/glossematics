@@ -285,6 +285,8 @@
 (def other-translations
   {:entity.type/unknown                 {:en "Unknown entity"
                                          :da "Ukendt entitet"}
+   :entity.type/domain                  {:en "Domain"
+                                         :da "Domæne"}
    :entity.type/archive                 {:en "Archive"
                                          :da "Arkiv"}
    :entity.type/person                  {:en "Person"
@@ -349,6 +351,8 @@
                                          :da "år"}
    :document/end-year                   {:en "year (end)"
                                          :da "år (afslutning)"}
+   :document/relevant                   {:en "relevant for"
+                                         :da "relevant for"}
    :file/name                           {:en "file"
                                          :da "fil"}
    :file/extension                      {:en "file extension"

@@ -37,7 +37,10 @@
 
 (def real-entity-types
   "The core searchable entities (with index pages)."
-  {:entity.type/archive
+  {:entity.type/domain
+   {:img-src "/images/university-svgrepo-com.svg"}
+
+   :entity.type/archive
    {:img-src "/images/archive-svgrepo-com.svg"}
 
    :entity.type/person
@@ -148,6 +151,7 @@
 
 (def search-rels
   {:document/mention            {:compatible (set (keys real-entity-types))}
+   :document/relevant           {:compatible (set (keys real-entity-types))}
    :document/author             {:compatible #{:entity.type/person}}
    :document/sender             {:compatible #{:entity.type/person}}
    :document/sender-location    {:compatible #{:entity.type/place}}

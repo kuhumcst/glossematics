@@ -40,8 +40,8 @@
 47	Cahiers  Ferdinand de Saussure
 48	Capitula XIII
 49	Caractères généraux des langues créoles
-50	Cas I
-51	Cas II
+50	La catégorie des cas, I-II
+51	La catégorie des cas
 52	Charisteria Mathesio
 53	Dansk biografisk  lexikon
 54	De nordiska språken
@@ -102,7 +102,7 @@
 110	realitet som grammatisk kategori
 111	sprogsystem og sprogforandring
 117	Brysselrapport
-118	IVe Congres intern. de ling., Résumés des 
+118	IVe Congres intern. de ling., Résumés des
 119	KZ
 120	Modersmålets fonetik
 121	Orph., Lith. 108
@@ -226,7 +226,7 @@
 242	Kindersprache, Aphasie und Allgemeine Lautgesetze
 243	Dansk begrebsordbog
 244	Språkanalys
-245	Das literarische Kunstwerk, Eine Untersuchung aus dem Grenzgebiet der Ontologie, Logik und Literaturwissenschaft 
+245	Das literarische Kunstwerk, Eine Untersuchung aus dem Grenzgebiet der Ontologie, Logik und Literaturwissenschaft
 246	Le Symbolisme / Le Symbolisme: Etude sur le Style des Symbolistes Francais
 247	A propos  de la syntagmatique du professeur A. Belic
 249	Kilder til Hittitternes historie
@@ -317,7 +317,7 @@
 341	Zeitschrift für vergleichende sprachwissenschaft
 342	Was ist ein Satz?
 343	Morfologi og Syntax
-344	Treatise of Phonematics 
+344	Treatise of Phonematics
 345	Tidsskrift for Nordisk Filologi
 346	Case and Gender
 347	The Phonemic Principle
@@ -328,3 +328,4 @@
 352	Pronunciation of Russian
 353	Abnormal Types of Speech in Nootka
 354	Grundriβ der Sprachwissenschaft
+356	Note sur les oppositions supprimables

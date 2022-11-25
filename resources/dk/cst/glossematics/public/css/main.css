@@ -492,6 +492,11 @@ img.nav-icon:hover {
     margin-bottom: -10px;
 }
 
+.reader-mode img.language-icon {
+    height: 16px;
+    width: 16px;
+}
+
 a.action {
     font-size: var(--font-size-l);
 }

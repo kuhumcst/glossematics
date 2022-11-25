@@ -39,6 +39,7 @@
                      [:extent {}
                       [:note {} page-count]]]]
    :hand-desc     '[:handDesc {} [:p {} hand]]
+   :relevant-for  '[:ref {:type "relevan_for" :target target}] ;TODO: add missing t
 
    ;; Explodes [:correspDesc ...] into its constituent parts.
    :sender        '[:correspAction {:type "sent"}
@@ -140,10 +141,17 @@
   #?(:clj  parse-long
      :cljs js/parseInt))
 
+(defn- support-triple
+  [filename v]
+  (if (get (-> sd/special-entity-types :document/condition :en->da) v)
+    [filename :document/condition v]
+    (log/info :tei/unsupported {:document/condition v})))
+
 (defn document-triples
   [filename {:keys [object-desc
                     hand-desc
                     facsimile
+                    relevant-for
                     language
                     body-refs
                     lang-refs
@@ -179,13 +187,14 @@
            (when-let [v (get-in object-desc [0 'form])]
              (if (get (-> sd/special-entity-types :document/condition :en->da) v)
                [filename :document/condition v]
-               (log/info :tei/unsupported {:document/condition v})))
-           (when-let [v (get-in object-desc [0 'support])]
-             (let [v (if (= v "copy") "photocopy" v)]
-               (if (get (-> sd/special-entity-types :document/condition :en->da) v)
-                 [filename :document/condition v]
-                 (log/info :tei/unsupported {:document/condition v}))))])
-        [(for [{:syms [id]} facsimile]
+               (log/info :tei/unsupported {:document/condition v})))])
+        [(when-let [v (get-in object-desc [0 'support])]
+           (->> (str/split v #"\s+and\s+")                  ; support multiple
+                (map #(if (= % "copy") "photocopy" %))
+                (map #(support-triple filename %))))
+         (for [{:syms [target]} relevant-for]
+           [filename :document/relevant target])
+         (for [{:syms [id]} facsimile]
            [filename :document/facsimile (fix-facsimile-id id)])
          (when-let [hands (get-in hand-desc [0 'hand])]
            (for [hand (->> (str/split hands #"\s+and\s+")
@@ -224,7 +233,7 @@
   (comp triples->entity ->triples))
 
 (comment
-  (def example (io/file "/Users/rqf595/Desktop/Glossematics-data/N-drev/Data-FINAL/DanielJones/TEI/DJtilHJU-1931-02-14-tei-final.xml"))
+  (def example (io/file "/Users/rqf595/Desktop/Glossematics-data/N-drev/1_HJELMSLEV-archive/TEI-wo-text/acc-1992_0005_102_14-30_1580-tei.xml"))
   (xml/parse (slurp example))
   (scrape-document (slurp example))
   (->triples example)
