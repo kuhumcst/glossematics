@@ -39,7 +39,8 @@
                      [:extent {}
                       [:note {} page-count]]]]
    :hand-desc     '[:handDesc {} [:p {} hand]]
-   :relevant-for  '[:ref {:type "relevan_for" :target target}] ;TODO: add missing t
+   :relevant-for  '[:ref {:type   "relevant_for"
+                          :target target}]
 
    ;; Explodes [:correspDesc ...] into its constituent parts.
    :sender        '[:correspAction {:type "sent"}
