@@ -58,7 +58,7 @@
   (let [items (query-params->items query-params id->name)]
     (cond-> {:items  (vec items)
              :unique (set items)}
-      order-by (assoc :order-by (->> (str/split order-by #",")
+      order-by (assoc :order-by (->> (str/split order-by #"\|")
                                      (mapv (comp keyword str/trim))))
       limit (assoc :limit (js/parseInt limit))
       offset (assoc :offset (js/parseInt offset))
@@ -275,7 +275,7 @@
   (when-let [params (items->query-params items)]            ; clear other params
     (let [[order-rel] order-by]
       (cond-> params
-        order-rel (assoc :order-by (str/join "," (map rel->s order-by)))
+        order-rel (assoc :order-by (str/join "|" (map rel->s order-by)))
         limit (assoc :limit limit)
         offset (assoc :offset offset)
         from (assoc :from from)
