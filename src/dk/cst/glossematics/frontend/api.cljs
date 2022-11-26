@@ -12,17 +12,19 @@
        (case status
          403 "The resource is restricted — you may have been logged out!\n\n"
          404 "The resource does not exist — the page may need to refresh!\n\n"
+         500 "The server responded with an error!\n\n"
          nil)
-       "Do you want to log in again and refresh the page?\n\n"))
+       "Do you want to log in again and try to refresh the page?\n\n"))
 
 (defn refresh-dialog
   "Display a dialog based on the HTTP `status` asking to refresh the page."
   [status]
   (when-not state/*block-modal-dialogs*
     (set! state/*block-modal-dialogs* true)
-    (when (js/confirm (refresh-dialog-msg status))
+    (if (js/confirm (refresh-dialog-msg status))
       (-> (sp.auth/saml-path state/paths :saml-login js/location.href)
-          (js/location.replace)))))
+          (js/location.replace))
+      (js/history.back))))
 
 (defn fetch
   "Do a GET request for the resource at `url`, returning the response body.
@@ -36,11 +38,10 @@
     (when-not (get @state/fetches current-fetch)
       (swap! state/fetches conj current-fetch)
       (p/let [{:keys [status body] :as m} (fetch/get url' opts)]
+        (swap! state/fetches disj current-fetch)
         (if-not (<= 200 status 299)
           (refresh-dialog status)
-          (do
-            (swap! state/fetches disj current-fetch)
-            body))))))
+          body)))))
 
 (defn login
   []
