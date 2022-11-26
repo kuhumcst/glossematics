@@ -39,6 +39,7 @@
                      [:extent {}
                       [:note {} page-count]]]]
    :hand-desc     '[:handDesc {} [:p {} hand]]
+   :ms-desc       '[:msDesc {:ana publish-state} ???]
    :relevant-for  '[:ref {:type   "relevant_for"
                           :target target}]
 
@@ -151,6 +152,7 @@
 (defn document-triples
   [filename {:keys [object-desc
                     hand-desc
+                    ms-desc
                     facsimile
                     relevant-for
                     language
@@ -188,7 +190,10 @@
            (when-let [v (get-in object-desc [0 'form])]
              (if (get (-> sd/special-entity-types :document/condition :en->da) v)
                [filename :document/condition v]
-               (log/info :tei/unsupported {:document/condition v})))])
+               (log/info :tei/unsupported {:document/condition v})))
+           (when-let [v (get-in ms-desc [0 'publish-state])]
+             (when (get #{"published" "unpublished" "draft"} v)
+               [filename :document/condition v]))])
         [(when-let [v (get-in object-desc [0 'support])]
            (->> (str/split v #"\s+and\s+")                  ; support multiple
                 (map #(if (= % "copy") "photocopy" %))

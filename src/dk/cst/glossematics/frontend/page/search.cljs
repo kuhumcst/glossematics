@@ -340,7 +340,7 @@
 (defn search-result-condition
   [tr]
   [:div.input-row
-   [:label {:for "condition"} (tr :document/condition)]
+   [:label {:for "condition"} (tr ::condition)]
    (let [{:keys [unique]} @state/query
          v->k (if (= (i18n/->tr) i18n/tr-da)
                 sd/da-attr->en-attr

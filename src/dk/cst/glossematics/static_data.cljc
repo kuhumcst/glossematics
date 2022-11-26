@@ -83,6 +83,11 @@
               "photocopy"    "fotokopi"
               "carbon copy"  "gennemslagspapir"
 
+              ;; publish state
+              "published"    "publiceret"
+              "unpublished"  "upubliceret"
+              "draft"        "udkast"
+
               ;; form
               "postcard"     "postkort"
               "document"     "dokument"

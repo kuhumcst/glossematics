@@ -205,6 +205,8 @@
                           :da [:<> [:strong "BEMÆRK:"] " søgning fungerer bedre, når du vælger en af de " [:em "foreslåede entiteter"] " fra listen."]}
    ::search/view-caption {:en "View in the reader"
                           :da "Vis i læseren"}
+   ::search/condition    {:en "Document condition"
+                          :da "Dokumentets tilstand"}
    ::search/limit-from   {:en "Limit from "
                           :da "Begræns fra "}
    ::search/limit-to     {:en " to "
