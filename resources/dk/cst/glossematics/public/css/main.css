@@ -542,11 +542,13 @@ a:hover img.action__icon {
     margin-right: var(--margin-s);
 }
 
-/* TODO: fix - no outline when tabbing to this element. */
 .search-form__item-select {
     position: absolute;
-    opacity: 0;
+    background: transparent;
+    color: transparent;
+    -webkit-appearance: none; /* Safari-specific background removal. */
     cursor: pointer;
+    border: none;
     margin: -12px; /* Counter parent margin. */
     min-height: 30px;
     font-size: 16px;
