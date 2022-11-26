@@ -126,6 +126,10 @@ body {
     background: var(--background-darker);
 }
 
+abbr {
+    cursor: help;
+}
+
 a {
     color: #1060d7;
     text-decoration: none;
@@ -276,6 +280,10 @@ nav input[type=checkbox].bookmark:checked {
     transition: all 0.66s;
 }
 
+.shell.fetching {
+    cursor: progress;
+}
+
 /* While fetching, the search results blur out and become inactive. */
 .shell.fetching .search-result .kvs-list {
     opacity: 0.5;
@@ -412,6 +420,7 @@ label {
     letter-spacing: 1.5;
     text-transform: uppercase;
     padding: 4px;
+    font-size: 18px;
 }
 
 .search-form__item {
@@ -428,6 +437,11 @@ label {
     margin: 12px 6px 0 0;
     white-space: nowrap;
     color: var(--color);
+}
+
+.search-form__item:hover {
+    transform: scale(1.04);
+    box-shadow: var(--box-shadow-elevated);
 }
 
 .search-form__item:last-child {
@@ -603,7 +617,7 @@ details[open] summary {
     appearance: none;
 
     transition: all 0.2s;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--color);
     border: var(--border);
     border-radius: var(--border-radius);
@@ -1124,13 +1138,15 @@ button.login-button {
     border: var(--border);
     border-radius: var(--border-radius);
     padding: var(--padding) var(--padding-xl);
+    box-shadow: var(--box-shadow-container);
     margin: 0;
     margin-left: auto;
 }
 
 button.logout-button:hover,
 button.login-button:hover {
-    border-color: black;
+    transform: scale(1.02);
+    box-shadow: var(--box-shadow-elevated);
 }
 
 button.logout-button:active,

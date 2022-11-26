@@ -152,8 +152,8 @@
     border-color: #7a4907;
 }
 .timeline-event-label {
-    padding: 2px 6px;
-    border: var(--border-subtle);
+    padding: 2px 0 2px 6px;
+    border: var(--border);
     background: var(--background);
     box-shadow: var(--box-shadow-container);
     font-family: Georgia, serif;
