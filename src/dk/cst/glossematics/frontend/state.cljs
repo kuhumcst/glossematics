@@ -74,6 +74,9 @@
 (defonce timeline
   (r/cursor db [:timeline]))
 
+(defonce ui
+  (r/cursor db [:ui]))
+
 (defonce search
   (r/cursor db [:search :meta]))
 

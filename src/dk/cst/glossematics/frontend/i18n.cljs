@@ -195,6 +195,8 @@
                           :da "Nulstil kriterier"}
    ::search/remove       {:en "Remove criterion"
                           :da "Fjern kriterie"}
+   ::search/add          {:en "Add another criterion"
+                          :da "Tilføj endnu et kriterie"}
    ::search/prev         {:en "← previous"
                           :da "← forrige"}
    ::search/next         {:en "next →"

@@ -439,6 +439,7 @@ label {
     color: var(--color);
 }
 
+.search-form__item:focus-within,
 .search-form__item:hover {
     transform: scale(1.04);
     box-shadow: var(--box-shadow-elevated);
@@ -472,6 +473,35 @@ ul.bookmarks > li button:hover {
 
 .search-form__item > button {
     margin-left: 4px;
+}
+
+button.search-form__add {
+    transition: all 0.2s;
+    cursor: pointer;
+    appearance: none;
+    opacity: 0.33;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-container);
+    height: 28px;
+    width: 28px;
+    margin: 0;
+    padding: 4px;
+    vertical-align: bottom;
+    background: url(/images/add-symbol-svgrepo-com.svg) no-repeat;
+    background-origin: content-box; /* respect padding */
+}
+
+button.search-form__add:focus,
+button.search-form__add:hover {
+    opacity: 1;
+
+    transform: scale(1.04);
+    box-shadow: var(--box-shadow-elevated);
+}
+
+button.search-form__add:disabled {
+    opacity: 0;
 }
 
 ul.bookmarks > li button {
@@ -628,6 +658,12 @@ details[open] summary {
     /* Fix Safari issue in search result paging. */
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.input-row input[type=list]:hover,
+.input-row input[type=list]:focus {
+    transform: scale(1.01);
+    box-shadow: var(--box-shadow-elevated);
 }
 
 .input-row input[type=date]::placeholder {

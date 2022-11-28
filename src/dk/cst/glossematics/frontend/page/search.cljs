@@ -440,6 +440,15 @@
       [select-opts tr (map ?disable sd/search-rels) [anything-opt tr]])
     [select-opts tr sd/search-rels [anything-opt tr]]))
 
+(defn search-criteria-add
+  [tr]
+  [:button.search-form__add
+   {:title    (tr ::add)
+    :disabled (= (:focus @state/ui) "v")
+    :on-click (fn [e]
+                (.preventDefault e)
+                (.focus (js/document.getElementById "v")))}])
+
 (defn search-criteria
   [tr id->type items]
   [:fieldset
@@ -497,7 +506,10 @@
                              (swap! state/query remove-kv kv)
                              (new-page!))}
         "x"]]
-      " "])])
+      " "])
+
+   ;; Only used to nudge users to add additional criteria.
+   [search-criteria-add tr]])
 
 (def condition-kv?
   (comp sd/en-attr->da-attr second))
@@ -536,6 +548,8 @@
                    :id          "v"
                    :disabled    (nil? name->id)
                    :on-change   set-in
+                   :on-focus    #(swap! state/ui assoc :focus "v")
+                   :on-blur     #(swap! state/ui dissoc :focus)
                    :value       in}]
           (when name->id
             (if (= "da" @state/language)
