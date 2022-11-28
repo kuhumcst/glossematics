@@ -606,6 +606,8 @@ details summary {
     text-align: right;
     text-transform: uppercase;
     cursor: pointer;
+    width: fit-content;
+    margin-left: auto;
 }
 
 details[open] summary {
