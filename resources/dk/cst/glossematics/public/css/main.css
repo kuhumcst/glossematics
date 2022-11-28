@@ -953,7 +953,6 @@ hr {
 }
 
 .text-illustration {
-    animation: fade-in 0.66s;
     width: 200px;
     max-width: 33%;
     padding: var(--padding) 0 0 0;
