@@ -174,7 +174,8 @@
   (let [{:keys [name->id]} @state/search
         bookmarks @state/bookmarks]
     (when (and (not bookmarks) state/assertions)
-      (fetch-bookmarks! (shared/assertions->user-id state/assertions)))
+      (when-let [user (shared/assertions->user-id state/assertions)]
+        (fetch-bookmarks! user)))
     (when-not name->id
       (search/fetch-metadata!))))
 

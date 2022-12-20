@@ -83,7 +83,7 @@
   (if development?
     "UNKNOWN"
     (when-let [user (assertions->user-ids assertions)]
-      (single user))))
+      (not-empty (single user)))))
 
 (comment
   ;; These should all be true
