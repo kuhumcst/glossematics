@@ -1,59 +1,53 @@
-{:paths   ["src" "resources"]
- :deps    {org.clojure/clojure                                       {:mvn/version "1.11.1"}
-           org.clojure/data.json                                     {:mvn/version "2.4.0"} ; Pedestal SP
-           org.clojure/data.csv                                      {:mvn/version "1.0.1"}
-           org.clojure/math.combinatorics                            {:mvn/version "0.1.6"}
-           dk.ative/docjure                                          {:mvn/version "1.18.0"}
-           tick/tick                                                 {:mvn/version "0.5.0"} ; bundles time-literals
+{:paths     ["src" "resources"]
+ :mvn/repos {"opensaml" {:url "https://build.shibboleth.net/nexus/content/repositories/releases/"}}
+ :deps      {org.clojure/clojure                                       {:mvn/version "1.11.1"}
+             org.clojure/data.json                                     {:mvn/version "2.4.0"} ; Pedestal SP
+             org.clojure/data.csv                                      {:mvn/version "1.0.1"}
+             org.clojure/math.combinatorics                            {:mvn/version "0.1.6"}
+             dk.ative/docjure                                          {:mvn/version "1.19.0"}
+             tick/tick                                                 {:mvn/version "0.5.0"} ; bundles time-literals
 
-           io.pedestal/pedestal.service                              {:mvn/version "0.5.11-SNAPSHOT"}
-           io.pedestal/pedestal.route                                {:mvn/version "0.5.11-SNAPSHOT"}
-           io.pedestal/pedestal.jetty                                {:mvn/version "0.5.11-SNAPSHOT"}
-           luminus/ring-ttl-session                                  {:mvn/version "0.3.3"}
-           org.slf4j/slf4j-simple                                    {:mvn/version "2.0.3"}
-           hiccup/hiccup                                             {:mvn/version "1.0.5"}
-           ring/ring-core                                            {:mvn/version "1.9.6"}
-           com.wsscode/transito                                      {:mvn/version "2021.07.04"}
-           org.clojars.quoll/asami                                   {:mvn/version "2.3.2"}
-           metabase/saml20-clj                                       {:mvn/version "2.0.2"}
+             io.pedestal/pedestal.service                              {:mvn/version "0.5.11-SNAPSHOT"}
+             io.pedestal/pedestal.route                                {:mvn/version "0.5.11-SNAPSHOT"}
+             io.pedestal/pedestal.jetty                                {:mvn/version "0.5.11-SNAPSHOT"}
+             luminus/ring-ttl-session                                  {:mvn/version "0.3.3"}
+             org.slf4j/slf4j-simple                                    {:mvn/version "2.0.5"}
+             hiccup/hiccup                                             {:mvn/version "1.0.5"}
+             ring/ring-core                                            {:mvn/version "1.9.6"}
+             com.wsscode/transito                                      {:mvn/version "2021.07.04"}
+             org.clojars.quoll/asami                                   {:mvn/version "2.3.2"}
+             metabase/saml20-clj                                       {:mvn/version "2.1.0"}
 
-           ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
-           ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
-           kuhumcst/cuphic                                           {:git/url "https://github.com/kuhumcst/cuphic.git"
-                                                                      :sha     "f2b96835004467628351355a77fc3207a5beb557"}
-           kuhumcst/rescope                                          {:git/url "https://github.com/kuhumcst/rescope.git"
-                                                                      :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
+             ;kuhumcst/cuphic           {:local/root "/Users/rqf595/Code/cuphic"}
+             ;kuhumcst/rescope          {:local/root "/Users/rqf595/Code/rescope"}
+             kuhumcst/cuphic                                           {:git/url "https://github.com/kuhumcst/cuphic.git"
+                                                                        :sha     "f2b96835004467628351355a77fc3207a5beb557"}
+             kuhumcst/rescope                                          {:git/url "https://github.com/kuhumcst/rescope.git"
+                                                                        :sha     "901879bdfa489a70b26a1e9fdd381475207130ca"}
 
-           ;; #23 use latest opensaml since saml20-clj is stuck on "3.4.6".
-           org.opensaml/opensaml-core                                {:mvn/version "4.0.1"}
-           org.opensaml/opensaml-saml-api                            {:mvn/version "4.0.1"}
-           org.opensaml/opensaml-saml-impl                           {:mvn/version "4.0.1"}
-           org.opensaml/opensaml-xmlsec-api                          {:mvn/version "4.0.1"}
-           org.opensaml/opensaml-xmlsec-impl                         {:mvn/version "4.0.1"}
+             ;; #23 use latest jackson
+             com.fasterxml.jackson.core/jackson-core                   {:mvn/version "2.14.0"}
+             com.fasterxml.jackson.core/jackson-databind               {:mvn/version "2.14.0"}
+             com.fasterxml.jackson.core/jackson-annotations            {:mvn/version "2.14.0"}
+             com.fasterxml.jackson.dataformat/jackson-dataformat-cbor  {:mvn/version "2.14.0"}
+             com.fasterxml.jackson.dataformat/jackson-dataformat-smile {:mvn/version "2.14.0"}
 
-           ;; #23 use latest jackson
-           com.fasterxml.jackson.core/jackson-core                   {:mvn/version "2.14.0"}
-           com.fasterxml.jackson.core/jackson-databind               {:mvn/version "2.14.0"}
-           com.fasterxml.jackson.core/jackson-annotations            {:mvn/version "2.14.0"}
-           com.fasterxml.jackson.dataformat/jackson-dataformat-cbor  {:mvn/version "2.14.0"}
-           com.fasterxml.jackson.dataformat/jackson-dataformat-smile {:mvn/version "2.14.0"}
+             ;; #23 latest Apache commons-codec and transitive deps
+             commons-codec/commons-codec                               {:mvn/version "1.15"}
+             org.springframework/spring-core                           {:mvn/version "5.3.23"}}
 
-           ;; #23 latest Apache commons-codec and transitive deps
-           commons-codec/commons-codec                               {:mvn/version "1.15"}
-           org.springframework/spring-core                           {:mvn/version "5.3.23"}}
-
- :aliases {:frontend {:extra-deps {org.clojure/clojurescript   {:mvn/version "1.11.60"}
-                                   thheller/shadow-cljs        {:mvn/version "2.20.10"}
-                                   tongue/tongue               {:mvn/version "0.4.4"}
-                                   com.lambdaisland/glogi      {:mvn/version "1.1.144"}
-                                   lambdaisland/fetch          {:mvn/version "1.1.60"}
-                                   metosin/reitit              {:mvn/version "0.5.18"}
-                                   reagent/reagent             {:mvn/version "1.1.1"}
-                                   reagent-utils/reagent-utils {:mvn/version "0.3.5"}
-                                   kitchen-async/kitchen-async {:mvn/version "0.1.0-SNAPSHOT"}}}
-           :graph    {:replace-deps {org.clojure/tools.deps.graph {:mvn/version "1.1.68"}}
-                      :ns-default   clojure.tools.deps.graph}
-           :build    {:extra-paths ["dev/src"]
-                      :extra-deps  {io.github.seancorfield/build-clj
-                                    {:git/tag "v0.8.3" :git/sha "7ac1f8d"}}}
-           :test     {:extra-paths ["test"]}}}
+ :aliases   {:frontend {:extra-deps {org.clojure/clojurescript   {:mvn/version "1.11.60"}
+                                     thheller/shadow-cljs        {:mvn/version "2.20.15"}
+                                     tongue/tongue               {:mvn/version "0.4.4"}
+                                     com.lambdaisland/glogi      {:mvn/version "1.2.164"}
+                                     lambdaisland/fetch          {:mvn/version "1.2.69"}
+                                     metosin/reitit              {:mvn/version "0.5.18"}
+                                     reagent/reagent             {:mvn/version "1.1.1"}
+                                     reagent-utils/reagent-utils {:mvn/version "0.3.5"}
+                                     kitchen-async/kitchen-async {:mvn/version "0.1.0-SNAPSHOT"}}}
+             :graph    {:replace-deps {org.clojure/tools.deps.graph {:mvn/version "1.1.68"}}
+                        :ns-default   clojure.tools.deps.graph}
+             :build    {:extra-paths ["dev/src"]
+                        :extra-deps  {io.github.seancorfield/build-clj
+                                      {:git/tag "v0.8.3" :git/sha "7ac1f8d"}}}
+             :test     {:extra-paths ["test"]}}}
