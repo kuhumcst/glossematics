@@ -309,12 +309,12 @@
     :as   search-state}
    in]
   (when-let [in (not-empty (str/trim in))]
-    (or (name->id in)                                       ; exact name
-        (da-name->id in)                                    ; danish locale only
-        (and (id->name in) in)                              ; entity IDs
+    (or (get name->id in)                                   ; exact name
+        (get da-name->id in)                                ; danish locale only
+        (and (get id->name in) in)                          ; entity IDs
         (let [lin (str/lower-case in)]
-          (or (lowercase-name->id lin)                      ; lower-case strings
-              (short-name->id lin))))))                     ; shorter variants
+          (or (get lowercase-name->id lin)                  ; lower-case strings
+              (get short-name->id lin))))))                 ; shorter variants
 
 (defn- add-criterion!
   [kv]
@@ -465,7 +465,7 @@
 
    (for [[k v :as kv] items
          :let [{:keys [label style]} (meta kv)
-               entity-type  (or (id->type v)
+               entity-type  (or (get id->type v)
                                 :entity.type/unknown)
                ->set-rel    (fn [e]
                               (let [rel (s->rel (e->v e))
