@@ -435,9 +435,9 @@
 (defn rel-select-opts
   [tr entity-type]
   (if entity-type
-    (let [compatible? (comp boolean entity-type :compatible second)
-          ?disable    #(with-meta % {:disabled (not (compatible? %))})]
-      [select-opts tr (map ?disable sd/search-rels) [anything-opt tr]])
+    (let [compatible?     (comp boolean entity-type :compatible second)
+          compatible-rels (remove (complement compatible?) sd/search-rels)]
+      [select-opts tr compatible-rels [anything-opt tr]])
     [select-opts tr sd/search-rels [anything-opt tr]]))
 
 (defn search-criteria-add

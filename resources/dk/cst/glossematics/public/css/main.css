@@ -599,6 +599,12 @@ a:hover img.action__icon {
     width: calc(100% - 24px);
 }
 
+/* Fix bug on Windows where options were permanently painted transparent. */
+.search-form__item-select option {
+    color: initial;
+    background: initial;
+}
+
 details summary {
     font-size: 12px;
     color: var(--color);
