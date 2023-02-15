@@ -431,13 +431,12 @@
   [tr]
   [:option {:value (rel->s '_)} (tr :any)])
 
-;; TODO: if only one option is available, display by default in UI
 (defn rel-select-opts
   [tr entity-type]
   (if entity-type
-    (let [compatible? (comp boolean entity-type :compatible second)
-          ?disable    #(with-meta % {:disabled (not (compatible? %))})]
-      [select-opts tr (map ?disable sd/search-rels) [anything-opt tr]])
+    (let [compatible?     (comp boolean entity-type :compatible second)
+          compatible-rels (filter compatible? sd/search-rels)]
+      [select-opts tr compatible-rels [anything-opt tr]])
     [select-opts tr sd/search-rels [anything-opt tr]]))
 
 (defn search-criteria-add
@@ -465,7 +464,7 @@
 
    (for [[k v :as kv] items
          :let [{:keys [label style]} (meta kv)
-               entity-type  (or (get id->type v)
+               entity-type  (or (id->type v)
                                 :entity.type/unknown)
                ->set-rel    (fn [e]
                               (let [rel (s->rel (e->v e))
