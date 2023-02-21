@@ -283,6 +283,11 @@ footer {
     text-align: center;
 }
 
+/* Span the entire width of the reader page. */
+.reader + footer {
+    max-width: inherit;
+}
+
 footer * {
     font-family: PoiretOne, sans-serif;
     font-size: 22px;

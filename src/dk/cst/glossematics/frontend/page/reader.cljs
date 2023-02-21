@@ -462,6 +462,9 @@
                                        (fn [s]
                                          (set-content! (.-name file) s)))))}])
 
+     (when (and i (> (count results) 1))
+       [reader-paging tr results i query-state])
+
      (when hiccup
        (if local-preview?
          ;; Only for previewing TEI parsing functionality.
@@ -505,7 +508,4 @@
                             (into
                               [[[tr ::transcription]
                                 ^{:key tei} [rescope/scope hiccup tei-css]]])))}
-           {:id "tei-tabs"}]]))
-
-     (when i
-       [reader-paging tr results i query-state])]))
+           {:id "tei-tabs"}]]))]))
