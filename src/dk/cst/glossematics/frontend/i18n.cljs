@@ -65,16 +65,20 @@
    ::frontend/privacy              {:da "Privatliv"
                                     :en "Privacy"}
    ::frontend/copyright            {:da [:p
-                                         "© 2022 - "
-                                         [:a {:href "https://www.ku.dk/"} "Københavns Universitet"]
+                                         "© 2022 / "
+                                         [:a {:href "https://www.ku.dk/"}
+                                          "Københavns Universitet"]
                                          " & "
-                                         [:a {:href "https://www.au.dk/"} "Aarhus Universitet"]
+                                         [:a {:href "https://www.au.dk/"}
+                                          "Aarhus Universitet"]
                                          "."]
                                     :en [:p
-                                         "© 2022 - "
-                                         [:a {:href "https://www.ku.dk/english/"} "University of Copenhagen"]
+                                         "© 2022 / "
+                                         [:a {:href "https://www.ku.dk/english/"}
+                                          "University of Copenhagen"]
                                          " & "
-                                         [:a {:href "https://international.au.dk/"} "Aarhus University"]
+                                         [:a {:href "https://international.au.dk/"}
+                                          "Aarhus University"]
                                          "."]}
    ::frontend/unknown-page         {:en [:p "Unknown page."]
                                     :da [:p "Ukendt side."]}})

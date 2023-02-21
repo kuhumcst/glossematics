@@ -277,13 +277,15 @@ nav input[type=checkbox].bookmark:checked {
 }
 
 footer {
-    padding-top: var(--padding-l);
+    max-width: 90ch;
+    margin: auto;
+    padding-top: var(--padding-xl);
     text-align: center;
 }
 
 footer * {
     font-family: PoiretOne, sans-serif;
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .shell .search-result .kvs-list {

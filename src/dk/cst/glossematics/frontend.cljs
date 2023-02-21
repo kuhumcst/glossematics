@@ -166,13 +166,14 @@
         [page]
         [tr ::unknown-page])
       [:footer
-       [:p
-        [:a {:href "https://www.was.digst.dk/glossematics-dk"} [tr ::a11y]]
-        " · "
-        [:a {:href "/privacy"} [tr ::privacy]]
-        " · "
-        [:a {:href "https://github.com/kuhumcst/glossematics"} "Github"]]
-       [tr ::copyright]]]]))
+       [:div.text-content.menu
+        [:p
+         [:a {:href "https://www.was.digst.dk/glossematics-dk"} [tr ::a11y]]
+         " / "
+         [:a {:href "/privacy"} [tr ::privacy]]
+         " / "
+         [:a {:href "https://github.com/kuhumcst/glossematics"} "Github"]]
+        [tr ::copyright]]]]]))
 
 (defn fetch-bookmarks!
   "Fetches and post-processes metadata used to populate the search form."
