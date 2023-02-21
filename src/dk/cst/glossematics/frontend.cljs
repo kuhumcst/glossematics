@@ -15,6 +15,7 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.page.main :as main]
+            [dk.cst.glossematics.frontend.page.privacy :as privacy]
             [dk.cst.glossematics.frontend.page.search :as search]
             [dk.cst.glossematics.frontend.page.bibliography :as bibliography]
             [dk.cst.glossematics.frontend.page.bookmarks :as bookmarks]
@@ -28,6 +29,10 @@
     {:name  ::main/page
      :title "Glossematics"
      :page  main/page}]
+   ["/privacy"
+    {:name  ::privacy/page
+     :title ::privacy
+     :page  privacy/page}]
    ["/app/encyclopedia/:ref"
     {:name  ::encyclopedia/page
      :title ::encyclopedia
@@ -159,7 +164,15 @@
                                     "fill-mode")}
       (if page
         [page]
-        [tr ::unknown-page])]]))
+        [tr ::unknown-page])
+      [:footer
+       [:p
+        [:a {:href "https://www.was.digst.dk/glossematics-dk"} [tr ::a11y]]
+        " · "
+        [:a {:href "/privacy"} [tr ::privacy]]
+        " · "
+        [:a {:href "https://github.com/kuhumcst/glossematics"} "Github"]]
+       [tr ::copyright]]]]))
 
 (defn fetch-bookmarks!
   "Fetches and post-processes metadata used to populate the search form."

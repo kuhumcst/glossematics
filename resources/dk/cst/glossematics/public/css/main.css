@@ -276,6 +276,16 @@ nav input[type=checkbox].bookmark:checked {
     padding: var(--padding-xl);
 }
 
+footer {
+    padding-top: var(--padding-l);
+    text-align: center;
+}
+
+footer * {
+    font-family: PoiretOne, sans-serif;
+    font-size: 20px;
+}
+
 .shell .search-result .kvs-list {
     transition: all 0.66s;
 }

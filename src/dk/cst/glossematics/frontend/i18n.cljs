@@ -5,6 +5,7 @@
             [dk.cst.glossematics.frontend :as-alias frontend]
             [dk.cst.glossematics.frontend.shared :as-alias fshared]
             [dk.cst.glossematics.frontend.page.main :as-alias main]
+            [dk.cst.glossematics.frontend.page.privacy :as-alias privacy]
             [dk.cst.glossematics.frontend.page.bookmarks :as-alias bookmarks]
             [dk.cst.glossematics.frontend.page.reader :as-alias reader]
             [dk.cst.glossematics.frontend.page.search :as-alias search]))
@@ -59,6 +60,22 @@
                                     :da "Opret bogmærke for denne side"}
    ::frontend/rem-bookmark-caption {:en "Remove bookmark for this page"
                                     :da "Fjern bogmærke for denne side"}
+   ::frontend/a11y                 {:da "Tilgængelighed"
+                                    :en "Accessibility"}
+   ::frontend/privacy              {:da "Privatliv"
+                                    :en "Privacy"}
+   ::frontend/copyright            {:da [:p
+                                         "© 2022 - "
+                                         [:a {:href "https://www.ku.dk/"} "Københavns Universitet"]
+                                         " & "
+                                         [:a {:href "https://www.au.dk/"} "Aarhus Universitet"]
+                                         "."]
+                                    :en [:p
+                                         "© 2022 - "
+                                         [:a {:href "https://www.ku.dk/english/"} "University of Copenhagen"]
+                                         " & "
+                                         [:a {:href "https://international.au.dk/"} "Aarhus University"]
+                                         "."]}
    ::frontend/unknown-page         {:en [:p "Unknown page."]
                                     :da [:p "Ukendt side."]}})
 
@@ -165,6 +182,40 @@
                                     [:p
                                      "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "
                                      "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]]}})
+
+(def privacy-page-translations
+  {::privacy/text {:da [:div.text-content
+                        [:h2 "Privatliv"]
+                        [:p
+                         "Glossematics indsamler ikke data om sine brugere til statistik eller andet.
+                        Dog skal du forvente at dit besøg på siden logges, og at der lagres cookies
+                        og andet data i det omfang du bruger siden."]
+                        [:p
+                         "Eksempelvis lagres dine sprogindstillinger lokalt i din browser,
+                        hvis du ændrer sproget og din sessions-ID gemmes også som en cookie både i
+                        din browser og på serveren, således at login-funktionaliteten fungerer.
+                        Funktionalitet på siden som kræver at andet data gemmes, f.eks. bogmærker,
+                        resulterer også i at data lagres på vores server."]
+                        [:p
+                         "Login håndteres helt transparent via din egen institutions login-side.
+                        Når du logger ind, modtager vi en lille portion data, der identificerer dig.
+                        De datapunkter vi modtager, kan du se under BRUGERDETALJER på forsiden."]]
+                   :en [:div.text-content
+                        [:h2 "Privacy"]
+                        [:p
+                         "Glossematics does not collect data about its users for statistics or other purposes.
+                         However, you should expect that your visit to this page is logged and that cookies
+                         and other data will be stored according to your site usage."]
+                        [:p
+                         "For example, your language settings are stored locally in your browser
+                         if you change the language and your session ID is also stored as a cookie in both
+                         your browser and on the server, such that logins are possible.
+                         Any functionality on this site which requires saving other data, e.g. bookmarks,
+                         also results in data being persisted on our server."]
+                        [:p
+                         "Login is handled completely transparently via the login page of your institution.
+                         When you log in, we will receive a tiny bit of data identifying you.
+                         You can inspect this data under USER DETAILS on the frontpage."]]}})
 
 (def reader-page-translations
   {::reader/local-file        {:en "Local TEI file"
@@ -387,6 +438,7 @@
 (def dicts
   (reduce into-dicts {} (merge frontend-translations
                                main-page-translations
+                               privacy-page-translations
                                reader-page-translations
                                search-page-translations
                                bookmarks-page-translations
