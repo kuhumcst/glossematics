@@ -82,7 +82,7 @@
   []
   (let [{:keys [id->name]} @state/search
         tr (i18n/->tr)]
-    [:div.main-page
+    [:article.main-page
      [user-section tr]
      [:div.text-content
       [tr ::introduction]

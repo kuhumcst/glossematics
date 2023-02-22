@@ -68,6 +68,9 @@
            :bookmarks nil
            :search    {:query query-defaults}}))
 
+(defonce compact
+  (r/cursor db [:compact]))
+
 (defonce location
   (r/cursor db [:location]))
 

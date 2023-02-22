@@ -110,22 +110,38 @@
    :raw?    true                                            ; use raw strings
    :secure? true})
 
+(defn mark-first
+  "Mark the first character of a string `s` with the class first.
+
+  This annoying workaround is needed because of 15+ year old bug in Firefox:
+  https://bugzilla.mozilla.org/show_bug.cgi?id=385615"
+  [s]
+  (let [c (subs s 0 1)
+        s (subs s 1)]
+    [:<> [:span.first c] s]))
+
 (defn shell
   "A container component that wraps the various pages of the app."
   []
   (let [{:keys [page name]} (:data @state/location)
         authenticated? @state/authenticated?
+        fetching?      (not-empty @state/fetches)
+        timeline?      (= name ::timeline/page)
+        reader?        (= name ::reader/page)
+        compact?       (or timeline? @state/compact #_reader?)
         tr             (i18n/->tr)
         bookmarks      @state/bookmarks
         user           (shared/assertions->user-id state/assertions)
         path           (fshared/current-path)
         {:keys [db/ident] :as bookmark} (get bookmarks path)]
-    [:div.shell {:class [(when (get #{::reader/page ::timeline/page} name)
-                           "reader-mode")
-                         (when (not-empty @state/fetches)
-                           "fetching")]}
-     [:img.loading-indicator {:src "/images/loading.svg"}]
-     [:nav
+    ;; A containing div is currently needed for the timeline to work properly.
+    [:div#shell {:class [(when fetching?
+                           "fetching")
+                         (when compact?
+                           "compact")
+                         (when timeline?
+                           "timeline")]}
+     [:header
       [:h1
        [:a {:href  (href ::main/page)
             :title (tr ::main-caption)}
@@ -138,42 +154,54 @@
                                             (fshared/location->page-title)
                                             (fshared/set-title!))))}
         (tr ::language-flag)]]
-      [:a {:href      (href ::search/page)
-           :title     (tr ::search-caption)
-           :tab-index (if authenticated? "0" "-1")          ; for accessibility
-           :disabled  (not authenticated?)}
-       [tr ::search]]
-      [:a {:href  (href ::timeline/page)
-           :title (tr ::timeline-caption)}
-       [tr ::timeline]]
-      [:a {:href  (href ::bibliography/page {:author "lh"})
-           :title (tr ::bibliography-caption)}
-       [tr ::bibliography]]
-      [:input.bookmark {:type      "checkbox"
-                        :disabled  (not authenticated?)
-                        :checked   (boolean bookmark)
-                        :title     (if bookmark
-                                     (tr ::rem-bookmark-caption)
-                                     (tr ::add-bookmark-caption))
-                        :on-change (fn [e]
-                                     (.preventDefault e)
-                                     (if bookmark
-                                       (api/del-bookmark user path ident)
-                                       (api/add-bookmark user path name)))}]]
-     [:div.shell__content {:class (when (= name ::timeline/page)
-                                    "fill-mode")}
+      [:div.toggle-compact (when-not timeline?
+                             {:style    {:cursor (if @state/compact
+                                                   "s-resize"
+                                                   "n-resize")}
+                              :on-click (fn [e]
+                                          (swap! state/compact not))})]
+      [:nav
+       [:a {:href      (href ::search/page)
+            :title     (tr ::search-caption)
+            :tab-index (if authenticated? "0" "-1")         ; for accessibility
+            :disabled  (not authenticated?)}
+        (mark-first (tr ::search))]
+       [:a {:href  (href ::timeline/page)
+            :title (tr ::timeline-caption)}
+        (mark-first (tr ::timeline))]
+       [:a {:href  (href ::bibliography/page {:author "lh"})
+            :title (tr ::bibliography-caption)}
+        (mark-first (tr ::bibliography))]
+       [:input.bookmark {:type      "checkbox"
+                         :disabled  (not authenticated?)
+                         :checked   (boolean bookmark)
+                         :title     (if bookmark
+                                      (tr ::rem-bookmark-caption)
+                                      (tr ::add-bookmark-caption))
+                         :on-change (fn [e]
+                                      (.preventDefault e)
+                                      (if bookmark
+                                        (api/del-bookmark user path ident)
+                                        (api/add-bookmark user path name)))}]]]
+     [:main
+      [:img.loading-indicator {:alt ""                      ; signal decorative
+                               :src "/images/loading.svg"}]
       (if page
         [page]
-        [tr ::unknown-page])
-      [:footer
-       [:div.text-content.menu
-        [:p
-         [:a {:href "https://www.was.digst.dk/glossematics-dk"} [tr ::a11y]]
-         " / "
-         [:a {:href "/privacy"} [tr ::privacy]]
-         " / "
-         [:a {:href "https://github.com/kuhumcst/glossematics"} "Github"]]
-        [tr ::copyright]]]]]))
+        [tr ::unknown-page])]
+     (when-not timeline?
+       [:footer
+        [:section.links
+         [:a {:href "https://www.was.digst.dk/glossematics-dk"}
+          (mark-first (tr ::a11y))]
+         [:span " / "]
+         [:a {:href "/privacy"}
+          (mark-first (tr ::privacy))]
+         [:span " / "]
+         [:a {:href "https://github.com/kuhumcst/glossematics"}
+          (mark-first "Github")]]
+        [:section.links
+         [tr ::copyright]]])]))
 
 (defn fetch-bookmarks!
   "Fetches and post-processes metadata used to populate the search form."

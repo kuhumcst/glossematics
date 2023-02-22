@@ -45,7 +45,7 @@
   (let [bookmarks @state/bookmarks
         tr        (i18n/->tr)
         author    (-> @state/location :path-params :author)]
-    [:div.index-page
+    [:article.index-page
      [:h1
       [:img {:src "/images/book-fill.svg"}] " " (tr ::frontend/bookmarks)]
      (if (empty? bookmarks)

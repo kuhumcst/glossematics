@@ -133,7 +133,7 @@
 ;; TODO: currently just a heuristic, can it be approached more rationally?
 (defn busy?
   [[k binned-dates]]
-  (> (count binned-dates) 4))
+  (> (count binned-dates) 6))
 
 (defn dates-between
   "Find dates between :start and :end of `event` with tick of size `ms`."

@@ -644,7 +644,7 @@
         {:keys [offset items]} @state/query
         {:keys [query-params]} @state/location
         tr (i18n/->tr)]
-    [:div.search-page
+    [:article.search-page
      ;; React key needed for input to update after name->id has been fetched!
      ^{:key [name->id tr]} [search-form tr]
      (if results
@@ -659,7 +659,8 @@
            (when id->name
              (let [kvs          (map (juxt :file/name identity) results)
                    entity-table (partial search-result-table tr search-state)]
-               [fshared/kvs-list kvs entity-table offset]))]])
+               [fshared/kvs-list kvs entity-table offset]))
+           [search-paging tr results]]])
        (when (empty? query-params)
          [:<>
           [:div.text-content.menu

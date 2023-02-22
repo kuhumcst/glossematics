@@ -68,7 +68,7 @@
         entity-type (->> (get-in @state/location [:path-params :kind])
                          (keyword "entity.type"))
         {:keys [img-src]} (get sd/real-entity-types entity-type)]
-    [:div.index-page
+    [:article.index-page
      [:h1 [:img {:src img-src}] " " (tr entity-type)]
      (when metadata
        (let [groups (index-groups metadata entity-type)]

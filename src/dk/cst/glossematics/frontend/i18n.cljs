@@ -64,21 +64,25 @@
                                     :en "Accessibility"}
    ::frontend/privacy              {:da "Privatliv"
                                     :en "Privacy"}
-   ::frontend/copyright            {:da [:p
-                                         "© 2022 / "
+   ::frontend/copyright            {:da [:<>
+                                         [:span "© 2022 - "]
                                          [:a {:href "https://www.ku.dk/"}
-                                          "Københavns Universitet"]
-                                         " & "
+                                          [:span.first "K"]
+                                          "øbenhavns Universitet"]
+                                         [:span " & "]
                                          [:a {:href "https://www.au.dk/"}
-                                          "Aarhus Universitet"]
+                                          [:span.first "A"]
+                                          "arhus Universitet"]
                                          "."]
-                                    :en [:p
-                                         "© 2022 / "
+                                    :en [:<>
+                                         [:span "© 2022 - "]
                                          [:a {:href "https://www.ku.dk/english/"}
-                                          "University of Copenhagen"]
-                                         " & "
+                                          [:span.first "U"]
+                                          "niversity of Copenhagen"]
+                                         [:span " & "]
                                          [:a {:href "https://international.au.dk/"}
-                                          "Aarhus University"]
+                                          [:span.first "A"]
+                                          "arhus University"]
                                          "."]}
    ::frontend/unknown-page         {:en [:p "Unknown page."]
                                     :da [:p "Ukendt side."]}})
@@ -188,8 +192,7 @@
                                      "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]]}})
 
 (def privacy-page-translations
-  {::privacy/text {:da [:div.text-content
-                        [:h2 "Privatliv"]
+  {::privacy/text {:da [:<>
                         [:p
                          "Glossematics indsamler ikke data om sine brugere til statistik eller andet.
                         Dog skal du forvente at dit besøg på siden logges, og at der lagres cookies
@@ -204,8 +207,7 @@
                          "Login håndteres helt transparent via din egen institutions login-side.
                         Når du logger ind, modtager vi en lille portion data, der identificerer dig.
                         De datapunkter vi modtager, kan du se under BRUGERDETALJER på forsiden."]]
-                   :en [:div.text-content
-                        [:h2 "Privacy"]
+                   :en [:<>
                         [:p
                          "Glossematics does not collect data about its users for statistics or other purposes.
                          However, you should expect that your visit to this page is logged and that cookies

@@ -437,6 +437,7 @@
         new-document?      (not= document current-document)
         {:keys [document/condition document/facsimile]} entity
         body?              (get condition "transcribed")
+        paging?            (and i (> (count results) 1))
         pdf-src            (and (not body?)
                                 (string? facsimile)
                                 (str/ends-with? facsimile ".pdf")
@@ -450,9 +451,9 @@
                (not= current-document *current-fetch*))
       (set-content! current-document))
 
-    [:div {:class (if local-preview?
-                    "reader-preview"
-                    "reader")}
+    [:article {:class (if local-preview?
+                        "reader-preview-page"
+                        "reader-page")}
      (when local-preview?
        [:input {:aria-label (tr ::local-file)
                 :type       "file"
@@ -462,7 +463,7 @@
                                        (fn [s]
                                          (set-content! (.-name file) s)))))}])
 
-     (when (and i (> (count results) 1))
+     (when paging?
        [reader-paging tr results i query-state])
 
      (when hiccup
@@ -508,4 +509,7 @@
                             (into
                               [[[tr ::transcription]
                                 ^{:key tei} [rescope/scope hiccup tei-css]]])))}
-           {:id "tei-tabs"}]]))]))
+           {:id "tei-tabs"}]]))
+
+     (when paging?
+       [reader-paging tr results i query-state])]))

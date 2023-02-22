@@ -36,6 +36,7 @@
     --background-darker: #EDEAE8 url(/images/texture/asfalt-dark.png);
     --box-shadow-hidden: 0 0 0 0 rgba(0,0,0,0);
     --box-shadow-elevated: 0 8px 8px rgba(0,0,0,0.2);
+    --box-shadow-elevated-reverse: 0 -8px 8px rgba(0,0,0,0.2);
     --color-subtle: #AAA;
     --color-very-subtle: #DDD;
     --font-family-heading: Futura, sans-serif;
@@ -53,6 +54,7 @@
     --padding-m: 8px;
     --padding-l: 16px;
     --padding-xl: 32px;
+    --padding-xxl: 48px;
     --transparent-border: 1px solid transparent;
 
     /* Transformations. */

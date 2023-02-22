@@ -57,7 +57,7 @@
         tr     (i18n/->tr)
         author (-> @state/location :path-params :author)
         id     (sd/author->id author)]
-    [:div.index-page
+    [:article.index-page
      [:h1
       [:img {:src "/images/book-fill.svg"}] " " (tr ::frontend/bibliography)]
      (when (and id->name results)

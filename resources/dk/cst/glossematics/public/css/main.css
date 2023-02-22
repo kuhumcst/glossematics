@@ -145,76 +145,73 @@ a[disabled] {
   opacity: 0.25;
 }
 
-/* Reset for special links. */
-nav a:hover {
-    text-decoration: none;
-}
-
-nav {
+header {
     background-image: linear-gradient(180deg, #000 66%, #222 100%);
     box-shadow: var(--box-shadow-elevated);
-    position: sticky;
-    top: 0;
-    z-index: 998;
+
     display: flex;
     align-items: flex-end;
-    padding:
-        var(--padding-xl)
-        var(--padding-l)
-        var(--padding-m)
-        var(--padding-l);
+
+    padding: 0 var(--padding);
 }
 
-nav, nav h1, nav a, nav button.language {
+/* Reset for special header links. */
+header a:hover,
+footer a:hover {
+    text-decoration: none;
+    animation: glow 0.5s ease-in-out infinite alternate;
+}
+
+header * {
     transition: all 0.2s;
 }
 
-nav h1, nav a {
+header > nav {
+    width: fit-content;
+    flex-grow: 0;
+}
+
+header > h1,
+header > h1 > a,
+header > nav > a {
     color: #EFEFEF;
+}
+
+header > nav > a {
+    font-size: 20px;
+}
+
+header > h1,
+header > h1 > a,
+header > nav > a {
     letter-spacing: 4px;
     font-family: PoiretOne, sans-serif;
     text-transform: uppercase;
-    padding: 0;
     margin: 0;
-    max-width: fit-content; /* fixes #47 - inconsistent widths in Firefox */
 }
 
-nav h1 {
-    margin-right: auto;
-    font-size: 40px;
+header > h1 {
+    margin-top: var(--margin);
+}
+
+/*  Circumventing a dumb Firefox bug in ::first-letter causing layout shifts. */
+.first {
+    font-family: PoiretOne, sans-serif;
+    text-transform: uppercase;
+    color: #ffc92e;
+    font-size: 200%;
+}
+
+header > h1 {
+    font-size: 60px;
     display: inline;
 }
 
-nav a {
-    text-decoration: none;
-    color: #EFEFEF;
-    padding: 0;
-}
-
-nav a:hover {
-    animation: glow 1s ease-in-out infinite alternate;
-}
-
-nav a:first-child {
-    margin-right: auto;
-}
-
-nav a:not(:first-child) {
-    margin: 0;
-    font-size: 20px;
-    flex-grow: 0; /* Fix Firefox width issue */
-}
-
-nav a:not(:first-child) + a {
+header > nav > a + a {
      margin-left: var(--margin-l);
 }
 
-nav a:not(:first-child)::first-letter {
-    font-size: 40px;
-    color: #ffc92e;
-}
-
-nav button.language {
+header > h1 > button.language {
     padding: 0;
     background: none;
     border: none;
@@ -224,12 +221,12 @@ nav button.language {
     opacity: 0.33;
 }
 
-nav button.language:hover {
+header button.language:hover {
     animation: wiggle 2s ease-in;
     opacity: 1;
 }
 
-nav input[type=checkbox].bookmark {
+header > nav > input[type=checkbox].bookmark {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -237,72 +234,63 @@ nav input[type=checkbox].bookmark {
     transition: all 0.2s;
     opacity: 0.33;
     margin-left: var(--margin-l);
+    vertical-align: bottom;
     width: 24px;
     height: 32px;
     background: url(/images/star-empty.svg) no-repeat center;
     background-size: contain;
 }
 
-nav input[type=checkbox].bookmark:not(:disabled):hover {
+header > nav > input[type=checkbox].bookmark:not(:disabled):hover {
     opacity: 1;
     animation: wiggle 2s ease-in;
     cursor: pointer;
 }
 
-nav input[type=checkbox].bookmark:checked {
+header > nav > input[type=checkbox].bookmark:checked {
      background: url(/images/star-filled.svg) no-repeat center;
      background-size: contain;
      opacity: 1;
 }
 
-.shell.reader-mode nav h1,
-.shell.reader-mode button.language,
-.shell.reader-mode nav a:not(:first-child),
-.shell.reader-mode nav a:not(:first-child)::first-letter {
-  font-size: 16px;
+.toggle-compact {
+    flex-grow: 1;
+    align-self: stretch;
+    justify-self: stretch;
 }
 
-.shell.reader-mode nav input[type=checkbox].bookmark {
-    width: 16px;
-    height: 16px;
-    margin-left: var(--margin);
+/*  The extra shell div is needed for the timeline to work.
+    TODO: better fix than this
+*/
+#shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.shell.reader-mode nav {
-  padding: var(--padding-m);
+main {
+    align-self: center;
 }
 
-.shell__content {
-    padding: var(--padding-xl);
+img.language-icon {
+    height: 20px;
+    width: 20px;
 }
 
-footer {
-    max-width: 90ch;
-    margin: auto;
-    padding-top: var(--padding-xl);
-    text-align: center;
+/* Workaround for timeline weirdness. */
+#shell.timeline {
+    display: inherit;
+}
+main > .timeline-container {
+    height: calc(100vh - 28px); /* Account for header */
 }
 
-/* Span the entire width of the reader page. */
-.reader + footer {
-    max-width: inherit;
-}
-
-footer * {
-    font-family: PoiretOne, sans-serif;
-    font-size: 22px;
-}
-
-.shell .search-result .kvs-list {
-    transition: all 0.66s;
-}
-
-.shell.fetching {
+#shell.fetching {
     cursor: progress;
 }
 
 /* While fetching, the search results blur out and become inactive. */
-.shell.fetching .search-result .kvs-list {
+#shell.fetching .search-result .kvs-list {
     opacity: 0.5;
     filter: blur(5px);
     filter: blur(5px);
@@ -310,6 +298,8 @@ footer * {
 }
 
 img.loading-indicator {
+    opacity: 0;
+    animation: fade-in-result 1s;
     pointer-events: none; /* Allow click-through. */
     transition: all 0.66s;
     transition-delay: 0; /* Should disappear quick. */
@@ -323,37 +313,161 @@ img.loading-indicator {
 }
 
 /* While fetching, the generic loading indicator starts to appear after 1s. */
-.shell.fetching img.loading-indicator {
+#shell.fetching img.loading-indicator {
     opacity: 0.8;
     transform: scale(2);
     transition-delay: 1s;
 }
 
-.shell__content.fill-mode {
-    padding: 0;
+/* The responsive breakpoints below mostly mirror the #shell.compact styles. */
+@media only screen and (max-width: 992px) {
+    #shell .toggle-compact {
+        pointer-events: none;
+    }
 }
 
-.shell__content.fill-mode > * {
-    height: calc(100vh - 58px); /* 38xp + 20px */
-    margin-top: 20px;
+#shell.compact header, {
+    padding: 0 var(--padding-s);
+}
+@media only screen and (max-width: 992px) {
+    #shell header {
+        padding: 0 var(--padding-s);
+    }
 }
 
-.reader {
-    min-width: 80ch;
-    margin: 0 auto;
+#shell.compact header > h1,
+#shell.compact header > nav {
+    margin: var(--padding-s) 0;
+}
+@media only screen and (max-width: 992px) {
+    #shell header > h1,
+    #shell header > nav {
+        margin: var(--padding-s) 0;
+    }
 }
 
-.reader-preview input[type=file] {
+#shell.compact > header * {
+  font-size: 14px;
+}
+@media only screen and (max-width: 992px) {
+    #shell > header * {
+      font-size: 14px;
+    }
+}
+
+
+#shell.compact > header > nav > a + a {
+    margin-left: var(--margin);
+}
+@media only screen and (max-width: 992px) {
+    #shell > header > nav > a + a {
+        margin-left: var(--margin);
+    }
+}
+
+
+#shell.compact button.language {
+    margin-left: var(--margin-s);
+    height: 16px;
+    width: 16px;
+}
+@media only screen and (max-width: 992px) {
+    #shell button.language {
+        margin-left: var(--margin-s);
+        height: 16px;
+        width: 16px;
+    }
+}
+
+#shell.compact img.language-icon {
+    height: 13px;
+    width: 13px;
+}
+@media only screen and (max-width: 992px) {
+    #shell img.language-icon {
+        height: 13px;
+        width: 13px;
+    }
+}
+
+#shell.compact input[type=checkbox].bookmark {
+    width: 14px;
+    height: 14px;
+    margin-left: var(--margin-s);
+}
+@media only screen and (max-width: 992px) {
+    #shell input[type=checkbox].bookmark {
+        width: 14px;
+        height: 14px;
+        margin-left: var(--margin-s);
+    }
+}
+
+footer {
+    background-image: linear-gradient(180deg, #000 66%, #222 100%);
+    box-shadow: var(--box-shadow-elevated-reverse);
+
+    align-self: stretch;
+    text-align: center;
+    margin-top: auto;
+    padding: var(--padding-l) var(--padding-m);
+}
+
+main > article
+{
+    width: clamp(
+        20ch,
+        calc(100vw - var(--margin-l) - var(--margin-l)),
+        90ch
+    );
+    margin: var(--margin-xl) var(--margin-l);
+}
+
+article.tabs {
+    width: inherit;
+}
+
+article.reader-page {
+    width: clamp(
+            40ch,
+            calc(100vw - var(--padding-xl) * 2),
+            180ch
+        );
+}
+
+article.reader-preview-page input[type=file] {
     margin-bottom: 10px;
 }
 
-.search-page,
-.index-page,
-.main-page,
-.reader-preview
-{
-    max-width: 90ch;
-    margin: auto;
+footer * {
+    color: white;
+    font-family: PoiretOne, sans-serif;
+}
+
+footer .links {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    font-size: 16px;
+}
+
+footer .links:first-child {
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: var(--margin);
+}
+
+footer .links:last-child {
+    letter-spacing: 2px;
+    font-size: 14px;
+}
+
+footer .links > * + * {
+    margin-left: 0.5ch;
+}
+
+.shell .search-result .kvs-list {
+    transition: all 0.66s;
 }
 
 .text-content {
@@ -372,8 +486,8 @@ img.loading-indicator {
 
 .text-content.menu {
     padding: var(--padding-l);
-    background: rgba(0,0,0,0.08);
-    border: var(--border-subtle);
+    background: rgba(0,0,0,0.1);
+    border: var(--border);
     box-shadow: none;
 }
 
@@ -529,33 +643,6 @@ img.entity-icon {
     height: var(--font-size);
     width: var(--font-size);
     margin-right: var(--margin);
-}
-
-img.language-icon {
-    height: 20px;
-    width: 20px;
-}
-
-img.nav-icon {
-    transition: all 0.2s;
-    height: 48px;
-    vertical-align: bottom;
-    margin-bottom: -11px;
-    opacity: 0.66;
-}
-
-img.nav-icon:hover {
-    opacity: 1;
-}
-
-.reader-mode img.nav-icon {
-    height: 32px;
-    margin-bottom: -10px;
-}
-
-.reader-mode img.language-icon {
-    height: 16px;
-    width: 16px;
 }
 
 a.action {
@@ -750,34 +837,21 @@ details[open] summary {
     text-transform: uppercase;
 }
 
+.reader-page > * + *,
+.search-result > * + * {
+    margin-top: 20px;
+}
+
 .search-result__paging {
     animation: fade-in-result 0.33s ease-out;
     border: var(--border);
-    border-radius:
-        var(--border-radius)
-        var(--border-radius)
-        0
-        0;
-    background:rgba(0,0,0,0.2);
+    border-radius: var(--border-radius);
+    background:rgba(0,0,0,0.1);
     box-shadow:
         inset 0 -16px 16px rgba(0,0,0,0.1),
         var(--box-shadow-elevated);
-    z-index: 998;
 
     transition: all 0.2s;
-    position: sticky;
-    top: 87px;
-}
-
-.reader .search-result__paging {
-    position: static;
-    border-radius: var(--border-radius);
-    margin-bottom: var(--margin-l);
-    box-shadow: var(--box-shadow-container);
-}
-
-.reader .search-result__paging:last-child {
-    margin: var(--margin-l) 0 0 0;
 }
 
 .search-result__paging .input-row {
@@ -803,20 +877,11 @@ details[open] summary {
 }
 
 .search-result__paging button:first-child {
-    border-radius: var(--border-radius) 0 0 0;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
     border-left: none;
 }
 
-.reader .search-result__paging button:first-child {
-    border-radius: var(--border-radius) 0 0 var(--border-radius);
-}
-
 .search-result__paging button:last-child {
-    border-radius: 0 var(--border-radius) 0 0;
-    border-right: none;
-}
-
-.reader .search-result__paging button:last-child {
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
     border-right: none;
 }
@@ -826,7 +891,7 @@ details[open] summary {
     text-align: center;
 }
 
-.reader .search-result__paging select {
+.reader-page .search-result__paging select {
     width: fit-content;
 }
 
@@ -1005,7 +1070,6 @@ hr {
 }
 
 dl.kvs-list {
-    margin: 0; /* reset */
     animation: fade-in-result 0.33s ease-out;
     box-shadow: var(--box-shadow-container);
 }
@@ -1013,11 +1077,6 @@ dl.kvs-list {
 
 dl.kvs-list dt {
     transition: all 0.2s;
-
-    position: sticky;
-    top: 87px;
-    scroll-margin: 87px; /* Fix scrollIntoView for sticky elem. */
-
     font-size: 16px;
     font-weight: bold;
     color: rgba(0,0,0,0.6);
@@ -1064,14 +1123,7 @@ dl.kvs-list dd:not(:last-child) {
 }
 
 .search-page dl.kvs-list dt {
-    position: static;
     text-align: center;
-}
-
-/* The :not(:first-child) part deals with lack of paging. */
-.search-page dl.kvs-list:not(:first-child) dt:first-child {
-    border-radius: 0;
-    border-top: none;
 }
 
 .index-page dl.kvs-list {
@@ -1098,73 +1150,6 @@ dl.kvs-list dd:not(:last-child) {
 
 .index-page ul li::marker {
     color: #999;
-}
-
-/* Responsive media query changes for small screens. */
-@media only screen and (max-width: 900px) {
-  nav h1,
-  nav button.language,
-  nav a:not(:first-child),
-  nav a:not(:first-child)::first-letter {
-    font-size: 16px;
-  }
-  nav {
-    padding: var(--padding-m);
-  }
-  img.nav-icon {
-      height: 32px;
-      margin-bottom: -10px;
-  }
-  img.language-icon {
-      height: 16px;
-      width: 16px;
-  }
-  nav input[type=checkbox].bookmark {
-      width: 16px;
-      height: 16px;
-      margin-left: var(--margin);
-    }
-
-  dl.kvs-list dt {
-      top: 35px;
-      scroll-margin: 35px;
-  }
-
-  .search-result__paging {
-    top: 38px;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-    nav h1,
-    nav button.language,
-    nav a:not(:first-child),
-    nav a:not(:first-child)::first-letter {
-      font-size: 12px;
-    }
-    img.nav-icon {
-          height: 24px;
-          margin-bottom: -9.5px;
-    }
-    img.language-icon {
-        height: 12px;
-        width: 12px;
-    }
-
-  nav input[type=checkbox].bookmark {
-    width: 12px;
-    height: 12px;
-    margin-left: var(--margin);
-  }
-
-    dl.kvs-list dt {
-        top: 30px;
-        scroll-margin: 30px;
-    }
-
-    .search-result__paging {
-      top: 30px;
-    }
 }
 
 .reader-content {
