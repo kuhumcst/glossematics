@@ -181,8 +181,8 @@
                          :on-change (fn [e]
                                       (.preventDefault e)
                                       (if bookmark
-                                        (api/del-bookmark user path ident)
-                                        (api/add-bookmark user path name)))}]]]
+                                        (api/del-bookmark! user path ident)
+                                        (api/add-bookmark! user path name)))}]]]
      [:main
       [:img.loading-indicator {:alt ""                      ; signal decorative
                                :src "/images/loading.svg"}]
