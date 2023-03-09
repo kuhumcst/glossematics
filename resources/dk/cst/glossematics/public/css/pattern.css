@@ -11,7 +11,7 @@
     transition: var(--transition);
 
     border: var(--transparent-border);
-    border-bottom: var(--border);
+    border-bottom: var(--border-some);
     border-top-right-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
 }
@@ -19,7 +19,7 @@
 .tab-list--drag-over {
      background: var(--background);
      border: var(--inactive-border);
-     border-bottom: var(--border);
+     border-bottom: var(--border-some);
      box-shadow:
          inset 8px 0px 16px -8px rgba(0,0,0,0.1),
          inset -8px 0px 16px -8px rgba(0,0,0,0.1),
@@ -48,7 +48,7 @@
     box-shadow:
         inset -8px 0px 8px -8px rgba(0,0,0,0.4),
         inset 0px -8px 8px -8px rgba(0,0,0,0.2);
-    border: var(--border);
+    border: var(--border-some);
     border-right: none;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -101,7 +101,7 @@
 
 .tab:last-child {
     border-top-right-radius: var(--border-radius);
-    border-right: var(--border);
+    border-right: var(--border-some);
 }
 
 /* Keeping the outline (the default behaviour) sucks. */
@@ -132,7 +132,7 @@
 .tab-panel {
     background: var(--background);
     padding: var(--padding);
-    border: var(--border);
+    border: var(--border-some);
     border-radius:  var(--border-radius);
 }
 
@@ -191,7 +191,7 @@
     flex-grow: 1;
     padding: var(--padding-l);
     background: var(--background);
-    border: var(--border);
+    border: var(--border-some);
     border-radius: var(--border-radius);
 }
 
@@ -224,7 +224,7 @@ button.carousel__select {
     transition: var(--transition);
     background: var(--background);
     filter: var(--inactive-filter);
-    border: var(--border);
+    border: var(--border-some);
     border-radius: var(--border-radius) 0 0 var(--border-radius);
     border-right: none; /* Only before visible slides. */
     opacity: 0;
@@ -233,7 +233,7 @@ button.carousel__select {
 
 /* Removes the left border instead of the right. */
 .carousel__slide ~ button.carousel__select {
-    border: var(--border);
+    border: var(--border-some);
     border-radius: 0 var(--border-radius) var(--border-radius) 0;
     border-left: none;
     box-shadow: inset 4px 0px 8px 0px rgba(0,0,0,0.15);
@@ -263,7 +263,7 @@ button.carousel__select:focus {
     display: block;
     overflow: auto;
     background: var(--background);
-    border: var(--border);
+    border: var(--border-some);
     border-radius: var(--border-radius);
     padding: var(--padding);
     font-size: var(--font-size);
