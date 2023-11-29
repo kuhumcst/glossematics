@@ -15,6 +15,7 @@
             [dk.cst.glossematics.frontend.state :as state :refer [db]]
             [dk.cst.glossematics.frontend.api :as api]
             [dk.cst.glossematics.frontend.page.main :as main]
+            [dk.cst.glossematics.frontend.page.topics.tol-lectures :as tol-lectures]
             [dk.cst.glossematics.frontend.page.privacy :as privacy]
             [dk.cst.glossematics.frontend.page.search :as search]
             [dk.cst.glossematics.frontend.page.bibliography :as bibliography]
@@ -29,10 +30,14 @@
     {:name  ::main/page
      :title "Glossematics"
      :page  main/page}]
-   ["/privacy"
+   ["/app/privacy"
     {:name  ::privacy/page
      :title ::privacy
      :page  privacy/page}]
+   ["/app/tol-lectures"
+    {:name  ::tol-lectures/page
+     :title ::tol-lectures
+     :page  tol-lectures/page}]
    ["/app/encyclopedia/:ref"
     {:name  ::encyclopedia/page
      :title ::encyclopedia
@@ -195,7 +200,7 @@
          [:a {:href "https://www.was.digst.dk/glossematics-dk"}
           (mark-first (tr ::a11y))]
          [:span " / "]
-         [:a {:href "/privacy"}
+         [:a {:href "/app/privacy"}
           (mark-first (tr ::privacy))]
          [:span " / "]
          [:a {:href "https://github.com/kuhumcst/glossematics"}

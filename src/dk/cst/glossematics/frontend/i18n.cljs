@@ -5,6 +5,7 @@
             [dk.cst.glossematics.frontend :as-alias frontend]
             [dk.cst.glossematics.frontend.shared :as-alias fshared]
             [dk.cst.glossematics.frontend.page.main :as-alias main]
+            [dk.cst.glossematics.frontend.page.topics.tol-lectures :as-alias tol-lectures]
             [dk.cst.glossematics.frontend.page.privacy :as-alias privacy]
             [dk.cst.glossematics.frontend.page.bookmarks :as-alias bookmarks]
             [dk.cst.glossematics.frontend.page.reader :as-alias reader]
@@ -62,6 +63,8 @@
                                     :da "Fjern bogmærke for denne side"}
    ::frontend/a11y                 {:da "Tilgængelighed"
                                     :en "Accessibility"}
+   ::frontend/tol-lectures         {:da "Forelæsninger over sprogteori"
+                                    :en "Lectures on the theory of language"}
    ::frontend/privacy              {:da "Privatliv"
                                     :en "Privacy"}
    ::frontend/copyright            {:da [:<>
@@ -134,20 +137,26 @@
                                     [:p
                                      "You may always view the timeline and the bibliography pages. "
                                      "However, the search page and the facsimile reader "
-                                     "are not available unless you first log in. "]
+                                     "are not available unless you first log in. "
+                                     "Once authenticated, you may search all documents within our archive."]
                                     [:p
                                      "Glossematics allows you to log in through your own institution "
                                      "as long as it is part of a common educational federation. "
                                      "Clicking 'Log in' above will direct you to "
                                      [:abbr {:title "Where Are You From"} "WAYF"] " "
-                                     "where you may choose your institution from a list (if applicable)."]]
+                                     "where you may choose your institution from a list (if applicable). "]]
+                                   [:section
+                                    [:h2 "Topic pages"]
+                                    [:p
+                                     "We try to collect important material under different topics pages:"]
+                                    [:ul
+                                     [:li [:a {:href "/app/tol-lectures"} "Lectures on the theory of language"]]]]
                                    [:section
                                     [:h2 "Correspondences"]
                                     [:img.text-illustration.right.bg3 {:src   "/images/pd_transparent.png"
                                                                        :title "Paul Diderichsen"
                                                                        :alt   "Paul Diderichsen portait"}]
                                     [:p
-                                     "Once authenticated, you may search all documents within our archive. "
                                      "Below are exchanges that were important to the theory of Glossematics:"]]]
                               :da [:<>
                                    [:section
@@ -175,21 +184,118 @@
                                     [:p
                                      "Du kan altid se tidslinjen og bibliografi-siderne. "
                                      "Søgesiden og facsimile-læseren "
-                                     "vil dog ikke være tilgængelige før du logger ind."]
+                                     "vil dog ikke være tilgængelige før du logger ind. "
+                                     "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv."]
                                     [:p
                                      "Glossematics lader dig logge ind via din egen institution, "
                                      "så længe den er en del af en kendt uddannelsesmæssig føderation. "
                                      "Ved at klikke 'Log ind' ovenover kommer du videre til "
                                      [:abbr {:title "Where Are You From"} "WAYF"] " "
-                                     "hvor du kan vælge din institution fra en liste, når førnævnte gælder."]]
+                                     "hvor du kan vælge din institution fra en liste, når førnævnte gælder. "]]
+                                   [:section
+                                    [:h2 "Temasider"]
+                                    [:p
+                                     "Vi forsøger at samle vigtigt materiale under forskellige temasider:"]
+                                    [:ul
+                                     [:li [:a {:href "/app/tol-lectures"} "Forelæsninger over sprogteori"]]]]
                                    [:section
                                     [:h2 "Korrespondancer"]
                                     [:img.text-illustration.right.bg3 {:src   "/images/pd_transparent.png"
                                                                        :title "Paul Diderichsen"
                                                                        :alt   "Paul Diderichsen portræt"}]
                                     [:p
-                                     "Når du har logget ind, kan du fremsøge alle dokumenter i vores arkiv. "
                                      "Nedenfor er brevvekslinger der havde betydning for Glossematikken:"]]]}})
+
+(def tol-lectures-page-translations
+  {::tol-lectures/text
+   {:da [:<>
+         [:p "Dette er en oversættelse af Francis J. Whitfield af den transkriberede stenografi fra Louis Hjelmslevs forelæsninger over sprogteori som de blev givet ved Københavns Universitet gennem årene 1942 og 1943."]
+         [:ul
+          [:li
+           [:a {:href "/app/reader/Introduction_to_FJWs_translation.pdf"}
+            "\"An introduction to Francis J. Whitfield’s English translation\""]
+           " — skrevet af Una Canger, Lorenzo Cigana og Frans Gregersen 2023."]
+          [:li
+           "Whitfields oprindelige manuskript:"
+           [:ul
+            [:li [:a {:href "/app/reader/Page_1-52.xml"} "Side 1-52"]]
+            [:li [:a {:href "/app/reader/Page_53-104.xml"} "Side 53-10"]]
+            [:li [:a {:href "/app/reader/Page_105-156.xml"} "Side 105-156"]]
+            [:li [:a {:href "/app/reader/Page_157_211.xml"} "Side 157-211"]]]]
+          [:li
+           "Det håndskrevne manuskript blev indtastet (af Nicolai Pharao) for at facilitere ordsøgning i dokumentet:"
+           [:ul
+            [:li [:a {:href "/app/reader/Typed_page_1-52.xml"} "Side 1-52"]]
+            [:li [:a {:href "/app/reader/Typed_page_53-104.xml"} "Side 53-10"]]
+            [:li [:a {:href "/app/reader/Typed_page_105-156.xml"} "Side 105-156"]]
+            [:li [:a {:href "/app/reader/Typed_page_157_211.xml"} "Side 157-211"]]]]
+          ;; TODO: need to fix the bullets in the reader
+          [:li
+           [:a {:href "/app/reader/acc-1992_0005_122_SogS_0050-tei.xml"}
+            "\"[SogS] 122-0050 Forelaesninger over sprogteori Kopi 3\""]
+           " — i manuskriptet er refererer numrene (p. xx) til siderne i de danske transkriptioner lavet af Harry Wett Frederiksens \"Forelaesninger over sprogteori\"."]
+          [:li
+           "Da Whitfield har udeladt visse passager af den originale tekst da han anså dem som irrelevante, er oversættelsen ikke helt komplet: "
+           [:a {:href "/app/reader/Omitted_passages_translated.xml"} "de udeladte passager (oversat af Heidi McGhee)"]
+           " — indekserne markeret med §xxx i den indtastede udgave af manuskriptet henviser til nummereringen af de udeladte passager."]
+          [:li
+           [:a {:href "/app/reader/Kærestefolkene_Toppen_og_Bolden.xml"} "Whitfields håndskrevne udgave af H. C. Andersens \"Kærestefolk\""]
+           " — denne historie af H. C. Andersen bliver analyseret i Hjelmslevs forelæsninger. "]
+          [:li
+           "Whitfield's oprindelige manuskript indeholder også nogle referencer:"
+           [:ul
+            [:li [:a {:href "/app/reader/TCLC_25-tei.xml"} "Omkring Sprogteoriens Grundlæggelse (OSG)"]]
+            [:li [:a {:href "/app/reader/TCLC_25-tei.xml "} "Résumé of a Theory of Language"]]]]
+          [:li
+           "Du kan også finde Louis Hjelmslevs egne dokumenter:"
+           [:ul
+            [:li [:a {:href "/app/reader/acc-1992_0005_113_Lectures_0100-tei.xml"} "[Lectures] 113-0100 Forelæsning over sprogteori"]]
+            [:li [:a {:href "/app/reader/acc-1992_0005_113_Lectures_0080-tei.xml"} "[Lectures] 113-0080 Forelæsning over sprogteori"]]
+            [:li [:a {:href "/app/reader/acc-1992_0005_144_Sprogteori_0030-tei.xml"} "[Sprogteori] 144-0030 Forelæsning over sprogteori 1943 II"]]]]]]
+    :en [:<>
+         [:p "This is a translation made by Francis J. Whitfield of the transcribed shorthand rendering of Louis Hjelmslev’s Lectures on the Theory of Language given at the University of Copenhagen during the years 1942 and 1943."]
+         [:ul
+          [:li
+           [:a {:href "/app/reader/Introduction_to_FJWs_translation.pdf"}
+            "\"An introduction to Francis J. Whitfield’s English translation\""]
+           " — written by Una Canger, Lorenzo Cigana and Frans Gregersen 2023."]
+          [:li
+           "Whitfield’s original manuscript:"
+           [:ul
+            [:li [:a {:href "/app/reader/Page_1-52.xml"} "Pages 1-52"]]
+            [:li [:a {:href "/app/reader/Page_53-104.xml"} "Pages 53-10"]]
+            [:li [:a {:href "/app/reader/Page_105-156.xml"} "Pages 105-156"]]
+            [:li [:a {:href "/app/reader/Page_157_211.xml"} "Pages 157-211"]]]]
+          [:li
+           "The handwritten manuscript was typed (by Nicolai Pharao) to facilitate word search in the document:"
+           [:ul
+            [:li [:a {:href "/app/reader/Typed_page_1-52.xml"} "Pages 1-52"]]
+            [:li [:a {:href "/app/reader/Typed_page_53-104.xml"} "Pages 53-10"]]
+            [:li [:a {:href "/app/reader/Typed_page_105-156.xml"} "Pages 105-156"]]
+            [:li [:a {:href "/app/reader/Typed_page_157_211.xml"} "Pages 157-211"]]]]
+          ;; TODO: need to fix the bullets in the reader
+          [:li
+           [:a {:href "/app/reader/acc-1992_0005_122_SogS_0050-tei.xml"}
+            "\"\t[SogS] 122-0050 Forelaesninger over sprogteori Kopi 3\""]
+           " — \tin the manuscript the numbering (p. xx) refers to the pages in the Danish transcripts made by Harry Wett Frederiksens \"Forelaesninger over sprogteori\"."]
+          [:li
+           "Since Whitfield omitted some passages of the original text as they were deemed irrelevant for his purpose, the translation is not complete: "
+           [:a {:href "/app/reader/Omitted_passages_translated.xml"} "the omitted passages (translated by Heidi McGhee)"]
+           " — the indexes §xxx in the typed version of the manuscript refer to the numbering of the omitted passages."]
+          [:li
+           [:a {:href "/app/reader/Kærestefolkene_Toppen_og_Bolden.xml"} "Whitfield’s handwritten version of Hans Christian Andersen's \"Kærestefolk\""]
+           " — this story by Hans Christian Andersen is analysed in the Hjelmslev lectures. "]
+          [:li
+           "Whitfield’s original manuscript also contains some references:"
+           [:ul
+            [:li [:a {:href "/app/reader/TCLC_25-tei.xml"} "Omkring Sprogteoriens Grundlæggelse (OSG)"]]
+            [:li [:a {:href "/app/reader/TCLC_25-tei.xml "} "Résumé of a Theory of Language"]]]]
+          [:li
+           "Louis Hjelmslev’s own documents are also available:"
+           [:ul
+            [:li [:a {:href "/app/reader/acc-1992_0005_113_Lectures_0100-tei.xml"} "[Lectures] 113-0100 Forelæsning over sprogteori"]]
+            [:li [:a {:href "/app/reader/acc-1992_0005_113_Lectures_0080-tei.xml"} "[Lectures] 113-0080 Forelæsning over sprogteori"]]
+            [:li [:a {:href "/app/reader/acc-1992_0005_144_Sprogteori_0030-tei.xml"} "[Sprogteori] 144-0030 Forelæsning over sprogteori 1943 II"]]]]]]}})
 
 (def privacy-page-translations
   {::privacy/text {:da [:<>
@@ -444,6 +550,7 @@
 (def dicts
   (reduce into-dicts {} (merge frontend-translations
                                main-page-translations
+                               tol-lectures-page-translations
                                privacy-page-translations
                                reader-page-translations
                                search-page-translations

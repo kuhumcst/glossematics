@@ -85,7 +85,11 @@
     [:article.main-page
      [user-section tr]
      [:div.text-content
-      [tr ::introduction]
-      [:ul
-       (for [[ref1 ref2] important-correspondences]
-         [:li {:key [ref1 ref2]} (correspondence ref1 ref2 id->name)])]]]))
+      (let [intro (tr ::introduction)]
+        (conj (subvec intro 0 (dec (count intro)))
+              ;; The correspondence list is inserted into the translated text.
+              (conj (last intro)
+                    [:ul
+                     (for [[ref1 ref2] important-correspondences]
+                       [:li {:key [ref1 ref2]}
+                        (correspondence ref1 ref2 id->name)])])))]]))
