@@ -198,6 +198,7 @@
 .carousel__slide-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding-bottom: var(--margin);
 }
 

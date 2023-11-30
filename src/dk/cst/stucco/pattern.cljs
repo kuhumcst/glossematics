@@ -170,10 +170,11 @@
     (let [{:keys [i kvs]} @state
           styles       (map (comp :style meta) kvs)
           [label content] (nth kvs i)
+          slide-count  (count kvs)
           tab-panel-id (random-uuid)
           label-id     (random-uuid)
           prev?        (> i 0)
-          next?        (< i (dec (count kvs)))]
+          next?        (< i (dec slide-count))]
       ;; This implementation most closely resembles the Tabbed Carousel:
       ;; https://www.w3.org/TR/wai-aria-practices-1.1/#tabbed-carousel-elements
       ;; The outer container follows the basic carousel pattern, while most of
@@ -192,11 +193,14 @@
                               :style           (nth styles i)}
         [:div.carousel__slide-header
          [:div.carousel__slide-label {:id label-id} label]
-         (when (> (count kvs) 1)
+         (cond
+           ;; For multi-page documents, small black dots are used to indicate
+           ;; and navigate between the different pages.
+           (>= 10 slide-count 1)
            (into [:div.slide-picker {:role        "tablist"
                                      :on-key-down kbd/roving-tabindex-handler
                                      :aria-label  "Choose a slide to display"}] ;TODO: localisation
-                 (for [n (range (count kvs))
+                 (for [n (range slide-count)
                        :let [selected? (= n i)
                              select    #(swap! state assoc :i n)]]
                    [:span.slide-picker__dot {:role          "tab"
@@ -205,7 +209,21 @@
                                              :tab-index     (if selected?
                                                               "0"
                                                               "-1")
-                                             :on-click      select}])))]
+                                             :on-click      select}]))
+
+           ;; For larger documents, the dots convert to a basic dropdown widget
+           (> slide-count 10)
+           [:div
+            "p. "
+            [:select {:on-change (fn [e]
+                                   (when-let [v (.-value (.-target e))]
+                                     (swap! state assoc :i (parse-long v))))}
+             (for [n (range slide-count)
+                   :let [selected? (= n i)]]
+               [:option {:key      n
+                         :value    n
+                         :selected selected?}
+                (inc n)])]])]
         [:div.carousel__slide-separator]
         content]
        [:button.carousel__select {:aria-label (str "View slide number " (inc i)) ;TODO: localisation
