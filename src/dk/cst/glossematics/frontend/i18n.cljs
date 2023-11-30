@@ -212,7 +212,7 @@
          [:p "Dette er en oversættelse af Francis J. Whitfield af den transkriberede stenografi fra Louis Hjelmslevs forelæsninger over sprogteori som de blev givet ved Københavns Universitet gennem årene 1942 og 1943."]
          [:ul
           [:li
-           [:a {:href "/app/reader/Introduction_to_FJWs_translation.pdf"}
+           [:a {:href "/app/reader/Introduction_to_FJWs_translation.xml"}
             "\"An introduction to Francis J. Whitfield’s English translation\""]
            " — skrevet af Una Canger, Lorenzo Cigana og Frans Gregersen 2023."]
           [:li
@@ -256,7 +256,7 @@
          [:p "This is a translation made by Francis J. Whitfield of the transcribed shorthand rendering of Louis Hjelmslev’s Lectures on the Theory of Language given at the University of Copenhagen during the years 1942 and 1943."]
          [:ul
           [:li
-           [:a {:href "/app/reader/Introduction_to_FJWs_translation.pdf"}
+           [:a {:href "/app/reader/Introduction_to_FJWs_translation.xml"}
             "\"An introduction to Francis J. Whitfield’s English translation\""]
            " — written by Una Canger, Lorenzo Cigana and Frans Gregersen 2023."]
           [:li

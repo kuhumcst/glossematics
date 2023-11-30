@@ -152,7 +152,7 @@ header {
     display: flex;
     align-items: flex-end;
 
-    padding: 0 var(--padding);
+    padding: var(--padding-l) var(--padding) var(--padding-s) var(--padding);
 }
 
 /* Reset for special header links. */
@@ -326,7 +326,7 @@ img.loading-indicator {
     }
 }
 
-#shell.compact header, {
+#shell.compact header {
     padding: 0 var(--padding-s);
 }
 @media only screen and (max-width: 992px) {
