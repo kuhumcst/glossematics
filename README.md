@@ -34,7 +34,7 @@ In order for SAML encryption to work, a Java keystore needs to be created. This 
 keytool -keystore /etc/glossematics/keystore.jks -keyalg RSA -genkey -alias glossematics`.
 ```
 
-I also install the certbot tool from Let's Encrypt and run it precisely _once_ to get an initial set of SSL certificates for HTTPS (located in the default location). These are picked up by the docker-compose setup as part of the [nginx-reverse-proxy](https://github.com/kuhumcst/glossematics/blob/master/docker/nginx-reverse-proxy/conf.d/reverse-proxy.conf) service. All future renewal is handled automatically by this Docker container running the nginx instance and certbot at a regular interval.
+I also install the certbot tool from Let's Encrypt and run it precisely _once_ to get an initial set of SSL certificates for HTTPS (located in the default location). These are picked up by the docker compose setup as part of the [nginx-reverse-proxy](https://github.com/kuhumcst/glossematics/blob/master/docker/nginx-reverse-proxy/conf.d/reverse-proxy.conf) service. All future renewal is handled automatically by this Docker container running the nginx instance and certbot at a regular interval.
 
 In addition to the keystore and the SSL certificates, the IdP's certificate needs to be present on disk too. In our case, we need the [WAYF certificate](https://www.wayf.dk/da/metadata) for the production server (and a self-supplied one for development). This public certificate doesn't need to be put inside a keystore. For local development, I run a "fake" IdP on localhost:7000 that I set up based on [the guide found here](https://github.com/quephird/saml-test).
 
@@ -53,18 +53,18 @@ GLOSSEMATICS_DB_DIR=${HOME}/.glossematics/db
 
 These volumes allow the container to access this content in the local filesystem. Assuming the files all exist in those locations, these lines should ideally be put inside a `.env` file located in the `docker/` directory to allow them to be picked up by the `docker-compose.yml` file.
 
-The `docker-compose` command is used to build and start the project from inside the `docker/` directory:
+The `docker compose` command is used to build and start the project from inside the `docker/` directory:
 
 ```shell
 # build, start, write output to shell
-docker-compose up --build
+docker compose up --build
 
 # the same, but run in detached mode
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 #### The systemd unit file
-While `docker-compose` is the actual _process_ used to start the service, automatic startup on boot is facilitated by [systemd](https://en.wikipedia.org/wiki/Systemd).
+While `docker compose` is the actual _process_ used to start the service, automatic startup on boot is facilitated by [systemd](https://en.wikipedia.org/wiki/Systemd).
 
 The `docker/` directory includes the systemd unit file `glossematics.service` used to register the service. This file should be copied to `/etc/systemd/system/glossematics.service` and the relevant services enabled:
 

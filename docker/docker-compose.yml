@@ -2,25 +2,15 @@ version: '3'
 
 services:
 
-  nginx-reverse-proxy:
+  caddy:
     build:
-      context: nginx-reverse-proxy
-      dockerfile: Dockerfile
+      # need to include files from parent dir (see Dockerfile)
+      context: ../
+      dockerfile: docker/caddy/Dockerfile
     restart: unless-stopped
-    depends_on:
-      - glossematics
-    environment:
-      - CERTBOT_EMAIL=simongray@hum.ku.dk
-      - STAGING=0
-      - DHPARAM_SIZE
-      - RSA_KEY_SIZE
-      - RENEWAL_INTERVAL
     ports:
-      - 80:80
-      - 443:443
-      - 8080
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
+      - "443:443"
+      - "80:80"
 
   glossematics:
     build:
@@ -35,4 +25,4 @@ services:
       - ${GLOSSEMATICS_FILES_DIR}:/etc/glossematics/files
       - ${GLOSSEMATICS_DB_DIR}:/etc/glossematics/db
     ports:
-      - 8080:8080
+      - "8080:8080"

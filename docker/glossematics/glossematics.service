@@ -10,8 +10,8 @@ After=docker.service
 Type=oneshot
 RemainAfterExit=true
 WorkingDirectory=/etc/glossematics/glossematics/docker
-ExecStart=/bin/docker-compose up -d --build --remove-orphans
-ExecStop=/bin/docker-compose down
+ExecStart=/bin/docker compose up -d --build --remove-orphans
+ExecStop=/bin/docker compose down
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+{
+    order rate_limit before basicauth
+}
+
+www.glossematics.dk {
+    redir https://glossematics.dk{uri}
+}
+
+glossematics.dk, localhost {
+    rate_limit {remote.ip} 240r/m
+    encode gzip
+    reverse_proxy glossematics:8080
+}
