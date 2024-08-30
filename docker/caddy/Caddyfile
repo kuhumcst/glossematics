@@ -9,5 +9,13 @@ www.glossematics.dk {
 glossematics.dk, localhost {
     rate_limit {remote.ip} 240r/m
     encode gzip
+
     reverse_proxy glossematics:8080
+
+    root * /var/www/caddy
+
+    handle_errors 502 {
+        rewrite * /502.html
+        file_server
+    }
 }

@@ -25,6 +25,11 @@ COPY --from=build /etc/caddy/caddy /usr/bin/caddy
 # Add the server configuration containing
 COPY ./docker/caddy/Caddyfile /etc/caddy/Caddyfile
 
+# Add a custom 'service down' message to display during updates
+RUN mkdir /var/www
+RUN mkdir /var/www/caddy
+COPY ./docker/caddy/502.html /var/www/caddy/502.html
+
 # Prepare the start script
 COPY ./docker/caddy/start.sh /etc/caddy/start.sh
 RUN chmod +x /etc/caddy/start.sh
