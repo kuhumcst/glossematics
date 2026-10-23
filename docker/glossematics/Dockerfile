@@ -1,4 +1,4 @@
-FROM ubuntu:jammy-20221101
+FROM ubuntu:jammy
 
 RUN apt-get clean && \
     apt-get update && \
@@ -28,11 +28,11 @@ WORKDIR /etc/glossematics
 
 # Install JS dependencies
 RUN npm init -y
-RUN npm install -g shadow-cljs
+RUN npm install -g shadow-cljs@2.20.15
 RUN npm install \
-    shadow-cljs \
-    react \
-    react-dom \
+    shadow-cljs@2.20.15 \
+    react@18.3.1 \
+    react-dom@18.3.1 \
     create-react-class
 
 # Fetch backend dependencies
